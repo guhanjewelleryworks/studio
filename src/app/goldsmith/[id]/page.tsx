@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'; // Import React
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -42,7 +43,17 @@ const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | nul
   return mockProfiles[id] || mockProfiles['default']; // Return specific profile or default
 }
 
-export default function GoldsmithProfilePage({ params }: { params: { id: string } }) {
+// Define the type for the params object
+interface PageParams {
+  id: string;
+}
+
+// Make the component accept a promise for params
+export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
+   // Use React.use to unwrap the promise
+  const params = React.use(paramsPromise);
+  const { id } = params; // Now you can safely access id
+
   const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +63,8 @@ export default function GoldsmithProfilePage({ params }: { params: { id: string 
       setIsLoading(true);
       setError(null);
       try {
-        const fetchedProfile = await fetchGoldsmithProfile(params.id);
+        // Use the unwrapped id here
+        const fetchedProfile = await fetchGoldsmithProfile(id);
         if (fetchedProfile) {
           setProfile(fetchedProfile);
         } else {
@@ -67,7 +79,7 @@ export default function GoldsmithProfilePage({ params }: { params: { id: string 
     };
 
     loadProfile();
-  }, [params.id]);
+  }, [id]); // Depend on the unwrapped id
 
 
   if (isLoading) {
@@ -233,4 +245,3 @@ export default function GoldsmithProfilePage({ params }: { params: { id: string 
     </div>
   );
 }
-
