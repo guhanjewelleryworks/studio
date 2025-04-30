@@ -49,10 +49,8 @@ interface PageParams {
 }
 
 // Make the component accept a promise for params
-export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
-   // Use React.use to unwrap the promise
-  const params = React.use(paramsPromise);
-  const { id } = params; // Now you can safely access id
+export default function GoldsmithProfilePage({ params }: { params: PageParams }) {
+  const { id } = params; // Direct access is okay if it's not a Promise, adjust based on how props are received
 
   const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,7 +61,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
       setIsLoading(true);
       setError(null);
       try {
-        // Use the unwrapped id here
+        // Use the already available id here
         const fetchedProfile = await fetchGoldsmithProfile(id);
         if (fetchedProfile) {
           setProfile(fetchedProfile);
@@ -78,8 +76,14 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
       }
     };
 
-    loadProfile();
-  }, [id]); // Depend on the unwrapped id
+    if (id) { // Ensure id is available before loading
+        loadProfile();
+    } else {
+        // Handle case where id might not be immediately available (though less likely with standard routing)
+        setError("Goldsmith ID not found in URL.");
+        setIsLoading(false);
+    }
+  }, [id]); // Depend on id
 
 
   if (isLoading) {
