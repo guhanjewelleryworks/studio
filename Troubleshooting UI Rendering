@@ -1,0 +1,144 @@
+OK. Let's focus on why the UI isn't rendering as expected. Since the application is running without errors, the problem likely lies in how the styles are being applied or loaded. Based on the prior discussion, please try these:
+
+**1. Verify Tailwind Directives in `globals.css` (Again!)**
+
+   *   I know we've checked this before, but it's the most common cause. Open `src/app/globals.css` and *carefully* confirm that it *exactly* matches this:
+
+       ```css
+       @tailwind base;
+       @tailwind components;
+       @tailwind utilities;
+
+       body {
+         font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+       }
+
+       @layer base {
+         :root {
+           --background: 56 100% 91%; /* Cream */
+           --foreground: 26 40% 25%; /* Dark Brown */
+           --card: 56 100% 91%; /* Cream */
+           --card-foreground: 26 40% 25%; /* Dark Brown */
+           --popover: 56 100% 91%; /* Cream */
+           --popover-foreground: 26 40% 25%; /* Dark Brown */
+           --primary: 51 100% 50%; /* Gold */
+           --primary-foreground: 26 65% 41%; /* Deep Brown */
+           --secondary: 54 80% 85%; /* Light Gold/Cream */
+           --secondary-foreground: 26 40% 25%; /* Dark Brown */
+           --muted: 54 80% 90%; /* Lighter Gold/Cream */
+           --muted-foreground: 26 30% 45%; /* Muted Brown */
+           --accent: 26 65% 41%; /* Deep Brown */
+           --accent-foreground: 56 100% 91%; /* Cream */
+           --destructive: 0 84.2% 60.2%;
+           --destructive-foreground: 0 0% 98%;
+           --border: 51 50% 80%; /* Light Gold/Brown */
+           --input: 51 50% 85%; /* Lighter Gold/Brown */
+           --ring: 51 100% 50%; /* Gold */
+           --chart-1: 12 76% 61%;
+           --chart-2: 173 58% 39%;
+           --chart-3: 197 37% 24%;
+           --chart-4: 43 74% 66%;
+           --chart-5: 27 87% 67%;
+           --radius: 0.5rem;
+           --sidebar-background: 0 0% 98%;
+           --sidebar-foreground: 240 5.3% 26.1%;
+           --sidebar-primary: 240 5.9% 10%;
+           --sidebar-primary-foreground: 0 0% 98%;
+           --sidebar-accent: 240 4.8% 95.9%;
+           --sidebar-accent-foreground: 240 5.9% 10%;
+           --sidebar-border: 220 13% 91%;
+           --sidebar-ring: 217.2 91.2% 59.8%;
+         }
+
+         .dark {
+           /* Define dark theme based on the light theme for consistency */
+           --background: 26 40% 15%; /* Dark Brown */
+           --foreground: 56 100% 91%; /* Cream */
+           --card: 26 40% 18%; /* Slightly Lighter Dark Brown */
+           --card-foreground: 56 100% 91%; /* Cream */
+           --popover: 26 40% 15%; /* Dark Brown */
+           --popover-foreground: 56 100% 91%; /* Cream */
+           --primary: 51 100% 50%; /* Gold */
+           --primary-foreground: 26 65% 41%; /* Deep Brown */
+           --secondary: 26 50% 30%; /* Muted Brown */
+           --secondary-foreground: 56 100% 91%; /* Cream */
+           --muted: 26 50% 25%; /* Darker Muted Brown */
+           --muted-foreground: 56 50% 75%; /* Lighter Cream/Gray */
+           --accent: 51 100% 60%; /* Brighter Gold */
+           --accent-foreground: 26 65% 41%; /* Deep Brown */
+           --destructive: 0 62.8% 30.6%;
+           --destructive-foreground: 0 0% 98%;
+           --border: 26 40% 30%; /* Muted Brown Border */
+           --input: 26 40% 35%; /* Lighter Muted Brown Input */
+           --ring: 51 100% 60%; /* Brighter Gold */
+           --chart-1: 220 70% 50%;
+           --chart-2: 160 60% 45%;
+           --chart-3: 30 80% 55%;
+           --chart-4: 280 65% 60%;
+           --chart-5: 340 75% 55%;
+           --sidebar-background: 240 5.9% 10%;
+           --sidebar-foreground: 240 4.8% 95.9%;
+           --sidebar-primary: 224.3 76.3% 48%;
+           --sidebar-primary-foreground: 0 0% 100%;
+           --sidebar-accent: 240 3.7% 15.9%;
+           --sidebar-accent-foreground: 240 4.8% 95.9%;
+           --sidebar-border: 240 3.7% 15.9%;
+           --sidebar-ring: 217.2 91.2% 59.8%;
+         }
+       }
+
+       @layer base {
+         * {
+           @apply border-border;
+         }
+         body {
+           @apply bg-background text-foreground;
+         }
+       }
+       ```
+
+       *   *If there are any differences, correct them.* Even a small typo can break everything.
+
+**2. Rebuild and Restart (Again!)**
+
+   *   After *any* changes to `tailwind.config.ts` or `globals.css`, you *must* rebuild and restart your application:
+
+       ```bash
+       npm run build
+       pm2 restart goldsmith-connect
+       ```
+
+**3. Verify Font Loading**
+
+   *   The `layout.tsx` file imports Geist fonts. Make sure the `geist` package is correctly installed. (It should be, but double-check):
+
+       ```bash
+       npm list geist
+       ```
+
+       *   If `geist` isn't listed, install it:
+
+           ```bash
+           npm install geist
+           ```
+
+**4. Clear Next.js Cache (Sometimes Necessary)**
+
+   *   In rare cases, Next.js's cache can cause problems. Try clearing the cache:
+
+       ```bash
+       npm run build
+       pm2 restart goldsmith-connect
+       ```
+
+**5. Hard Refresh in Browser**
+
+   *   After making these changes on the server, do a *hard refresh* in your browser (Ctrl+Shift+R or Cmd+Shift+R) to bypass the browser cache.
+
+**If it's still not working, we'll need more information:**
+
+*   **What do you mean "code you've given me"?** Have you modified component files or just `tailwind.config.ts` and `globals.css` files
+*   **Take Another Screenshot:**  Please provide a full-screen screenshot of your application, including the browser's developer console (open the console with F12). This will help me identify any CSS loading errors or other issues.
+*   **Check the DOM:** In your browser's developer tools, inspect the HTML elements of your page. See if the Tailwind CSS classes are present on the elements. If they are present but the styles aren't being applied, it strongly suggests a problem with CSS loading or specificity.
+*   **CSS Specificity:** If the classes are there, check if there is any other conflicting CSS that may be overriding them
+    
