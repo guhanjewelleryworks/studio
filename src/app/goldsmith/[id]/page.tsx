@@ -2,7 +2,6 @@
 'use client'
 
 import * as React from 'react'; // Import React
-// Use React.use hook to unwrap the params promise
 // Removed direct import of useParams, as params are passed as props
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Label } from "@/components/ui/label"; // Added import for Label
+import { Label } from "@/components/ui/label";
 
 interface GoldsmithProfile {
   id: string;
@@ -54,8 +53,10 @@ const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | nul
 }
 
 // Make the component accept a promise for params
-export default function GoldsmithProfilePage({ params }: { params: PageParams }) {
-  const { id } = params; // Accessing id directly (adjust based on framework specifics if needed)
+export default function GoldsmithProfilePage({ params }: { params: Promise<PageParams> }) {
+  // Unwrap the params promise using React.use()
+  const resolvedParams = React.use(params);
+  const { id } = resolvedParams; // Access id from the resolved params
 
   const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,7 +67,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
       setIsLoading(true);
       setError(null);
       try {
-        // Use the id obtained from props
+        // Use the id obtained from resolvedParams
         const fetchedProfile = await fetchGoldsmithProfile(id);
         if (fetchedProfile) {
           setProfile(fetchedProfile);
