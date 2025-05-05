@@ -2,7 +2,8 @@
 'use client'
 
 import * as React from 'react'; // Import React
-import { useParams } from 'next/navigation'; // Import useParams
+// Use React.use hook to unwrap the params promise
+// Removed direct import of useParams, as params are passed as props
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label"; // Added import for Label
 
 interface GoldsmithProfile {
   id: string;
@@ -27,6 +29,12 @@ interface GoldsmithProfile {
   profileImageUrl: string;
   portfolioImages: string[];
 }
+
+// Define the expected shape of the params prop
+interface PageParams {
+  id: string;
+}
+
 
 // Mock Data - Replace with API call based on params.id
 const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | null> => {
@@ -45,11 +53,9 @@ const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | nul
   return mockProfiles[id] || mockProfiles['default']; // Return specific profile or default
 }
 
-// Removed the params prop
-export default function GoldsmithProfilePage() {
-  // Use useParams hook to get route parameters
-  const params = useParams();
-  const id = params.id as string; // Accessing id from the hook
+// Make the component accept a promise for params
+export default function GoldsmithProfilePage({ params }: { params: PageParams }) {
+  const { id } = params; // Accessing id directly (adjust based on framework specifics if needed)
 
   const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,7 +66,7 @@ export default function GoldsmithProfilePage() {
       setIsLoading(true);
       setError(null);
       try {
-        // Use the id obtained from useParams
+        // Use the id obtained from props
         const fetchedProfile = await fetchGoldsmithProfile(id);
         if (fetchedProfile) {
           setProfile(fetchedProfile);
@@ -78,7 +84,6 @@ export default function GoldsmithProfilePage() {
     if (id) { // Ensure id is available before loading
         loadProfile();
     } else {
-        // This case might be less likely now with useParams but good for robustness
         setError("Goldsmith ID not found in URL.");
         setIsLoading(false);
     }
@@ -185,7 +190,7 @@ export default function GoldsmithProfilePage() {
                   <Send className="mr-2 h-4 w-4"/> Request Custom Order (via Admin)
                </Button>
                 {/* Changed "Send a Message" to "Request Introduction" */}
-                <Button variant="outline" className="w-full border-accent text-accent hover:bg-accent/10">
+                <Button variant="outline" className="w-full border-accent text-accent hover:bg-accent/10" onClick={handleRequestIntroduction}>
                   <MessageSquare className="mr-2 h-4 w-4"/> Request Introduction (via Admin)
                </Button>
             </CardContent>
@@ -222,6 +227,7 @@ export default function GoldsmithProfilePage() {
                       width={300}
                       height={200}
                       className="rounded-lg object-cover w-full aspect-[3/2] hover:opacity-90 transition-opacity cursor-pointer shadow-sm"
+                       data-ai-hint="goldsmith portfolio jewelry" // AI Hint for image generation
                        // TODO: Add onClick for modal view
                     />
                   ))}
@@ -265,3 +271,4 @@ export default function GoldsmithProfilePage() {
     </div>
   );
 }
+
