@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -28,17 +29,24 @@ export function Header() {
               How It Works
             </Link>
              <Link
+              href="/pricing"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Pricing
+            </Link>
+             <Link
               href="/goldsmith-portal"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
               Goldsmith Portal
             </Link>
-            <Link
+            {/* Hiding Admin link from main nav for typical users */}
+            {/* <Link
               href="/admin"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
               Admin
-            </Link>
+            </Link> */}
           </nav>
         </div>
         {/* Mobile Menu */}
@@ -64,8 +72,9 @@ export function Header() {
             <div className="flex flex-col space-y-3 px-4">
               <Link href="/discover" className="text-foreground">Discover</Link>
               <Link href="/#how-it-works" className="text-foreground">How It Works</Link>
+              <Link href="/pricing" className="text-foreground">Pricing</Link>
               <Link href="/goldsmith-portal" className="text-foreground">Goldsmith Portal</Link>
-               <Link href="/admin" className="text-foreground">Admin Portal</Link>
+               <Link href="/admin" className="text-foreground">Admin Portal</Link> {/* Keep Admin in mobile for convenience */}
             </div>
            </SheetContent>
         </Sheet>

@@ -1,3 +1,4 @@
+
 /**
  * Represents a geographical location with latitude and longitude coordinates.
  */
@@ -26,6 +27,11 @@ export async function getNearbyLocations(
   console.log('Fetching nearby locations for query:', query, 'near:', currentLocation);
   // TODO: Implement this by calling a real Geolocation API (e.g., Google Maps Places API)
   // This mock implementation returns fixed locations regardless of input for demonstration.
+
+  // IMPORTANT: If this service is used to fetch goldsmith data directly, ensure that
+  // sensitive information like direct contact details are *not* returned here.
+  // Fetch only the necessary data for discovery (name, general location, specialties, profile image URL, ID).
+  // Full profile details (including brokered contact methods) should be fetched on the profile page.
 
   // If no current location is provided, you might return a default set or an empty array.
   if (!currentLocation) {

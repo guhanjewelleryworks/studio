@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Gem } from 'lucide-react';
 
@@ -22,15 +23,21 @@ export function Footer() {
             . © {currentYear} Goldsmith Connect. All rights reserved.
           </p>
         </div>
-        <nav className="flex gap-4 sm:gap-6 text-sm text-muted-foreground">
+        <nav className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
           <Link href="/terms" className="transition-colors hover:text-foreground">
             Terms
           </Link>
           <Link href="/privacy" className="transition-colors hover:text-foreground">
             Privacy
           </Link>
+           <Link href="/pricing" className="transition-colors hover:text-foreground">
+            Pricing
+          </Link>
           <Link href="/contact" className="transition-colors hover:text-foreground">
             Contact
+          </Link>
+           <Link href="/admin" className="transition-colors hover:text-foreground">
+             Admin
           </Link>
         </nav>
       </div>

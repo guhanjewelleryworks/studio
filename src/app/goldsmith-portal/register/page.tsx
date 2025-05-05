@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -8,6 +9,25 @@ import Link from 'next/link'
 
 export default function GoldsmithRegisterPage() {
   // TODO: Implement form handling with react-hook-form and server action
+  // Server Action (e.g., handleRegistration in 'actions/goldsmith-actions.ts') should:
+  // 1. Validate the form data using Zod.
+  // 2. Check if the email is already registered.
+  // 3. Hash the password securely (e.g., using bcrypt).
+  // 4. Save the goldsmith details to a database (e.g., Firebase Firestore).
+  //    - Example Firestore structure: /goldsmiths/{userId}
+  //    - Store: workshopName, contactPerson, email, phone, address, specialties, portfolioLink (hashedPassword is often stored separately in an auth system like Firebase Auth).
+  // 5. Handle potential errors (e.g., email already exists, database error).
+  // 6. Redirect the user upon successful registration or show a success message.
+  // 7. Consider implementing email verification.
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // Placeholder for form submission logic
+    alert('Registration submission not yet implemented. Data needs to be saved to a database.');
+    // Replace alert with actual server action call using react-hook-form
+  };
+
+
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-12 bg-gradient-to-b from-background to-secondary">
       <Card className="w-full max-w-2xl shadow-xl border-primary/30">
@@ -17,8 +37,10 @@ export default function GoldsmithRegisterPage() {
           <CardDescription>Join our network of skilled artisans. Fill in the details below.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-6">
+          {/* Replace with <Form {...form}> from react-hook-form */}
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               {/* Wrap inputs with <FormField> */}
                <div className="space-y-2">
                 <Label htmlFor="workshopName">Workshop Name</Label>
                 <Input id="workshopName" placeholder="e.g., Golden Touch Crafters" required />
@@ -67,6 +89,7 @@ export default function GoldsmithRegisterPage() {
 
 
             {/* Add form submission status/errors here */}
+            {/* e.g., form.formState.errors */}
 
             <Button type="submit" className="w-full shadow-md hover:shadow-lg transition-shadow">
               Submit Registration

@@ -1,7 +1,8 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Search, ShoppingBag, Sparkles, UserCheck, CheckCircle } from 'lucide-react';
+import { MapPin, Search, Sparkles, UserCheck, CheckCircle, Lock } from 'lucide-react'; // Changed ShoppingBag to Lock
 import Image from 'next/image';
 
 // Inline SVG for a goldsmith icon
@@ -37,7 +38,7 @@ export default function Home() {
                   Discover Local Goldsmiths, Craft Your Dreams
                 </h1>
                 <p className="max-w-[600px] text-foreground md:text-xl">
-                  Goldsmith Connect links you with skilled artisans in your area. Find the perfect goldsmith to bring your custom jewelry vision to life.
+                  Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -61,6 +62,7 @@ export default function Home() {
               width={600}
               height={400}
               className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square shadow-lg"
+              data-ai-hint="jewelry crafting hands"
             />
           </div>
         </div>
@@ -72,32 +74,32 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm text-primary-foreground">How It Works</div>
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-primary-foreground">Simple Steps to Your Perfect Piece</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-primary-foreground">Your Secure Path to Custom Jewelry</h2>
               <p className="max-w-[900px] text-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Connecting with talented goldsmiths and ordering custom jewelry has never been easier.
+                We connect you with talented goldsmiths through a verified and mediated process.
               </p>
             </div>
           </div>
           <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3 lg:max-w-none pt-12">
             <div className="grid gap-1 text-center">
               <Search className="h-10 w-10 mx-auto text-accent" />
-              <h3 className="text-xl font-bold text-primary-foreground">1. Discover</h3>
+              <h3 className="text-xl font-bold text-primary-foreground">1. Discover & Inquire</h3>
               <p className="text-sm text-foreground">
-                Browse nearby goldsmiths using our map or list view. Filter by specialty and location.
+                Browse verified goldsmith profiles. Submit an introduction or custom order request via our platform.
               </p>
             </div>
             <div className="grid gap-1 text-center">
-               <ShoppingBag className="h-10 w-10 mx-auto text-accent" />
-              <h3 className="text-xl font-bold text-primary-foreground">2. Connect & Order</h3>
+               <Lock className="h-10 w-10 mx-auto text-accent" /> {/* Changed Icon */}
+              <h3 className="text-xl font-bold text-primary-foreground">2. Admin Mediation</h3>
               <p className="text-sm text-foreground">
-                View profiles, message goldsmiths directly, and place your custom order with specific details.
+                Our team reviews your request. If approved (and based on your plan), we facilitate a secure introduction or pass order details to the goldsmith.
               </p>
             </div>
             <div className="grid gap-1 text-center">
                <Sparkles className="h-10 w-10 mx-auto text-accent" />
               <h3 className="text-xl font-bold text-primary-foreground">3. Create & Receive</h3>
               <p className="text-sm text-foreground">
-                Your chosen artisan crafts your unique piece. Receive updates and get your dream jewelry delivered or pick it up.
+                Communicate with the artisan via the platform to finalize details. Your chosen artisan crafts your piece, and you receive your dream jewelry.
               </p>
             </div>
           </div>
@@ -123,6 +125,7 @@ export default function Home() {
                     width={400}
                     height={250}
                     className="rounded-t-lg object-cover w-full aspect-video"
+                    data-ai-hint="jewelry goldsmith profile"
                   />
                   <CardTitle className="pt-4 text-primary-foreground">Artisan Jewelers {i}</CardTitle>
                   <CardDescription className="flex items-center justify-center text-foreground">
