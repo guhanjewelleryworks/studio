@@ -2,6 +2,7 @@
 'use client'
 
 import * as React from 'react'; // Import React
+import { useParams } from 'next/navigation'; // Import useParams
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,15 +23,12 @@ interface GoldsmithProfile {
   specialty: string[];
   rating: number;
   bio: string;
-  // Removed phone and email for direct contact
-  // phone: string;
-  // email: string;
+  // Removed direct contact info
   profileImageUrl: string;
   portfolioImages: string[];
 }
 
 // Mock Data - Replace with API call based on params.id
-// Ensure mock data reflects the removal of direct contact info
 const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | null> => {
   console.log("Fetching profile for ID:", id);
    // Simulate API delay
@@ -47,14 +45,11 @@ const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | nul
   return mockProfiles[id] || mockProfiles['default']; // Return specific profile or default
 }
 
-// Define the type for the params object
-interface PageParams {
-  id: string;
-}
-
-// Make the component accept a promise for params
-export default function GoldsmithProfilePage({ params }: { params: PageParams }) {
-  const { id } = params; // Accessing id directly (adjust based on framework specifics if needed)
+// Removed the params prop
+export default function GoldsmithProfilePage() {
+  // Use useParams hook to get route parameters
+  const params = useParams();
+  const id = params.id as string; // Accessing id from the hook
 
   const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -65,6 +60,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
       setIsLoading(true);
       setError(null);
       try {
+        // Use the id obtained from useParams
         const fetchedProfile = await fetchGoldsmithProfile(id);
         if (fetchedProfile) {
           setProfile(fetchedProfile);
@@ -82,6 +78,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
     if (id) { // Ensure id is available before loading
         loadProfile();
     } else {
+        // This case might be less likely now with useParams but good for robustness
         setError("Goldsmith ID not found in URL.");
         setIsLoading(false);
     }
@@ -184,12 +181,6 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
             <Separator />
             <CardContent className="space-y-4 pt-4">
                {/* Removed direct contact info display */}
-               {/* <div className="flex items-center text-sm text-foreground">
-                 <Phone className="h-4 w-4 mr-2 text-muted-foreground" /> {profile.phone}
-               </div>
-               <div className="flex items-center text-sm text-foreground">
-                 <Mail className="h-4 w-4 mr-2 text-muted-foreground" /> {profile.email}
-               </div> */}
                <Button className="w-full shadow-sm" onClick={handleRequestCustomOrder}>
                   <Send className="mr-2 h-4 w-4"/> Request Custom Order (via Admin)
                </Button>
