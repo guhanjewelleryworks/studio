@@ -9,6 +9,8 @@ body {
 @layer base {
   :root {
     /* Light Theme - Image Inspired */
+    --background-image-url: url('https://images.unsplash.com/photo-1581790704113-dd5a91124581?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    --background-overlay: 35 100% 97% / 0.85; /* Light peach/cream with 85% opacity */
     --background: 35 100% 97%; /* Very light peach/cream */
     --foreground: 40 25% 35%; /* Muted earthy brown */
     --card: 35 100% 97%; /* Match background */
@@ -38,6 +40,8 @@ body {
 
   .dark {
     /* Dark Theme - Image Inspired */
+    --background-image-url: url('https://images.unsplash.com/photo-1581790704113-dd5a91124581?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    --background-overlay: 40 10% 15% / 0.9; /* Dark earthy brown/charcoal with 90% opacity */
     --background: 40 10% 15%; /* Dark earthy brown/charcoal */
     --foreground: 35 60% 88%; /* Light peachy cream for text */
     --card: 40 10% 18%; /* Slightly lighter dark earthy brown */
@@ -71,7 +75,11 @@ body {
     @apply border-border transition-colors duration-200 ease-in-out;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply text-foreground antialiased;
+    background-image: var(--background-image-url);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Keeps the background image fixed during scroll */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -81,4 +89,16 @@ body {
    html {
       scroll-behavior: smooth;
    }
+}
+
+/* Semi-transparent overlay for content readability */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: hsla(var(--background-overlay));
+  z-index: -1; /* Place it behind the content */
 }

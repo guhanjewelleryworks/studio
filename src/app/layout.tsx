@@ -12,7 +12,6 @@ const geistSans = GeistSans;
 export const metadata: Metadata = {
   title: 'Goldsmith Connect',
   description: 'Find local artisans and craft your dream jewelry.',
-   // Basic favicon setup - ensure favicon.ico is in public folder
   icons: {
     icon: '/favicon.ico', 
   },
@@ -27,13 +26,14 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body
         className={cn(
-          'min-h-full font-sans flex flex-col bg-background text-foreground',
+          'min-h-full font-sans flex flex-col text-foreground', // Removed bg-background, as body has bg image now
           geistSans.variable
         )}
       >
-        <div className="relative flex min-h-dvh flex-col">
+        {/* This div acts as the content container on top of the ::before pseudo-element overlay */}
+        <div className="relative flex min-h-dvh flex-col bg-transparent z-0"> 
           <Header />
-          <main className="flex-1 pt-0">{children}</main> {/* Removed top padding */}
+          <main className="flex-1 pt-0">{children}</main>
           <Footer />
         </div>
         <Toaster />
