@@ -18,12 +18,13 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm",
         ghost: "hover:bg-accent/10 hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        premium: "bg-gradient-to-r from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90 shadow-lg", // New Giva-inspired variant
+        premium: "bg-gradient-to-r from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90 shadow-lg",
       },
       size: {
-        default: "h-10 px-6 py-2", // Slightly more padding
-        sm: "h-9 rounded-md px-4", // Adjusted for better proportions
-        lg: "h-12 rounded-md px-10 text-base", // Larger text for lg
+        default: "h-10 px-5 py-2", // Adjusted default padding
+        sm: "h-9 rounded-md px-4 text-xs", // Adjusted for better proportions, smaller text
+        lg: "h-12 rounded-md px-8 text-base", // Larger text for lg, more padding
+        xs: "h-8 rounded-md px-3 text-xs", // Extra small button
         icon: "h-10 w-10",
       },
     },

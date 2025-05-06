@@ -59,19 +59,19 @@ const tiers = [
 
 export default function PricingPage() {
   return (
-    <div className="bg-gradient-to-b from-background via-secondary/20 to-background py-12 sm:py-16"> {/* Reduced padding */}
-      <div className="mx-auto max-w-7xl px-4 lg:px-6"> {/* Adjusted padding */}
+    <div className="bg-gradient-to-b from-background via-secondary/20 to-background py-10 sm:py-12">
+      <div className="mx-auto max-w-7xl px-4 lg:px-6">
         <div className="mx-auto max-w-4xl text-center">
-           <Sparkles className="h-9 w-9 mx-auto text-primary mb-2.5" /> {/* Adjusted size and margin */}
-          <h2 className="text-base font-semibold leading-7 text-primary uppercase tracking-wider">Pricing Plans</h2>
-          <p className="mt-1.5 text-4xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl"> {/* Reduced margin */}
+           <Sparkles className="h-8 w-8 mx-auto text-primary mb-2" />
+          <h2 className="text-sm font-semibold leading-7 text-primary uppercase tracking-wider">Pricing Plans</h2>
+          <p className="mt-1 text-3xl font-extrabold tracking-tight text-primary-foreground sm:text-4xl">
             Connect & Create with Goldsmith Connect
           </p>
         </div>
-        <p className="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-foreground/70"> {/* Reduced margin */}
+        <p className="mx-auto mt-3 max-w-2xl text-center text-md leading-8 text-foreground/70">
           Choose a plan that suits your journey into the world of bespoke jewelry. We facilitate secure and inspiring connections between discerning customers and skilled artisans.
         </p>
-        <div className="isolate mx-auto mt-12 grid max-w-md grid-cols-1 gap-6 md:max-w-2xl md:grid-cols-2 lg:max-w-none lg:grid-cols-3"> {/* Reduced margin and gap */}
+        <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-5 md:max-w-2xl md:grid-cols-2 lg:max-w-none lg:grid-cols-3">
           {tiers.map((tier) => (
             <Card
               key={tier.id}
@@ -81,42 +81,42 @@ export default function PricingPage() {
               )}
             >
               {tier.mostPopular && (
-                <div className="bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wider py-1 px-3 text-center"> {/* Adjusted padding */}
+                <div className="bg-primary text-primary-foreground text-[0.65rem] font-semibold uppercase tracking-wider py-1 px-2.5 text-center">
                   Most Popular
                 </div>
               )}
-              <CardHeader className="pb-5 pt-6 px-5"> {/* Adjusted padding */}
-                <CardTitle className="text-xl font-semibold leading-6 text-primary-foreground">{tier.name}</CardTitle> {/* Reduced font size */}
-                <p className="mt-3"> {/* Reduced margin */}
-                  <span className="text-3xl font-extrabold tracking-tight text-foreground">{tier.priceMonthly}</span> {/* Reduced font size */}
-                  {tier.priceMonthly !== 'Free' && <span className="text-sm font-semibold leading-6 text-muted-foreground">/month</span>}
+              <CardHeader className="pb-4 pt-5 px-4">
+                <CardTitle className="text-lg font-semibold leading-6 text-primary-foreground">{tier.name}</CardTitle>
+                <p className="mt-2.5">
+                  <span className="text-2xl font-extrabold tracking-tight text-foreground">{tier.priceMonthly}</span>
+                  {tier.priceMonthly !== 'Free' && <span className="text-xs font-semibold leading-6 text-muted-foreground">/month</span>}
                 </p>
                 {tier.priceAnnual && tier.priceMonthly !== 'Free' && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-[0.65rem] text-muted-foreground">
                     or {tier.priceAnnual}/year
                   </p>
                 )}
-                <CardDescription className="mt-2.5 text-sm leading-6 text-muted-foreground h-14">{tier.description}</CardDescription> {/* Adjusted margin and height */}
+                <CardDescription className="mt-2 text-xs leading-6 text-muted-foreground h-12">{tier.description}</CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow pt-0 px-5"> {/* Adjusted padding */}
-                <ul role="list" className="space-y-2 text-sm leading-6 text-foreground/90"> {/* Reduced space */}
+              <CardContent className="flex-grow pt-0 px-4">
+                <ul role="list" className="space-y-1.5 text-xs leading-6 text-foreground/90">
                   {tier.features.map((feature) => (
-                    <li key={feature} className="flex gap-x-2.5 items-center"> {/* Reduced gap */}
-                      <Check className="h-4 w-4 flex-none text-primary" aria-hidden="true" /> {/* Reduced icon size */}
+                    <li key={feature} className="flex gap-x-2 items-center">
+                      <Check className="h-3.5 w-3.5 flex-none text-primary" aria-hidden="true" />
                       {feature}
                     </li>
                   ))}
                 </ul>
               </CardContent>
-              <div className="p-5 pt-3 mt-auto"> {/* Adjusted padding */}
+              <div className="p-4 pt-2.5 mt-auto">
                 <Link
                   href={tier.href}
                   className={cn(
                       buttonVariants({ 
                         variant: tier.mostPopular ? 'premium' : 'default', 
-                        size: 'default' // Changed to default size
+                        size: 'sm'
                       }),
-                      'w-full shadow-md rounded-full text-sm py-2.5' // Adjusted padding and text size
+                      'w-full shadow-md rounded-full text-xs py-2'
                   )}
                 >
                   <span>{tier.cta}</span>
@@ -125,7 +125,7 @@ export default function PricingPage() {
             </Card>
           ))}
         </div>
-        <p className="text-center text-sm text-muted-foreground mt-10"> {/* Reduced margin */}
+        <p className="text-center text-xs text-muted-foreground mt-8">
            *All direct contact details are shared upon subscription and admin approval to ensure a secure and trusted environment.
         </p>
       </div>
