@@ -2,12 +2,15 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox' // Assuming checkbox component exists
+import { Checkbox } from '@/components/ui/checkbox'
 import { LogIn } from 'lucide-react'
 import Link from 'next/link'
+import { Separator } from '@/components/ui/separator'
+import { SocialAuthButtons } from '@/components/auth/social-auth-buttons'
 
 export default function LoginPage() {
   // TODO: Implement form handling with react-hook-form and server action
+  // TODO: Implement social authentication logic with Firebase
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-12 bg-gradient-to-b from-background to-secondary">
       <Card className="w-full max-w-md shadow-xl border-primary/30">
@@ -54,12 +57,11 @@ export default function LoginPage() {
               Login
             </Button>
 
-            {/* Optional: Add social login buttons here */}
-             {/* <Separator className="my-4" />
-             <Button variant="outline" className="w-full">Login with Google</Button> */}
+            <Separator className="my-4" />
+            <SocialAuthButtons mode="login" />
 
 
-             <p className="text-center text-sm text-muted-foreground">
+             <p className="text-center text-sm text-muted-foreground pt-4">
                 Don't have an account?{' '}
                 <Link href="/signup" className="underline text-primary hover:text-primary/80">
                   Sign up here

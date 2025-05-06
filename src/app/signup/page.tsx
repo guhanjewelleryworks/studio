@@ -4,9 +4,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { UserPlus } from 'lucide-react'
 import Link from 'next/link'
+import { Separator } from '@/components/ui/separator'
+import { SocialAuthButtons } from '@/components/auth/social-auth-buttons'
+// import { Checkbox } from '@/components/ui/checkbox' // Uncomment if terms checkbox is re-enabled
 
 export default function SignUpPage() {
   // TODO: Implement form handling with react-hook-form and server action
+  // TODO: Implement social authentication logic with Firebase
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-12 bg-gradient-to-b from-background to-secondary">
       <Card className="w-full max-w-md shadow-xl border-primary/30">
@@ -52,10 +56,12 @@ export default function SignUpPage() {
             <Button type="submit" className="w-full shadow-md hover:shadow-lg transition-shadow">
               Sign Up
             </Button>
+            
+            <Separator className="my-4" />
+            <SocialAuthButtons mode="signup" />
 
-            {/* Optional: Add social signup buttons here */}
 
-             <p className="text-center text-sm text-muted-foreground">
+             <p className="text-center text-sm text-muted-foreground pt-4">
                 Already have an account?{' '}
                 <Link href="/login" className="underline text-primary hover:text-primary/80">
                   Login here
