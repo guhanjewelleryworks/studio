@@ -61,10 +61,32 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
       window.location.href = '/'; // Simple redirect for now
     } catch (error) {
       const authError = error as AuthError;
-      console.error(`Google ${mode} error:`, authError);
+      console.error(`Google ${mode} error:`, authError.code, authError.message);
+      let description = authError.message || `Failed to ${mode} with Google. Please try again.`;
+      
+      switch (authError.code) {
+        case 'auth/cancelled-popup-request':
+        case 'auth/popup-closed-by-user':
+          description = 'The sign-in popup was closed. Please try again.';
+          break;
+        case 'auth/popup-blocked':
+          description = 'The sign-in popup was blocked by your browser. Please allow popups for this site and try again.';
+          break;
+        case 'auth/operation-not-allowed':
+          description = `Sign-in with Google is not enabled for this project. Please contact support or check Firebase console configuration.`;
+          break;
+        case 'auth/unauthorized-domain':
+          description = 'This domain is not authorized for OAuth operations for this project. Please check your Firebase console.';
+          break;
+        // Add other specific Firebase error codes as needed
+        default:
+          // Use the default Firebase message or a generic one
+          break;
+      }
+      
       toast({
         title: "Authentication Error",
-        description: authError.message || `Failed to ${mode} with Google. Please try again.`,
+        description: description,
         variant: "destructive",
       });
     }
@@ -82,10 +104,35 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
        window.location.href = '/'; // Simple redirect for now
     } catch (error) {
       const authError = error as AuthError;
-      console.error(`Facebook ${mode} error:`, authError);
+      console.error(`Facebook ${mode} error:`, authError.code, authError.message);
+      let description = authError.message || `Failed to ${mode} with Facebook. Please try again.`;
+
+      switch (authError.code) {
+        case 'auth/cancelled-popup-request':
+        case 'auth/popup-closed-by-user':
+          description = 'The sign-in popup was closed. Please try again.';
+          break;
+        case 'auth/popup-blocked':
+          description = 'The sign-in popup was blocked by your browser. Please allow popups for this site and try again.';
+          break;
+        case 'auth/operation-not-allowed':
+          description = `Sign-in with Facebook is not enabled for this project. Please contact support or check Firebase console configuration.`;
+          break;
+        case 'auth/unauthorized-domain':
+          description = 'This domain is not authorized for OAuth operations for this project. Please check your Firebase console.';
+          break;
+        case 'auth/account-exists-with-different-credential':
+          description = 'An account already exists with the same email address but different sign-in credentials. Try signing in using a different provider.';
+          break;
+        // Add other specific Firebase error codes as needed
+        default:
+          // Use the default Firebase message or a generic one
+          break;
+      }
+
        toast({
         title: "Authentication Error",
-        description: authError.message || `Failed to ${mode} with Facebook. Please try again.`,
+        description: description,
         variant: "destructive",
       });
     }
@@ -106,3 +153,4 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
     </div>
   );
 }
+
