@@ -2,9 +2,11 @@
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Search, UserCheck, ShieldCheck, Sparkles, Edit3, MessageSquare, Award, Users, Briefcase, Database, BarChartHorizontal, Settings, Handshake } from 'lucide-react';
+import { MapPin, Search, UserCheck, ShieldCheck, Gift, Handshake } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { GoldsmithIcon } from '@/components/icons/goldsmith-icon';
+
 
 // Subtle pattern for hero section
 const HeroPattern = () => (
@@ -31,11 +33,11 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center">
       {/* Hero Section */}
-      <section className="relative w-full py-12 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/30 via-background to-background overflow-hidden">
+      <section className="relative w-full py-12 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/10 via-background to-background overflow-hidden">
         <HeroPattern />
         <div className="container px-4 md:px-6 relative z-10">
           <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-8 xl:grid-cols-[1fr_550px] items-center">
-            <div className="flex flex-col justify-center space-y-3">
+            <div className="flex flex-col justify-center space-y-2">
               <div className="space-y-1.5">
                 <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl xl:text-5xl/none text-primary-foreground leading-tight">
                   Discover Local Goldsmiths, Craft Your Dreams
@@ -49,7 +51,7 @@ export default function Home() {
                    href="/discover"
                    className={cn(
                      buttonVariants({ size: 'lg' }),
-                     'shadow-md hover:shadow-lg transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2.5 text-base'
+                     'shadow-md hover:shadow-lg transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2 text-base'
                    )}
                  >
                    <span>
@@ -61,7 +63,7 @@ export default function Home() {
                    href="/goldsmith-portal"
                    className={cn(
                      buttonVariants({ variant: 'outline', size: 'lg' }),
-                     'shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10 hover:text-accent-foreground rounded-full px-6 py-2.5 text-base'
+                     'shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10 hover:text-accent-foreground rounded-full px-6 py-2 text-base'
                    )}
                  >
                    <span>
@@ -72,7 +74,7 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://images.unsplash.com/photo-1610500795055-206091564d31?q=80&w=800&auto=format&fit=crop"
+              src="https://picsum.photos/seed/hero-jewelry/600/550"
               alt="Elegant Jewelry Background"
               width={600}
               height={550}
@@ -85,7 +87,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="w-full py-12 md:py-16 lg:py-20 bg-background">
+      <section id="how-it-works" className="w-full py-10 md:py-12 lg:py-16 bg-background">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-2 text-center">
             <div className="space-y-1">
@@ -100,7 +102,7 @@ export default function Home() {
             {[
               { icon: Search, title: "1. Discover & Inquire", description: "Browse verified goldsmith profiles. Submit an introduction or custom order request through our elegant platform." },
               { icon: ShieldCheck, title: "2. Admin Mediation", description: "Our team reviews your request, ensuring a secure and smooth process. We facilitate introductions and order details." },
-              { icon: Handshake, title: "3. Create & Cherish", description: "Collaborate with your chosen artisan. They craft your piece with passion, and you receive your dream jewelry." },
+              { icon: Gift, title: "3. Create & Cherish", description: "Collaborate with your chosen artisan. They craft your piece with passion, and you receive your dream jewelry." },
             ].map((step, index) => (
               <div key={index} className="grid gap-1 text-center group p-3 rounded-xl bg-card hover:shadow-lg transition-shadow duration-300 border border-transparent hover:border-primary/20">
                 <div className="flex justify-center items-center mb-1.5">
@@ -119,7 +121,7 @@ export default function Home() {
       </section>
 
       {/* Featured Goldsmiths Section */}
-      <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/20 to-background">
+      <section className="w-full py-10 md:py-12 lg:py-16 bg-gradient-to-b from-secondary/10 to-background">
         <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
           <div className="space-y-1.5">
             <h2 className="text-2xl font-bold tracking-tight md:text-3xl/tight text-primary-foreground">Meet Our Talented Artisans</h2>
@@ -177,7 +179,7 @@ export default function Home() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="w-full py-12 md:py-16 lg:py-20 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background">
+      <section className="w-full py-10 md:py-12 lg:py-16 border-t border-border/10 bg-gradient-to-t from-secondary/5 to-background">
         <div className="container grid items-center justify-center gap-2.5 px-4 text-center md:px-6">
           <div className="space-y-1.5">
              <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
@@ -219,4 +221,3 @@ export default function Home() {
     </div>
   );
 }
-
