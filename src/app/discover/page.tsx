@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button'; // Import buttonVariants
 import { MapPin, List, Search, Star, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getNearbyLocations, type Location } from '@/services/geolocation'; // Assuming this service exists
+import { cn } from '@/lib/utils'; // Import cn
 
 // Placeholder for Map Component
 const MapPlaceholder = ({ locations }: { locations: Location[] }) => (
@@ -102,10 +103,10 @@ export default function DiscoverPage() {
         <h1 className="text-3xl font-bold text-primary-foreground">Find a Goldsmith</h1>
         <div className="flex gap-2">
           <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} aria-label="List View">
-            <List className="h-5 w-5 mr-2" /> List
+            <List className="mr-2" /> List
           </Button>
           <Button variant={viewMode === 'map' ? 'default' : 'outline'} onClick={() => setViewMode('map')} aria-label="Map View">
-            <MapPin className="h-5 w-5 mr-2" /> Map
+            <MapPin className="mr-2" /> Map
           </Button>
         </div>
       </div>
@@ -157,9 +158,15 @@ export default function DiscoverPage() {
                       <Star className="h-4 w-4 mr-1 fill-current" /> {goldsmith.rating.toFixed(1)}
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" asChild className="mt-auto border-accent text-accent hover:bg-accent/10">
-                    <Link href={`/goldsmith/${goldsmith.id}`}><span>View Profile</span></Link>
-                  </Button>
+                  <Link
+                    href={`/goldsmith/${goldsmith.id}`}
+                    className={cn(
+                       buttonVariants({ variant: "outline", size: "sm" }),
+                       'text-accent border-accent hover:bg-accent/10 mt-auto' // Adjusted styles
+                    )}
+                  >
+                    <span>View Profile</span>
+                  </Link>
                 </CardContent>
               </Card>
             ))

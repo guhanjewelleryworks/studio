@@ -73,7 +73,7 @@ export function Header() {
                 <Link href="/goldsmith-portal" className="text-base font-medium text-foreground hover:text-primary transition-colors">Goldsmith Portal</Link>
                  <Link href="/admin" className="text-base font-medium text-foreground hover:text-primary transition-colors">Admin Portal</Link> {/* Keep Admin in mobile for convenience */}
               </div>
-              {/* Optional: Add Login/Signup links at the bottom of the mobile menu */}
+              {/* Login/Signup links at the bottom of the mobile menu */}
                <div className="px-6 pb-6 mt-auto flex flex-col gap-3">
                   <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "w-full")}>Login</Link>
                   <Link href="/signup" className={cn(buttonVariants({ size: "sm" }), "w-full")}>Sign Up</Link>

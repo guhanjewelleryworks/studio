@@ -167,7 +167,7 @@ export default function Home() {
                       href={`/goldsmith/artisan-${i}`}
                       className={cn(
                          buttonVariants({ variant: "outline", size: "sm" }), // Changed variant and size
-                         'text-accent border-accent hover:bg-accent/10 hover:text-accent-foreground mt-4 w-full' // Adjusted styles
+                         'text-accent border-accent hover:bg-accent/10 mt-4 w-full' // Adjusted styles and removed hover:text-accent-foreground
                       )}
                     >
                       <span>View Profile</span>
@@ -182,7 +182,7 @@ export default function Home() {
                  href="/discover"
                  className={cn(
                    buttonVariants({ size: 'lg', variant: 'outline' }),
-                   'border-primary text-primary hover:bg-primary/10 hover:text-primary shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' // Adjusted styles and hover
+                   'border-primary text-primary hover:bg-primary/10 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' // Adjusted styles and hover, removed hover:text-primary
                  )}
                >
                  <span>Explore All Goldsmiths</span>
@@ -222,7 +222,7 @@ export default function Home() {
                  href="/goldsmith-portal/register"
                  className={cn(
                    buttonVariants({ variant: 'secondary', size: 'lg' }),
-                   'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 text-accent-foreground hover:bg-accent/90' // Enhanced hover effect
+                   'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 text-accent-foreground hover:bg-secondary/90' // Adjusted styles and hover
                  )}
                >
                  <span>

@@ -1,7 +1,8 @@
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button'; // Import buttonVariants
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
+import { cn } from '@/lib/utils'; // Import cn
 
 // Placeholder pricing tiers
 const tiers = [
@@ -89,11 +90,15 @@ export default function PricingPage() {
                 </ul>
               </CardContent>
               <div className="p-6 pt-0 mt-auto">
-                <Button asChild className={`w-full shadow-md ${tier.mostPopular ? '' : 'bg-accent text-accent-foreground hover:bg-accent/90'}`}>
-                  <Link href={tier.href}>
-                    <span>{tier.id.includes('customer') ? 'Get started' : 'Register Now'}</span>
-                  </Link>
-                </Button>
+                <Link
+                  href={tier.href}
+                  className={cn(
+                      buttonVariants({ variant: tier.mostPopular ? 'default' : 'secondary' }),
+                      'w-full shadow-md'
+                  )}
+                >
+                  <span>{tier.id.includes('customer') ? 'Get started' : 'Register Now'}</span>
+                </Link>
               </div>
             </Card>
           ))}

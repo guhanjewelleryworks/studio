@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button'; // Import buttonVariants
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, DollarSign, Users, BarChart } from 'lucide-react';
 import Image from 'next/image';
+import { cn } from '@/lib/utils'; // Import cn
 
 // Inline SVG for a Hammer/Anvil icon representing craftsmanship
 const CraftIcon = () => (
@@ -32,16 +33,24 @@ export default function GoldsmithPortalPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-shadow">
-                  <Link href="/goldsmith-portal/register">
-                    <span>Register Your Workshop</span>
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10">
-                  <Link href="/goldsmith-portal/login">
-                    <span>Login to Dashboard</span>
-                  </Link>
-                </Button>
+                <Link
+                  href="/goldsmith-portal/register"
+                  className={cn(
+                    buttonVariants({ size: 'lg' }),
+                    'shadow-md hover:shadow-lg transition-shadow'
+                  )}
+                >
+                  <span>Register Your Workshop</span>
+                </Link>
+                <Link
+                  href="/goldsmith-portal/login"
+                  className={cn(
+                    buttonVariants({ variant: 'outline', size: 'lg' }),
+                    'shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10'
+                  )}
+                >
+                  <span>Login to Dashboard</span>
+                </Link>
               </div>
             </div>
              <Image
@@ -161,19 +170,27 @@ export default function GoldsmithPortalPage() {
             </p>
           </div>
           <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
-             <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-shadow">
-              <Link href="/goldsmith-portal/register">
+             <Link
+                href="/goldsmith-portal/register"
+                className={cn(
+                    buttonVariants({ size: 'lg' }),
+                    'shadow-md hover:shadow-lg transition-shadow'
+                )}
+              >
                 <span>
                   Register Now
                   <CheckCircle className="ml-2 h-5 w-5 inline" />
                 </span>
               </Link>
-            </Button>
-             <Button asChild variant="link" size="lg" className="text-accent hover:text-accent/80">
-               <Link href="/contact?subject=GoldsmithInquiry">
-                 <span>Have Questions? Contact Us</span>
-               </Link>
-             </Button>
+             <Link
+               href="/contact?subject=GoldsmithInquiry"
+               className={cn(
+                   buttonVariants({ variant: 'link', size: 'lg' }),
+                   'text-accent hover:text-accent/80'
+                )}
+             >
+               <span>Have Questions? Contact Us</span>
+             </Link>
           </div>
         </div>
       </section>
