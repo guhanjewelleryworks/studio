@@ -2,6 +2,14 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { auth } from '@/lib/firebase/firebase'; // Import Firebase auth instance
+import { 
+  GoogleAuthProvider, 
+  FacebookAuthProvider, 
+  signInWithPopup,
+  type AuthError 
+} from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast'; // Import useToast
 
 // Inline SVG for Google Icon
 const GoogleIcon = () => (
@@ -39,16 +47,48 @@ interface SocialAuthButtonsProps {
 }
 
 export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
-  const handleGoogleAuth = () => {
-    // TODO: Implement Google Sign-In/Sign-Up with Firebase
-    console.log(`Attempting Google ${mode}`);
-    alert(`Google ${mode} not yet implemented.`);
+  const { toast } = useToast(); // Initialize toast
+
+  const handleGoogleAuth = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      toast({
+        title: "Authentication Successful",
+        description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Google.`,
+      });
+      // TODO: Redirect user or update application state (e.g., router.push('/dashboard'))
+      window.location.href = '/'; // Simple redirect for now
+    } catch (error) {
+      const authError = error as AuthError;
+      console.error(`Google ${mode} error:`, authError);
+      toast({
+        title: "Authentication Error",
+        description: authError.message || `Failed to ${mode} with Google. Please try again.`,
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleFacebookAuth = () => {
-    // TODO: Implement Facebook Sign-In/Sign-Up with Firebase
-    console.log(`Attempting Facebook ${mode}`);
-    alert(`Facebook ${mode} not yet implemented.`);
+  const handleFacebookAuth = async () => {
+    const provider = new FacebookAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      toast({
+        title: "Authentication Successful",
+        description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Facebook.`,
+      });
+      // TODO: Redirect user or update application state
+       window.location.href = '/'; // Simple redirect for now
+    } catch (error) {
+      const authError = error as AuthError;
+      console.error(`Facebook ${mode} error:`, authError);
+       toast({
+        title: "Authentication Error",
+        description: authError.message || `Failed to ${mode} with Facebook. Please try again.`,
+        variant: "destructive",
+      });
+    }
   };
 
   const buttonTextPrefix = mode === 'login' ? 'Login' : 'Sign up';
