@@ -1,6 +1,6 @@
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -9,99 +9,124 @@ const tiers = [
     name: 'Customer Basic',
     id: 'tier-customer-basic',
     href: '/signup', 
-    priceMonthly: '$X',
-    description: 'Browse goldsmith profiles and general information.',
+    priceMonthly: 'Free', // Updated placeholder
+    priceAnnual: null,
+    description: 'Discover artisans and explore their creations. Perfect for browsing and initial inquiries.',
     features: [
-      'View goldsmith portfolios',
-      'See general location',
-      'Submit order inquiries (Admin mediated)',
+      'View goldsmith portfolios & specialties',
+      'See general artisan locations',
+      'Submit admin-mediated order inquiries',
+      'Save favorite artisans',
     ],
     mostPopular: false,
+    cta: 'Get Started',
   },
   {
     name: 'Customer Premium',
     id: 'tier-customer-premium',
     href: '/signup', 
-    priceMonthly: '$Y',
-    description: 'Unlock direct communication features after admin approval.',
+    priceMonthly: '$19', // Updated placeholder
+    priceAnnual: '$199', // Added annual pricing example
+    description: 'Unlock direct communication and enhanced features for a personalized experience.',
     features: [
       'All Basic features',
-      'Request direct introduction (Admin approved)',
-      'Priority support',
+      'Request direct introductions (Admin approved)',
+      'Priority support for inquiries',
+      'Exclusive access to new artisan showcases',
+      'Early access to platform features',
     ],
     mostPopular: true,
+    cta: 'Go Premium',
   },
   {
     name: 'Goldsmith Partner',
     id: 'tier-goldsmith-partner',
     href: '/goldsmith-portal/register', 
-    priceMonthly: '$Z', 
-    description: 'Receive curated order requests and showcase your work.',
+    priceMonthly: '$49', // Updated placeholder
+    priceAnnual: '$499',
+    description: 'Showcase your artistry, receive curated order requests, and grow your bespoke business.',
     features: [
-      'Verified profile listing',
-      'Receive admin-approved order requests',
-      'Secure communication channel (Admin mediated)',
-      'Portfolio showcase',
+      'Verified profile listing with portfolio showcase',
+      'Receive admin-approved custom order requests',
+      'Secure, mediated communication channel',
+      'Analytics on profile views and inquiries',
+      'Featured artisan opportunities',
     ],
     mostPopular: false,
+    cta: 'Become a Partner',
   },
 ];
 
 export default function PricingPage() {
   return (
-    <div className="bg-gradient-to-b from-background to-secondary py-10 sm:py-20"> {/* Reduced py */}
+    <div className="bg-gradient-to-b from-background via-secondary/20 to-background py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-base font-semibold leading-7 text-primary">Pricing</h2>
-          <p className="mt-1 text-4xl font-bold tracking-tight text-primary-foreground sm:text-5xl"> {/* Reduced mt */}
-            Connect Through Goldsmith Connect
+           <Sparkles className="h-10 w-10 mx-auto text-primary mb-3" />
+          <h2 className="text-base font-semibold leading-7 text-primary uppercase tracking-wider">Pricing Plans</h2>
+          <p className="mt-2 text-4xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl">
+            Connect & Create with Goldsmith Connect
           </p>
         </div>
-        <p className="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-foreground"> {/* Reduced mt */}
-          Choose the plan that best suits your needs. We facilitate connections between customers and skilled goldsmiths. Direct contact details are shared upon subscription and admin approval.
+        <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-foreground/70">
+          Choose a plan that suits your journey into the world of bespoke jewelry. We facilitate secure and inspiring connections between discerning customers and skilled artisans.
         </p>
-        <div className="isolate mx-auto mt-12 grid max-w-md grid-cols-1 gap-y-6 md:max-w-2xl md:grid-cols-2 lg:max-w-none lg:grid-cols-3"> {/* Reduced mt, gap-y */}
+        <div className="isolate mx-auto mt-16 grid max-w-md grid-cols-1 gap-8 md:max-w-2xl md:grid-cols-2 lg:max-w-none lg:grid-cols-3">
           {tiers.map((tier) => (
             <Card
               key={tier.id}
-              className={`shadow-lg border-primary/30 flex flex-col justify-between ${
-                tier.mostPopular ? 'ring-2 ring-primary' : ''
-              }`}
+              className={cn(
+                "shadow-xl border-primary/10 flex flex-col rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02]",
+                tier.mostPopular ? 'ring-2 ring-primary border-primary bg-primary/5' : 'bg-card'
+              )}
             >
-              <CardHeader className="pb-4"> {/* Added pb */}
-                <CardTitle className="text-xl font-semibold leading-6 text-primary-foreground">{tier.name}</CardTitle>
-                <CardDescription className="mt-2 text-sm leading-6 text-muted-foreground">{tier.description}</CardDescription> {/* Reduced mt */}
-                <p className="mt-4 flex items-baseline gap-x-1"> {/* Reduced mt */}
-                  <span className="text-4xl font-bold tracking-tight text-foreground">{tier.priceMonthly}</span>
-                  <span className="text-sm font-semibold leading-6 text-muted-foreground">/month</span>
+              {tier.mostPopular && (
+                <div className="bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wider py-1.5 px-3 text-center">
+                  Most Popular
+                </div>
+              )}
+              <CardHeader className="pb-6 pt-8 px-6">
+                <CardTitle className="text-2xl font-semibold leading-6 text-primary-foreground">{tier.name}</CardTitle>
+                <p className="mt-4">
+                  <span className="text-4xl font-extrabold tracking-tight text-foreground">{tier.priceMonthly}</span>
+                  {tier.priceMonthly !== 'Free' && <span className="text-sm font-semibold leading-6 text-muted-foreground">/month</span>}
                 </p>
+                {tier.priceAnnual && tier.priceMonthly !== 'Free' && (
+                  <p className="text-xs text-muted-foreground">
+                    or {tier.priceAnnual}/year
+                  </p>
+                )}
+                <CardDescription className="mt-3 text-sm leading-6 text-muted-foreground h-16">{tier.description}</CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow pt-0"> {/* Removed mt, added pt-0 to CardContent */}
-                <ul role="list" className="space-y-2 text-sm leading-6 text-foreground"> {/* Reduced space-y */}
+              <CardContent className="flex-grow pt-0 px-6">
+                <ul role="list" className="space-y-2.5 text-sm leading-6 text-foreground/90">
                   {tier.features.map((feature) => (
-                    <li key={feature} className="flex gap-x-2"> {/* Reduced gap-x */}
-                      <Check className="h-5 w-5 flex-none text-primary" aria-hidden="true" /> {/* Slightly smaller icon */}
+                    <li key={feature} className="flex gap-x-3 items-center">
+                      <Check className="h-5 w-5 flex-none text-primary" aria-hidden="true" />
                       {feature}
                     </li>
                   ))}
                 </ul>
               </CardContent>
-              <div className="p-4 pt-0 mt-auto"> {/* Reduced p, pt, added mt-auto */}
+              <div className="p-6 pt-4 mt-auto">
                 <Link
                   href={tier.href}
                   className={cn(
-                      buttonVariants({ variant: tier.mostPopular ? 'default' : 'secondary' }),
-                      'w-full shadow-md'
+                      buttonVariants({ 
+                        variant: tier.mostPopular ? 'premium' : 'default', // Using premium for most popular
+                        size: 'lg' 
+                      }),
+                      'w-full shadow-md rounded-full text-base py-3'
                   )}
                 >
-                  <span>{tier.id.includes('customer') ? 'Get started' : 'Register Now'}</span>
+                  <span>{tier.cta}</span>
                 </Link>
               </div>
             </Card>
           ))}
         </div>
-        <p className="text-center text-sm text-muted-foreground mt-8"> {/* Reduced mt */}
-           * Pricing is illustrative. Please define your actual subscription model and fees.
+        <p className="text-center text-sm text-muted-foreground mt-12">
+           *All direct contact details are shared upon subscription and admin approval to ensure a secure and trusted environment.
         </p>
       </div>
     </div>

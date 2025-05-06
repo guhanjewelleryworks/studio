@@ -12,6 +12,10 @@ const geistSans = GeistSans;
 export const metadata: Metadata = {
   title: 'Goldsmith Connect',
   description: 'Find local artisans and craft your dream jewelry.',
+   // Basic favicon setup - ensure favicon.ico is in public folder
+  icons: {
+    icon: '/favicon.ico', 
+  },
 };
 
 export default function RootLayout({
@@ -20,16 +24,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full antialiased">
       <body
         className={cn(
-          'min-h-full font-sans antialiased flex flex-col', // Ensure body is flex column and takes full height
-          geistSans.variable,
+          'min-h-full font-sans flex flex-col bg-background text-foreground',
+          geistSans.variable
         )}
       >
-        <div className="relative flex min-h-dvh flex-col bg-background"> {/* This div should encompass Header, main, and Footer */}
+        <div className="relative flex min-h-dvh flex-col">
           <Header />
-          <main className="flex-1">{children}</main> {/* flex-1 allows main to grow and push footer down */}
+          <main className="flex-1 pt-0">{children}</main> {/* Removed top padding */}
           <Footer />
         </div>
         <Toaster />

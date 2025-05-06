@@ -3,18 +3,19 @@
 
 import type { AuthError } from 'firebase/auth';
 import {
-  FacebookAuthProvider,
-  GoogleAuthProvider,
   signInWithPopup,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
 } from 'firebase/auth';
 
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast'; // Import useToast
-import { auth } from '@/lib/firebase/firebase'; // Import Firebase auth instance
+import { Button, buttonVariants } from '@/components/ui/button'; // Import buttonVariants
+import { useToast } from '@/hooks/use-toast'; 
+import { auth } from '@/lib/firebase/firebase'; 
+import { cn } from '@/lib/utils';
 
 // Inline SVG for Google Icon
 const GoogleIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-4 w-4 mr-2">
+  <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2.5"> {/* Slightly larger icon, adjusted margin */}
     <path
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
       fill="#4285F4"
@@ -37,7 +38,7 @@ const GoogleIcon = () => (
 
 // Inline SVG for Facebook Icon
 const FacebookIcon = () => (
-    <svg viewBox="0 0 24 24" className="h-4 w-4 mr-2" fill="currentColor">
+    <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2.5" fill="currentColor"> {/* Slightly larger icon, adjusted margin */}
         <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878V14.89H8.078V12.376h2.36V10.47c0-2.336 1.393-3.632 3.526-3.632.997 0 1.855.074 2.104.107v2.213H14.89c-1.142 0-1.363.542-1.363 1.333v1.885h2.473l-.32 2.513H13.526v7.008C18.343 21.128 22 16.991 22 12z"></path>
     </svg>
 );
@@ -48,132 +49,42 @@ interface SocialAuthButtonsProps {
 }
 
 export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
-  const { toast } = useToast(); // Initialize toast
+  const { toast } = useToast();
 
   const handleGoogleAuth = async () => {
-    // TODO: Remove this simulation and re-enable actual Firebase auth
     console.log("Simulating successful Google login...");
     toast({
       title: "Authentication Successful (Simulated)",
       description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Google.`,
     });
-    // Simulate redirect
     setTimeout(() => {
-      window.location.href = '/'; // Simple redirect for now
+      window.location.href = '/'; 
     }, 1000);
-    return; // Skip actual Firebase call
-
-    // ----- Actual Firebase Logic (commented out for simulation) -----
-    // const provider = new GoogleAuthProvider();
-    // try {
-    //   await signInWithPopup(auth, provider);
-    //   toast({
-    //     title: "Authentication Successful",
-    //     description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Google.`,
-    //   });
-    //   // TODO: Redirect user or update application state (e.g., router.push('/dashboard'))
-    //   window.location.href = '/'; // Simple redirect for now
-    // } catch (error) {
-    //   const authError = error as AuthError;
-    //   console.error(`Google ${mode} error:`, authError.code, authError.message);
-    //   let description = authError.message || `Failed to ${mode} with Google. Please try again.`;
-
-    //   switch (authError.code) {
-    //     case 'auth/cancelled-popup-request':
-    //     case 'auth/popup-closed-by-user':
-    //       description = 'The sign-in popup was closed. Please try again.';
-    //       break;
-    //     case 'auth/popup-blocked':
-    //       description = 'The sign-in popup was blocked by your browser. Please allow popups for this site and try again.';
-    //       break;
-    //     case 'auth/operation-not-allowed':
-    //       description = `Sign-in with Google is not enabled for this project. Please contact support or check Firebase console configuration.`;
-    //       break;
-    //     case 'auth/unauthorized-domain':
-    //       description = 'This domain is not authorized for OAuth operations for this project. Please check your Firebase console.';
-    //       break;
-    //     case 'auth/api-key-not-valid':
-    //       description = 'The Firebase API key is invalid. Please check your Firebase project configuration and ensure the API key in `src/lib/firebase/config.ts` is correct.';
-    //       break;
-    //     // Add other specific Firebase error codes as needed
-    //     default:
-    //       // Use the default Firebase message or a generic one
-    //       break;
-    //   }
-
-    //   toast({
-    //     title: "Authentication Error",
-    //     description: description,
-    //     variant: "destructive",
-    //   });
-    // }
-    // ----- End Actual Firebase Logic -----
   };
 
   const handleFacebookAuth = async () => {
-    // TODO: Implement Facebook login simulation or actual logic if needed
-    alert('Facebook login is not implemented in this simulation.');
-    return;
-
-    // ----- Actual Facebook Logic -----
-    // const provider = new FacebookAuthProvider();
-    // try {
-    //   await signInWithPopup(auth, provider);
-    //   toast({
-    //     title: "Authentication Successful",
-    //     description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Facebook.`,
-    //   });
-    //   // TODO: Redirect user or update application state
-    //    window.location.href = '/'; // Simple redirect for now
-    // } catch (error) {
-    //   const authError = error as AuthError;
-    //   console.error(`Facebook ${mode} error:`, authError.code, authError.message);
-    //   let description = authError.message || `Failed to ${mode} with Facebook. Please try again.`;
-
-    //   switch (authError.code) {
-    //     case 'auth/cancelled-popup-request':
-    //     case 'auth/popup-closed-by-user':
-    //       description = 'The sign-in popup was closed. Please try again.';
-    //       break;
-    //     case 'auth/popup-blocked':
-    //       description = 'The sign-in popup was blocked by your browser. Please allow popups for this site and try again.';
-    //       break;
-    //     case 'auth/operation-not-allowed':
-    //       description = `Sign-in with Facebook is not enabled for this project. Please contact support or check Firebase console configuration.`;
-    //       break;
-    //     case 'auth/unauthorized-domain':
-    //       description = 'This domain is not authorized for OAuth operations for this project. Please check your Firebase console.';
-    //       break;
-    //     case 'auth/account-exists-with-different-credential':
-    //       description = 'An account already exists with the same email address but different sign-in credentials. Try signing in using a different provider.';
-    //       break;
-    //     case 'auth/api-key-not-valid':
-    //        description = 'The Firebase API key is invalid. Please check your Firebase project configuration and ensure the API key in `src/lib/firebase/config.ts` is correct.';
-    //       break;
-    //     // Add other specific Firebase error codes as needed
-    //     default:
-    //       // Use the default Firebase message or a generic one
-    //       break;
-    //   }
-
-    //    toast({
-    //     title: "Authentication Error",
-    //     description: description,
-    //     variant: "destructive",
-    //   });
-    // }
-    // ----- End Actual Facebook Logic -----
+    alert('Facebook login is not fully implemented in this simulation.');
   };
 
-  const buttonTextPrefix = mode === 'login' ? 'Login' : 'Sign up';
+  const buttonTextPrefix = mode === 'login' ? 'Continue' : 'Sign up';
 
   return (
-    <div className="space-y-2">
-      <Button variant="outline" className="w-full" onClick={handleGoogleAuth}>
+    <div className="space-y-3"> {/* Adjusted spacing */}
+      <Button 
+        variant="outline" 
+        size="lg" // Using lg for better touch target & visual weight
+        className="w-full rounded-full text-base py-3 shadow-sm" 
+        onClick={handleGoogleAuth}
+      >
         <GoogleIcon />
         {buttonTextPrefix} with Google
       </Button>
-      <Button variant="outline" className="w-full" onClick={handleFacebookAuth}>
+      <Button 
+        variant="outline" 
+        size="lg"
+        className="w-full rounded-full text-base py-3 shadow-sm" 
+        onClick={handleFacebookAuth}
+      >
         <FacebookIcon />
         {buttonTextPrefix} with Facebook
       </Button>

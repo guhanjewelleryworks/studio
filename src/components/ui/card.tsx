@@ -9,7 +9,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm transition-shadow duration-200 ease-in-out hover:shadow-md", // Added transition and hover:shadow-md
+      "rounded-xl border bg-card text-card-foreground shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl", // Softer shadow, more rounding, subtle hover
       className
     )}
     {...props}
@@ -23,20 +23,20 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    className={cn("flex flex-col space-y-2 p-6", className)} // Adjusted space-y
     {...props}
   />
 ))
 CardHeader.displayName = "CardHeader"
 
 const CardTitle = React.forwardRef<
-  HTMLHeadingElement, // Changed from HTMLDivElement for semantic correctness
+  HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
-  <h3 // Changed from div to h3
+  <h3
     ref={ref}
     className={cn(
-      "text-xl font-semibold leading-none tracking-tight", // Adjusted size for consistency
+      "text-2xl font-semibold leading-none tracking-tight text-primary-foreground", // Slightly larger and more prominent title
       className
     )}
     {...props}
@@ -48,9 +48,9 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p // Changed from div to p
+  <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-sm text-muted-foreground leading-relaxed", className)} // Improved line height
     {...props}
   />
 ))

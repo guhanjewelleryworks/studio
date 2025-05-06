@@ -8,80 +8,76 @@ body {
 
 @layer base {
   :root {
-    /* Light Theme */
-    --background: 56 100% 94%; /* Slightly brighter Cream */
-    --foreground: 26 45% 25%; /* Darker Brown for better contrast */
-    --card: 56 100% 94%; /* Match background */
-    --card-foreground: 26 45% 25%; /* Match foreground */
-    --popover: 56 100% 94%; /* Match background */
-    --popover-foreground: 26 45% 25%; /* Match foreground */
-    --primary: 45 90% 50%; /* Slightly warmer Gold */
-    --primary-foreground: 26 70% 15%; /* Deeper Brown for primary text */
-    --secondary: 54 85% 90%; /* Lighter Gold/Cream */
-    --secondary-foreground: 26 45% 30%; /* Slightly darker Brown */
-    --muted: 54 80% 93%; /* Muted Gold/Cream */
-    --muted-foreground: 26 35% 55%; /* Muted Brown */
-    --accent: 26 65% 38%; /* Deep Brown Accent */
-    --accent-foreground: 56 100% 94%; /* Match background */
-    --destructive: 0 75% 55%; /* Standard Red */
+    /* Light Theme - Giva Inspired */
+    --background: 30 100% 98%; /* Very light, warm cream */
+    --foreground: 30 10% 25%; /* Dark, soft charcoal/brown */
+    --card: 30 100% 98%; /* Match background */
+    --card-foreground: 30 10% 25%; /* Match foreground */
+    --popover: 30 100% 97%; /* Slightly off-white */
+    --popover-foreground: 30 10% 25%; /* Match foreground */
+    --primary: 40 85% 65%; /* Elegant, soft gold */
+    --primary-foreground: 30 10% 15%; /* Darker text on primary for contrast */
+    --secondary: 40 70% 90%; /* Very light, pale gold/cream */
+    --secondary-foreground: 30 10% 30%; /* Darker charcoal/brown */
+    --muted: 30 50% 95%; /* Very light, muted cream/grey */
+    --muted-foreground: 30 10% 50%; /* Medium grey/brown */
+    --accent: 35 70% 50%; /* A richer, slightly desaturated bronze/brown as a contrast */
+    --accent-foreground: 30 100% 98%; /* Light cream for text on accent */
+    --destructive: 0 65% 55%; /* Soft, less aggressive red */
     --destructive-foreground: 0 0% 98%; /* Light text on destructive */
-    --border: 50 40% 80%; /* Light Gold/Brown Border */
-    --input: 50 40% 85%; /* Lighter Gold/Brown Input */
-    --ring: 45 90% 55%; /* Brighter Gold for focus ring */
+    --border: 30 30% 88%; /* Very light grey/cream border */
+    --input: 30 30% 92%; /* Slightly darker cream for input */
+    --ring: 40 85% 70%; /* Soft gold for focus ring */
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --radius: 0.6rem; /* Slightly more rounded */
   }
 
   .dark {
-    /* Dark Theme */
-    --background: 26 40% 12%; /* Darker Brown */
-    --foreground: 56 100% 90%; /* Off-white/Cream */
-    --card: 26 40% 16%; /* Slightly Lighter Dark Brown */
-    --card-foreground: 56 100% 90%; /* Match foreground */
-    --popover: 26 40% 12%; /* Match background */
-    --popover-foreground: 56 100% 90%; /* Match foreground */
-    --primary: 45 90% 55%; /* Brighter Gold */
-    --primary-foreground: 26 70% 15%; /* Deep Brown for primary text */
-    --secondary: 26 50% 25%; /* Muted Dark Brown */
-    --secondary-foreground: 56 100% 88%; /* Slightly muted Cream */
-    --muted: 26 50% 20%; /* Darker Muted Brown */
-    --muted-foreground: 56 50% 75%; /* Lighter Cream/Gray */
-    --accent: 45 90% 60%; /* Brighter Gold Accent */
-    --accent-foreground: 26 70% 15%; /* Deep Brown for accent text */
-    --destructive: 0 65% 50%; /* Standard Red */
+    /* Dark Theme - Giva Inspired */
+    --background: 220 15% 10%; /* Deep, cool charcoal/navy */
+    --foreground: 220 20% 90%; /* Off-white, slightly cool */
+    --card: 220 15% 12%; /* Slightly lighter dark charcoal */
+    --card-foreground: 220 20% 90%; /* Match foreground */
+    --popover: 220 15% 10%; /* Match background */
+    --popover-foreground: 220 20% 90%; /* Match foreground */
+    --primary: 40 80% 70%; /* Brighter, elegant gold */
+    --primary-foreground: 220 10% 15%; /* Dark text on primary */
+    --secondary: 220 15% 20%; /* Muted dark blue/grey */
+    --secondary-foreground: 220 20% 85%; /* Lighter off-white */
+    --muted: 220 15% 15%; /* Darker muted blue/grey */
+    --muted-foreground: 220 15% 65%; /* Medium cool grey */
+    --accent: 35 75% 60%; /* A richer bronze for accent */
+    --accent-foreground: 220 10% 15%; /* Dark text on accent */
+    --destructive: 0 60% 50%; /* Soft red */
     --destructive-foreground: 0 0% 98%; /* Light text on destructive */
-    --border: 26 40% 28%; /* Muted Brown Border */
-    --input: 26 40% 32%; /* Lighter Muted Brown Input */
-    --ring: 45 90% 60%; /* Brighter Gold for focus ring */
+    --border: 220 15% 25%; /* Muted dark blue/grey border */
+    --input: 220 15% 22%; /* Slightly lighter dark input */
+    --ring: 40 80% 75%; /* Brighter gold for focus ring */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    /* Sidebar variables removed as sidebar component is not present */
+    --radius: 0.6rem; /* Slightly more rounded */
   }
 }
 
 @layer base {
   * {
-    @apply border-border transition-colors duration-200 ease-in-out; /* Slightly longer transition */
+    @apply border-border transition-colors duration-200 ease-in-out; 
   }
   body {
     @apply bg-background text-foreground antialiased;
-    /* Improve font rendering */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  /* Consistent focus ring styling */
    *:focus-visible {
      @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
    }
-
-   /* Add smooth scrolling */
    html {
       scroll-behavior: smooth;
    }

@@ -4,80 +4,84 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckCircle } from 'lucide-react'
+import { CheckCircle, Briefcase } from 'lucide-react' // Using Briefcase for workshop
 import Link from 'next/link'
 
 export default function GoldsmithRegisterPage() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    alert('Registration submission not yet implemented. Data needs to be saved to a database.');
+    alert('Registration submission (simulated). Actual database integration needed.');
   };
 
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-8rem)] py-8 bg-gradient-to-b from-background to-secondary"> {/* Reduced py and min-h calc */}
-      <Card className="w-full max-w-2xl shadow-xl border-primary/30">
-        <CardHeader className="text-center">
-          <CheckCircle className="h-10 w-10 mx-auto text-primary mb-2" /> {/* Slightly smaller icon */}
-          <CardTitle className="text-2xl font-bold text-primary-foreground">Register Your Goldsmith Workshop</CardTitle>
-          <CardDescription>Join our network of skilled artisans. Fill in the details below.</CardDescription>
+    <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-12 bg-gradient-to-br from-secondary/30 to-background">
+      <Card className="w-full max-w-2xl shadow-xl border-primary/10 rounded-xl">
+        <CardHeader className="text-center pt-8 pb-4">
+          <Briefcase className="h-12 w-12 mx-auto text-primary mb-3" />
+          <CardTitle className="text-3xl font-bold text-primary-foreground">Register Your Goldsmith Workshop</CardTitle>
+          <CardDescription className="text-foreground/70">Join our curated network of skilled artisans. Please fill in your details below.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit}> {/* Reduced space-y */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3"> {/* Reduced gap */}
-               <div className="space-y-1.5"> {/* Reduced space-y */}
+        <CardContent className="px-8 pb-8 pt-4">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+               <div className="space-y-2">
                 <Label htmlFor="workshopName">Workshop Name</Label>
-                <Input id="workshopName" placeholder="e.g., Golden Touch Crafters" required />
+                <Input id="workshopName" placeholder="e.g., Aura & Gold Creations" required className="text-base"/>
               </div>
-               <div className="space-y-1.5"> {/* Reduced space-y */}
+               <div className="space-y-2">
                 <Label htmlFor="contactPerson">Contact Person</Label>
-                <Input id="contactPerson" placeholder="Your Name" required />
+                <Input id="contactPerson" placeholder="Your Full Name" required className="text-base"/>
               </div>
             </div>
 
-            <div className="space-y-1.5"> {/* Reduced space-y */}
-              <Label htmlFor="email">Email Address</Label>
-              <Input id="email" type="email" placeholder="you@example.com" required />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="email">Business Email Address</Label>
+                <Input id="email" type="email" placeholder="contact@auragold.com" required className="text-base"/>
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="phone">Business Phone Number</Label>
+                <Input id="phone" type="tel" placeholder="(+1) 555-123-4567" required className="text-base"/>
+              </div>
             </div>
+            
 
-             <div className="space-y-1.5"> {/* Reduced space-y */}
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input id="phone" type="tel" placeholder="Your Contact Number" required />
-            </div>
-
-            <div className="space-y-1.5"> {/* Reduced space-y */}
+            <div className="space-y-2">
               <Label htmlFor="address">Workshop Address</Label>
-              <Textarea id="address" placeholder="Full address of your workshop" required rows={3} /> {/* Reduced rows */}
+              <Textarea id="address" placeholder="Full address of your workshop or studio" required rows={3} className="text-base"/>
             </div>
 
-             <div className="space-y-1.5"> {/* Reduced space-y */}
-              <Label htmlFor="specialties">Specialties</Label>
-              <Input id="specialties" placeholder="e.g., Custom Rings, Engraving, Restoration" required />
-               <p className="text-xs text-muted-foreground">Separate specialties with commas.</p>
+             <div className="space-y-2">
+              <Label htmlFor="specialties">Specialties & Techniques</Label>
+              <Input id="specialties" placeholder="e.g., Custom Engagement Rings, Hand Engraving, Gemstone Setting" required className="text-base"/>
+               <p className="text-xs text-muted-foreground">Separate multiple specialties with commas.</p>
             </div>
 
-            <div className="space-y-1.5"> {/* Reduced space-y */}
-              <Label htmlFor="portfolio">Portfolio Link (Optional)</Label>
-              <Input id="portfolio" type="url" placeholder="Link to your website or online portfolio" />
+            <div className="space-y-2">
+              <Label htmlFor="portfolio">Portfolio Link (Website, Instagram, etc.)</Label>
+              <Input id="portfolio" type="url" placeholder="https://yourportfolio.com" className="text-base"/>
             </div>
-
-            <div className="space-y-1.5"> {/* Reduced space-y */}
-              <Label htmlFor="password">Create Password</Label>
-              <Input id="password" type="password" required />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="password">Create Password</Label>
+                <Input id="password" type="password" required className="text-base"/>
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input id="confirmPassword" type="password" required className="text-base"/>
+              </div>
             </div>
+            
 
-             <div className="space-y-1.5"> {/* Reduced space-y */}
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input id="confirmPassword" type="password" required />
-            </div>
-
-            <Button type="submit" className="w-full shadow-md hover:shadow-lg transition-shadow">
-              Submit Registration
+            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-3 bg-primary hover:bg-primary/90 text-primary-foreground mt-2">
+              <CheckCircle className="mr-2 h-5 w-5"/> Submit Registration
             </Button>
-             <p className="text-center text-sm text-muted-foreground pt-2"> {/* Reduced pt */}
-                Already have an account?{' '}
-                <Link href="/goldsmith-portal/login" className="underline text-primary hover:text-primary/80">
-                  Login here
+             <p className="text-center text-sm text-muted-foreground pt-4">
+                Already a partner?{' '}
+                <Link href="/goldsmith-portal/login" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
+                  Login to your portal
                 </Link>
               </p>
           </form>
