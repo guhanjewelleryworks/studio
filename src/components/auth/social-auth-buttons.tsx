@@ -51,98 +51,118 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
   const { toast } = useToast(); // Initialize toast
 
   const handleGoogleAuth = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      toast({
-        title: "Authentication Successful",
-        description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Google.`,
-      });
-      // TODO: Redirect user or update application state (e.g., router.push('/dashboard'))
+    // TODO: Remove this simulation and re-enable actual Firebase auth
+    console.log("Simulating successful Google login...");
+    toast({
+      title: "Authentication Successful (Simulated)",
+      description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Google.`,
+    });
+    // Simulate redirect
+    setTimeout(() => {
       window.location.href = '/'; // Simple redirect for now
-    } catch (error) {
-      const authError = error as AuthError;
-      console.error(`Google ${mode} error:`, authError.code, authError.message);
-      let description = authError.message || `Failed to ${mode} with Google. Please try again.`;
-      
-      switch (authError.code) {
-        case 'auth/cancelled-popup-request':
-        case 'auth/popup-closed-by-user':
-          description = 'The sign-in popup was closed. Please try again.';
-          break;
-        case 'auth/popup-blocked':
-          description = 'The sign-in popup was blocked by your browser. Please allow popups for this site and try again.';
-          break;
-        case 'auth/operation-not-allowed':
-          description = `Sign-in with Google is not enabled for this project. Please contact support or check Firebase console configuration.`;
-          break;
-        case 'auth/unauthorized-domain':
-          description = 'This domain is not authorized for OAuth operations for this project. Please check your Firebase console.';
-          break;
-        case 'auth/api-key-not-valid':
-          description = 'The Firebase API key is invalid. Please check your Firebase project configuration and ensure the API key in `src/lib/firebase/config.ts` is correct.';
-          break;
-        // Add other specific Firebase error codes as needed
-        default:
-          // Use the default Firebase message or a generic one
-          break;
-      }
-      
-      toast({
-        title: "Authentication Error",
-        description: description,
-        variant: "destructive",
-      });
-    }
+    }, 1000);
+    return; // Skip actual Firebase call
+
+    // ----- Actual Firebase Logic (commented out for simulation) -----
+    // const provider = new GoogleAuthProvider();
+    // try {
+    //   await signInWithPopup(auth, provider);
+    //   toast({
+    //     title: "Authentication Successful",
+    //     description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Google.`,
+    //   });
+    //   // TODO: Redirect user or update application state (e.g., router.push('/dashboard'))
+    //   window.location.href = '/'; // Simple redirect for now
+    // } catch (error) {
+    //   const authError = error as AuthError;
+    //   console.error(`Google ${mode} error:`, authError.code, authError.message);
+    //   let description = authError.message || `Failed to ${mode} with Google. Please try again.`;
+
+    //   switch (authError.code) {
+    //     case 'auth/cancelled-popup-request':
+    //     case 'auth/popup-closed-by-user':
+    //       description = 'The sign-in popup was closed. Please try again.';
+    //       break;
+    //     case 'auth/popup-blocked':
+    //       description = 'The sign-in popup was blocked by your browser. Please allow popups for this site and try again.';
+    //       break;
+    //     case 'auth/operation-not-allowed':
+    //       description = `Sign-in with Google is not enabled for this project. Please contact support or check Firebase console configuration.`;
+    //       break;
+    //     case 'auth/unauthorized-domain':
+    //       description = 'This domain is not authorized for OAuth operations for this project. Please check your Firebase console.';
+    //       break;
+    //     case 'auth/api-key-not-valid':
+    //       description = 'The Firebase API key is invalid. Please check your Firebase project configuration and ensure the API key in `src/lib/firebase/config.ts` is correct.';
+    //       break;
+    //     // Add other specific Firebase error codes as needed
+    //     default:
+    //       // Use the default Firebase message or a generic one
+    //       break;
+    //   }
+
+    //   toast({
+    //     title: "Authentication Error",
+    //     description: description,
+    //     variant: "destructive",
+    //   });
+    // }
+    // ----- End Actual Firebase Logic -----
   };
 
   const handleFacebookAuth = async () => {
-    const provider = new FacebookAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      toast({
-        title: "Authentication Successful",
-        description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Facebook.`,
-      });
-      // TODO: Redirect user or update application state
-       window.location.href = '/'; // Simple redirect for now
-    } catch (error) {
-      const authError = error as AuthError;
-      console.error(`Facebook ${mode} error:`, authError.code, authError.message);
-      let description = authError.message || `Failed to ${mode} with Facebook. Please try again.`;
+    // TODO: Implement Facebook login simulation or actual logic if needed
+    alert('Facebook login is not implemented in this simulation.');
+    return;
 
-      switch (authError.code) {
-        case 'auth/cancelled-popup-request':
-        case 'auth/popup-closed-by-user':
-          description = 'The sign-in popup was closed. Please try again.';
-          break;
-        case 'auth/popup-blocked':
-          description = 'The sign-in popup was blocked by your browser. Please allow popups for this site and try again.';
-          break;
-        case 'auth/operation-not-allowed':
-          description = `Sign-in with Facebook is not enabled for this project. Please contact support or check Firebase console configuration.`;
-          break;
-        case 'auth/unauthorized-domain':
-          description = 'This domain is not authorized for OAuth operations for this project. Please check your Firebase console.';
-          break;
-        case 'auth/account-exists-with-different-credential':
-          description = 'An account already exists with the same email address but different sign-in credentials. Try signing in using a different provider.';
-          break;
-        case 'auth/api-key-not-valid':
-           description = 'The Firebase API key is invalid. Please check your Firebase project configuration and ensure the API key in `src/lib/firebase/config.ts` is correct.';
-          break;
-        // Add other specific Firebase error codes as needed
-        default:
-          // Use the default Firebase message or a generic one
-          break;
-      }
+    // ----- Actual Facebook Logic -----
+    // const provider = new FacebookAuthProvider();
+    // try {
+    //   await signInWithPopup(auth, provider);
+    //   toast({
+    //     title: "Authentication Successful",
+    //     description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Facebook.`,
+    //   });
+    //   // TODO: Redirect user or update application state
+    //    window.location.href = '/'; // Simple redirect for now
+    // } catch (error) {
+    //   const authError = error as AuthError;
+    //   console.error(`Facebook ${mode} error:`, authError.code, authError.message);
+    //   let description = authError.message || `Failed to ${mode} with Facebook. Please try again.`;
 
-       toast({
-        title: "Authentication Error",
-        description: description,
-        variant: "destructive",
-      });
-    }
+    //   switch (authError.code) {
+    //     case 'auth/cancelled-popup-request':
+    //     case 'auth/popup-closed-by-user':
+    //       description = 'The sign-in popup was closed. Please try again.';
+    //       break;
+    //     case 'auth/popup-blocked':
+    //       description = 'The sign-in popup was blocked by your browser. Please allow popups for this site and try again.';
+    //       break;
+    //     case 'auth/operation-not-allowed':
+    //       description = `Sign-in with Facebook is not enabled for this project. Please contact support or check Firebase console configuration.`;
+    //       break;
+    //     case 'auth/unauthorized-domain':
+    //       description = 'This domain is not authorized for OAuth operations for this project. Please check your Firebase console.';
+    //       break;
+    //     case 'auth/account-exists-with-different-credential':
+    //       description = 'An account already exists with the same email address but different sign-in credentials. Try signing in using a different provider.';
+    //       break;
+    //     case 'auth/api-key-not-valid':
+    //        description = 'The Firebase API key is invalid. Please check your Firebase project configuration and ensure the API key in `src/lib/firebase/config.ts` is correct.';
+    //       break;
+    //     // Add other specific Firebase error codes as needed
+    //     default:
+    //       // Use the default Firebase message or a generic one
+    //       break;
+    //   }
+
+    //    toast({
+    //     title: "Authentication Error",
+    //     description: description,
+    //     variant: "destructive",
+    //   });
+    // }
+    // ----- End Actual Facebook Logic -----
   };
 
   const buttonTextPrefix = mode === 'login' ? 'Login' : 'Sign up';
@@ -160,4 +180,3 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
     </div>
   );
 }
-
