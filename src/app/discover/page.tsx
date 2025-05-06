@@ -143,6 +143,7 @@ export default function DiscoverPage() {
                     width={400}
                     height={200}
                     className="rounded-t-lg object-cover w-full aspect-video"
+                    data-ai-hint="goldsmith jewelry store"
                   />
                 </CardHeader>
                 <CardContent className="p-4 flex-grow flex flex-col justify-between">
@@ -157,7 +158,7 @@ export default function DiscoverPage() {
                     </div>
                   </div>
                   <Button variant="outline" size="sm" asChild className="mt-auto border-accent text-accent hover:bg-accent/10">
-                    <Link href={`/goldsmith/${goldsmith.id}`}>View Profile</Link>
+                    <Link href={`/goldsmith/${goldsmith.id}`}><span>View Profile</span></Link>
                   </Button>
                 </CardContent>
               </Card>

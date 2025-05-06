@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,7 +36,7 @@ export default function AdminPortalPage() {
              {/* Example: <Link href="/admin/users">Manage Users</Link> */}
             <Button asChild size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow mt-4">
               <Link href="/admin/login">
-                Admin Login
+                <span>Admin Login</span>
               </Link>
             </Button>
           </CardContent>

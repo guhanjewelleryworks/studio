@@ -34,12 +34,12 @@ export default function GoldsmithPortalPage() {
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
                 <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-shadow">
                   <Link href="/goldsmith-portal/register">
-                    Register Your Workshop
+                    <span>Register Your Workshop</span>
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10">
                   <Link href="/goldsmith-portal/login">
-                    Login to Dashboard
+                    <span>Login to Dashboard</span>
                   </Link>
                 </Button>
               </div>
@@ -50,6 +50,7 @@ export default function GoldsmithPortalPage() {
               width={600}
               height={400}
               className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full shadow-lg"
+              data-ai-hint="goldsmith working"
             />
           </div>
         </div>
@@ -162,13 +163,15 @@ export default function GoldsmithPortalPage() {
           <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
              <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-shadow">
               <Link href="/goldsmith-portal/register">
-                Register Now
-                <CheckCircle className="ml-2 h-5 w-5" />
+                <span>
+                  Register Now
+                  <CheckCircle className="ml-2 h-5 w-5 inline" />
+                </span>
               </Link>
             </Button>
              <Button asChild variant="link" size="lg" className="text-accent hover:text-accent/80">
                <Link href="/contact?subject=GoldsmithInquiry">
-                 Have Questions? Contact Us
+                 <span>Have Questions? Contact Us</span>
                </Link>
              </Button>
           </div>

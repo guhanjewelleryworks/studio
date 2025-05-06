@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check } from 'lucide-react';
@@ -92,7 +91,7 @@ export default function PricingPage() {
               <div className="p-6 pt-0 mt-auto">
                 <Button asChild className={`w-full shadow-md ${tier.mostPopular ? '' : 'bg-accent text-accent-foreground hover:bg-accent/90'}`}>
                   <Link href={tier.href}>
-                    {tier.id.includes('customer') ? 'Get started' : 'Register Now'}
+                    <span>{tier.id.includes('customer') ? 'Get started' : 'Register Now'}</span>
                   </Link>
                 </Button>
               </div>
