@@ -11,16 +11,7 @@ export function Footer() {
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
           <Gem className="hidden h-6 w-6 text-primary md:inline-block" />
           <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            Built by{' '}
-            <a
-              href="https://firebase.google.com/docs/studio" // Replace with actual link if needed
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium underline underline-offset-4 hover:text-primary"
-            >
-              Firebase Studio
-            </a>
-            . © {currentYear} Goldsmith Connect. All rights reserved.
+            © {currentYear} Goldsmith Connect. All rights reserved.
           </p>
         </div>
         <nav className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
