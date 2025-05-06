@@ -9,10 +9,10 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center">
       {/* Hero Section */}
-      <section className="w-full py-16 md:py-20 lg:py-28 xl:py-32 bg-gradient-to-br from-secondary/80 via-background to-background"> {/* Reduced py */}
+      <section className="w-full pt-8 pb-16 md:pt-10 md:pb-20 lg:pt-14 lg:pb-28 xl:pt-16 xl:pb-32 bg-gradient-to-br from-secondary/80 via-background to-background"> {/* Reduced pt values */}
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-[1fr_450px] lg:gap-10 xl:grid-cols-[1fr_550px]"> {/* Reduced gap */}
-            <div className="flex flex-col justify-center space-y-4"> {/* Reduced space-y */}
+            <div className="flex flex-col justify-center space-y-3"> {/* Reduced space-y */}
               <div className="space-y-2"> {/* Reduced space-y */}
                 <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl/none text-primary-foreground">
                   Discover Local Goldsmiths, Craft Your Dreams
@@ -62,7 +62,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="w-full py-12 md:py-20 lg:py-24 bg-background"> {/* Reduced py */}
+      <section id="how-it-works" className="w-full py-10 md:py-16 lg:py-20 bg-background"> {/* Reduced py */}
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-3 text-center"> {/* Reduced space-y */}
             <div className="space-y-2"> {/* Reduced space-y */}
@@ -73,10 +73,10 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-10 lg:grid-cols-3 lg:max-w-none pt-10 md:pt-12"> {/* Reduced gap, adjusted pt */}
-            <div className="grid gap-1.5 text-center group"> {/* Reduced gap */}
-              <div className="flex justify-center items-center mb-2.5"> {/* Reduced mb */}
-                 <div className="p-2.5 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110"> {/* Reduced p */}
+          <div className="mx-auto grid max-w-5xl items-start gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:max-w-none pt-8 md:pt-10"> {/* Reduced gap, adjusted pt */}
+            <div className="grid gap-1 text-center group"> {/* Reduced gap */}
+              <div className="flex justify-center items-center mb-2"> {/* Reduced mb */}
+                 <div className="p-2 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110"> {/* Reduced p */}
                     <Search className="h-6 w-6" /> {/* Slightly smaller icon */}
                  </div>
               </div>
@@ -85,9 +85,9 @@ export default function Home() {
                 Browse verified goldsmith profiles. Submit an introduction or custom order request via our platform.
               </p>
             </div>
-            <div className="grid gap-1.5 text-center group"> {/* Reduced gap */}
-               <div className="flex justify-center items-center mb-2.5"> {/* Reduced mb */}
-                 <div className="p-2.5 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110"> {/* Reduced p */}
+            <div className="grid gap-1 text-center group"> {/* Reduced gap */}
+               <div className="flex justify-center items-center mb-2"> {/* Reduced mb */}
+                 <div className="p-2 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110"> {/* Reduced p */}
                     <Lock className="h-6 w-6" /> {/* Slightly smaller icon */}
                  </div>
               </div>
@@ -96,9 +96,9 @@ export default function Home() {
                 Our team reviews your request. If approved, we facilitate a secure introduction or pass order details to the goldsmith.
               </p>
             </div>
-            <div className="grid gap-1.5 text-center group"> {/* Reduced gap */}
-               <div className="flex justify-center items-center mb-2.5"> {/* Reduced mb */}
-                  <div className="p-2.5 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110"> {/* Reduced p */}
+            <div className="grid gap-1 text-center group"> {/* Reduced gap */}
+               <div className="flex justify-center items-center mb-2"> {/* Reduced mb */}
+                  <div className="p-2 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110"> {/* Reduced p */}
                     <Sparkles className="h-6 w-6" /> {/* Slightly smaller icon */}
                   </div>
                </div>
@@ -112,7 +112,7 @@ export default function Home() {
       </section>
 
       {/* Featured Goldsmiths Section */}
-      <section className="w-full py-12 md:py-20 lg:py-24 bg-gradient-to-b from-secondary/60 to-background"> {/* Reduced py */}
+      <section className="w-full py-10 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/60 to-background"> {/* Reduced py */}
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6"> {/* Reduced gap */}
           <div className="space-y-2"> {/* Reduced space-y */}
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl/tight text-primary-foreground">Meet Our Talented Artisans</h2>
@@ -120,7 +120,7 @@ export default function Home() {
               Discover skilled goldsmiths ready to craft your next masterpiece.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8"> {/* Reduced gap, pt */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-6"> {/* Reduced gap, pt */}
             {[1, 2, 3].map((i) => (
               <Card key={i} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/20 overflow-hidden group"> {/* Reduced hover translate */}
                 <CardHeader className="p-0 relative">
@@ -134,7 +134,7 @@ export default function Home() {
                   />
                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </CardHeader>
-                 <CardContent className="p-4 text-left space-y-1.5"> {/* Reduced p, space-y */}
+                 <CardContent className="p-3 text-left space-y-1"> {/* Reduced p, space-y */}
                   <CardTitle className="text-xl text-primary-foreground">Artisan Jewelers {i}</CardTitle> {/* Removed mb */}
                   <CardDescription className="flex items-center text-foreground text-sm">
                     <MapPin className="mr-1.5 h-4 w-4 text-muted-foreground" /> Cityville, ST
@@ -144,7 +144,7 @@ export default function Home() {
                       href={`/goldsmith/artisan-${i}`}
                       className={cn(
                          buttonVariants({ variant: "outline", size: "sm" }),
-                         'text-accent border-accent hover:bg-accent/10 mt-2.5 w-full' // Reduced mt
+                         'text-accent border-accent hover:bg-accent/10 mt-2 w-full' // Reduced mt
                       )}
                     >
                       <span>View Profile</span>
@@ -153,7 +153,7 @@ export default function Home() {
               </Card>
             ))}
           </div>
-           <div className="mt-8 md:mt-10"> {/* Reduced mt */}
+           <div className="mt-6 md:mt-8"> {/* Reduced mt */}
               <Link
                  href="/discover"
                  className={cn(
@@ -168,10 +168,10 @@ export default function Home() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="w-full py-12 md:py-16 lg:py-20 border-t border-border/20 bg-gradient-to-t from-secondary/40 to-background"> {/* Reduced py */}
-        <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6"> {/* Reduced gap */}
+      <section className="w-full py-10 md:py-12 lg:py-16 border-t border-border/20 bg-gradient-to-t from-secondary/40 to-background"> {/* Reduced py */}
+        <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6"> {/* Reduced gap */}
           <div className="space-y-2"> {/* Reduced space-y */}
-             <Handshake className="h-10 w-10 mx-auto text-primary mb-2" /> {/* Replaced icon and adjusted size/margin */}
+             <Handshake className="h-10 w-10 mx-auto text-primary mb-1" /> {/* Replaced icon and adjusted size/margin */}
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl/tight text-primary-foreground">
               Ready to Create or Connect?
             </h2>
@@ -179,7 +179,7 @@ export default function Home() {
               Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmith Connect is your platform.
             </p>
           </div>
-          <div className="flex flex-col gap-2.5 min-[400px]:flex-row justify-center"> {/* Reduced gap */}
+          <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center"> {/* Reduced gap */}
               <Link
                  href="/discover"
                  className={cn(
