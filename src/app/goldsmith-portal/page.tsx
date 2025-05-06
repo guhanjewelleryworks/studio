@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'; // Import cn
 
 // Inline SVG for a Hammer/Anvil icon representing craftsmanship
 const CraftIcon = () => (
- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-12 w-12 text-primary">
+ <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-10 w-10 text-primary"> {/* Slightly smaller icon */}
     <path d="M15 12l-4-4 1-1 4 4-1 1z"/>
     <path d="M3 21h18"/>
     <path d="M12 21v-6"/><path d="M7.5 7.5C9 6 10 6 11 7c1-1 2-1 3.5-1.5s2.5.5 2.5 2c0 2-2.5 4.5-5 6.5s-5 4.5-5 6.5c0 1.5 1 2.5 2.5 2.5S13 22 14 21"/>
@@ -19,11 +19,11 @@ export default function GoldsmithPortalPage() {
   return (
     <div className="flex flex-col items-center">
       {/* Hero Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-secondary to-background">
+      <section className="w-full py-16 md:py-20 lg:py-28 bg-gradient-to-b from-secondary to-background"> {/* Reduced py */}
         <div className="container px-4 md:px-6">
-          <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:items-center">
-            <div className="flex flex-col justify-center space-y-4">
-              <div className="space-y-2">
+          <div className="grid gap-6 lg:grid-cols-2 lg:gap-10 xl:items-center"> {/* Reduced gap */}
+            <div className="flex flex-col justify-center space-y-3"> {/* Reduced space-y */}
+              <div className="space-y-2"> {/* Reduced space-y */}
                  <div className="inline-block rounded-lg bg-primary px-3 py-1 text-sm text-primary-foreground shadow-sm">Goldsmith Portal</div>
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none text-primary-foreground">
                   Showcase Your Craft, Connect with Clients
@@ -66,21 +66,21 @@ export default function GoldsmithPortalPage() {
       </section>
 
       {/* Benefits Section */}
-      <section id="benefits" className="w-full py-12 md:py-24 lg:py-32 bg-background">
+      <section id="benefits" className="w-full py-12 md:py-20 lg:py-28 bg-background"> {/* Reduced py */}
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
+          <div className="flex flex-col items-center justify-center space-y-3 text-center"> {/* Reduced space-y */}
+            <div className="space-y-2"> {/* Reduced space-y */}
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-primary-foreground">Why Partner with Us?</h2>
               <p className="max-w-[900px] text-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 Expand your reach, streamline your orders, and focus on what you do best – creating beautiful jewelry.
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3 lg:max-w-none pt-12">
+          <div className="mx-auto grid max-w-5xl items-start gap-6 sm:grid-cols-2 md:gap-10 lg:grid-cols-3 lg:max-w-none pt-10 md:pt-12"> {/* Reduced gap, pt */}
             <Card className="shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-primary-foreground">Receive Orders</CardTitle>
-                 <Users className="h-6 w-6 text-accent" />
+                 <Users className="h-5 w-5 text-accent" /> {/* Slightly smaller icon */}
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
@@ -91,7 +91,7 @@ export default function GoldsmithPortalPage() {
              <Card className="shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-primary-foreground">Manage Your Business</CardTitle>
-                <DollarSign className="h-6 w-6 text-accent" />
+                <DollarSign className="h-5 w-5 text-accent" /> {/* Slightly smaller icon */}
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
@@ -102,7 +102,7 @@ export default function GoldsmithPortalPage() {
              <Card className="shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-primary-foreground">Grow Your Reach</CardTitle>
-                 <BarChart className="h-6 w-6 text-accent" />
+                 <BarChart className="h-5 w-5 text-accent" /> {/* Slightly smaller icon */}
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
@@ -115,17 +115,17 @@ export default function GoldsmithPortalPage() {
       </section>
 
        {/* How to Join Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-secondary">
+      <section className="w-full py-12 md:py-20 lg:py-28 bg-secondary"> {/* Reduced py */}
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
+          <div className="flex flex-col items-center justify-center space-y-3 text-center"> {/* Reduced space-y */}
+            <div className="space-y-2"> {/* Reduced space-y */}
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-primary-foreground">Joining is Simple</h2>
                <p className="max-w-[900px] text-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 Start connecting with customers in just a few steps.
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-3xl items-start gap-8 sm:grid-cols-2 md:gap-12 pt-12">
+          <div className="mx-auto grid max-w-3xl items-start gap-6 sm:grid-cols-2 md:gap-10 pt-10 md:pt-12"> {/* Reduced gap, pt */}
              <div className="grid gap-1 text-center items-center">
                 <div className="flex justify-center items-center mb-2">
                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground mr-2">1</span>
@@ -158,7 +158,7 @@ export default function GoldsmithPortalPage() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 border-t border-border">
+      <section className="w-full py-12 md:py-20 lg:py-28 border-t border-border"> {/* Reduced py */}
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
           <div className="space-y-3">
              <CraftIcon />

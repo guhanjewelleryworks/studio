@@ -8,7 +8,7 @@ import Link from 'next/link'
 export default function AdminLoginPage() {
   // TODO: Implement form handling with react-hook-form and server action
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-12 bg-gradient-to-b from-background to-muted">
+    <div className="flex justify-center items-center min-h-[calc(100vh-8rem)] py-8 bg-gradient-to-b from-background to-muted"> {/* Reduced py and min-h calculation */}
       <Card className="w-full max-w-md shadow-xl border-destructive/50">
         <CardHeader className="text-center">
            <ShieldAlert className="h-12 w-12 mx-auto text-destructive mb-2" />
@@ -16,27 +16,22 @@ export default function AdminLoginPage() {
           <CardDescription>Restricted Access. Authorized Personnel Only.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-6">
-            <div className="space-y-2">
+          <form className="space-y-4"> {/* Reduced space-y */}
+            <div className="space-y-1.5"> {/* Reduced space-y */}
               <Label htmlFor="username">Username or Email</Label>
               <Input id="username" type="text" placeholder="admin_user" required />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5"> {/* Reduced space-y */}
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" required />
             </div>
-
-            {/* Add form submission status/errors here (consider more robust auth indicators) */}
-            {/* e.g., <p className="text-destructive text-sm">Invalid credentials.</p> */}
 
             <Button type="submit" variant="destructive" className="w-full shadow-md hover:shadow-lg transition-shadow">
               Secure Login
             </Button>
 
-            {/* Optional: Add MFA input or other security measures here */}
-
-              <p className="text-center text-xs text-muted-foreground pt-4">
+              <p className="text-center text-xs text-muted-foreground pt-3"> {/* Reduced pt */}
                  For security reasons, password recovery options are limited. Contact system administrator if you have issues logging in.
                  <br />
                  <Link href="/" className="underline hover:text-primary">Return to Homepage</Link>
