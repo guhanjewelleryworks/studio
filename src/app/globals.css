@@ -8,65 +8,81 @@ body {
 
 @layer base {
   :root {
-    /* Light Theme - Image Inspired */
-    --background-image-url: url('https://images.unsplash.com/photo-1581790704113-dd5a91124581?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-    --background-overlay: 35 100% 97% / 0.85; /* Light peach/cream with 85% opacity */
-    --background: 35 100% 97%; /* Very light peach/cream */
-    --foreground: 40 25% 35%; /* Muted earthy brown */
-    --card: 35 100% 97%; /* Match background */
-    --card-foreground: 40 25% 35%; /* Match foreground */
-    --popover: 35 100% 96%; /* Slightly off-white peach */
-    --popover-foreground: 40 25% 35%; /* Match foreground */
-    --primary: 30 85% 70%; /* Soft apricot/peach */
-    --primary-foreground: 30 20% 20%; /* Darker brown for contrast on primary */
-    --secondary: 35 70% 92%; /* Very light, pale peach */
-    --secondary-foreground: 40 25% 40%; /* Slightly darker muted brown */
-    --muted: 35 60% 95%; /* Very light muted peach/grey */
-    --muted-foreground: 40 20% 55%; /* Medium muted brown */
-    --accent: 350 75% 78%; /* Muted rose/pink */
-    --accent-foreground: 350 100% 98%; /* Very light (almost white) for text on accent */
-    --destructive: 0 65% 60%; /* Soft, less aggressive red */
-    --destructive-foreground: 0 0% 98%; /* Light text on destructive */
-    --border: 35 40% 90%; /* Very light peachy border */
-    --input: 35 50% 94%; /* Slightly darker peachy input background */
-    --ring: 30 85% 75%; /* Soft apricot/peach for focus ring */
-    --chart-1: 25 80% 70%; /* Peach */
-    --chart-2: 350 70% 75%; /* Rose */
-    --chart-3: 60 40% 65%;  /* Light Olive/Yellow-Green */
-    --chart-4: 40 30% 50%; /* Muted Brown */
-    --chart-5: 35 90% 80%; /* Lighter Apricot */
-    --radius: 0.6rem; /* Slightly more rounded */
+    /* Light Theme - Cheerful, Vibrant & Happy */
+    --background: 50 100% 97%; /* Pale Yellow/Cream */
+    --foreground: 20 15% 25%; /* Dark Brown for text */
+
+    --card: 44 100% 95%; /* Slightly darker Cream */
+    --card-foreground: 20 15% 25%;
+
+    --popover: 44 100% 94%; /* Cream */
+    --popover-foreground: 20 15% 25%;
+
+    --primary: 345 90% 60%; /* Bright Pink/Coral */
+    --primary-foreground: 0 0% 100%; /* White */
+
+    --secondary: 15 100% 70%; /* Coral/Orange */
+    --secondary-foreground: 20 15% 25%;
+
+    --muted: 40 100% 90%; /* Light Peach */
+    --muted-foreground: 20 15% 45%; /* Muted Brown */
+
+    --accent: 30 100% 80%; /* Peach */
+    --accent-foreground: 20 15% 20%; /* Dark Brown for contrast on accent */
+
+    --destructive: 0 70% 55%; /* Softer Red */
+    --destructive-foreground: 0 0% 100%; /* White */
+
+    --border: 40 60% 88%; /* Light Peachy Border */
+    --input: 40 70% 92%;   /* Peachy Input Background */
+    --ring: 345 90% 65%;   /* Bright Pink/Coral for focus ring */
+
+    --chart-1: 345 85% 65%; /* Pink/Coral */
+    --chart-2: 15 90% 75%;  /* Coral/Orange */
+    --chart-3: 30 95% 85%;  /* Peach */
+    --chart-4: 50 90% 90%;  /* Pale Yellow */
+    --chart-5: 25 80% 70%;  /* Light Orange */
+
+    --radius: 0.5rem; /* Standard rounding */
   }
 
   .dark {
-    /* Dark Theme - Image Inspired */
-    --background-image-url: url('https://images.unsplash.com/photo-1581790704113-dd5a91124581?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-    --background-overlay: 40 10% 15% / 0.9; /* Dark earthy brown/charcoal with 90% opacity */
-    --background: 40 10% 15%; /* Dark earthy brown/charcoal */
-    --foreground: 35 60% 88%; /* Light peachy cream for text */
-    --card: 40 10% 18%; /* Slightly lighter dark earthy brown */
-    --card-foreground: 35 60% 88%; /* Match foreground */
-    --popover: 40 10% 15%; /* Match background */
-    --popover-foreground: 35 60% 88%; /* Match foreground */
-    --primary: 30 80% 70%; /* Brighter apricot/peach, consistent with light theme's primary shade but stands out on dark */
-    --primary-foreground: 30 15% 10%; /* Very dark brown for text on primary */
-    --secondary: 40 10% 25%; /* Muted dark brown */
-    --secondary-foreground: 35 50% 80%; /* Lighter peachy cream */
-    --muted: 40 10% 20%; /* Darker muted brown */
-    --muted-foreground: 35 30% 65%; /* Medium peachy grey */
-    --accent: 350 70% 70%; /* Rose/pink, slightly more saturated for dark mode */
-    --accent-foreground: 350 15% 10%; /* Dark text on accent for contrast */
-    --destructive: 0 60% 55%; /* Soft red, slightly more prominent on dark */
-    --destructive-foreground: 0 0% 98%; /* Light text on destructive */
-    --border: 40 10% 30%; /* Muted dark brown border */
-    --input: 40 10% 28%; /* Slightly lighter dark input background */
-    --ring: 30 80% 75%; /* Brighter apricot/peach for focus ring */
-    --chart-1: 30 75% 65%; /* Peach */
-    --chart-2: 350 65% 65%; /* Rose */
-    --chart-3: 70 45% 60%;  /* Olive/Yellow-Green */
-    --chart-4: 35 50% 75%; /* Lighter Apricot */
-    --chart-5: 40 20% 45%; /* Muted Brown */
-    --radius: 0.6rem; /* Slightly more rounded */
+    /* Dark Theme - Cheerful, Vibrant & Happy (Adjusted for Dark Mode) */
+    --background: 20 15% 10%; /* Very Dark Brown */
+    --foreground: 40 100% 92%; /* Light Peach/Cream for text */
+
+    --card: 20 15% 15%; /* Darker Brown */
+    --card-foreground: 40 100% 92%;
+
+    --popover: 20 15% 12%; /* Very Dark Brown */
+    --popover-foreground: 40 100% 92%;
+
+    --primary: 345 90% 65%; /* Bright Pink/Coral (Slightly lighter for dark mode) */
+    --primary-foreground: 0 0% 100%; /* White */
+
+    --secondary: 15 100% 75%; /* Coral/Orange (Slightly lighter) */
+    --secondary-foreground: 20 15% 20%; /* Dark Brown for contrast */
+
+    --muted: 20 15% 20%; /* Dark Muted Brown */
+    --muted-foreground: 40 80% 80%; /* Lighter Peachy Cream */
+
+    --accent: 30 100% 85%; /* Peach (Slightly lighter) */
+    --accent-foreground: 20 15% 15%; /* Dark Brown for contrast */
+
+    --destructive: 0 70% 60%; /* Softer Red (Slightly lighter) */
+    --destructive-foreground: 0 0% 100%; /* White */
+
+    --border: 20 15% 25%; /* Muted Dark Brown Border */
+    --input: 20 15% 18%;   /* Darker Input Background */
+    --ring: 345 90% 70%;   /* Bright Pink/Coral for focus ring (Slightly lighter) */
+    
+    --chart-1: 345 80% 70%; /* Pink/Coral */
+    --chart-2: 15 85% 80%;  /* Coral/Orange */
+    --chart-3: 30 90% 90%;  /* Peach */
+    --chart-4: 50 85% 95%;  /* Pale Yellow */
+    --chart-5: 25 75% 75%;  /* Light Orange */
+
+    --radius: 0.5rem;
   }
 }
 
@@ -75,11 +91,7 @@ body {
     @apply border-border transition-colors duration-200 ease-in-out;
   }
   body {
-    @apply text-foreground antialiased;
-    background-image: var(--background-image-url);
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed; /* Keeps the background image fixed during scroll */
+    @apply bg-background text-foreground antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -89,16 +101,4 @@ body {
    html {
       scroll-behavior: smooth;
    }
-}
-
-/* Semi-transparent overlay for content readability */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: hsla(var(--background-overlay));
-  z-index: -1; /* Place it behind the content */
 }
