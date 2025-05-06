@@ -30,12 +30,12 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center">
       {/* Hero Section */}
-      <section className="relative w-full pt-12 pb-20 md:pt-16 md:pb-28 lg:pt-20 lg:pb-36 xl:pt-24 xl:pb-40 bg-gradient-to-br from-secondary/50 via-background to-background overflow-hidden">
+      <section className="relative w-full pt-10 pb-16 md:pt-12 md:pb-20 lg:pt-16 lg:pb-24 xl:pt-20 xl:pb-28 bg-gradient-to-br from-secondary/50 via-background to-background overflow-hidden">
         <HeroPattern />
         <div className="container px-4 md:px-6 relative z-10">
-          <div className="grid gap-8 lg:grid-cols-[1fr_500px] lg:gap-12 xl:grid-cols-[1fr_550px] items-center">
-            <div className="flex flex-col justify-center space-y-4">
-              <div className="space-y-3">
+          <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-10 xl:grid-cols-[1fr_550px] items-center">
+            <div className="flex flex-col justify-center space-y-3">
+              <div className="space-y-2">
                 <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl/none text-primary-foreground leading-tight">
                   Craft Your Story, Piece by Piece
                 </h1>
@@ -43,7 +43,7 @@ export default function Home() {
                   Goldsmith Connect is your trusted partner in discovering local artisans. Find the perfect goldsmith to bring your unique jewelry vision to life through a secure, mediated, and delightful experience.
                 </p>
               </div>
-              <div className="flex flex-col gap-3 min-[400px]:flex-row pt-2">
+              <div className="flex flex-col gap-2.5 min-[400px]:flex-row pt-1">
                  <Link
                    href="/discover"
                    className={cn(
@@ -84,10 +84,10 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="w-full py-16 md:py-24 lg:py-28 bg-background">
+      <section id="how-it-works" className="w-full py-12 md:py-16 lg:py-20 bg-background">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-3 text-center">
-            <div className="space-y-2">
+          <div className="flex flex-col items-center justify-center space-y-2 text-center">
+            <div className="space-y-1.5">
               <div className="inline-block rounded-full bg-secondary/70 px-4 py-1.5 text-sm font-medium text-secondary-foreground shadow-sm">How It Works</div>
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-primary-foreground">Your Journey to Custom Jewelry</h2>
               <p className="max-w-[900px] text-foreground/70 md:text-lg/relaxed lg:text-base/relaxed xl:text-lg/relaxed">
@@ -95,14 +95,14 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-10 lg:grid-cols-3 lg:max-w-none pt-12 md:pt-16">
+          <div className="mx-auto grid max-w-5xl items-start gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:max-w-none pt-10 md:pt-12">
             {[
               { icon: Search, title: "1. Discover & Inquire", description: "Browse verified goldsmith profiles. Submit an introduction or custom order request through our elegant platform." },
               { icon: ShieldCheck, title: "2. Admin Mediation", description: "Our team reviews your request, ensuring a secure and smooth process. We facilitate introductions and order details." },
               { icon: Gift, title: "3. Create & Cherish", description: "Collaborate with your chosen artisan. They craft your piece with passion, and you receive your dream jewelry." },
             ].map((step, index) => (
-              <div key={index} className="grid gap-2 text-center group p-6 rounded-xl bg-card hover:shadow-xl transition-shadow duration-300 border border-transparent hover:border-primary/30">
-                <div className="flex justify-center items-center mb-3">
+              <div key={index} className="grid gap-1.5 text-center group p-5 rounded-xl bg-card hover:shadow-xl transition-shadow duration-300 border border-transparent hover:border-primary/30">
+                <div className="flex justify-center items-center mb-2.5">
                    <div className="p-3 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110">
                       <step.icon className="h-7 w-7" />
                    </div>
@@ -118,15 +118,15 @@ export default function Home() {
       </section>
 
       {/* Featured Goldsmiths Section */}
-      <section className="w-full py-16 md:py-24 lg:py-28 bg-gradient-to-b from-secondary/40 to-background">
-        <div className="container grid items-center justify-center gap-6 px-4 text-center md:px-6">
-          <div className="space-y-3">
+      <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/40 to-background">
+        <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+          <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl/tight text-primary-foreground">Meet Our Artisans</h2>
             <p className="mx-auto max-w-[650px] text-foreground/70 md:text-lg/relaxed lg:text-base/relaxed xl:text-lg/relaxed">
               Discover skilled goldsmiths, each with a unique style, ready to craft your next treasured piece.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-8">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/10 overflow-hidden group rounded-xl">
                 <CardHeader className="p-0 relative">
@@ -142,7 +142,7 @@ export default function Home() {
                      <h3 className="text-lg font-semibold text-white">Artisan Jewelers {i}</h3>
                    </div>
                 </CardHeader>
-                 <CardContent className="p-4 text-left space-y-2">
+                 <CardContent className="p-4 text-left space-y-1.5">
                   <CardDescription className="flex items-center text-foreground/70 text-sm">
                     <MapPin className="mr-1.5 h-4 w-4 text-muted-foreground" /> Cityville, ST
                   </CardDescription>
@@ -151,7 +151,7 @@ export default function Home() {
                       href={`/goldsmith/artisan-${i}`}
                       className={cn(
                          buttonVariants({ variant: "outline", size: "sm" }),
-                         'text-accent border-accent hover:bg-accent/10 mt-3 w-full rounded-full'
+                         'text-accent border-accent hover:bg-accent/10 mt-2.5 w-full rounded-full'
                       )}
                     >
                       <span>View Profile</span>
@@ -160,7 +160,7 @@ export default function Home() {
               </Card>
             ))}
           </div>
-           <div className="mt-10 md:mt-12">
+           <div className="mt-8 md:mt-10">
               <Link
                  href="/discover"
                  className={cn(
@@ -175,10 +175,10 @@ export default function Home() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="w-full py-16 md:py-20 lg:py-24 border-t border-border/10 bg-gradient-to-t from-secondary/20 to-background">
-        <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
-          <div className="space-y-3">
-             <Gem className="h-12 w-12 mx-auto text-primary mb-2" />
+      <section className="w-full py-12 md:py-16 lg:py-20 border-t border-border/10 bg-gradient-to-t from-secondary/20 to-background">
+        <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
+          <div className="space-y-2">
+             <Gem className="h-10 w-10 mx-auto text-primary mb-1.5" />
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl/tight text-primary-foreground">
               Ready to Create or Connect?
             </h2>
@@ -186,7 +186,7 @@ export default function Home() {
               Whether you're looking for a unique custom piece or you're a goldsmith ready to showcase your exceptional craft, Goldsmith Connect is your premier destination.
             </p>
           </div>
-          <div className="flex flex-col gap-3 min-[400px]:flex-row justify-center pt-2">
+          <div className="flex flex-col gap-2.5 min-[400px]:flex-row justify-center pt-1.5">
               <Link
                  href="/discover"
                  className={cn(

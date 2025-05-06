@@ -26,14 +26,14 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body
         className={cn(
-          'min-h-full font-sans flex flex-col text-foreground', // Removed bg-background, as body has bg image now
+          'min-h-full font-sans flex flex-col text-foreground', 
           geistSans.variable
         )}
       >
         {/* This div acts as the content container on top of the ::before pseudo-element overlay */}
         <div className="relative flex min-h-dvh flex-col bg-transparent z-0"> 
           <Header />
-          <main className="flex-1 pt-0">{children}</main>
+          <main className="flex-1">{children}</main> {/* Removed pt-0 */}
           <Footer />
         </div>
         <Toaster />

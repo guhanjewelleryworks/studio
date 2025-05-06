@@ -13,8 +13,8 @@ import { cn } from '@/lib/utils';
 
 // Placeholder for Map Component
 const MapPlaceholder = ({ locations }: { locations: Location[] }) => (
-  <div className="w-full h-[400px] md:h-full bg-muted/50 rounded-xl flex flex-col items-center justify-center text-muted-foreground border border-border shadow-inner">
-    <MapPin className="h-12 w-12 mr-2 text-primary/70 mb-3" />
+  <div className="w-full h-[350px] md:h-full bg-muted/50 rounded-xl flex flex-col items-center justify-center text-muted-foreground border border-border shadow-inner">
+    <MapPin className="h-10 w-10 mr-2 text-primary/70 mb-2" />
     <p className="text-lg font-medium">Map View Placeholder</p>
     <p className="text-sm">(Displaying {locations.length} locations)</p>
   </div>
@@ -57,7 +57,7 @@ export default function DiscoverPage() {
          setTimeout(() => { 
            setGoldsmiths(mockGoldsmiths);
            setIsLoading(false);
-         }, 1200); // Slightly longer for effect
+         }, 1000); 
       },
       (err) => {
         console.error("Error getting location:", err);
@@ -66,7 +66,7 @@ export default function DiscoverPage() {
         setTimeout(() => { 
            setGoldsmiths(mockGoldsmiths); 
            setIsLoading(false);
-         }, 1200);
+         }, 1000);
       }
     );
   }, []); 
@@ -87,50 +87,50 @@ export default function DiscoverPage() {
        if (filtered.length === 0) {
          setError(`No goldsmiths found matching "${searchTerm}". Try a different term.`);
        }
-     }, 700);
+     }, 600);
   };
 
   const goldsmithLocations = goldsmiths.map(g => g.location);
 
   return (
-    <div className="container py-8 px-4 md:px-6 min-h-[calc(100vh-10rem)]">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+    <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)]"> {/* Reduced vertical padding */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-6"> {/* Reduced gap and margin */}
         <h1 className="text-3xl font-extrabold text-primary-foreground tracking-tight">Find a Goldsmith</h1>
         <div className="flex gap-2">
-          <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} aria-label="List View" className="rounded-full px-5 py-2.5">
-            <List className="mr-2 h-5 w-5" /> List
+          <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} aria-label="List View" className="rounded-full px-5 py-2.5 text-sm">
+            <List className="mr-2 h-4 w-4" /> List
           </Button>
-          <Button variant={viewMode === 'map' ? 'default' : 'outline'} onClick={() => setViewMode('map')} aria-label="Map View" className="rounded-full px-5 py-2.5">
-            <MapPin className="mr-2 h-5 w-5" /> Map
+          <Button variant={viewMode === 'map' ? 'default' : 'outline'} onClick={() => setViewMode('map')} aria-label="Map View" className="rounded-full px-5 py-2.5 text-sm">
+            <MapPin className="mr-2 h-4 w-4" /> Map
           </Button>
         </div>
       </div>
 
-      <form onSubmit={handleSearch} className="mb-8 flex flex-col sm:flex-row gap-3 items-center">
+      <form onSubmit={handleSearch} className="mb-6 flex flex-col sm:flex-row gap-2.5 items-center"> {/* Reduced gap and margin */}
         <Input
           type="search"
           placeholder="Search by name, specialty, or location..."
-          className="flex-grow rounded-full text-base px-5 py-3 shadow-sm"
+          className="flex-grow rounded-full text-sm px-4 py-2.5 shadow-sm" /* Reduced padding and text size */
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button type="button" variant="ghost" size="icon" className="sm:ml-2 hidden sm:inline-flex">
-            <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
+        <Button type="button" variant="ghost" size="icon" className="sm:ml-1.5 hidden sm:inline-flex"> {/* Reduced margin */}
+            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
             <span className="sr-only">Filters</span>
         </Button>
-        <Button type="submit" disabled={isLoading} size="lg" className="rounded-full px-8 py-3 w-full sm:w-auto">
-          {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Search className="mr-2 h-5 w-5" />}
+        <Button type="submit" disabled={isLoading} size="default" className="rounded-full px-6 py-2.5 text-sm w-full sm:w-auto"> {/* Reduced padding and text size */}
+          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}
           Search
         </Button>
       </form>
 
-       {error && <p className="text-destructive text-center mb-6 text-sm">{error}</p>}
+       {error && <p className="text-destructive text-center mb-4 text-sm">{error}</p>} {/* Reduced margin */}
 
-      <div className={`grid gap-8 ${viewMode === 'map' ? 'grid-cols-1 md:grid-cols-[2fr_3fr]' : ''}`}>
-        <div className={`${viewMode === 'map' ? 'hidden md:block' : ''} ${viewMode === 'list' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'overflow-y-auto max-h-[calc(100vh-20rem)] pr-4 space-y-5'}`}>
+      <div className={`grid gap-6 ${viewMode === 'map' ? 'grid-cols-1 md:grid-cols-[2fr_3fr]' : ''}`}> {/* Reduced gap */}
+        <div className={`${viewMode === 'map' ? 'hidden md:block' : ''} ${viewMode === 'list' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5' : 'overflow-y-auto max-h-[calc(100vh-18rem)] pr-3 space-y-4'}`}> {/* Reduced gap, padding, and space */}
           {isLoading ? (
              Array.from({ length: viewMode === 'list' ? 4 : 2 }).map((_, index) => (
-              <Card key={index} className="animate-pulse bg-muted/70 h-[380px] rounded-xl shadow-md"></Card>
+              <Card key={index} className="animate-pulse bg-muted/70 h-[350px] rounded-xl shadow-md"></Card> /* Reduced height */
              ))
           ) : goldsmiths.length > 0 ? (
              goldsmiths.map((goldsmith) => (
@@ -140,29 +140,29 @@ export default function DiscoverPage() {
                     src={goldsmith.imageUrl}
                     alt={goldsmith.name}
                     width={400}
-                    height={260}
-                    className="rounded-t-xl object-cover w-full aspect-[4/2.6] group-hover:scale-105 transition-transform duration-300"
+                    height={240} /* Reduced height */
+                    className="rounded-t-xl object-cover w-full aspect-[4/2.4] group-hover:scale-105 transition-transform duration-300"
                     data-ai-hint="fine jewelry piece"
                   />
-                  <div className="absolute top-3 right-3 bg-primary/80 backdrop-blur-sm text-primary-foreground px-2.5 py-1 rounded-full text-xs font-semibold flex items-center">
-                     <Star className="h-3.5 w-3.5 mr-1 fill-current" /> {goldsmith.rating.toFixed(1)}
+                  <div className="absolute top-2.5 right-2.5 bg-primary/80 backdrop-blur-sm text-primary-foreground px-2 py-0.5 rounded-full text-xs font-semibold flex items-center"> {/* Adjusted padding and position */}
+                     <Star className="h-3 w-3 mr-1 fill-current" /> {goldsmith.rating.toFixed(1)}
                   </div>
                 </CardHeader>
-                <CardContent className="p-5 flex-grow flex flex-col justify-between">
+                <CardContent className="p-4 flex-grow flex flex-col justify-between"> {/* Reduced padding */}
                   <div>
-                    <CardTitle className="text-xl text-primary-foreground mb-1.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
-                    <CardDescription className="text-sm text-muted-foreground mb-1 line-clamp-1">
-                      <MapPin className="inline-block h-4 w-4 mr-1.5" /> {goldsmith.address}
+                    <CardTitle className="text-lg text-primary-foreground mb-1 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Reduced font size */}
+                    <CardDescription className="text-xs text-muted-foreground mb-1 line-clamp-1"> {/* Reduced font size */}
+                      <MapPin className="inline-block h-3.5 w-3.5 mr-1" /> {goldsmith.address}
                     </CardDescription>
-                    <p className="text-sm text-foreground/80 mb-2 font-medium">Specialty: {goldsmith.specialty}</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-3">{goldsmith.shortBio}</p>
+                    <p className="text-xs text-foreground/80 mb-1.5 font-medium">Specialty: {goldsmith.specialty}</p> {/* Reduced font size and margin */}
+                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-2.5">{goldsmith.shortBio}</p> {/* Reduced margin */}
                     
                   </div>
                   <Link
                     href={`/goldsmith/${goldsmith.id}`}
                     className={cn(
-                       buttonVariants({ variant: "outline", size: "default" }), // Changed to default size
-                       'text-accent border-accent hover:bg-accent/10 mt-3 w-full rounded-full text-sm py-2.5'
+                       buttonVariants({ variant: "outline", size: "sm" }), // Using sm size
+                       'text-accent border-accent hover:bg-accent/10 mt-2 w-full rounded-full text-xs py-2' // Reduced padding, margin, text size
                     )}
                   >
                     <span>View Profile & Connect</span>
@@ -171,15 +171,15 @@ export default function DiscoverPage() {
               </Card>
             ))
           ) : (
-             !isLoading && !error && <p className="col-span-full text-center text-muted-foreground py-10">No goldsmiths found based on your criteria.</p>
+             !isLoading && !error && <p className="col-span-full text-center text-muted-foreground py-8">No goldsmiths found based on your criteria.</p>
           )}
         </div>
 
         {viewMode === 'map' && (
           <div className="md:col-span-1">
             {isLoading && !currentLocation ? (
-                <div className="w-full h-[400px] md:h-full bg-muted/50 rounded-xl flex items-center justify-center text-muted-foreground border border-border shadow-inner">
-                    <Loader2 className="h-10 w-10 animate-spin mr-3 text-primary" /> Loading Map Data...
+                <div className="w-full h-[350px] md:h-full bg-muted/50 rounded-xl flex items-center justify-center text-muted-foreground border border-border shadow-inner">
+                    <Loader2 className="h-8 w-8 animate-spin mr-2.5 text-primary" /> Loading Map Data...
                 </div>
             ) : (
                  <MapPlaceholder locations={goldsmithLocations} />
