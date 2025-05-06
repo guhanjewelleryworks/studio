@@ -1,15 +1,16 @@
 // src/components/auth/social-auth-buttons.tsx
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { auth } from '@/lib/firebase/firebase'; // Import Firebase auth instance
-import { 
-  GoogleAuthProvider, 
-  FacebookAuthProvider, 
+import type { AuthError } from 'firebase/auth';
+import {
+  FacebookAuthProvider,
+  GoogleAuthProvider,
   signInWithPopup,
-  type AuthError 
 } from 'firebase/auth';
+
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast'; // Import useToast
+import { auth } from '@/lib/firebase/firebase'; // Import Firebase auth instance
 
 // Inline SVG for Google Icon
 const GoogleIcon = () => (
@@ -78,6 +79,9 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
         case 'auth/unauthorized-domain':
           description = 'This domain is not authorized for OAuth operations for this project. Please check your Firebase console.';
           break;
+        case 'auth/api-key-not-valid':
+          description = 'The Firebase API key is invalid. Please check your Firebase project configuration and ensure the API key in `src/lib/firebase/config.ts` is correct.';
+          break;
         // Add other specific Firebase error codes as needed
         default:
           // Use the default Firebase message or a generic one
@@ -123,6 +127,9 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
           break;
         case 'auth/account-exists-with-different-credential':
           description = 'An account already exists with the same email address but different sign-in credentials. Try signing in using a different provider.';
+          break;
+        case 'auth/api-key-not-valid':
+           description = 'The Firebase API key is invalid. Please check your Firebase project configuration and ensure the API key in `src/lib/firebase/config.ts` is correct.';
           break;
         // Add other specific Firebase error codes as needed
         default:
