@@ -56,23 +56,35 @@ export default function DiscoverPage() {
 
     // Load goldsmiths from localStorage
     let storedGoldsmiths: Goldsmith[] = [];
-    const storedData = localStorage.getItem('goldsmiths-data');
-    if (storedData) {
-      try {
-        storedGoldsmiths = JSON.parse(storedData);
-      } catch (e) {
-        console.error("Error parsing goldsmiths from localStorage", e);
-      }
+    if (typeof window !== 'undefined') { // Ensure localStorage is accessed only on the client
+        const storedData = localStorage.getItem('goldsmiths-data');
+        if (storedData) {
+          try {
+            storedGoldsmiths = JSON.parse(storedData);
+          } catch (e) {
+            console.error("Error parsing goldsmiths from localStorage", e);
+          }
+        }
     }
     
     // Combine mock and stored goldsmiths, ensuring no duplicates by ID
-    const combinedGoldsmiths = [...mockGoldsmiths];
+    const combinedGoldsmithsMap = new Map<string, Goldsmith>();
+    mockGoldsmiths.forEach(g => combinedGoldsmithsMap.set(g.id, g));
     storedGoldsmiths.forEach(sg => {
-      if (!mockGoldsmiths.find(mg => mg.id === sg.id)) {
-        combinedGoldsmiths.push(sg);
-      }
+        // Ensure stored goldsmiths have default values for optional fields if missing
+        const completeStoredGoldsmith: Goldsmith = {
+            rating: 0, // Default rating
+            imageUrl: `https://picsum.photos/seed/${sg.id}/400/300`, // Default image
+            profileImageUrl: `https://picsum.photos/seed/${sg.id}-profile/120/120`, // Default profile image
+            location: sg.location || { lat: 34.0522, lng: -118.2437 }, // Default location
+            shortBio: sg.shortBio || `Specializing in ${Array.isArray(sg.specialty) ? sg.specialty.join(', ') : sg.specialty}`,
+            ...sg, // Spread the stored goldsmith to override defaults if present
+        };
+        combinedGoldsmithsMap.set(sg.id, completeStoredGoldsmith);
     });
 
+
+    const combinedGoldsmiths = Array.from(combinedGoldsmithsMap.values());
     setAllGoldsmiths(combinedGoldsmiths);
     setDisplayedGoldsmiths(combinedGoldsmiths); // Initially display all
     setIsLoading(false);
@@ -104,12 +116,13 @@ export default function DiscoverPage() {
      }, 500);
   };
 
-  const goldsmithLocations = displayedGoldsmiths.map(g => g.location);
+  const goldsmithLocations = displayedGoldsmiths.map(g => g.location).filter(loc => loc !== undefined) as Location[];
+
 
   return (
     <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)]"> {/* Reduced py */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-6"> {/* Reduced gap and mb */}
-        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Find a Goldsmith</h1> {/* Changed to text-foreground */}
+        <h1 className="text-3xl font-heading text-foreground tracking-tight">Find a Goldsmith</h1> {/* Changed to text-foreground */}
         <div className="flex gap-2">
           <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} aria-label="List View" className="rounded-lg px-4 py-2 text-sm shadow-md">
             <List className="mr-1.5 h-4 w-4" /> List
@@ -151,7 +164,7 @@ export default function DiscoverPage() {
               <Card key={goldsmith.id} className="shadow-lg hover:shadow-2xl transition-all duration-300 bg-card border-primary/15 flex flex-col rounded-xl overflow-hidden group">
                 <CardHeader className="p-0 relative">
                   <Image
-                    src={goldsmith.imageUrl!}
+                    src={goldsmith.imageUrl || 'https://picsum.photos/seed/default-goldsmith/400/300'}
                     alt={goldsmith.name}
                     width={400}
                     height={200}
@@ -205,3 +218,4 @@ export default function DiscoverPage() {
     </div>
   );
 }
+
