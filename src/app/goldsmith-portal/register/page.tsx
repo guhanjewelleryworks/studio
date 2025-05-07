@@ -1,6 +1,7 @@
 // src/app/goldsmith-portal/register/page.tsx
-'use client'; // This is important for event handlers
+'use client'; 
 
+import type { Goldsmith } from '@/types/goldsmith';
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,9 @@ import Link from 'next/link'
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
+
+const defaultGoldsmithImageUrl = 'https://picsum.photos/seed/new-goldsmith/400/300';
+const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Default to Los Angeles
 
 export default function GoldsmithRegisterPage() {
   const { toast } = useToast();
@@ -23,7 +27,7 @@ export default function GoldsmithRegisterPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [specialties, setSpecialties] = useState('');
+  const [specialties, setSpecialties] = useState(''); // Single string for input
   const [portfolio, setPortfolio] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -39,43 +43,68 @@ export default function GoldsmithRegisterPage() {
         description: 'Passwords do not match.',
         variant: 'destructive',
       });
-      setIsLoading(false); // Reset loading state on error
+      setIsLoading(false);
       return;
     }
 
-    // In a real app, you would make an API call here to your backend
-    // to register the goldsmith and store their details.
     try {
-      // Simulate API call for registration
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
 
-      console.log('Simulated registration submitted:', { workshopName, contactPerson, email, phone, address, specialties, portfolio });
+      const newGoldsmith: Goldsmith = {
+        id: workshopName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
+        name: workshopName,
+        address: address,
+        // Convert comma-separated string to array of strings for specialty
+        specialty: specialties.split(',').map(s => s.trim()).filter(s => s), 
+        rating: 0, // Default rating for new goldsmiths
+        imageUrl: `${defaultGoldsmithImageUrl}?random=${Date.now()}`, // Add random query to vary image
+        profileImageUrl: `${defaultGoldsmithImageUrl}?random=${Date.now()}`,
+        location: defaultLocation, // Default location
+        shortBio: `Newly registered workshop specializing in ${specialties.split(',')[0] || 'fine jewelry'}. Contact for details.`, // Generic short bio
+        // Add other default fields from Goldsmith type if necessary
+        tagline: `Crafting unique pieces in ${workshopName}`,
+        bio: `Welcome to ${workshopName}, contact us for your custom jewelry needs.`,
+        yearsExperience: 0,
+        responseTime: "Varies",
+        ordersCompleted: 0,
+      };
+
+      // Store in localStorage
+      const existingGoldsmithsJSON = localStorage.getItem('goldsmiths-data');
+      let goldsmithsList: Goldsmith[] = [];
+      if (existingGoldsmithsJSON) {
+        try {
+          goldsmithsList = JSON.parse(existingGoldsmithsJSON);
+        } catch (e) {
+          console.error("Error parsing goldsmiths data from localStorage", e);
+          // If parsing fails, start with an empty list to avoid further errors
+          goldsmithsList = []; 
+        }
+      }
+      goldsmithsList.push(newGoldsmith);
+      localStorage.setItem('goldsmiths-data', JSON.stringify(goldsmithsList));
+
 
       toast({
         title: 'Registration Submitted (Simulated)',
-        description: 'Your workshop details have been submitted for review. You will be redirected shortly.',
+        description: 'Your workshop details have been submitted. You will be redirected shortly.',
       });
 
-      // Redirect after a short delay
       setTimeout(() => {
-        router.push('/goldsmith-portal/login'); // Redirect to login or a confirmation page
+        router.push('/goldsmith-portal/login'); 
       }, 2000);
 
-      // Optionally reset form fields here if not redirecting immediately
-      // setWorkshopName(''); setContactPerson(''); setEmail(''); // etc.
-
     } catch (error) {
-      // This catch block is for potential errors during the (real or simulated) API call
       toast({
         title: 'Registration Failed',
         description: (error as Error).message || 'An unexpected error occurred.',
         variant: 'destructive',
       });
-    } finally {
-      // Ensure isLoading is set to false regardless of success or failure,
-      // to re-enable form elements if redirection is delayed or doesn't occur.
-      setIsLoading(false);
-    }
+       setIsLoading(false); // Ensure loading is stopped on error
+    } 
+    // Do not set isLoading to false here if redirecting, 
+    // it will be handled by the redirect or error cases.
+    // If not redirecting (e.g. for errors without redirect), set it in the catch or specific error paths.
   };
 
 
