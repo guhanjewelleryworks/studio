@@ -8,81 +8,80 @@ body {
 
 @layer base {
   :root {
-    /* Goldsmith Connect Theme - Elegant Gold & Cream */
-    --background: 48 83% 90%; /* Cream (#FFFDD0) */
-    --foreground: 39 67% 18%; /* Deep Brown (#8B4513) for text */
+    /* New Vibrant E-commerce Theme - Inspired by Tanishq, CaratLane, BlueStone, Giva */
+    --background: 0 0% 100%; /* White */
+    --foreground: 20 15% 25%; /* Dark Charcoal/Brown - for text */
 
-    --card: 50 80% 92%; /* Lighter Cream for cards */
-    --card-foreground: 39 67% 18%;
+    --card: 0 0% 98%; /* Very Light Gray - for cards to subtly stand out */
+    --card-foreground: 20 15% 25%; /* Dark Charcoal/Brown */
 
-    --popover: 50 80% 92%; /* Lighter Cream for popovers */
-    --popover-foreground: 39 67% 18%;
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 20 15% 25%;
 
-    --primary: 51 100% 50%; /* Gold (#FFD700) */
-    --primary-foreground: 39 67% 18%; /* Deep Brown for text on primary */
+    --primary: 45 85% 55%; /* Rich, Saturated Gold */
+    --primary-foreground: 0 0% 100%; /* White - for text on primary gold buttons */
 
-    --secondary: 48 83% 85%; /* Lighter Cream, close to #FFFDD0 but slightly different for secondary elements */
-    --secondary-foreground: 39 67% 25%; /* Slightly lighter brown for secondary text */
+    --secondary: 45 30% 90%; /* Pale Gold/Cream - for subtle backgrounds or secondary elements */
+    --secondary-foreground: 20 15% 35%; /* Darker Charcoal/Brown for secondary text */
 
-    --muted: 48 83% 93%; /* Very Light Cream / Off-white */
-    --muted-foreground: 39 67% 40%; /* Muted Brown for less important text */
+    --muted: 0 0% 90%; /* Light Gray - for muted text, dividers */
+    --muted-foreground: 20 10% 50%; /* Medium Gray for less important text */
 
-    --accent: 39 67% 28%; /* Deep Brown (#8B4513) for CTAs and highlights */
-    --accent-foreground: 48 83% 90%; /* Cream text on accent */
-
-    --destructive: 0 70% 55%; /* A standard, slightly softer red */
+    --accent: 10 80% 60%; /* A Warm Peach/Rose Gold accent */
+    --accent-foreground: 0 0% 100%; /* White */
+    
+    --destructive: 0 72% 51%; /* Standard Red */
     --destructive-foreground: 0 0% 100%; /* White */
 
-    --border: 51 50% 75%; /* Muted Gold for borders */
-    --input: 50 70% 94%;   /* Very Light Cream for input backgrounds */
-    --ring: 51 100% 60%;   /* Brighter Gold for focus rings */
+    --border: 0 0% 88%; /* Light Gray border */
+    --input: 0 0% 96%;   /* Very Light Gray for input backgrounds */
+    --ring: 45 85% 60%;   /* Brighter Gold for focus rings */
 
-    --chart-1: 51 100% 50%; /* Gold */
-    --chart-2: 39 67% 28%;  /* Deep Brown */
-    --chart-3: 48 83% 80%;  /* Medium Cream */
-    --chart-4: 51 80% 60%;  /* Lighter Gold */
-    --chart-5: 39 50% 40%;  /* Muted Brown */
+    --chart-1: 45 85% 55%; /* Gold */
+    --chart-2: 10 80% 60%;  /* Peach/Rose Gold */
+    --chart-3: 200 60% 50%; /* A soft blue for contrast */
+    --chart-4: 45 60% 75%;  /* Lighter Gold */
+    --chart-5: 20 15% 40%;  /* Muted Brown/Gray */
 
-    --radius: 0.75rem; /* Slightly more rounded corners for elegance */
+    --radius: 0.5rem; /* Standard ShadCN radius */
   }
 
   .dark {
-    /* Dark Theme - Goldsmith Connect - Gold on Dark Brown/Charcoal */
-    --background: 30 20% 10%; /* Very Dark Brown/Charcoal */
-    --foreground: 48 83% 90%; /* Cream for text */
+    --background: 20 15% 10%; /* Very Dark Charcoal/Almost Black */
+    --foreground: 0 0% 95%; /* Off-White/Light Gray for text */
 
-    --card: 30 20% 15%; /* Darker Brown/Charcoal for cards */
-    --card-foreground: 48 83% 90%;
+    --card: 20 15% 15%; /* Dark Gray for cards */
+    --card-foreground: 0 0% 95%;
 
-    --popover: 30 20% 12%; /* Very Dark Brown for popovers */
-    --popover-foreground: 48 83% 90%;
+    --popover: 20 15% 12%; /* Very Dark Gray for popovers */
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 51 100% 55%; /* Gold (slightly brighter for dark mode) */
-    --primary-foreground: 30 20% 10%; /* Dark Brown/Charcoal for text on primary */
+    --primary: 45 85% 60%; /* Rich Gold (slightly brighter for dark mode) */
+    --primary-foreground: 20 15% 10%; /* Dark Charcoal for text on primary */
 
-    --secondary: 30 20% 20%; /* Dark Brown, slightly lighter than background */
-    --secondary-foreground: 48 83% 85%; /* Lighter Cream for secondary text */
+    --secondary: 20 15% 20%; /* Darker Gray, slightly lighter than background */
+    --secondary-foreground: 0 0% 85%; /* Lighter Gray for secondary text */
 
-    --muted: 30 20% 25%; /* Muted Dark Brown */
-    --muted-foreground: 48 70% 70%; /* Muted Cream */
+    --muted: 20 15% 25%; /* Muted Dark Gray */
+    --muted-foreground: 0 0% 70%; /* Muted Light Gray */
 
-    --accent: 51 100% 65%; /* Brighter Gold for CTAs and highlights in dark mode */
-    --accent-foreground: 30 20% 10%; /* Dark Brown/Charcoal text on accent */
+    --accent: 10 80% 65%; /* Brighter Peach/Rose Gold for dark mode */
+    --accent-foreground: 20 15% 10%;
 
-    --destructive: 0 70% 60%; /* Softer Red (Slightly lighter for dark mode) */
-    --destructive-foreground: 0 0% 100%; /* White */
+    --destructive: 0 62% 50%; /* Slightly desaturated red for dark mode */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 51 50% 40%; /* Dark Muted Gold for borders */
-    --input: 30 20% 18%;   /* Darker Input Background */
-    --ring: 51 100% 65%;   /* Brighter Gold for focus ring (Slightly lighter) */
+    --border: 20 15% 30%; /* Dark Gray border */
+    --input: 20 15% 18%;   /* Darker Input Background */
+    --ring: 45 85% 65%;   /* Brighter Gold for focus ring */
+    
+    --chart-1: 45 85% 60%; /* Gold */
+    --chart-2: 10 80% 65%;  /* Peach/Rose Gold */
+    --chart-3: 200 70% 60%; /* A soft blue for contrast */
+    --chart-4: 45 60% 80%;  /* Lighter Gold */
+    --chart-5: 0 0% 70%;  /* Muted Light Gray */
 
-    --chart-1: 51 100% 55%; /* Gold */
-    --chart-2: 48 83% 90%;  /* Cream */
-    --chart-3: 51 80% 70%;  /* Lighter Gold */
-    --chart-4: 30 20% 30%;  /* Medium Dark Brown */
-    --chart-5: 48 60% 60%;  /* Muted Cream */
-
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 }
 

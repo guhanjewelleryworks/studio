@@ -1,5 +1,4 @@
 
-
 'use client'
 
 import * as React from 'react';
@@ -17,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { cn } from '@/lib/utils';
-import { GoldsmithIcon } from '@/components/icons/goldsmith-icon'; // Corrected import path
+import { GoldsmithIcon } from '@/components/icons/goldsmith-icon';
 
 
 interface GoldsmithProfile {
@@ -56,13 +55,12 @@ const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | nul
 }
 
 // Make the component accept a promise for params
-export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
-  const params = React.use(paramsPromise);
-  const id = params.id; 
+export default function GoldsmithProfilePage({ params }: { params: PageParams }) {
+  const { id } = params; // Accessing id directly (adjust based on framework specifics if needed)
 
-  const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
+  const [profile, setProfile = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
 
    useEffect(() => {
     const loadProfile = async () => {
@@ -94,27 +92,27 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
   if (isLoading) {
      return (
-      <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)]"> {/* Reduced min-h and py */}
-        <div className="grid md:grid-cols-3 gap-6"> {/* Adjusted gap */}
-          <div className="md:col-span-1 space-y-5"> {/* Adjusted spacing */}
-            <Skeleton className="h-32 w-32 rounded-full mx-auto bg-muted/70" /> {/* Increased size */}
-            <Skeleton className="h-8 w-4/5 mx-auto bg-muted/70" /> {/* Adjusted width */}
-            <Skeleton className="h-5 w-3/5 mx-auto bg-muted/70" /> {/* Adjusted width */}
-            <Skeleton className="h-4 w-2/5 mx-auto bg-muted/70" /> {/* Adjusted width */}
-            <Skeleton className="h-10 w-full rounded-full bg-muted/70" /> {/* Increased height */}
-            <Skeleton className="h-10 w-full rounded-full bg-muted/60" /> {/* Increased height */}
+      <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)]">
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-1 space-y-5">
+            <Skeleton className="h-32 w-32 rounded-full mx-auto bg-muted/70" />
+            <Skeleton className="h-8 w-4/5 mx-auto bg-muted/70" />
+            <Skeleton className="h-5 w-3/5 mx-auto bg-muted/70" />
+            <Skeleton className="h-4 w-2/5 mx-auto bg-muted/70" />
+            <Skeleton className="h-10 w-full rounded-full bg-muted/70" />
+            <Skeleton className="h-10 w-full rounded-full bg-muted/60" />
           </div>
-          <div className="md:col-span-2 space-y-6"> {/* Adjusted spacing */}
-             <Skeleton className="h-8 w-2/5 bg-muted/70" /> {/* Adjusted width */}
-             <Skeleton className="h-20 w-full bg-muted/70" /> {/* Increased height */}
-             <Skeleton className="h-8 w-1/3 bg-muted/70" /> {/* Adjusted width */}
-             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3"> {/* Adjusted gap */}
-                 <Skeleton className="h-40 w-full aspect-square rounded-lg bg-muted/70" /> {/* Adjusted height and aspect ratio */}
+          <div className="md:col-span-2 space-y-6">
+             <Skeleton className="h-8 w-2/5 bg-muted/70" />
+             <Skeleton className="h-20 w-full bg-muted/70" />
+             <Skeleton className="h-8 w-1/3 bg-muted/70" />
+             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                 <Skeleton className="h-40 w-full aspect-square rounded-lg bg-muted/70" />
                  <Skeleton className="h-40 w-full aspect-square rounded-lg bg-muted/70" />
                  <Skeleton className="h-40 w-full aspect-square rounded-lg bg-muted/70" />
              </div>
-             <Skeleton className="h-8 w-1/3 bg-muted/70" /> {/* Adjusted width */}
-              <Skeleton className="h-40 w-full rounded-lg bg-muted/70" /> {/* Increased height */}
+             <Skeleton className="h-8 w-1/3 bg-muted/70" />
+              <Skeleton className="h-40 w-full rounded-lg bg-muted/70" />
           </div>
         </div>
       </div>
@@ -122,11 +120,11 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   }
 
    if (error) {
-     return <div className="container py-8 px-4 md:px-6 text-center text-destructive text-lg">{error}</div>; {/* Adjusted padding and font size */}
+     return <div className="container py-8 px-4 md:px-6 text-center text-destructive text-lg">{error}</div>;
    }
 
   if (!profile) {
-    return <div className="container py-8 px-4 md:px-6 text-center text-muted-foreground text-lg">Profile not found.</div>; {/* Adjusted padding and font size */}
+    return <div className="container py-8 px-4 md:px-6 text-center text-muted-foreground text-lg">Profile not found.</div>;
   }
 
   const handleRequestIntroduction = (e: React.FormEvent) => {
@@ -139,95 +137,95 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
    }
 
   return (
-    <div className="container py-8 px-4 md:px-6"> {/* Adjusted padding */}
-        <Alert variant="default" className="mb-6 border-accent/50 text-accent-foreground bg-accent/10 rounded-lg p-4 shadow-sm"> {/* Adjusted margin, padding, and shadow */}
-          <ShieldCheck className="h-4 w-4 !text-accent mr-2" /> {/* Adjusted icon size and margin */}
-          <AlertTitle className="font-semibold text-sm">Secure & Mediated Connection</AlertTitle> {/* Adjusted font size */}
-          <AlertDescription className="text-xs mt-0.5"> {/* Adjusted font size and margin */}
+    <div className="container py-8 px-4 md:px-6">
+        <Alert variant="default" className="mb-6 border-accent/50 text-accent-foreground bg-accent/10 rounded-lg p-4 shadow-sm">
+          <ShieldCheck className="h-4 w-4 !text-accent mr-2" />
+          <AlertTitle className="font-semibold text-sm text-foreground">Secure & Mediated Connection</AlertTitle>
+          <AlertDescription className="text-xs mt-0.5 text-muted-foreground">
             To ensure a high-quality and secure experience for both customers and artisans, all initial communications and custom order requests are facilitated through Goldsmith Connect administrators. Direct contact details are shared upon mutual agreement and project confirmation.
           </AlertDescription>
         </Alert>
-      <div className="grid md:grid-cols-3 gap-6 lg:gap-8"> {/* Adjusted gap */}
+      <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
         {/* Left Sidebar - Profile Info */}
-        <div className="md:col-span-1 space-y-5"> {/* Adjusted spacing */}
-          <Card className="shadow-xl border-primary/15 rounded-xl overflow-hidden">
-            <CardHeader className="items-center text-center bg-gradient-to-b from-card to-secondary/10 p-6"> {/* Adjusted padding and gradient */}
-              <Avatar className="w-28 h-28 mb-3 border-4 border-primary/50 shadow-lg"> {/* Increased size and border */}
+        <div className="md:col-span-1 space-y-5">
+          <Card className="shadow-xl border-primary/15 rounded-xl overflow-hidden bg-card">
+            <CardHeader className="items-center text-center bg-gradient-to-b from-card to-secondary/10 p-6">
+              <Avatar className="w-28 h-28 mb-3 border-4 border-primary/50 shadow-lg">
                 <AvatarImage src={profile.profileImageUrl} alt={profile.name} data-ai-hint="artisan portrait" />
-                <AvatarFallback className="text-3xl bg-primary/20 text-primary-foreground">{profile.name.charAt(0)}</AvatarFallback> {/* Adjusted size and bg opacity */}
+                <AvatarFallback className="text-3xl bg-primary/20 text-primary-foreground">{profile.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              <CardTitle className="text-2xl font-bold text-foreground">{profile.name}</CardTitle> {/* Changed to text-foreground, increased size */}
-              <p className="text-sm text-accent-foreground font-medium">{profile.tagline}</p> {/* Adjusted font size and color */}
-              <div className="flex items-center text-amber-500 mt-1"> {/* Adjusted color and margin */}
-                <Star className="h-4 w-4 mr-1.5 fill-current" /> <span className="text-sm">{profile.rating.toFixed(1)}</span> {/* Adjusted icon size and margin */}
-                 <span className="text-xs text-muted-foreground ml-1.5">(Based on X reviews)</span> {/* Adjusted margin */}
+              <CardTitle className="text-2xl font-bold text-foreground">{profile.name}</CardTitle>
+              <p className="text-sm text-primary font-medium">{profile.tagline}</p>
+              <div className="flex items-center text-amber-500 mt-1">
+                <Star className="h-4 w-4 mr-1.5 fill-current" /> <span className="text-sm text-foreground">{profile.rating.toFixed(1)}</span>
+                 <span className="text-xs text-muted-foreground ml-1.5">(Based on X reviews)</span>
               </div>
-              <CardDescription className="flex items-center justify-center text-muted-foreground text-sm pt-1"> {/* Adjusted font size and padding */}
-                <MapPin className="h-3.5 w-3.5 mr-1" /> {profile.address} {/* Adjusted icon size and margin */}
+              <CardDescription className="flex items-center justify-center text-muted-foreground text-sm pt-1">
+                <MapPin className="h-3.5 w-3.5 mr-1" /> {profile.address}
               </CardDescription>
-               <div className="pt-2 flex flex-wrap justify-center gap-1.5"> {/* Adjusted padding and gap */}
+               <div className="pt-2 flex flex-wrap justify-center gap-1.5">
                     {profile.specialty.map(spec => (
-                        <Badge key={spec} variant="secondary" className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full shadow-sm">{spec}</Badge> {/* Adjusted bg opacity, font size, and padding */}
+                        <Badge key={spec} variant="secondary" className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full shadow-sm">{spec}</Badge>
                     ))}
                 </div>
             </CardHeader>
             
-            <CardContent className="space-y-3.5 p-5"> {/* Adjusted padding and spacing */}
+            <CardContent className="space-y-3.5 p-5">
                {profile.yearsExperience && (
-                <div className="flex items-center text-sm text-foreground/80"> {/* Adjusted font size */}
-                    <Award className="h-4 w-4 mr-1.5 text-primary/70"/> {/* Adjusted icon size and margin */}
+                <div className="flex items-center text-sm text-foreground">
+                    <Award className="h-4 w-4 mr-1.5 text-primary/70"/>
                     <span>{profile.yearsExperience} years of master craftsmanship</span>
                 </div>
                )}
                 {profile.certifications && profile.certifications.length > 0 && (
-                    <div className="text-sm text-foreground/80"> {/* Adjusted font size */}
-                        <Sparkles className="h-4 w-4 mr-1.5 text-primary/70 inline"/> {/* Adjusted icon size and margin */}
+                    <div className="text-sm text-foreground">
+                        <Sparkles className="h-4 w-4 mr-1.5 text-primary/70 inline"/>
                         Certifications: {profile.certifications.join(', ')}
                     </div>
                 )}
                 {profile.responseTime && (
-                    <div className="flex items-center text-sm text-foreground/80"> {/* Adjusted font size */}
-                        <MessageSquare className="h-4 w-4 mr-1.5 text-primary/70"/> {/* Adjusted icon size and margin */}
+                    <div className="flex items-center text-sm text-foreground">
+                        <MessageSquare className="h-4 w-4 mr-1.5 text-primary/70"/>
                         <span>Responds: {profile.responseTime}</span>
                     </div>
                 )}
                  {profile.ordersCompleted !== undefined && (
-                    <div className="flex items-center text-sm text-foreground/80"> {/* Adjusted font size */}
-                        <Edit3 className="h-4 w-4 mr-1.5 text-primary/70"/> {/* Adjusted icon size and margin */}
+                    <div className="flex items-center text-sm text-foreground">
+                        <Edit3 className="h-4 w-4 mr-1.5 text-primary/70"/>
                         <span>{profile.ordersCompleted}+ Orders Completed</span>
                     </div>
                 )}
-               <Button size="default" className="w-full shadow-md rounded-full text-sm py-2.5 bg-primary hover:bg-primary/90 mt-1" onClick={handleRequestCustomOrder}> {/* Adjusted size, padding and margin */}
-                  <Send className="mr-2 h-3.5 w-3.5"/> Request Custom Order {/* Adjusted icon margin */}
+               <Button size="default" className="w-full shadow-md rounded-full text-sm py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground mt-1" onClick={handleRequestCustomOrder}>
+                  <Send className="mr-2 h-3.5 w-3.5"/> Request Custom Order
                </Button>
-                <Button variant="outline" size="default" className="w-full border-accent text-accent-foreground hover:bg-accent/10 rounded-full text-sm py-2.5 shadow-sm" onClick={handleRequestIntroduction}> {/* Adjusted size, padding and colors */}
-                  <User className="mr-2 h-3.5 w-3.5"/> Request Introduction {/* Adjusted icon margin */}
+                <Button variant="outline" size="default" className="w-full border-primary text-primary hover:bg-primary/10 rounded-full text-sm py-2.5 shadow-sm" onClick={handleRequestIntroduction}>
+                  <User className="mr-2 h-3.5 w-3.5"/> Request Introduction
                </Button>
             </CardContent>
           </Card>
         </div>
 
         {/* Right Content - Bio, Portfolio, Contact Form */}
-        <div className="md:col-span-2 space-y-6"> {/* Adjusted spacing */}
-            <Card className="shadow-xl border-primary/10 rounded-xl"> {/* Adjusted border */}
-                <CardHeader className="p-5"> {/* Adjusted padding */}
-                    <CardTitle className="text-xl font-semibold text-foreground">About {profile.name}</CardTitle> {/* Changed to text-foreground, increased size */}
+        <div className="md:col-span-2 space-y-6">
+            <Card className="shadow-xl border-primary/10 rounded-xl bg-card">
+                <CardHeader className="p-5">
+                    <CardTitle className="text-xl font-semibold text-foreground">About {profile.name}</CardTitle>
                 </CardHeader>
-                <CardContent className="p-5 pt-0"> {/* Adjusted padding */}
-                    <p className="text-base text-foreground/80 leading-relaxed whitespace-pre-line">{profile.bio}</p> {/* Increased font size */}
+                <CardContent className="p-5 pt-0">
+                    <p className="text-base text-foreground/80 leading-relaxed whitespace-pre-line">{profile.bio}</p>
                 </CardContent>
             </Card>
 
-          <Card className="shadow-xl border-primary/10 rounded-xl"> {/* Adjusted border */}
-            <CardHeader className="p-5"> {/* Adjusted padding */}
-              <CardTitle className="text-xl font-semibold text-foreground">Portfolio Showcase</CardTitle> {/* Changed to text-foreground, increased size */}
-               <CardDescription className="text-sm text-foreground/70 mt-0.5">A glimpse into the artisan&apos;s craft.</CardDescription> {/* Adjusted font size and margin */}
+          <Card className="shadow-xl border-primary/10 rounded-xl bg-card">
+            <CardHeader className="p-5">
+              <CardTitle className="text-xl font-semibold text-foreground">Portfolio Showcase</CardTitle>
+               <CardDescription className="text-sm text-muted-foreground mt-0.5">A glimpse into the artisan&apos;s craft.</CardDescription>
             </CardHeader>
-            <CardContent className="p-5 pt-0"> {/* Adjusted padding */}
+            <CardContent className="p-5 pt-0">
               {profile.portfolioImages.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> {/* Adjusted gap */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {profile.portfolioImages.map((imgUrl, index) => (
-                    <div key={index} className="rounded-lg overflow-hidden shadow-md aspect-square group relative"> {/* Changed to aspect-square */}
+                    <div key={index} className="rounded-lg overflow-hidden shadow-md aspect-square group relative">
                         <Image
                           src={imgUrl}
                           alt={`Portfolio image ${index + 1} for ${profile.name}`}
@@ -236,42 +234,42 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300 ease-in-out"
                           data-ai-hint="luxury jewelry photography"
                         />
-                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"> {/* Adjusted gradient */}
-                            <Eye className="h-7 w-7 text-white/80"/> {/* Increased icon size */}
+                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <Eye className="h-7 w-7 text-white/80"/>
                          </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-muted-foreground text-center py-6 text-base">This artisan&apos;s portfolio is currently being curated. Check back soon!</p> {/* Adjusted padding and font size */}
+                <p className="text-muted-foreground text-center py-6 text-base">This artisan&apos;s portfolio is currently being curated. Check back soon!</p>
               )}
             </CardContent>
           </Card>
 
-           <Card className="shadow-xl border-primary/10 rounded-xl"> {/* Adjusted border */}
-            <CardHeader className="p-5"> {/* Adjusted padding */}
-              <CardTitle className="text-xl font-semibold text-foreground">Connect with {profile.name}</CardTitle> {/* Changed to text-foreground, increased size */}
-               <CardDescription className="text-sm text-foreground/70 mt-0.5">Initiate a conversation or request a custom piece through our secure admin-mediated process.</CardDescription> {/* Adjusted font size and margin */}
+           <Card className="shadow-xl border-primary/10 rounded-xl bg-card">
+            <CardHeader className="p-5">
+              <CardTitle className="text-xl font-semibold text-foreground">Connect with {profile.name}</CardTitle>
+               <CardDescription className="text-sm text-muted-foreground mt-0.5">Initiate a conversation or request a custom piece through our secure admin-mediated process.</CardDescription>
             </CardHeader>
-            <CardContent className="p-5 pt-0"> {/* Adjusted padding */}
-              <form className="space-y-4" onSubmit={handleRequestIntroduction}> {/* Adjusted spacing */}
+            <CardContent className="p-5 pt-0">
+              <form className="space-y-4" onSubmit={handleRequestIntroduction}>
                 {/* TODO: Add form handling with react-hook-form */}
-                 <div className="space-y-1.5"> {/* Adjusted spacing */}
-                    <Label htmlFor="contact-name">Your Name</Label>
-                    <Input id="contact-name" placeholder="John Doe" required className="py-2.5"/> {/* Adjusted padding */}
+                 <div className="space-y-1.5">
+                    <Label htmlFor="contact-name" className="text-foreground">Your Name</Label>
+                    <Input id="contact-name" placeholder="John Doe" required className="py-2.5 text-foreground"/>
                  </div>
-                 <div className="space-y-1.5"> {/* Adjusted spacing */}
-                    <Label htmlFor="contact-email">Your Email</Label>
-                    <Input id="contact-email" type="email" placeholder="john.doe@example.com" required className="py-2.5"/> {/* Adjusted padding */}
+                 <div className="space-y-1.5">
+                    <Label htmlFor="contact-email" className="text-foreground">Your Email</Label>
+                    <Input id="contact-email" type="email" placeholder="john.doe@example.com" required className="py-2.5 text-foreground"/>
                  </div>
-                 <div className="space-y-1.5"> {/* Adjusted spacing */}
-                    <Label htmlFor="contact-message">Your Inquiry / Project Idea</Label>
-                    <Textarea id="contact-message" placeholder="Briefly explain your jewelry idea or why you'd like to connect..." required rows={4} className="py-2.5"/> {/* Adjusted rows and padding */}
+                 <div className="space-y-1.5">
+                    <Label htmlFor="contact-message" className="text-foreground">Your Inquiry / Project Idea</Label>
+                    <Textarea id="contact-message" placeholder="Briefly explain your jewelry idea or why you'd like to connect..." required rows={4} className="py-2.5 text-foreground"/>
                  </div>
-                 <Button type="submit" size="default" className="shadow-md rounded-full text-sm py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground"> {/* Adjusted size and padding */}
-                    <Send className="mr-2 h-4 w-4"/> Send Inquiry to Admin {/* Adjusted icon margin */}
+                 <Button type="submit" size="default" className="shadow-md rounded-full text-sm py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground">
+                    <Send className="mr-2 h-4 w-4"/> Send Inquiry to Admin
                  </Button>
-                 <p className="text-xs text-muted-foreground pt-1.5">Your request will be reviewed by an administrator before contact is established with the artisan.</p> {/* Adjusted padding and font size */}
+                 <p className="text-xs text-muted-foreground pt-1.5">Your request will be reviewed by an administrator before contact is established with the artisan.</p>
               </form>
             </CardContent>
           </Card>
