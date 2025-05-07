@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] hover:scale-[1.01] hover:brightness-105 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] hover:scale-[1.01] hover:brightness-105 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 font-poppins font-semibold", // Added font-poppins and font-semibold
   {
     variants: {
       variant: {
@@ -21,10 +21,10 @@ const buttonVariants = cva(
         premium: "bg-gradient-to-r from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90 shadow-lg",
       },
       size: {
-        default: "h-10 px-5 py-2", // Adjusted default padding
-        sm: "h-9 rounded-md px-4 text-xs", // Adjusted for better proportions, smaller text
-        lg: "h-12 rounded-md px-8 text-base", // Larger text for lg, more padding
-        xs: "h-8 rounded-md px-3 text-xs", // Extra small button
+        default: "h-10 px-5 py-2",
+        sm: "h-9 rounded-md px-4 text-xs",
+        lg: "h-12 rounded-md px-8 text-base", 
+        xs: "h-8 rounded-md px-3 text-xs",
         icon: "h-10 w-10",
       },
     },

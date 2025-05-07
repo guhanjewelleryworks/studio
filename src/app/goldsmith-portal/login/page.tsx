@@ -13,7 +13,7 @@ export default function GoldsmithLoginPage() {
       <Card className="w-full max-w-lg shadow-xl border-primary/15 rounded-xl bg-card">
         <CardHeader className="text-center pt-8 pb-5">
            <LogIn className="h-14 w-14 mx-auto text-primary mb-3.5" />
-          <CardTitle className="font-heading text-3xl font-bold text-foreground">Goldsmith Portal Login</CardTitle>
+          <CardTitle className="text-3xl text-foreground">Goldsmith Portal Login</CardTitle> {/* CardTitle uses font-heading */}
           <CardDescription className="text-muted-foreground mt-1 text-sm">Access your dashboard to manage your profile and orders.</CardDescription>
         </CardHeader>
         <CardContent className="px-8 pb-8 pt-5">

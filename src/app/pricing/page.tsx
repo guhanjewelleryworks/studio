@@ -64,12 +64,12 @@ export default function PricingPage() {
       <div className="mx-auto max-w-7xl px-4 lg:px-6">
         <div className="mx-auto max-w-4xl text-center">
            <Sparkles className="h-10 w-10 mx-auto text-primary mb-2.5" />
-          <h2 className="text-base font-semibold leading-7 text-primary uppercase tracking-wider">Pricing Plans</h2>
-          <p className="font-heading mt-1.5 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+          <h2 className="text-base font-semibold leading-7 text-primary uppercase tracking-wider font-poppins">Pricing Plans</h2>
+          <p className="font-heading mt-1.5 text-4xl tracking-tight text-foreground sm:text-5xl"> {/* font-extrabold removed to rely on h1 global style */}
             Connect & Create with Goldsmith Connect
           </p>
         </div>
-        <p className="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-foreground/75">
+        <p className="mx-auto mt-4 max-w-2xl text-center text-lg leading-8 text-foreground/85"> {/* text-foreground/75 might be too light */}
           Choose a plan that suits your journey into the world of bespoke jewelry. We facilitate secure and inspiring connections between discerning customers and skilled artisans.
         </p>
         <div className="isolate mx-auto mt-12 grid max-w-md grid-cols-1 gap-6 md:max-w-2xl md:grid-cols-2 lg:max-w-none lg:grid-cols-3">
@@ -82,18 +82,18 @@ export default function PricingPage() {
               )}
             >
               {tier.mostPopular && (
-                <div className="bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wider py-1.5 px-3 text-center">
+                <div className="bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wider py-1.5 px-3 text-center font-poppins">
                   Most Popular
                 </div>
               )}
               <CardHeader className="pb-4 pt-6 px-5">
-                <CardTitle className="font-heading text-xl font-semibold leading-6 text-foreground">{tier.name}</CardTitle>
+                <CardTitle className="text-xl leading-6 text-foreground">{tier.name}</CardTitle> {/* CardTitle uses font-heading (Poppins) by default */}
                 <p className="mt-3">
-                  <span className="text-3xl font-extrabold tracking-tight text-foreground">{tier.priceMonthly}</span>
-                  {tier.priceMonthly !== 'Free' && <span className="text-sm font-semibold leading-6 text-muted-foreground">/month</span>}
+                  <span className="text-3xl font-extrabold tracking-tight text-foreground font-poppins">{tier.priceMonthly}</span>
+                  {tier.priceMonthly !== 'Free' && <span className="text-sm font-semibold leading-6 text-muted-foreground font-poppins">/month</span>}
                 </p>
                 {tier.priceAnnual && tier.priceMonthly !== 'Free' && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground font-poppins">
                     or {tier.priceAnnual}/year
                   </p>
                 )}
@@ -117,7 +117,7 @@ export default function PricingPage() {
                         variant: tier.mostPopular ? 'default' : 'outline', 
                         size: 'lg' 
                       }),
-                      'w-full shadow-md rounded-full text-sm py-2.5',
+                      'w-full shadow-md rounded-full text-sm py-2.5', // Buttons already use Poppins via buttonVariants
                       tier.mostPopular ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'border-primary text-primary hover:bg-primary/10'
                   )}
                 >

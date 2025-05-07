@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, DollarSign, Users, Edit3, Gift, Handshake, Palette } from 'lucide-react'; // Added Handshake, Palette
+import { CheckCircle, DollarSign, Users, Handshake, Palette } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
@@ -16,11 +16,11 @@ export default function GoldsmithPortalPage() {
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-10 xl:items-center">
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2.5">
-                 <div className="inline-block rounded-full bg-primary/10 px-3.5 py-1.5 text-sm font-semibold text-primary shadow-sm">Goldsmith Partner Portal</div>
-                <h1 className="font-heading text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl/none text-foreground leading-tight">
+                 <div className="inline-block rounded-full bg-primary/10 px-3.5 py-1.5 text-sm font-semibold text-primary shadow-sm font-poppins">Goldsmith Partner Portal</div>
+                <h1 className="font-heading text-foreground leading-tight"> {/* Removed size and weight, will inherit from global h1 */}
                   Showcase Your Artistry, Expand Your Reach
                 </h1>
-                <p className="max-w-[600px] text-foreground/80 md:text-lg leading-relaxed">
+                <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed">
                   Join Goldsmith Connect to receive custom order inquiries, manage your bespoke creations, and connect with a discerning clientele passionate about fine jewelry.
                 </p>
               </div>
@@ -29,7 +29,7 @@ export default function GoldsmithPortalPage() {
                   href="/goldsmith-portal/register"
                   className={cn(
                     buttonVariants({ size: 'lg', variant: 'default' }), 
-                    'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-8 py-3 text-base bg-primary text-primary-foreground hover:bg-primary/90' 
+                    'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-8 py-3 text-base' // Buttons already use Poppins
                   )}
                 >
                   <span>Register Your Workshop</span>
@@ -62,8 +62,8 @@ export default function GoldsmithPortalPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-3 text-center">
             <div className="space-y-1.5">
-              <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Why Partner with Goldsmith Connect?</h2>
-              <p className="max-w-[850px] text-foreground/75 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed">
+              <h2 className="font-heading text-foreground">Why Partner with Goldsmith Connect?</h2> {/* Removed size and weight */}
+              <p className="max-w-[850px] text-foreground/85 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed">
                 Expand your reach, streamline your custom orders, and focus on what you do best – creating beautiful, timeless jewelry.
               </p>
             </div>
@@ -79,7 +79,7 @@ export default function GoldsmithPortalPage() {
                   <div className="p-2.5 rounded-full bg-primary/10 text-primary mb-2.5 shadow-md">
                     <benefit.icon className="h-6 w-6" />
                   </div>
-                  <CardTitle className="font-heading text-lg font-semibold text-foreground">{benefit.title}</CardTitle>
+                  <CardTitle className="text-lg text-foreground">{benefit.title}</CardTitle> {/* CardTitle uses font-heading */}
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <p className="text-sm text-muted-foreground leading-relaxed">
@@ -97,8 +97,8 @@ export default function GoldsmithPortalPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-3 text-center">
             <div className="space-y-1.5">
-              <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Joining is Simple</h2>
-               <p className="max-w-[850px] text-foreground/75 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed">
+              <h2 className="font-heading text-foreground">Joining is Simple</h2> {/* Removed size and weight */}
+               <p className="max-w-[850px] text-foreground/85 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed">
                 Start connecting with customers in just a few easy steps.
               </p>
             </div>
@@ -111,10 +111,10 @@ export default function GoldsmithPortalPage() {
              ].map((item) => (
                <div key={item.step} className="grid gap-1.5 text-center items-center p-3 rounded-lg hover:bg-card/60 transition-colors">
                   <div className="flex justify-center items-center mb-2.5">
-                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">{item.step}</span>
+                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg font-poppins">{item.step}</span>
                   </div>
                   <h3 className="font-heading text-lg font-semibold text-foreground">{item.title}</h3>
-                  <p className="text-sm text-foreground/70 leading-relaxed">
+                  <p className="text-sm text-foreground/80 leading-relaxed"> {/* text-foreground/70 might be too light */}
                     {item.description}
                   </p>
                 </div>
@@ -128,10 +128,10 @@ export default function GoldsmithPortalPage() {
         <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
           <div className="space-y-3">
              <Handshake className="h-10 w-10 mx-auto text-primary mb-1.5" />
-            <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl/tight text-foreground">
+            <h2 className="font-heading text-foreground"> {/* Removed size and weight */}
               Ready to Elevate Your Goldsmith Business?
             </h2>
-            <p className="mx-auto max-w-[600px] text-foreground/75 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed">
+            <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed">
               Join our growing network of skilled artisans. Register today and start receiving custom orders, connecting you with clients who appreciate true craftsmanship.
             </p>
           </div>
@@ -140,7 +140,7 @@ export default function GoldsmithPortalPage() {
                 href="/goldsmith-portal/register"
                 className={cn(
                     buttonVariants({ size: 'lg', variant: 'default' }), 
-                    'shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-10 py-3 text-base bg-primary text-primary-foreground hover:bg-primary/90' 
+                    'shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-10 py-3 text-base'
                 )}
               >
                 <span>
