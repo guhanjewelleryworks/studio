@@ -4,7 +4,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, LogIn, UserPlus, Gem } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
+// import Image from 'next/image'; // Removed Image import
 
 const navLinkClasses = "relative text-sm font-medium text-foreground/80 transition-colors hover:text-primary after:absolute after:bottom-[-5px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full";
 
@@ -15,10 +15,10 @@ export function Header() {
         {/* Desktop Navigation */}
         <div className="mr-6 hidden md:flex items-center">
           <Link href="/" className="mr-8 flex items-center space-x-2">
-            {/* <Gem className="h-7 w-7 text-primary" /> */}
-            <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={36} height={36} className="h-9 w-9 text-primary" />
+            <Gem className="h-7 w-7 text-primary" /> {/* Reverted to Gem icon */}
+            {/* <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={36} height={36} className="h-9 w-9 text-primary" /> */}
             <div className="flex flex-col">
-              <span className="font-bold text-lg text-accent"> {/* Changed from text-primary-foreground */}
+              <span className="font-bold text-lg text-accent">
                 Goldsmith Connect
               </span>
               <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
@@ -47,10 +47,10 @@ export function Header() {
                   href="/"
                   className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
                 >
-                  {/* <Gem className="h-7 w-7 text-primary" /> */}
-                  <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary" />
+                  <Gem className="h-7 w-7 text-primary" /> {/* Reverted to Gem icon */}
+                  {/* <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary" /> */}
                   <div className="flex flex-col">
-                    <span className="font-bold text-lg text-accent">Goldsmith Connect</span> {/* Changed from text-primary-foreground */}
+                    <span className="font-bold text-lg text-accent">Goldsmith Connect</span>
                     <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
                   </div>
                 </Link>
@@ -62,7 +62,7 @@ export function Header() {
                   <Link href="/admin" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Admin Portal</Link>
                 </nav>
                 <div className="px-6 pb-8 mt-auto flex flex-col gap-3 border-t border-border/20 pt-6">
-                  <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}> {/* Adjusted outline button */}
+                  <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
                     <LogIn className="mr-2 h-4 w-4" /> Login
                   </Link>
                   <Link href="/signup" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
@@ -74,10 +74,10 @@ export function Header() {
           </Sheet>
 
           <Link href="/" className="flex items-center space-x-2">
-            {/* <Gem className="h-7 w-7 text-primary md:hidden" /> Use md:hidden if you only want it for the Sheet version */}
-             <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary md:hidden" />
+            <Gem className="h-7 w-7 text-primary md:hidden" /> {/* Reverted to Gem icon for mobile center logo */}
+            {/* <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary md:hidden" /> */}
             <div className="flex flex-col md:hidden"> {/* md:hidden to hide on larger screens where full logo is shown */}
-              <span className="font-bold text-lg text-accent"> {/* Changed from text-primary-foreground */}
+              <span className="font-bold text-lg text-accent">
                 Goldsmith Connect
               </span>
                <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
@@ -93,8 +93,8 @@ export function Header() {
           <Link
             href="/login"
             className={cn(
-              buttonVariants({ variant: 'outline', size: 'default' }), // Changed to outline
-              'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2' // Adjusted styling
+              buttonVariants({ variant: 'outline', size: 'default' }),
+              'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2'
             )}
           >
             <span>Login</span>
