@@ -2,7 +2,7 @@
 'use client';
 
 import type { Goldsmith as GoldsmithProfile } from '@/types/goldsmith';
-import * as React from 'react';
+import * as React from 'react'; // Keep this for React namespace if other React features are used explicitly
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,11 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react"; // 'use' is already here
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast'; // Added useToast import
+import { useToast } from '@/hooks/use-toast';
 
 interface PageParams {
   id: string;
@@ -39,13 +39,14 @@ const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | nul
 
 
 // Make the component accept a promise for params
-export default function GoldsmithProfilePage({ params }: { params: PageParams }) {
-  const { id } = params; // Accessing id directly (adjust based on framework specifics if needed)
+export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
+  const params = use(paramsPromise);
+  const { id } = params;
 
   const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast(); // Initialize useToast
+  const { toast } = useToast();
 
    useEffect(() => {
     const loadProfile = async () => {
@@ -114,7 +115,6 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
 
   const handleRequestIntroduction = (e: React.FormEvent) => {
      e.preventDefault();
-     // Simulate admin mediation logic
      toast({
         title: 'Introduction Request Sent',
         description: 'Your request has been sent to an administrator for review and approval. You will be notified once confirmed.',
@@ -123,7 +123,6 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
    };
 
    const handleRequestCustomOrder = () => {
-    // Simulate admin mediation logic
      toast({
         title: 'Custom Order Request Submitted',
         description: 'Your custom order request has been submitted to an administrator for review. They will contact you or the goldsmith soon.',
@@ -134,9 +133,9 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
 
   return (
     <div className="container py-10 md:py-14 px-4 md:px-6 bg-background text-foreground">
-        <Alert variant="default" className="mb-6 border-accent/50 text-accent-foreground bg-accent/10 rounded-lg p-3 shadow-sm"> {/* Reduced mb and p */}
-          <ShieldCheck className="h-4 w-4 !text-accent mr-1.5" /> {/* Reduced mr */}
-          <AlertTitle className="font-poppins font-semibold text-sm text-foreground">Secure & Mediated Connection</AlertTitle> {/* Changed to text-foreground */}
+        <Alert variant="default" className="mb-6 border-accent/50 text-accent-foreground bg-accent/10 rounded-lg p-3 shadow-sm">
+          <ShieldCheck className="h-4 w-4 !text-accent mr-1.5" />
+          <AlertTitle className="font-poppins font-semibold text-sm text-foreground">Secure & Mediated Connection</AlertTitle>
           <AlertDescription className="text-xs mt-0.5 text-muted-foreground">
             All initial communications and custom order requests are facilitated through Goldsmith Connect administrators.
           </AlertDescription>
@@ -250,7 +249,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
                <CardDescription className="text-xs text-muted-foreground mt-0.5">Initiate a conversation or request a custom piece through our secure admin-mediated process.</CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
-              <form className="space-y-3.5" onSubmit={handleRequestIntroduction}> {/* Updated to handleRequestIntroduction, can be adjusted */}
+              <form className="space-y-3.5" onSubmit={handleRequestIntroduction}>
                  {/* TODO: Add form handling with react-hook-form */}
                  <div className="space-y-1">
                     <Label htmlFor="contact-name" className="text-foreground text-xs font-medium">Your Name</Label>
@@ -276,3 +275,4 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
     </div>
   );
 }
+
