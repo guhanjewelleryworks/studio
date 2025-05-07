@@ -2,15 +2,13 @@
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Search, ShieldCheck, Gift, MapPin, Handshake } from 'lucide-react';
+import { Search, ShieldCheck, Gift, MapPin, Handshake, UserCheck } from 'lucide-react'; // Added UserCheck
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-// import { GoldsmithIcon } from '@/components/icons/goldsmith-icon'; // Corrected import path
-
 
 // Subtle pattern for hero section
 const HeroPattern = () => (
-  <div className="absolute inset-0 opacity-[0.03] [mask-image:radial-gradient(farthest-side_at_top_left,white,transparent)]">
+  <div className="absolute inset-0 opacity-[0.02] [mask-image:radial-gradient(farthest-side_at_top_left,white,transparent)]">
     <svg aria-hidden="true" className="absolute inset-0 h-full w-full">
       <defs>
         <pattern
@@ -20,7 +18,7 @@ const HeroPattern = () => (
           patternUnits="userSpaceOnUse"
           patternContentUnits="userSpaceOnUse"
         >
-          <path d="M0 80L80 0ZM80 80L0 0Z" className="stroke-primary/40 fill-none" />
+          <path d="M0 80L80 0ZM80 80L0 0Z" className="stroke-primary/30 fill-none" />
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill="url(#hero-pattern)" />
@@ -45,18 +43,18 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center bg-background text-foreground">
       {/* Hero Section */}
-      <section className="relative w-full py-16 md:py-20 lg:py-24 bg-gradient-to-br from-background via-secondary/10 to-background overflow-hidden"> {/* Reduced py */}
+      <section className="relative w-full py-12 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/30 via-background to-background overflow-hidden"> {/* Reduced py */}
         <HeroPattern />
         <div className="container px-4 md:px-6 relative z-10">
           <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-8 xl:grid-cols-[1fr_550px] items-center">
-            <div className="flex flex-col justify-center space-y-3 md:space-y-4"> {/* Reduced space-y */}
-              <div className="space-y-2"> {/* Reduced space-y */}
+            <div className="flex flex-col justify-center space-y-2"> {/* Reduced space-y */}
+              <div className="space-y-1.5"> {/* Reduced space-y */}
                 <h1 className="font-heading text-accent leading-tight text-3xl sm:text-4xl xl:text-5xl/none"> {/* Use text-accent */}
                   Discover Local Goldsmiths,
                   <br />
                   <span className="text-primary">Craft Your Dreams.</span>
                 </h1>
-                <p className="max-w-[600px] text-foreground/85 md:text-base lg:text-lg leading-relaxed"> {/* Adjusted text size for md */}
+                <p className="max-w-[600px] text-foreground/75 md:text-lg leading-relaxed"> {/* Adjusted text size for md */}
                   Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
                 </p>
               </div>
@@ -77,12 +75,12 @@ export default function Home() {
             </div>
             <div className="relative mx-auto aspect-[6/5.5] w-full lg:order-last group rounded-xl shadow-xl overflow-hidden border-2 border-primary/10">
               <Image
-                src="https://images.unsplash.com/photo-1515562141207-dea6284784f2?q=80&w=800&auto=format&fit=crop"
+                src="https://images.unsplash.com/photo-1610500795055-206091564d31?q=80&w=800&auto=format&fit=crop"
                 alt="Elegant Jewelry Background"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 550px"
-                data-ai-hint="luxury jewelry piece"
+                data-ai-hint="elegant jewelry"
                 priority
               />
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-transparent via-black/5 to-black/20 pointer-events-none group-hover:bg-black/5 transition-colors"></div>
@@ -92,27 +90,27 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="w-full py-12 md:py-16 lg:py-20 bg-background"> {/* Reduced py */}
+      <section id="how-it-works" className="w-full py-10 md:py-12 lg:py-16 bg-background"> {/* Reduced py */}
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-2 text-center mb-6 md:mb-8"> {/* Reduced mb */}
-            <div className="space-y-1.5"> {/* Reduced space-y */}
-              <div className="inline-block rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground shadow-sm">How It Works</div>
+            <div className="space-y-1"> {/* Reduced space-y */}
+              <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-sm font-medium text-secondary-foreground shadow-sm">How It Works</div>
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Your Secure Path to Custom Jewelry</h2> {/* Use text-accent */}
-              <p className="max-w-[800px] text-muted-foreground md:text-sm lg:text-base/relaxed xl:text-base/relaxed"> {/* Adjusted text size */}
+              <p className="max-w-[800px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size */}
                 We connect you with talented goldsmiths through a verified and mediated process, ensuring quality and trust.
               </p>
             </div>
           </div>
           <div className="mx-auto grid max-w-5xl items-start gap-4 md:gap-5 lg:grid-cols-3 lg:max-w-none pt-4 md:pt-6"> {/* Reduced gap and pt */}
             {howItWorksSteps.map((step, index) => (
-              <div key={index} className="grid gap-1 text-center group p-3 rounded-xl bg-card hover:shadow-lg transition-shadow duration-300 border border-primary/10 hover:border-primary/30">
-                <div className="flex justify-center items-center mb-1"> {/* Reduced mb */}
+              <div key={index} className="grid gap-1 text-center group p-3 rounded-xl bg-card hover:shadow-lg transition-shadow duration-300 border border-transparent hover:border-primary/20">
+                <div className="flex justify-center items-center mb-1.5"> {/* Reduced mb */}
                   <div className="p-2 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-105 shadow-md">
                     <step.icon className="h-5 w-5" />
                   </div>
                 </div>
-                <h3 className="text-base font-heading font-semibold text-accent">{step.title}</h3> {/* Use text-accent */}
-                <p className="text-xs text-muted-foreground leading-relaxed">{step.description}</p>
+                <h3 className="text-md font-semibold text-accent">{step.title}</h3> {/* Use text-accent */}
+                <p className="text-xs text-foreground/70 leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
@@ -120,11 +118,11 @@ export default function Home() {
       </section>
 
       {/* Featured Goldsmiths Section */}
-      <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/10 to-background"> {/* Reduced py */}
+      <section className="w-full py-10 md:py-12 lg:py-16 bg-gradient-to-b from-secondary/20 to-background"> {/* Reduced py */}
         <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
           <div className="space-y-1.5 mb-4 md:mb-6"> {/* Reduced mb */}
             <h2 className="font-heading text-accent text-2xl sm:text-3xl">Meet Our Talented Artisans</h2> {/* Use text-accent */}
-            <p className="mx-auto max-w-[600px] text-muted-foreground md:text-sm lg:text-base/relaxed xl:text-base/relaxed"> {/* Adjusted text size */}
+            <p className="mx-auto max-w-[600px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size */}
               Discover skilled goldsmiths ready to craft your next masterpiece.
             </p>
           </div>
@@ -140,19 +138,19 @@ export default function Home() {
                     className="object-cover w-full aspect-video group-hover:scale-105 transition-transform duration-300"
                     data-ai-hint={goldsmith.dataAiHint}
                   />
-                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2"> {/* Reduced p */}
-                    <h3 className="text-base font-semibold text-white font-poppins">{goldsmith.name}</h3> {/* Use text-white for overlay */}
+                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2.5"> {/* Reduced p */}
+                    <h3 className="text-md font-semibold text-white">{goldsmith.name}</h3> {/* Use text-white for overlay */}
                   </div>
                 </CardHeader>
                 <CardContent className="p-2.5 text-left space-y-0.5"> {/* Reduced p */}
-                  <CardTitle className="text-base text-accent group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Use text-accent */}
-                  <p className="flex items-center text-muted-foreground text-xs">
+                  <CardTitle className="text-md text-accent mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Use text-accent */}
+                  <p className="flex items-center text-foreground/70 text-[0.7rem]">
                      <MapPin className="mr-1 h-3 w-3 text-muted-foreground" /> {goldsmith.specialty}
                   </p>
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  <p className="text-[0.7rem] text-foreground/80 leading-relaxed line-clamp-2">
                     A master of timeless designs and intricate details, located in {goldsmith.location}.
                   </p>
-                  <Link href={`/goldsmith/${goldsmith.id}`} className={cn(buttonVariants({ variant: "outline", size: "xs" }), "text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-1 w-full rounded-full text-[0.65rem] py-1")}> {/* Adjusted mt and py */}
+                  <Link href={`/goldsmith/${goldsmith.id}`} className={cn(buttonVariants({ variant: "outline", size: "xs" }), "text-accent border-accent hover:bg-accent/10 mt-1.5 w-full rounded-full text-[0.65rem] py-1")}> {/* Adjusted mt and py */}
                     <span>View Profile</span>
                   </Link>
                 </CardContent>
@@ -171,14 +169,14 @@ export default function Home() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="w-full py-12 md:py-16 lg:py-20 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background"> {/* Reduced py and border */}
+      <section className="w-full py-10 md:py-12 lg:py-16 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background"> {/* Reduced py and border */}
         <div className="container grid items-center justify-center gap-2 px-4 text-center md:px-6"> {/* Reduced gap */}
           <div className="space-y-1 mb-2 md:mb-3"> {/* Reduced space-y and mb */}
              <Handshake className="h-7 w-7 mx-auto text-primary mb-0.5" /> {/* Reduced size and mb */}
             <h2 className="font-heading text-accent text-2xl sm:text-3xl"> {/* Use text-accent */}
               Ready to Create or Connect?
             </h2>
-            <p className="mx-auto max-w-[600px] text-muted-foreground md:text-sm lg:text-base/relaxed xl:text-base/relaxed"> {/* Adjusted text size */}
+            <p className="mx-auto max-w-[600px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size */}
               Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmith Connect is your platform.
             </p>
           </div>
