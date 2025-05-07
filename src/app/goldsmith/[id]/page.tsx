@@ -1,3 +1,4 @@
+
 // src/app/goldsmith/[id]/page.tsx
 'use client';
 
@@ -13,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react"; // Removed 'use'
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from '@/lib/utils';
@@ -36,9 +37,10 @@ const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | nul
   return mockProfiles[id] || mockProfiles['default'];
 };
 
-// Make the component accept a promise for params
-export default function GoldsmithProfilePage({ params }: { params: PageParams }) {
-  const { id } = params; // Accessing id directly (adjust based on framework specifics if needed)
+
+export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
+  const params = React.use(paramsPromise);
+  const { id } = params;
 
   const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,7 +127,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
     <div className="container py-10 md:py-14 px-4 md:px-6 bg-background text-foreground">
         <Alert variant="default" className="mb-6 border-accent/50 text-accent-foreground bg-accent/10 rounded-lg p-3 shadow-sm"> {/* Reduced mb and p */}
           <ShieldCheck className="h-4 w-4 !text-accent mr-1.5" /> {/* Reduced mr */}
-          <AlertTitle className="font-poppins font-semibold text-sm text-accent">Secure & Mediated Connection</AlertTitle> {/* Use text-accent */}
+          <AlertTitle className="font-poppins font-semibold text-sm text-foreground">Secure & Mediated Connection</AlertTitle> {/* Changed to text-foreground */}
           <AlertDescription className="text-xs mt-0.5 text-muted-foreground">
             All initial communications and custom order requests are facilitated through Goldsmith Connect administrators.
           </AlertDescription>
@@ -139,7 +141,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
                 <AvatarImage src={profile.profileImageUrl} alt={profile.name} data-ai-hint="artisan portrait" />
                 <AvatarFallback className="text-3xl bg-primary/20 text-primary-foreground font-poppins">{profile.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              <CardTitle className="text-xl text-accent">{profile.name}</CardTitle> {/* Use text-accent */}
+              <CardTitle className="text-xl text-accent">{profile.name}</CardTitle>
               {profile.tagline && <p className="text-xs text-primary font-medium font-poppins mt-0.5">{profile.tagline}</p>}
               <div className="flex items-center text-amber-500 mt-1">
                 <Star className="h-3.5 w-3.5 mr-1 fill-current" /> <span className="text-xs text-foreground font-poppins">{profile.rating.toFixed(1)}</span>
@@ -196,7 +198,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
         <div className="md:col-span-2 space-y-6">
             <Card className="shadow-xl border-primary/10 rounded-xl bg-card">
                 <CardHeader className="p-5">
-                    <CardTitle className="text-lg text-accent">About {profile.name}</CardTitle> {/* Use text-accent */}
+                    <CardTitle className="text-lg text-accent">About {profile.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 pt-0">
                     {profile.bio && <p className="text-sm text-foreground/85 leading-normal whitespace-pre-line">{profile.bio}</p>}
@@ -205,7 +207,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
 
           <Card className="shadow-xl border-primary/10 rounded-xl bg-card">
             <CardHeader className="p-5">
-              <CardTitle className="text-lg text-accent">Portfolio Showcase</CardTitle> {/* Use text-accent */}
+              <CardTitle className="text-lg text-accent">Portfolio Showcase</CardTitle>
                <CardDescription className="text-xs text-muted-foreground mt-0.5">A glimpse into the artisan&apos;s craft.</CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
@@ -235,7 +237,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
 
            <Card className="shadow-xl border-primary/10 rounded-xl bg-card">
             <CardHeader className="p-5">
-              <CardTitle className="text-lg text-accent">Connect with {profile.name}</CardTitle> {/* Use text-accent */}
+              <CardTitle className="text-lg text-accent">Connect with {profile.name}</CardTitle>
                <CardDescription className="text-xs text-muted-foreground mt-0.5">Initiate a conversation or request a custom piece through our secure admin-mediated process.</CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">

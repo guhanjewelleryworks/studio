@@ -10,23 +10,23 @@ export default function AdminPortalPage() {
     <div className="flex flex-col items-center py-8 md:py-10 bg-gradient-to-br from-secondary/20 to-background min-h-[calc(100vh-8rem)]">
       <div className="container px-4 md:px-6 text-center">
         <ShieldCheck className="h-12 w-12 mx-auto text-primary mb-2.5" />
-        <h1 className="font-heading text-accent mb-2.5"> {/* Updated to text-accent */}
+        <h1 className="font-heading text-foreground mb-2.5"> {/* Changed to text-foreground */}
           Admin Dashboard
         </h1>
-        <p className="max-w-[700px] mx-auto text-muted-foreground md:text-lg mb-5 leading-relaxed"> {/* Updated to text-muted-foreground */}
+        <p className="max-w-[700px] mx-auto text-muted-foreground md:text-lg mb-5 leading-relaxed">
           Oversee and manage all aspects of the Goldsmith Connect platform. This central hub provides tools for user data management, goldsmith partnerships, order facilitation, and system settings.
         </p>
 
         <Card className="max-w-lg mx-auto shadow-xl bg-card border-primary/20 rounded-xl">
           <CardHeader className="pt-5 pb-2.5">
-            <CardTitle className="text-2xl text-accent">Platform Management Tools</CardTitle> {/* Updated to text-accent */}
+            <CardTitle className="text-2xl text-accent">Platform Management Tools</CardTitle>
             <CardDescription className="text-muted-foreground text-sm mt-0.5">Secure access to critical platform operations.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 px-5 pb-5 pt-1">
              <p className="text-sm text-muted-foreground text-left">
                Key administrative functions include:
              </p>
-             <ul className="list-none text-left text-foreground space-y-1.5 pl-1"> 
+             <ul className="list-none text-left text-foreground space-y-1.5 pl-1">
                 <li className="flex items-center text-base"><Users className="h-4 w-4 mr-2 text-primary"/>Customer Account Management</li>
                 <li className="flex items-center text-base"><Briefcase className="h-4 w-4 mr-2 text-primary"/>Goldsmith Partner Management & Verification</li>
                 <li className="flex items-center text-base"><BarChartHorizontal className="h-4 w-4 mr-2 text-primary"/>Order Management & Mediation</li>

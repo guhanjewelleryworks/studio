@@ -1,21 +1,22 @@
+
 // src/app/discover/page.tsx
 'use client';
 
 import type { Location } from '@/services/geolocation';
-import type { Goldsmith } from '@/types/goldsmith'; 
+import type { Goldsmith } from '@/types/goldsmith';
 import { useState, useEffect, FormEvent } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { MapPin, List, Search, Star, Loader2, SlidersHorizontal, Palette } from 'lucide-react';
-import { Link as LinkIcon } from 'lucide-react'; 
+import { Link as LinkIcon } from 'lucide-react';
 import Image from 'next/image';
 import NextLink from 'next/link';
 import { cn } from '@/lib/utils';
 
 // Placeholder for Map Component
 const MapPlaceholder = ({ locations }: { locations: Location[] }) => (
-  <div className="w-full h-[300px] md:h-full bg-card/70 rounded-xl flex flex-col items-center justify-center text-muted-foreground border border-border shadow-inner"> {/* Changed bg-muted/30 to bg-card/70 for theme */}
+  <div className="w-full h-[300px] md:h-full bg-card/70 rounded-xl flex flex-col items-center justify-center text-muted-foreground border border-border shadow-inner">
     <MapPin className="h-16 w-16 text-primary/70 mb-4" />
     <p className="text-xl font-semibold text-foreground">Interactive Map View</p>
     <p className="text-base mt-1 text-muted-foreground">(Displaying {locations.length} locations)</p>
@@ -87,7 +88,7 @@ export default function DiscoverPage() {
   return (
     <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)]"> {/* Reduced py */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-6"> {/* Reduced gap and mb */}
-        <h1 className="text-3xl font-extrabold text-accent tracking-tight">Find a Goldsmith</h1> {/* Changed to text-accent */}
+        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Find a Goldsmith</h1> {/* Changed to text-foreground */}
         <div className="flex gap-2">
           <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} aria-label="List View" className="rounded-lg px-4 py-2 text-sm shadow-md">
             <List className="mr-1.5 h-4 w-4" /> List
@@ -106,7 +107,7 @@ export default function DiscoverPage() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button type="button" variant="outline" size="icon" className="sm:ml-2 hidden sm:inline-flex p-2.5 rounded-lg shadow-md border-border hover:bg-secondary/30"> {/* Adjusted hover color */}
+        <Button type="button" variant="outline" size="icon" className="sm:ml-2 hidden sm:inline-flex p-2.5 rounded-lg shadow-md border-border hover:bg-secondary/30">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
             <span className="sr-only">Filters</span>
         </Button>
@@ -143,11 +144,11 @@ export default function DiscoverPage() {
                 <CardContent className="p-3 flex-grow flex flex-col justify-between"> {/* Reduced p */}
                   <div>
                     <CardTitle className="font-heading text-md text-accent mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Use text-accent */}
-                    <CardDescription className="text-xs text-muted-foreground mb-0.5 line-clamp-1"> 
+                    <CardDescription className="text-xs text-muted-foreground mb-0.5 line-clamp-1">
                       <MapPin className="inline-block h-3 w-3 mr-0.5" /> {goldsmith.address}
                     </CardDescription>
-                    <p className="text-xs text-muted-foreground mb-1 font-medium flex items-center"> {/* Use text-muted-foreground */}
-                      <Palette className="inline-block h-3 w-3 mr-0.5 text-primary"/>Specialty: {goldsmith.specialty} {/* Use text-primary for icon */}
+                    <p className="text-xs text-muted-foreground mb-1 font-medium flex items-center">
+                      <Palette className="inline-block h-3 w-3 mr-0.5 text-primary"/>Specialty: {goldsmith.specialty}
                     </p>
                     <p className="text-xs text-muted-foreground leading-snug line-clamp-2 mb-2">{goldsmith.shortBio}</p> {/* Reduced mb */}
                   </div>
@@ -155,7 +156,7 @@ export default function DiscoverPage() {
                     href={`/goldsmith/${goldsmith.id}`}
                     className={cn(
                        buttonVariants({ variant: "outline", size: "xs" }),
-                       'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-1.5 w-full rounded-lg text-xs py-1.5 shadow-md' // Adjusted outline button to primary colors
+                       'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-1.5 w-full rounded-lg text-xs py-1.5 shadow-md'
                     )}
                   >
                     <LinkIcon className="mr-1 h-3 w-3"/>View Profile & Connect
@@ -171,7 +172,7 @@ export default function DiscoverPage() {
         {viewMode === 'map' && (
           <div className="md:col-span-1">
             {isLoading && !currentLocation ? (
-                <div className="w-full h-[300px] md:h-full bg-card/80 rounded-xl flex items-center justify-center text-muted-foreground border border-border shadow-inner"> {/* Changed bg-muted/40 to bg-card/80 */}
+                <div className="w-full h-[300px] md:h-full bg-card/80 rounded-xl flex items-center justify-center text-muted-foreground border border-border shadow-inner">
                     <Loader2 className="h-8 w-8 animate-spin mr-2 text-primary" /> Loading Map Data...
                 </div>
             ) : (

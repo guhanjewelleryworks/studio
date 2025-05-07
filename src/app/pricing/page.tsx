@@ -9,8 +9,8 @@ const tiers = [
   {
     name: 'Customer Basic',
     id: 'tier-customer-basic',
-    href: '/signup', 
-    priceMonthly: 'Free', 
+    href: '/signup',
+    priceMonthly: 'Free',
     priceAnnual: null,
     description: 'Discover artisans and explore their creations. Perfect for browsing and initial inquiries.',
     features: [
@@ -25,9 +25,9 @@ const tiers = [
   {
     name: 'Customer Premium',
     id: 'tier-customer-premium',
-    href: '/signup', 
-    priceMonthly: '$19', 
-    priceAnnual: '$199', 
+    href: '/signup',
+    priceMonthly: '$19',
+    priceAnnual: '$199',
     description: 'Unlock direct communication and enhanced features for a personalized experience.',
     features: [
       'All Basic features',
@@ -42,8 +42,8 @@ const tiers = [
   {
     name: 'Goldsmith Partner',
     id: 'tier-goldsmith-partner',
-    href: '/goldsmith-portal/register', 
-    priceMonthly: '$49', 
+    href: '/goldsmith-portal/register',
+    priceMonthly: '$49',
     priceAnnual: '$499',
     description: 'Showcase your artistry, receive curated order requests, and grow your bespoke business.',
     features: [
@@ -65,11 +65,11 @@ export default function PricingPage() {
         <div className="mx-auto max-w-4xl text-center mb-8">
            <Sparkles className="h-9 w-9 mx-auto text-primary mb-2" />
           <h2 className="text-base font-semibold leading-7 text-primary uppercase tracking-wider font-poppins">Pricing Plans</h2>
-          <p className="font-heading mt-1 text-4xl tracking-tight text-accent sm:text-5xl"> {/* Use text-accent */}
+          <p className="font-heading mt-1 text-4xl tracking-tight text-foreground sm:text-5xl"> {/* Changed to text-foreground */}
             Connect & Create with Goldsmith Connect
           </p>
         </div>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-lg leading-8 text-muted-foreground mb-10"> {/* Use text-muted-foreground */}
+        <p className="mx-auto mt-3 max-w-2xl text-center text-lg leading-8 text-muted-foreground mb-10">
           Choose a plan that suits your journey into the world of bespoke jewelry. We facilitate secure and inspiring connections between discerning customers and skilled artisans.
         </p>
         <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-5 md:max-w-2xl md:grid-cols-2 lg:max-w-none lg:grid-cols-3">
@@ -87,9 +87,9 @@ export default function PricingPage() {
                 </div>
               )}
               <CardHeader className="pb-3 pt-5 px-4">
-                <CardTitle className="text-xl leading-6 text-accent">{tier.name}</CardTitle> {/* Use text-accent */}
+                <CardTitle className="text-xl leading-6 text-accent">{tier.name}</CardTitle>
                 <p className="mt-2.5">
-                  <span className="text-3xl font-extrabold tracking-tight text-foreground font-poppins">{tier.priceMonthly}</span> {/* Use text-foreground */}
+                  <span className="text-3xl font-extrabold tracking-tight text-foreground font-poppins">{tier.priceMonthly}</span>
                   {tier.priceMonthly !== 'Free' && <span className="text-sm font-semibold leading-6 text-muted-foreground font-poppins">/month</span>}
                 </p>
                 {tier.priceAnnual && tier.priceMonthly !== 'Free' && (
@@ -100,7 +100,7 @@ export default function PricingPage() {
                 <CardDescription className="mt-2.5 text-sm leading-6 text-muted-foreground h-12">{tier.description}</CardDescription>
               </CardHeader>
               <CardContent className="flex-grow pt-0.5 px-4">
-                <ul role="list" className="space-y-1.5 text-sm leading-6 text-foreground/90"> {/* Use text-foreground/90 */}
+                <ul role="list" className="space-y-1.5 text-sm leading-6 text-foreground/90">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex gap-x-2 items-center">
                       <Check className="h-3.5 w-3.5 flex-none text-primary" aria-hidden="true" />
@@ -113,12 +113,12 @@ export default function PricingPage() {
                 <Link
                   href={tier.href}
                   className={cn(
-                      buttonVariants({ 
-                        variant: tier.mostPopular ? 'default' : 'outline', 
-                        size: 'lg' 
+                      buttonVariants({
+                        variant: tier.mostPopular ? 'default' : 'outline',
+                        size: 'lg'
                       }),
                       'w-full shadow-md rounded-full text-sm py-2.5',
-                      tier.mostPopular ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground' // Ensure outline uses primary colors
+                      tier.mostPopular ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground'
                   )}
                 >
                   <span>{tier.cta}</span>

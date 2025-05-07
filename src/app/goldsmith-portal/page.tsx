@@ -17,10 +17,10 @@ export default function GoldsmithPortalPage() {
             <div className="flex flex-col justify-center space-y-3">
               <div className="space-y-1.5">
                  <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary shadow-sm font-poppins">Goldsmith Partner Portal</div>
-                <h1 className="font-heading text-accent leading-tight"> 
+                <h1 className="font-heading text-foreground leading-tight"> {/* Changed text-accent to text-foreground */}
                   Showcase Your Artistry, Expand Your Reach
                 </h1>
-                <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed"> 
+                <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed">
                   Join Goldsmith Connect to receive custom order inquiries, manage your bespoke creations, and connect with a discerning clientele passionate about fine jewelry.
                 </p>
               </div>
@@ -28,7 +28,7 @@ export default function GoldsmithPortalPage() {
                 <Link
                   href="/goldsmith-portal/register"
                   className={cn(
-                    buttonVariants({ size: 'lg', variant: 'default' }), 
+                    buttonVariants({ size: 'lg', variant: 'default' }),
                     'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-6 py-2 text-base'
                   )}
                 >
@@ -38,14 +38,14 @@ export default function GoldsmithPortalPage() {
                   href="/goldsmith-portal/login"
                   className={cn(
                     buttonVariants({ variant: 'outline', size: 'lg' }),
-                    'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 text-base' 
+                    'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 text-base'
                   )}
                 >
                   <span>Login to Dashboard</span>
                 </Link>
               </div>
             </div>
-            <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-xl shadow-2xl group border-2 border-primary/20"> {/* Added border */}
+            <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-xl shadow-2xl group border-2 border-primary/20">
               <Image
                 src="https://images.unsplash.com/photo-1596548405158-809386f68048?q=80&w=800&auto=format&fit=crop"
                 alt="Goldsmith crafting jewelry"
@@ -54,7 +54,7 @@ export default function GoldsmithPortalPage() {
                 sizes="(max-width: 768px) 100vw, 600px"
                 data-ai-hint="goldsmith crafting jewelry"
               />
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-transparent via-black/5 to-black/20 pointer-events-none group-hover:bg-black/5 transition-colors"></div> {/* Subtle overlay */}
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-transparent via-black/5 to-black/20 pointer-events-none group-hover:bg-black/5 transition-colors"></div>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@ export default function GoldsmithPortalPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8">
             <div className="space-y-1">
-              <h2 className="font-heading text-accent">Why Partner with Goldsmith Connect?</h2>
+              <h2 className="font-heading text-foreground">Why Partner with Goldsmith Connect?</h2> {/* Changed text-accent to text-foreground */}
               <p className="max-w-[850px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-lg/relaxed">
                 Expand your reach, streamline your custom orders, and focus on what you do best – creating beautiful, timeless jewelry.
               </p>
@@ -100,7 +100,7 @@ export default function GoldsmithPortalPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8">
             <div className="space-y-1">
-              <h2 className="font-heading text-accent">Joining is Simple</h2>
+              <h2 className="font-heading text-foreground">Joining is Simple</h2> {/* Changed text-accent to text-foreground */}
                <p className="max-w-[850px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-lg/relaxed">
                 Start connecting with customers in just a few easy steps.
               </p>
@@ -131,7 +131,7 @@ export default function GoldsmithPortalPage() {
         <div className="container grid items-center justify-center gap-2 px-4 text-center md:px-6">
           <div className="space-y-1.5">
              <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
-            <h2 className="font-heading text-accent">
+            <h2 className="font-heading text-foreground"> {/* Changed text-accent to text-foreground */}
               Ready to Elevate Your Goldsmith Business?
             </h2>
             <p className="mx-auto max-w-[600px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-lg/relaxed">
@@ -142,7 +142,7 @@ export default function GoldsmithPortalPage() {
              <Link
                 href="/goldsmith-portal/register"
                 className={cn(
-                    buttonVariants({ size: 'lg', variant: 'default' }), 
+                    buttonVariants({ size: 'lg', variant: 'default' }),
                     'shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-6 py-2 text-base'
                 )}
               >
@@ -154,8 +154,8 @@ export default function GoldsmithPortalPage() {
              <Link
                href="/contact?subject=GoldsmithInquiry"
                className={cn(
-                   buttonVariants({ variant: 'link', size: 'lg' }), 
-                   'text-primary hover:text-primary/80 text-base' 
+                   buttonVariants({ variant: 'link', size: 'lg' }),
+                   'text-primary hover:text-primary/80 text-base'
                 )}
              >
                <span>Have Questions? Contact Us</span>
