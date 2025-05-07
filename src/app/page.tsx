@@ -44,20 +44,20 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center bg-background text-foreground">
       {/* Hero Section */}
-      <section className="relative w-full py-16 md:py-20 lg:py-24 bg-gradient-to-br from-secondary/20 via-background to-background overflow-hidden">
+      <section className="relative w-full py-12 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/20 via-background to-background overflow-hidden">
         <HeroPattern />
         <div className="container px-4 md:px-6 relative z-10">
           <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-8 xl:grid-cols-[1fr_550px] items-center">
-            <div className="flex flex-col justify-center space-y-4">
-              <h1 className="font-heading text-foreground"> {/* text-primary-foreground was too light on light-cream */}
+            <div className="flex flex-col justify-center space-y-3"> {/* Reduced space-y-4 to space-y-3 */}
+              <h1 className="font-heading text-foreground">
                 Discover Local Goldsmiths,
                 <br />
                 <span className="text-primary">Craft Your Dreams.</span>
               </h1>
-              <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed"> {/* text-foreground/75 might be too light with new gray */}
+              <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed">
                 Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
               </p>
-              <div className="flex flex-col gap-2.5 min-[400px]:flex-row pt-2">
+              <div className="flex flex-col gap-2.5 min-[400px]:flex-row pt-3"> {/* Increased pt-2 to pt-3 */}
                 <Link
                   href="/discover"
                   className={cn(buttonVariants({ size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-8 py-3 text-base")}
@@ -86,9 +86,9 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="w-full py-16 md:py-20 lg:py-24 bg-background">
+      <section id="how-it-works" className="w-full py-12 md:py-16 lg:py-20 bg-background">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-3 text-center">
+          <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8 md:mb-10"> {/* Reduced space-y-3, added mb */}
             <div className="space-y-1.5">
               <div className="inline-block rounded-full bg-secondary/70 px-3.5 py-1.5 text-xs font-medium text-secondary-foreground shadow-sm">How It Works</div>
               <h2 className="font-heading text-foreground">Your Secure Path to Custom Jewelry</h2>
@@ -97,7 +97,7 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl items-start gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:max-w-none pt-10 md:pt-12">
+          <div className="mx-auto grid max-w-5xl items-start gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:max-w-none pt-6 md:pt-8"> {/* Reduced gap, reduced pt */}
             {howItWorksSteps.map((step, index) => (
               <div key={index} className="grid gap-1.5 text-center group p-4 rounded-xl bg-card hover:shadow-lg transition-shadow duration-300 border border-transparent hover:border-primary/20">
                 <div className="flex justify-center items-center mb-2">
@@ -114,15 +114,15 @@ export default function Home() {
       </section>
 
       {/* Featured Goldsmiths Section */}
-      <section className="w-full py-16 md:py-20 lg:py-24 bg-gradient-to-b from-secondary/20 to-background">
-        <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
-          <div className="space-y-2">
+      <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/20 to-background">
+        <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6"> {/* Reduced gap-4 */}
+          <div className="space-y-1.5 mb-6 md:mb-8"> {/* Reduced space-y-2, added mb */}
             <h2 className="font-heading text-foreground">Meet Our Talented Artisans</h2>
             <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
               Discover skilled goldsmiths ready to craft your next masterpiece.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4"> {/* Reduced gap-5, reduced pt-8 */}
             {featuredGoldsmiths.map((goldsmith) => (
               <Card key={goldsmith.id} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/10 overflow-hidden group rounded-xl">
                 <CardHeader className="p-0 relative">
@@ -138,8 +138,8 @@ export default function Home() {
                     <h3 className="text-lg font-semibold text-white font-poppins">{goldsmith.name}</h3>
                   </div>
                 </CardHeader>
-                <CardContent className="p-4 text-left space-y-1">
-                  <CardTitle className="text-lg text-foreground group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* CardTitle already uses font-heading */}
+                <CardContent className="p-3 text-left space-y-1"> {/* Reduced p-4 to p-3 */}
+                  <CardTitle className="text-lg text-foreground group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
                   <p className="flex items-center text-foreground/70 text-xs">
                      <GoldsmithIcon className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" /> {goldsmith.specialty}
                   </p>
@@ -153,7 +153,7 @@ export default function Home() {
               </Card>
             ))}
           </div>
-          <div className="mt-8 md:mt-10">
+          <div className="mt-6 md:mt-8"> {/* Reduced mt-8/mt-10 */}
             <Link
               href="/discover"
               className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), "border-primary text-primary hover:bg-primary/10 shadow-md hover:shadow-lg transition-shadow rounded-full px-8 py-3 text-base")}
@@ -165,9 +165,9 @@ export default function Home() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="w-full py-16 md:py-20 lg:py-24 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background">
-        <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
-          <div className="space-y-2">
+      <section className="w-full py-12 md:py-16 lg:py-20 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background">
+        <div className="container grid items-center justify-center gap-2.5 px-4 text-center md:px-6"> {/* Reduced gap-3 */}
+          <div className="space-y-1.5 mb-4"> {/* Reduced space-y-2, added mb */}
              <Handshake className="h-10 w-10 mx-auto text-primary mb-1.5" />
             <h2 className="font-heading text-foreground">
               Ready to Create or Connect?
@@ -176,7 +176,7 @@ export default function Home() {
               Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmith Connect is your platform.
             </p>
           </div>
-          <div className="flex flex-col gap-2.5 min-[400px]:flex-row justify-center pt-2">
+          <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center pt-1"> {/* Reduced gap-2.5, reduced pt-2 */}
             <Link
               href="/discover"
               className={cn(buttonVariants({ size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-8 py-3 text-base")}
