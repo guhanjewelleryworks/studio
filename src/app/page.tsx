@@ -2,10 +2,11 @@
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Search, UserCheck, ShieldCheck, Gift, Handshake } from 'lucide-react';
+import { Search, UserCheck, ShieldCheck, Gift } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { GoldsmithIcon } from '@/components/icons/goldsmith-icon';
+import { GoldsmithIcon } from '@/components/icons/goldsmith-icon'; // Corrected import path
+
 
 // Subtle pattern for hero section
 const HeroPattern = () => (
@@ -44,43 +45,49 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center bg-background text-foreground">
       {/* Hero Section */}
-      <section className="relative w-full py-12 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/20 via-background to-background overflow-hidden">
+      <section className="relative w-full py-12 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/30 via-background to-background overflow-hidden">
         <HeroPattern />
         <div className="container px-4 md:px-6 relative z-10">
           <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-8 xl:grid-cols-[1fr_550px] items-center">
-            <div className="flex flex-col justify-center space-y-3"> {/* Reduced space-y-4 to space-y-3 */}
-              <h1 className="font-heading text-foreground">
-                Discover Local Goldsmiths,
-                <br />
-                <span className="text-primary">Craft Your Dreams.</span>
-              </h1>
-              <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed">
-                Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
-              </p>
-              <div className="flex flex-col gap-2.5 min-[400px]:flex-row pt-3"> {/* Increased pt-2 to pt-3 */}
+            <div className="flex flex-col justify-center space-y-2"> {/* Reduced space-y */}
+              <div className="space-y-1.5"> {/* Reduced space-y */}
+                <h1 className="font-heading text-primary-foreground leading-tight"> {/* Use Poppins Extra Bold and adjusted font size */}
+                  Discover Local Goldsmiths,
+                  <br />
+                  <span className="text-primary">Craft Your Dreams.</span>
+                </h1>
+                <p className="max-w-[600px] text-foreground/75 md:text-lg leading-relaxed"> {/* Adjusted text color for contrast */}
+                  Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 min-[400px]:flex-row pt-1"> {/* Reduced gap and pt */}
                 <Link
                   href="/discover"
-                  className={cn(buttonVariants({ size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-8 py-3 text-base")}
+                  className={cn(buttonVariants({ size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2 text-base")} /* Reduced px/py */
                 >
-                  <span>Find a Goldsmith <Search className="ml-1.5 h-4 w-4 inline" /></span>
+                  <span>Find a Goldsmith <Search className="ml-2 h-4 w-4 inline" /></span> {/* Reduced ml */}
                 </Link>
                 <Link
                   href="/goldsmith-portal"
-                  className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10 hover:text-accent rounded-full px-8 py-3 text-base")}
+                  className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10 hover:text-accent-foreground rounded-full px-6 py-2 text-base")} /* Reduced px/py, changed text-accent-foreground */
                 >
-                   <span>Join as a Goldsmith <UserCheck className="ml-1.5 h-4 w-4 inline" /></span>
+                   <span>Join as a Goldsmith <UserCheck className="ml-2 h-4 w-4 inline" /></span> {/* Reduced ml */}
                 </Link>
               </div>
             </div>
-            <Image
-              src="https://images.unsplash.com/photo-1515562141207-dea2ef6f99a1?q=80&w=800&auto=format&fit=crop"
-              alt="Elegant Jewelry Background"
-              width={600}
-              height={550}
-              className="mx-auto aspect-[6/5.5] overflow-hidden rounded-xl object-cover sm:w-full lg:order-last shadow-xl border-2 border-primary/10 transition-transform duration-300 hover:scale-105"
-              data-ai-hint="elegant jewelry"
-              priority
-            />
+            <div className="relative mx-auto aspect-[6/5.5] w-full lg:order-last group rounded-xl shadow-xl overflow-hidden">
+              <Image
+                src="https://images.unsplash.com/photo-1610500795055-206091564d31?q=80&w=800&auto=format&fit=crop"
+                alt="Elegant Jewelry Background"
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 1024px) 100vw, 550px"
+                data-ai-hint="elegant jewelry"
+                priority
+              />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-secondary/0 via-background/20 to-background/60 pointer-events-none"></div>
+              <div className="absolute inset-0 rounded-xl border-2 border-primary/5 pointer-events-none"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -88,25 +95,25 @@ export default function Home() {
       {/* How It Works Section */}
       <section id="how-it-works" className="w-full py-12 md:py-16 lg:py-20 bg-background">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8 md:mb-10"> {/* Reduced space-y-3, added mb */}
-            <div className="space-y-1.5">
-              <div className="inline-block rounded-full bg-secondary/70 px-3.5 py-1.5 text-xs font-medium text-secondary-foreground shadow-sm">How It Works</div>
-              <h2 className="font-heading text-foreground">Your Secure Path to Custom Jewelry</h2>
-              <p className="max-w-[800px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
+          <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8"> {/* Reduced space-y and mb */}
+            <div className="space-y-1">
+              <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-xs font-medium text-secondary-foreground shadow-sm">How It Works</div> {/* Reduced px/py */}
+              <h2 className="font-heading text-primary-foreground">Your Secure Path to Custom Jewelry</h2> {/* Changed text color */}
+              <p className="max-w-[800px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Changed text color */}
                 We connect you with talented goldsmiths through a verified and mediated process, ensuring quality and trust.
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl items-start gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:max-w-none pt-6 md:pt-8"> {/* Reduced gap, reduced pt */}
+          <div className="mx-auto grid max-w-5xl items-start gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:max-w-none pt-6 md:pt-8"> {/* Reduced gap and pt */}
             {howItWorksSteps.map((step, index) => (
-              <div key={index} className="grid gap-1.5 text-center group p-4 rounded-xl bg-card hover:shadow-lg transition-shadow duration-300 border border-transparent hover:border-primary/20">
-                <div className="flex justify-center items-center mb-2">
-                  <div className="p-2.5 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-105 shadow-md">
-                    <step.icon className="h-5 w-5" />
+              <div key={index} className="grid gap-1 text-center group p-3 rounded-xl bg-card hover:shadow-lg transition-shadow duration-300 border border-transparent hover:border-primary/20"> {/* Reduced p and gap */}
+                <div className="flex justify-center items-center mb-1.5"> {/* Reduced mb */}
+                  <div className="p-2 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-105 shadow-md"> {/* Reduced p */}
+                    <step.icon className="h-5 w-5" /> {/* Reduced icon size */}
                   </div>
                 </div>
-                <h3 className="text-lg font-heading font-semibold text-foreground">{step.title}</h3>
-                <p className="text-sm text-foreground/80 leading-relaxed">{step.description}</p>
+                <h3 className="text-md font-heading font-semibold text-primary-foreground">{step.title}</h3> {/* Changed text color */}
+                <p className="text-xs text-foreground/70 leading-relaxed">{step.description}</p> {/* Changed text color */}
               </div>
             ))}
           </div>
@@ -115,14 +122,14 @@ export default function Home() {
 
       {/* Featured Goldsmiths Section */}
       <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/20 to-background">
-        <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6"> {/* Reduced gap-4 */}
-          <div className="space-y-1.5 mb-6 md:mb-8"> {/* Reduced space-y-2, added mb */}
-            <h2 className="font-heading text-foreground">Meet Our Talented Artisans</h2>
-            <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
+        <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6"> {/* Reduced gap */}
+          <div className="space-y-1.5 mb-6"> {/* Reduced space-y and mb */}
+            <h2 className="font-heading text-primary-foreground">Meet Our Talented Artisans</h2> {/* Changed text color */}
+            <p className="mx-auto max-w-[600px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Changed text color */}
               Discover skilled goldsmiths ready to craft your next masterpiece.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4"> {/* Reduced gap-5, reduced pt-8 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4"> {/* Reduced gap and pt */}
             {featuredGoldsmiths.map((goldsmith) => (
               <Card key={goldsmith.id} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/10 overflow-hidden group rounded-xl">
                 <CardHeader className="p-0 relative">
@@ -134,29 +141,29 @@ export default function Home() {
                     className="object-cover w-full aspect-video group-hover:scale-105 transition-transform duration-300"
                     data-ai-hint={goldsmith.dataAiHint}
                   />
-                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                    <h3 className="text-lg font-semibold text-white font-poppins">{goldsmith.name}</h3>
+                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2.5"> {/* Reduced p */}
+                    <h3 className="text-md font-semibold text-white font-poppins">{goldsmith.name}</h3> {/* Reduced text size */}
                   </div>
                 </CardHeader>
-                <CardContent className="p-3 text-left space-y-1"> {/* Reduced p-4 to p-3 */}
-                  <CardTitle className="text-lg text-foreground group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
-                  <p className="flex items-center text-foreground/70 text-xs">
-                     <GoldsmithIcon className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" /> {goldsmith.specialty}
+                <CardContent className="p-3 text-left space-y-0.5"> {/* Reduced p and space-y */}
+                  <CardTitle className="text-md text-primary-foreground group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Changed text color */}
+                  <p className="flex items-center text-foreground/60 text-xs"> {/* Changed text color */}
+                     <GoldsmithIcon className="mr-1 h-3 w-3 text-muted-foreground" /> {goldsmith.specialty} {/* Reduced mr and icon size */}
                   </p>
-                  <p className="text-sm text-foreground/80 leading-relaxed line-clamp-2">
+                  <p className="text-xs text-foreground/70 leading-relaxed line-clamp-2"> {/* Changed text color */}
                     A master of timeless designs and intricate details, located in {goldsmith.location}.
                   </p>
-                  <Link href={`/goldsmith/${goldsmith.id}`} className={cn(buttonVariants({ variant: "outline", size: "sm" }), "text-accent border-accent hover:bg-accent/10 mt-2 w-full rounded-full text-xs py-1.5")}>
+                  <Link href={`/goldsmith/${goldsmith.id}`} className={cn(buttonVariants({ variant: "outline", size: "xs" }), "text-accent-foreground border-accent hover:bg-accent/10 mt-1.5 w-full rounded-full text-[0.65rem] py-1")}> {/* Reduced mt and py */}
                     <span>View Profile</span>
                   </Link>
                 </CardContent>
               </Card>
             ))}
           </div>
-          <div className="mt-6 md:mt-8"> {/* Reduced mt-8/mt-10 */}
+          <div className="mt-6"> {/* Reduced mt */}
             <Link
               href="/discover"
-              className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), "border-primary text-primary hover:bg-primary/10 shadow-md hover:shadow-lg transition-shadow rounded-full px-8 py-3 text-base")}
+              className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), "border-primary text-primary hover:bg-primary/10 shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2 text-base")} /* Reduced px/py */
             >
               <span>Explore All Goldsmiths</span>
             </Link>
@@ -166,28 +173,28 @@ export default function Home() {
 
       {/* Call to Action Section */}
       <section className="w-full py-12 md:py-16 lg:py-20 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background">
-        <div className="container grid items-center justify-center gap-2.5 px-4 text-center md:px-6"> {/* Reduced gap-3 */}
-          <div className="space-y-1.5 mb-4"> {/* Reduced space-y-2, added mb */}
-             <Handshake className="h-10 w-10 mx-auto text-primary mb-1.5" />
-            <h2 className="font-heading text-foreground">
+        <div className="container grid items-center justify-center gap-2 px-4 text-center md:px-6"> {/* Reduced gap */}
+          <div className="space-y-1.5 mb-3"> {/* Reduced space-y and mb */}
+             <GoldsmithIcon className="h-8 w-8 mx-auto text-primary mb-1" /> {/* Reduced size and mb, replaced Handshake */}
+            <h2 className="font-heading text-primary-foreground"> {/* Changed text color */}
               Ready to Create or Connect?
             </h2>
-            <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
+            <p className="mx-auto max-w-[600px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Changed text color */}
               Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmith Connect is your platform.
             </p>
           </div>
-          <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center pt-1"> {/* Reduced gap-2.5, reduced pt-2 */}
+          <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center pt-1"> {/* Reduced gap and pt */}
             <Link
               href="/discover"
-              className={cn(buttonVariants({ size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-8 py-3 text-base")}
+              className={cn(buttonVariants({ size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2 text-base")} /* Reduced px/py */
             >
-              <span>Start Your Search <Search className="ml-1.5 h-4 w-4 inline" /></span>
+              <span>Start Your Search <Search className="ml-2 h-4 w-4 inline" /></span> {/* Reduced ml */}
             </Link>
             <Link
               href="/goldsmith-portal/register"
-              className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10 hover:text-accent rounded-full px-8 py-3 text-base")}
+              className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10 hover:text-accent-foreground rounded-full px-6 py-2 text-base")} /* Reduced px/py, changed text-accent-foreground */
             >
-               <span>Register as a Goldsmith <UserCheck className="ml-1.5 h-4 w-4 inline" /></span>
+               <span>Register as a Goldsmith <UserCheck className="ml-2 h-4 w-4 inline" /></span> {/* Reduced ml */}
             </Link>
           </div>
         </div>
