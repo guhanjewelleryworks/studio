@@ -8,81 +8,81 @@ body {
 
 @layer base {
   :root {
-    /* Light Theme - Cheerful, Vibrant & Happy */
-    --background: 50 100% 97%; /* Pale Yellow/Cream */
-    --foreground: 20 15% 25%; /* Dark Brown for text */
+    /* Goldsmith Connect Theme - Elegant Gold & Cream */
+    --background: 48 83% 90%; /* Cream (#FFFDD0) */
+    --foreground: 39 67% 18%; /* Deep Brown (#8B4513) for text */
 
-    --card: 44 100% 95%; /* Slightly darker Cream */
-    --card-foreground: 20 15% 25%;
+    --card: 50 80% 92%; /* Lighter Cream for cards */
+    --card-foreground: 39 67% 18%;
 
-    --popover: 44 100% 94%; /* Cream */
-    --popover-foreground: 20 15% 25%;
+    --popover: 50 80% 92%; /* Lighter Cream for popovers */
+    --popover-foreground: 39 67% 18%;
 
-    --primary: 345 90% 60%; /* Bright Pink/Coral */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 51 100% 50%; /* Gold (#FFD700) */
+    --primary-foreground: 39 67% 18%; /* Deep Brown for text on primary */
 
-    --secondary: 15 100% 70%; /* Coral/Orange */
-    --secondary-foreground: 20 15% 25%;
+    --secondary: 48 83% 85%; /* Lighter Cream, close to #FFFDD0 but slightly different for secondary elements */
+    --secondary-foreground: 39 67% 25%; /* Slightly lighter brown for secondary text */
 
-    --muted: 40 100% 90%; /* Light Peach */
-    --muted-foreground: 20 15% 45%; /* Muted Brown */
+    --muted: 48 83% 93%; /* Very Light Cream / Off-white */
+    --muted-foreground: 39 67% 40%; /* Muted Brown for less important text */
 
-    --accent: 30 100% 80%; /* Peach */
-    --accent-foreground: 20 15% 20%; /* Dark Brown for contrast on accent */
+    --accent: 39 67% 28%; /* Deep Brown (#8B4513) for CTAs and highlights */
+    --accent-foreground: 48 83% 90%; /* Cream text on accent */
 
-    --destructive: 0 70% 55%; /* Softer Red */
+    --destructive: 0 70% 55%; /* A standard, slightly softer red */
     --destructive-foreground: 0 0% 100%; /* White */
 
-    --border: 40 60% 88%; /* Light Peachy Border */
-    --input: 40 70% 92%;   /* Peachy Input Background */
-    --ring: 345 90% 65%;   /* Bright Pink/Coral for focus ring */
+    --border: 51 50% 75%; /* Muted Gold for borders */
+    --input: 50 70% 94%;   /* Very Light Cream for input backgrounds */
+    --ring: 51 100% 60%;   /* Brighter Gold for focus rings */
 
-    --chart-1: 345 85% 65%; /* Pink/Coral */
-    --chart-2: 15 90% 75%;  /* Coral/Orange */
-    --chart-3: 30 95% 85%;  /* Peach */
-    --chart-4: 50 90% 90%;  /* Pale Yellow */
-    --chart-5: 25 80% 70%;  /* Light Orange */
+    --chart-1: 51 100% 50%; /* Gold */
+    --chart-2: 39 67% 28%;  /* Deep Brown */
+    --chart-3: 48 83% 80%;  /* Medium Cream */
+    --chart-4: 51 80% 60%;  /* Lighter Gold */
+    --chart-5: 39 50% 40%;  /* Muted Brown */
 
-    --radius: 0.5rem; /* Standard rounding */
+    --radius: 0.75rem; /* Slightly more rounded corners for elegance */
   }
 
   .dark {
-    /* Dark Theme - Cheerful, Vibrant & Happy (Adjusted for Dark Mode) */
-    --background: 20 15% 10%; /* Very Dark Brown */
-    --foreground: 40 100% 92%; /* Light Peach/Cream for text */
+    /* Dark Theme - Goldsmith Connect - Gold on Dark Brown/Charcoal */
+    --background: 30 20% 10%; /* Very Dark Brown/Charcoal */
+    --foreground: 48 83% 90%; /* Cream for text */
 
-    --card: 20 15% 15%; /* Darker Brown */
-    --card-foreground: 40 100% 92%;
+    --card: 30 20% 15%; /* Darker Brown/Charcoal for cards */
+    --card-foreground: 48 83% 90%;
 
-    --popover: 20 15% 12%; /* Very Dark Brown */
-    --popover-foreground: 40 100% 92%;
+    --popover: 30 20% 12%; /* Very Dark Brown for popovers */
+    --popover-foreground: 48 83% 90%;
 
-    --primary: 345 90% 65%; /* Bright Pink/Coral (Slightly lighter for dark mode) */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 51 100% 55%; /* Gold (slightly brighter for dark mode) */
+    --primary-foreground: 30 20% 10%; /* Dark Brown/Charcoal for text on primary */
 
-    --secondary: 15 100% 75%; /* Coral/Orange (Slightly lighter) */
-    --secondary-foreground: 20 15% 20%; /* Dark Brown for contrast */
+    --secondary: 30 20% 20%; /* Dark Brown, slightly lighter than background */
+    --secondary-foreground: 48 83% 85%; /* Lighter Cream for secondary text */
 
-    --muted: 20 15% 20%; /* Dark Muted Brown */
-    --muted-foreground: 40 80% 80%; /* Lighter Peachy Cream */
+    --muted: 30 20% 25%; /* Muted Dark Brown */
+    --muted-foreground: 48 70% 70%; /* Muted Cream */
 
-    --accent: 30 100% 85%; /* Peach (Slightly lighter) */
-    --accent-foreground: 20 15% 15%; /* Dark Brown for contrast */
+    --accent: 51 100% 65%; /* Brighter Gold for CTAs and highlights in dark mode */
+    --accent-foreground: 30 20% 10%; /* Dark Brown/Charcoal text on accent */
 
-    --destructive: 0 70% 60%; /* Softer Red (Slightly lighter) */
+    --destructive: 0 70% 60%; /* Softer Red (Slightly lighter for dark mode) */
     --destructive-foreground: 0 0% 100%; /* White */
 
-    --border: 20 15% 25%; /* Muted Dark Brown Border */
-    --input: 20 15% 18%;   /* Darker Input Background */
-    --ring: 345 90% 70%;   /* Bright Pink/Coral for focus ring (Slightly lighter) */
-    
-    --chart-1: 345 80% 70%; /* Pink/Coral */
-    --chart-2: 15 85% 80%;  /* Coral/Orange */
-    --chart-3: 30 90% 90%;  /* Peach */
-    --chart-4: 50 85% 95%;  /* Pale Yellow */
-    --chart-5: 25 75% 75%;  /* Light Orange */
+    --border: 51 50% 40%; /* Dark Muted Gold for borders */
+    --input: 30 20% 18%;   /* Darker Input Background */
+    --ring: 51 100% 65%;   /* Brighter Gold for focus ring (Slightly lighter) */
 
-    --radius: 0.5rem;
+    --chart-1: 51 100% 55%; /* Gold */
+    --chart-2: 48 83% 90%;  /* Cream */
+    --chart-3: 51 80% 70%;  /* Lighter Gold */
+    --chart-4: 30 20% 30%;  /* Medium Dark Brown */
+    --chart-5: 48 60% 60%;  /* Muted Cream */
+
+    --radius: 0.75rem;
   }
 }
 
