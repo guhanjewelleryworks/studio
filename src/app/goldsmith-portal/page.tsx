@@ -110,7 +110,7 @@ export default function GoldsmithPortalPage() {
              ].map((item) => (
                <div key={item.step} className="grid gap-1.5 text-center items-center p-3 rounded-lg hover:bg-card/60 transition-colors"> {/* Adjusted gap and padding */}
                   <div className="flex justify-center items-center mb-2.5"> {/* Adjusted mb */}
-                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground shadow-lg">{item.step}</span> {/* Increased size and shadow */}
+                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">{item.step}</span> {/* Increased size and shadow */}
                   </div>
                   <h3 className="text-lg font-semibold text-foreground">{item.title}</h3> {/* Changed to text-foreground, increased size */}
                   <p className="text-sm text-foreground/70 leading-relaxed"> {/* Increased font size */}

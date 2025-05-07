@@ -1,4 +1,5 @@
 
+
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -72,7 +73,7 @@ export default function Home() {
               </div>
             </div>
             <Image
-              src="https://images.unsplash.com/photo-1610500795055-206091564d31?q=80&w=1200&auto=format&fit=crop" 
+              src="https://picsum.photos/seed/goldsmith-hero/600/550" 
               alt="Elegant Jewelry Background"
               width={600}
               height={550}
@@ -204,7 +205,7 @@ export default function Home() {
               <Link
                 href="/goldsmith-portal/register"
                 className={cn(
-                  buttonVariants({ variant: 'outline', size: 'lg' }),
+                  buttonVariants({ size: 'lg', variant: 'outline' }),
                   'shadow-lg hover:shadow-xl transition-shadow border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-8 py-3 text-base'
                 )}
               >

@@ -1,8 +1,9 @@
 
+
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogIn, UserPlus } from 'lucide-react';
+import { Menu, LogIn, UserPlus, Gem } from 'lucide-react'; // Added Gem
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
@@ -15,7 +16,8 @@ export function Header() {
         {/* Desktop Navigation */}
         <div className="mr-6 hidden md:flex items-center">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8" />
+            {/* <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8" /> */}
+            <Gem className="h-7 w-7 text-primary" /> {/* Reverted to Gem icon */}
             <div className="flex flex-col">
               <span className="font-bold text-lg text-foreground">
                 Goldsmith Connect
@@ -47,7 +49,8 @@ export function Header() {
                   href="/"
                   className="flex items-center space-x-2 px-4 py-4 border-b border-border/20" /* Adjusted padding */
                 >
-                  <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={28} height={28} className="h-7 w-7" />
+                  {/* <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={28} height={28} className="h-7 w-7" /> */}
+                  <Gem className="h-7 w-7 text-primary" /> {/* Reverted to Gem icon */}
                   <div>
                     <span className="font-bold text-md text-foreground">Goldsmith Connect</span> {/* Adjusted size */}
                     <p className="text-[0.65rem] text-muted-foreground -mt-0.5">Finely Handcrafted</p> {/* Adjusted size and margin */}
@@ -75,7 +78,8 @@ export function Header() {
         {/* Mobile Logo */}
         <div className="flex flex-1 items-center justify-center md:justify-start md:hidden">
             <Link href="/" className="flex items-center space-x-2">
-              <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={28} height={28} className="h-7 w-7" />
+              {/* <Image src="/logo.svg" alt="Goldsmith Connect Logo" width={28} height={28} className="h-7 w-7" /> */}
+              <Gem className="h-7 w-7 text-primary" /> {/* Reverted to Gem icon */}
                <div className="flex flex-col">
                 <span className="font-bold text-md sm:inline-block text-foreground">
                     Goldsmith Connect
