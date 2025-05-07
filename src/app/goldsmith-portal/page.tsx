@@ -1,34 +1,34 @@
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, DollarSign, Users, Edit3, Gift } from 'lucide-react';
+import { CheckCircle, DollarSign, Users, Edit3, Gift, Handshake, Palette } from 'lucide-react'; // Added Handshake, Palette
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 
 export default function GoldsmithPortalPage() {
   return (
-    <div className="flex flex-col items-center bg-background">
+    <div className="flex flex-col items-center bg-background min-h-[calc(100vh-8rem)]"> {/* Reduced min-h */}
       {/* Hero Section */}
-      <section className="w-full py-10 md:py-12 lg:py-16 bg-gradient-to-b from-secondary/30 to-background">
+      <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/10 via-background to-background"> {/* Adjusted py and gradient */}
         <div className="container px-4 md:px-6">
-          <div className="grid gap-5 lg:grid-cols-2 lg:gap-8 xl:items-center">
-            <div className="flex flex-col justify-center space-y-3.5">
-              <div className="space-y-2">
-                 <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary shadow-sm">Goldsmith Partner Portal</div>
-                <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl xl:text-5xl/none text-primary-foreground leading-tight">
+          <div className="grid gap-6 lg:grid-cols-2 lg:gap-10 xl:items-center"> {/* Adjusted gap */}
+            <div className="flex flex-col justify-center space-y-4"> {/* Adjusted space-y */}
+              <div className="space-y-2.5"> {/* Adjusted space-y */}
+                 <div className="inline-block rounded-full bg-primary/10 px-3.5 py-1.5 text-sm font-semibold text-primary shadow-sm">Goldsmith Partner Portal</div> {/* Adjusted size */}
+                <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl/none text-foreground leading-tight"> {/* Changed to text-foreground, adjusted size */}
                   Showcase Your Artistry, Expand Your Reach
                 </h1>
-                <p className="max-w-[550px] text-foreground/80 md:text-lg leading-relaxed">
+                <p className="max-w-[600px] text-foreground/80 md:text-lg leading-relaxed"> {/* Adjusted max-w */}
                   Join Goldsmith Connect to receive custom order inquiries, manage your bespoke creations, and connect with a discerning clientele passionate about fine jewelry.
                 </p>
               </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row pt-1">
+              <div className="flex flex-col gap-2.5 min-[400px]:flex-row pt-1.5"> {/* Adjusted gap and pt */}
                 <Link
                   href="/goldsmith-portal/register"
                   className={cn(
-                    buttonVariants({ size: 'default', variant: 'default' }), 
-                    'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-6 py-2 text-sm'
+                    buttonVariants({ size: 'lg', variant: 'default' }),  /* Changed to lg */
+                    'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-8 py-3 text-base' /* Adjusted size */
                   )}
                 >
                   <span>Register Your Workshop</span>
@@ -36,8 +36,8 @@ export default function GoldsmithPortalPage() {
                 <Link
                   href="/goldsmith-portal/login"
                   className={cn(
-                    buttonVariants({ variant: 'outline', size: 'default' }),
-                    'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 border-accent text-accent hover:bg-accent/10 hover:text-accent-foreground rounded-full px-6 py-2 text-sm'
+                    buttonVariants({ variant: 'outline', size: 'lg' }), /* Changed to lg */
+                    'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 border-accent text-accent-foreground hover:bg-accent/10 rounded-full px-8 py-3 text-base' /* Adjusted size and colors */
                   )}
                 >
                   <span>Login to Dashboard</span>
@@ -45,43 +45,43 @@ export default function GoldsmithPortalPage() {
               </div>
             </div>
              <Image
-              src="https://picsum.photos/seed/goldsmith-studio/600/450"
-              alt="Modern Goldsmith Studio"
+              src="https://images.unsplash.com/photo-1596548405158-809386f68048?q=80&w=800&auto=format&fit=crop"
+              alt="Goldsmith crafting jewelry"
               width={600}
               height={450}
-              className="mx-auto aspect-[4/3] overflow-hidden rounded-xl object-cover sm:w-full shadow-xl border-2 border-primary/10"
-              data-ai-hint="modern goldsmith studio"
+              className="mx-auto aspect-[4/3] overflow-hidden rounded-xl object-cover sm:w-full shadow-2xl border-2 border-primary/15 transition-transform duration-300 hover:scale-105" /* Adjusted shadow, border, and hover effect */
+              data-ai-hint="goldsmith crafting jewelry"
             />
           </div>
         </div>
       </section>
 
       {/* Benefits Section */}
-      <section id="benefits" className="w-full py-10 md:py-12 lg:py-16 bg-background">
+      <section id="benefits" className="w-full py-12 md:py-16 lg:py-20 bg-background"> {/* Adjusted py */}
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-2 text-center">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-primary-foreground">Why Partner with Goldsmith Connect?</h2>
-              <p className="max-w-[800px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
+          <div className="flex flex-col items-center justify-center space-y-3 text-center"> {/* Adjusted space-y */}
+            <div className="space-y-1.5"> {/* Adjusted space-y */}
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Why Partner with Goldsmith Connect?</h2> {/* Changed to text-foreground, adjusted size */}
+              <p className="max-w-[850px] text-foreground/75 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed"> {/* Adjusted max-w, opacity, and size */}
                 Expand your reach, streamline your custom orders, and focus on what you do best – creating beautiful, timeless jewelry.
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl items-start gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:max-w-none pt-8 md:pt-10">
+          <div className="mx-auto grid max-w-5xl items-start gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:max-w-none pt-10 md:pt-12"> {/* Adjusted gap and pt */}
             {[
               { icon: Users, title: "Connect with Clients", description: "Receive curated custom order requests from customers seeking unique, handcrafted jewelry." },
-              { icon: Edit3, title: "Showcase Your Craft", description: "Build a stunning portfolio to display your unique style and expertise to a targeted audience." },
+              { icon: Palette, title: "Showcase Your Craft", description: "Build a stunning portfolio to display your unique style and expertise to a targeted audience." }, // Changed icon
               { icon: DollarSign, title: "Streamline Orders", description: "Manage inquiries, communications, and order progress through your dedicated dashboard." }
             ].map((benefit, index) => (
-              <Card key={index} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/10 rounded-xl flex flex-col text-center p-4">
-                <CardHeader className="items-center pb-2">
-                  <div className="p-2 rounded-full bg-primary/10 text-primary mb-2">
-                    <benefit.icon className="h-5 w-5" />
+              <Card key={index} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/10 rounded-xl flex flex-col text-center p-5"> {/* Adjusted padding */}
+                <CardHeader className="items-center pb-2.5"> {/* Adjusted pb */}
+                  <div className="p-2.5 rounded-full bg-primary/10 text-primary mb-2.5 shadow-md"> {/* Adjusted padding, margin, and added shadow */}
+                    <benefit.icon className="h-6 w-6" /> {/* Increased icon size */}
                   </div>
-                  <CardTitle className="text-lg font-semibold text-primary-foreground">{benefit.title}</CardTitle>
+                  <CardTitle className="text-lg font-semibold text-foreground">{benefit.title}</CardTitle> {/* Changed to text-foreground */}
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <p className="text-xs text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed"> {/* Increased font size */}
                     {benefit.description}
                   </p>
                 </CardContent>
@@ -92,28 +92,28 @@ export default function GoldsmithPortalPage() {
       </section>
 
        {/* How to Join Section */}
-      <section className="w-full py-10 md:py-12 lg:py-16 bg-secondary/30">
+      <section className="w-full py-12 md:py-16 lg:py-20 bg-secondary/10"> {/* Adjusted py and bg */}
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-2 text-center">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-primary-foreground">Joining is Simple</h2>
-               <p className="max-w-[800px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
+          <div className="flex flex-col items-center justify-center space-y-3 text-center"> {/* Adjusted space-y */}
+            <div className="space-y-1.5"> {/* Adjusted space-y */}
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Joining is Simple</h2> {/* Changed to text-foreground, adjusted size */}
+               <p className="max-w-[850px] text-foreground/75 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed"> {/* Adjusted max-w, opacity, and size */}
                 Start connecting with customers in just a few easy steps.
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-4xl items-start gap-5 md:grid-cols-3 pt-8 md:pt-10">
+          <div className="mx-auto grid max-w-4xl items-start gap-6 md:grid-cols-3 pt-10 md:pt-12"> {/* Adjusted gap and pt */}
              {[
                { step: 1, title: "Register Profile", description: "Sign up and create your detailed goldsmith profile. Showcase your workshop, specialties, and unique style." },
                { step: 2, title: "Verification Process", description: "Our team will review and verify your details to maintain a high standard of quality and trust within our network." },
                { step: 3, title: "Start Connecting", description: "Once approved, you'll begin receiving order inquiries and can manage everything from your personalized dashboard." },
              ].map((item) => (
-               <div key={item.step} className="grid gap-1 text-center items-center p-2.5 rounded-lg hover:bg-card/50 transition-colors">
-                  <div className="flex justify-center items-center mb-2">
-                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground shadow-md">{item.step}</span>
+               <div key={item.step} className="grid gap-1.5 text-center items-center p-3 rounded-lg hover:bg-card/60 transition-colors"> {/* Adjusted gap and padding */}
+                  <div className="flex justify-center items-center mb-2.5"> {/* Adjusted mb */}
+                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground shadow-lg">{item.step}</span> {/* Increased size and shadow */}
                   </div>
-                  <h3 className="text-md font-semibold text-primary-foreground">{item.title}</h3>
-                  <p className="text-xs text-foreground/70 leading-relaxed">
+                  <h3 className="text-lg font-semibold text-foreground">{item.title}</h3> {/* Changed to text-foreground, increased size */}
+                  <p className="text-sm text-foreground/70 leading-relaxed"> {/* Increased font size */}
                     {item.description}
                   </p>
                 </div>
@@ -123,35 +123,35 @@ export default function GoldsmithPortalPage() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="w-full py-10 md:py-12 lg:py-16 border-t border-border/10">
-        <div className="container grid items-center justify-center gap-2.5 px-4 text-center md:px-6">
-          <div className="space-y-2.5">
-             <Gift className="h-9 w-9 mx-auto text-primary mb-1" />
-            <h2 className="text-2xl font-bold tracking-tight md:text-3xl/tight text-primary-foreground">
+      <section className="w-full py-12 md:py-16 lg:py-20 border-t border-border/15 bg-background"> {/* Adjusted py and border */}
+        <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6"> {/* Adjusted gap */}
+          <div className="space-y-3"> {/* Adjusted space-y */}
+             <Handshake className="h-10 w-10 mx-auto text-primary mb-1.5" /> {/* Changed icon, increased size and mb */}
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl/tight text-foreground"> {/* Changed to text-foreground, adjusted size */}
               Ready to Elevate Your Goldsmith Business?
             </h2>
-            <p className="mx-auto max-w-[550px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
+            <p className="mx-auto max-w-[600px] text-foreground/75 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed"> {/* Adjusted max-w, opacity, and size */}
               Join our growing network of skilled artisans. Register today and start receiving custom orders, connecting you with clients who appreciate true craftsmanship.
             </p>
           </div>
-          <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center pt-2.5">
+          <div className="flex flex-col gap-2.5 min-[400px]:flex-row justify-center pt-3"> {/* Adjusted gap and pt */}
              <Link
                 href="/goldsmith-portal/register"
                 className={cn(
-                    buttonVariants({ size: 'default', variant: 'premium' }), 
-                    'shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-8 py-2 text-sm'
+                    buttonVariants({ size: 'lg', variant: 'premium' }), /* Changed to lg */
+                    'shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-10 py-3 text-base' /* Adjusted size */
                 )}
               >
                 <span>
                   Register Now
-                  <CheckCircle className="ml-1.5 h-3.5 w-3.5 inline" />
+                  <CheckCircle className="ml-2 h-4 w-4 inline" /> {/* Increased icon size */}
                 </span>
               </Link>
              <Link
                href="/contact?subject=GoldsmithInquiry"
                className={cn(
-                   buttonVariants({ variant: 'link', size: 'default' }),
-                   'text-accent hover:text-accent/80 text-sm'
+                   buttonVariants({ variant: 'link', size: 'lg' }), /* Changed to lg */
+                   'text-accent-foreground hover:text-accent/80 text-base' /* Adjusted colors and size */
                 )}
              >
                <span>Have Questions? Contact Us</span>
