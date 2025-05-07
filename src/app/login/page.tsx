@@ -1,3 +1,5 @@
+// src/app/login/page.tsx
+'use client';
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,7 +24,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-xl border-primary/10 rounded-xl bg-card">
         <CardHeader className="text-center pt-6 pb-3">
            <LogIn className="h-10 w-10 mx-auto text-primary mb-2.5" />
-          <CardTitle className="text-3xl text-accent">Welcome Back!</CardTitle> {/* Updated to text-accent */}
+          <CardTitle className="text-3xl text-accent">Welcome Back!</CardTitle>
           <CardDescription className="text-muted-foreground mt-1">Log in to continue your Goldsmith Connect journey.</CardDescription>
         </CardHeader>
         <CardContent className="px-6 pb-6 pt-3">
@@ -48,7 +50,7 @@ export default function LoginPage() {
                   </label>
                 </div>
                 <Link
-                  href="/forgot-password" 
+                  href="/forgot-password"
                   className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
                 >
                   Forgot password?
