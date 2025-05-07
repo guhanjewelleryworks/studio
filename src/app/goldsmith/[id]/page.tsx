@@ -1,66 +1,51 @@
+// src/app/goldsmith/[id]/page.tsx
+'use client';
 
-'use client'
-
+import type { Goldsmith } from '@/types/goldsmith';
 import * as React from 'react';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Label } from '@/components/ui/label';
 import { MapPin, Star, MessageSquare, Send, Info, ShieldCheck, Sparkles, Award, Eye, User, Edit3 } from "lucide-react"; 
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Label } from "@/components/ui/label";
 import { cn } from '@/lib/utils';
-import { GoldsmithIcon } from '@/components/icons/goldsmith-icon';
 
-
-interface GoldsmithProfile {
-  id: string;
-  name: string;
-  tagline: string;
-  address: string;
-  specialty: string[];
-  rating: number;
-  bio: string;
-  profileImageUrl: string;
-  portfolioImages: string[];
-  yearsExperience?: number;
-  certifications?: string[];
-  responseTime?: string;
-  ordersCompleted?: number;
-}
 
 interface PageParams {
   id: string;
 }
 
 
-const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | null> => {
+const fetchGoldsmithProfile = async (id: string): Promise<Goldsmith | null> => {
   console.log("Fetching profile for ID:", id);
   await new Promise(resolve => setTimeout(resolve, 700)); 
 
-  const mockProfiles: { [key: string]: GoldsmithProfile } = {
-      'artisan-1': { id: 'artisan-1', name: 'Lumière Jewels', tagline: "Crafting Brilliance, One Gem at a Time", address: '123 Diamond St, Cityville', specialty: ['Engagement Rings', 'Custom Designs', 'Ethically Sourced Gems'], rating: 4.9, bio: 'At Lumière Jewels, we believe every piece of jewelry tells a story. With over 20 years of experience, our master artisans dedicate themselves to crafting unique and timeless pieces that capture life\'s most precious moments. We specialize in bespoke engagement rings and fine jewelry, using only ethically sourced diamonds and gemstones to ensure beauty with a conscience.', profileImageUrl: 'https://picsum.photos/seed/lumiere-profile/120/120', portfolioImages: ['https://picsum.photos/seed/lumiere-work1/600/450', 'https://picsum.photos/seed/lumiere-work2/600/450', 'https://picsum.photos/seed/lumiere-work3/600/450'], yearsExperience: 22, certifications: ['GIA Graduate Gemologist'], responseTime: 'Within 24 hours', ordersCompleted: 150 },
-      'artisan-2': { id: 'artisan-2', name: 'Aura & Gold', tagline: "Your Story, Forged in Gold", address: '456 Sapphire Ave, Townsville', specialty: ['Custom Pendants', 'Personalized Necklaces', 'Gold & Platinum'], rating: 4.7, bio: 'Aura & Gold blends modern design sensibilities with traditional goldsmithing techniques. We specialize in creating personalized pendants and necklaces that reflect your unique aura. Each piece is meticulously handcrafted to become a cherished extension of your identity.', profileImageUrl: 'https://picsum.photos/seed/aura-profile/120/120', portfolioImages: ['https://picsum.photos/seed/aura-work1/600/450', 'https://picsum.photos/seed/aura-work2/600/450'], yearsExperience: 15, responseTime: '1-2 business days', ordersCompleted: 85 },
-      'artisan-3': { id: 'artisan-3', name: 'Heritage Metalsmiths', tagline: "Preserving Legacies, Restoring Beauty", address: '789 Ruby Ln, Villagetown', specialty: ['Antique Restoration', 'Heirloom Redesign', 'Intricate Repairs'], rating: 4.8, bio: 'Heritage Metalsmiths is dedicated to the art of jewelry restoration and preservation. We are experts in bringing heirlooms and antique pieces back to their former glory, combining meticulous care with profound respect for craftsmanship of the past.', profileImageUrl: 'https://picsum.photos/seed/heritage-profile/120/120', portfolioImages: ['https://picsum.photos/seed/heritage-work1/600/450', 'https://picsum.photos/seed/heritage-work2/600/450', 'https://picsum.photos/seed/heritage-work3/600/450', 'https://picsum.photos/seed/heritage-work4/600/450'], yearsExperience: 30, certifications: ['Master Goldsmith Certification'], responseTime: 'Within 48 hours', ordersCompleted: 200 },
-       'default': { id: 'default', name: 'Example Goldsmith', tagline: "Artistry in Every Detail", address: '1 Example Rd, Sample City', specialty: ['General Craftsmanship', 'Fine Repairs'], rating: 4.2, bio: 'This is a sample profile for a talented goldsmith, showcasing a commitment to quality and artistry in every piece created or restored.', profileImageUrl: 'https://picsum.photos/seed/goldsmith-default-profile/120/120', portfolioImages: ['https://picsum.photos/seed/goldsmith-default-work1/600/450'], responseTime: 'Varies', ordersCompleted: 30 }
+  const mockProfiles: { [key: string]: Goldsmith } = {
+      'artisan-1': { id: 'artisan-1', name: 'Lumière Jewels', tagline: "Crafting Brilliance, One Gem at a Time", address: '123 Diamond St, Cityville', specialty: ['Engagement Rings', 'Custom Designs', 'Ethically Sourced Gems'], rating: 4.9, bio: 'At Lumière Jewels, we believe every piece of jewelry tells a story. With over 20 years of experience, our master artisans dedicate themselves to crafting unique and timeless pieces that capture life\'s most precious moments. We specialize in bespoke engagement rings and fine jewelry, using only ethically sourced diamonds and gemstones to ensure beauty with a conscience.', profileImageUrl: 'https://picsum.photos/seed/lumiere-profile/120/120', portfolioImages: ['https://picsum.photos/seed/lumiere-work1/600/450', 'https://picsum.photos/seed/lumiere-work2/600/450', 'https://picsum.photos/seed/lumiere-work3/600/450'], yearsExperience: 22, certifications: ['GIA Graduate Gemologist'], responseTime: 'Within 24 hours', ordersCompleted: 150, location: { lat: 34.0522, lng: -118.2437 } },
+      'artisan-2': { id: 'artisan-2', name: 'Aura & Gold', tagline: "Your Story, Forged in Gold", address: '456 Sapphire Ave, Townsville', specialty: ['Custom Pendants', 'Personalized Necklaces', 'Gold & Platinum'], rating: 4.7, bio: 'Aura & Gold blends modern design sensibilities with traditional goldsmithing techniques. We specialize in creating personalized pendants and necklaces that reflect your unique aura. Each piece is meticulously handcrafted to become a cherished extension of your identity.', profileImageUrl: 'https://picsum.photos/seed/aura-profile/120/120', portfolioImages: ['https://picsum.photos/seed/aura-work1/600/450', 'https://picsum.photos/seed/aura-work2/600/450'], yearsExperience: 15, responseTime: '1-2 business days', ordersCompleted: 85, location: { lat: 34.0530, lng: -118.2445 } },
+      'artisan-3': { id: 'artisan-3', name: 'Heritage Metalsmiths', tagline: "Preserving Legacies, Restoring Beauty", address: '789 Ruby Ln, Villagetown', specialty: ['Antique Restoration', 'Heirloom Redesign', 'Intricate Repairs'], rating: 4.8, bio: 'Heritage Metalsmiths is dedicated to the art of jewelry restoration and preservation. We are experts in bringing heirlooms and antique pieces back to their former glory, combining meticulous care with profound respect for craftsmanship of the past.', profileImageUrl: 'https://picsum.photos/seed/heritage-profile/120/120', portfolioImages: ['https://picsum.photos/seed/heritage-work1/600/450', 'https://picsum.photos/seed/heritage-work2/600/450', 'https://picsum.photos/seed/heritage-work3/600/450', 'https://picsum.photos/seed/heritage-work4/600/450'], yearsExperience: 30, certifications: ['Master Goldsmith Certification'], responseTime: 'Within 48 hours', ordersCompleted: 200, location: { lat: 34.0515, lng: -118.2430 } },
+       'default': { id: 'default', name: 'Example Goldsmith', tagline: "Artistry in Every Detail", address: '1 Example Rd, Sample City', specialty: ['General Craftsmanship', 'Fine Repairs'], rating: 4.2, bio: 'This is a sample profile for a talented goldsmith, showcasing a commitment to quality and artistry in every piece created or restored.', profileImageUrl: 'https://picsum.photos/seed/goldsmith-default-profile/120/120', portfolioImages: ['https://picsum.photos/seed/goldsmith-default-work1/600/450'], responseTime: 'Varies', ordersCompleted: 30, location: { lat: 34.0540, lng: -118.2450 } }
   };
 
   return mockProfiles[id] || mockProfiles['default'];
 }
 
 // Make the component accept a promise for params
-export default function GoldsmithProfilePage({ params }: { params: PageParams }) {
-  const { id } = params; // Accessing id directly (adjust based on framework specifics if needed)
+export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
+  const params = use(paramsPromise);
+  const { id } = params; 
 
-  const [profile, setProfile = useState(null);
+  const [profile, setProfile] = useState<Goldsmith | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
    useEffect(() => {
     const loadProfile = async () => {
@@ -92,7 +77,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
 
   if (isLoading) {
      return (
-      <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)]">
+      <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-background text-foreground">
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-1 space-y-5">
             <Skeleton className="h-32 w-32 rounded-full mx-auto bg-muted/70" />
@@ -137,7 +122,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
    }
 
   return (
-    <div className="container py-8 px-4 md:px-6">
+    <div className="container py-8 px-4 md:px-6 bg-background text-foreground">
         <Alert variant="default" className="mb-6 border-accent/50 text-accent-foreground bg-accent/10 rounded-lg p-4 shadow-sm">
           <ShieldCheck className="h-4 w-4 !text-accent mr-2" />
           <AlertTitle className="font-semibold text-sm text-foreground">Secure & Mediated Connection</AlertTitle>
@@ -155,7 +140,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
                 <AvatarFallback className="text-3xl bg-primary/20 text-primary-foreground">{profile.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <CardTitle className="text-2xl font-bold text-foreground">{profile.name}</CardTitle>
-              <p className="text-sm text-primary font-medium">{profile.tagline}</p>
+              {profile.tagline && <p className="text-sm text-primary font-medium">{profile.tagline}</p>}
               <div className="flex items-center text-amber-500 mt-1">
                 <Star className="h-4 w-4 mr-1.5 fill-current" /> <span className="text-sm text-foreground">{profile.rating.toFixed(1)}</span>
                  <span className="text-xs text-muted-foreground ml-1.5">(Based on X reviews)</span>
@@ -164,9 +149,11 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
                 <MapPin className="h-3.5 w-3.5 mr-1" /> {profile.address}
               </CardDescription>
                <div className="pt-2 flex flex-wrap justify-center gap-1.5">
-                    {profile.specialty.map(spec => (
+                    {Array.isArray(profile.specialty) ? profile.specialty.map(spec => (
                         <Badge key={spec} variant="secondary" className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full shadow-sm">{spec}</Badge>
-                    ))}
+                    )) : (
+                        <Badge variant="secondary" className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full shadow-sm">{profile.specialty}</Badge>
+                    )}
                 </div>
             </CardHeader>
             
@@ -212,7 +199,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
                     <CardTitle className="text-xl font-semibold text-foreground">About {profile.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 pt-0">
-                    <p className="text-base text-foreground/80 leading-relaxed whitespace-pre-line">{profile.bio}</p>
+                    {profile.bio && <p className="text-base text-foreground/80 leading-relaxed whitespace-pre-line">{profile.bio}</p>}
                 </CardContent>
             </Card>
 
@@ -222,7 +209,7 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
                <CardDescription className="text-sm text-muted-foreground mt-0.5">A glimpse into the artisan&apos;s craft.</CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
-              {profile.portfolioImages.length > 0 ? (
+              {profile.portfolioImages && profile.portfolioImages.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {profile.portfolioImages.map((imgUrl, index) => (
                     <div key={index} className="rounded-lg overflow-hidden shadow-md aspect-square group relative">
@@ -253,7 +240,6 @@ export default function GoldsmithProfilePage({ params }: { params: PageParams })
             </CardHeader>
             <CardContent className="p-5 pt-0">
               <form className="space-y-4" onSubmit={handleRequestIntroduction}>
-                {/* TODO: Add form handling with react-hook-form */}
                  <div className="space-y-1.5">
                     <Label htmlFor="contact-name" className="text-foreground">Your Name</Label>
                     <Input id="contact-name" placeholder="John Doe" required className="py-2.5 text-foreground"/>
