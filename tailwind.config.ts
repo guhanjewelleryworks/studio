@@ -9,6 +9,10 @@ export default {
   ],
   theme: {
   	extend: {
+      fontFamily: {
+        sans: ['var(--font-geist-sans)'],
+        poppins: ['var(--font-poppins)'], // Add Poppins
+      },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
