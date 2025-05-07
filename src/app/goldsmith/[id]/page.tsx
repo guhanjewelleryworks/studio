@@ -1,4 +1,3 @@
-
 // src/app/goldsmith/[id]/page.tsx
 'use client';
 
@@ -14,10 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react"; // Removed 'use'
+import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast'; // Added useToast import
 
 interface PageParams {
   id: string;
@@ -38,13 +38,14 @@ const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | nul
 };
 
 
-export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
-  const params = React.use(paramsPromise);
-  const { id } = params;
+// Make the component accept a promise for params
+export default function GoldsmithProfilePage({ params }: { params: PageParams }) {
+  const { id } = params; // Accessing id directly (adjust based on framework specifics if needed)
 
   const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast(); // Initialize useToast
 
    useEffect(() => {
     const loadProfile = async () => {
@@ -113,13 +114,21 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
   const handleRequestIntroduction = (e: React.FormEvent) => {
      e.preventDefault();
-     // TODO: Implement actual admin mediation logic
-     alert("Introduction request sent to admin for approval. (Simulated)");
+     // Simulate admin mediation logic
+     toast({
+        title: 'Introduction Request Sent',
+        description: 'Your request has been sent to an administrator for review and approval. You will be notified once confirmed.',
+        duration: 5000,
+      });
    };
 
    const handleRequestCustomOrder = () => {
-    // TODO: Implement actual admin mediation logic
-     alert("Custom order request sent to admin for review. (Simulated)");
+    // Simulate admin mediation logic
+     toast({
+        title: 'Custom Order Request Submitted',
+        description: 'Your custom order request has been submitted to an administrator for review. They will contact you or the goldsmith soon.',
+        duration: 5000,
+      });
    };
 
 
@@ -241,18 +250,18 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                <CardDescription className="text-xs text-muted-foreground mt-0.5">Initiate a conversation or request a custom piece through our secure admin-mediated process.</CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
-              <form className="space-y-4" onSubmit={handleRequestIntroduction}>
+              <form className="space-y-3.5" onSubmit={handleRequestIntroduction}> {/* Updated to handleRequestIntroduction, can be adjusted */}
                  {/* TODO: Add form handling with react-hook-form */}
                  <div className="space-y-1">
-                    <Label htmlFor="contact-name" className="text-foreground text-xs">Your Name</Label>
+                    <Label htmlFor="contact-name" className="text-foreground text-xs font-medium">Your Name</Label>
                     <Input id="contact-name" placeholder="John Doe" required className="text-foreground text-sm py-2"/>
                  </div>
                  <div className="space-y-1">
-                    <Label htmlFor="contact-email" className="text-foreground text-xs">Your Email</Label>
+                    <Label htmlFor="contact-email" className="text-foreground text-xs font-medium">Your Email</Label>
                     <Input id="contact-email" type="email" placeholder="john.doe@example.com" required className="text-foreground text-sm py-2"/>
                  </div>
                  <div className="space-y-1">
-                    <Label htmlFor="contact-message" className="text-foreground text-xs">Your Inquiry / Project Idea</Label>
+                    <Label htmlFor="contact-message" className="text-foreground text-xs font-medium">Your Inquiry / Project Idea</Label>
                     <Textarea id="contact-message" placeholder="Briefly explain your jewelry idea or why you'd like to connect..." required rows={3} className="text-foreground text-sm py-2"/>
                  </div>
                  <Button type="submit" size="default" className="shadow-md rounded-full text-xs py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground">
