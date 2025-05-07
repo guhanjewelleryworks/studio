@@ -65,7 +65,7 @@ export default function PricingPage() {
         <div className="mx-auto max-w-4xl text-center">
            <Sparkles className="h-10 w-10 mx-auto text-primary mb-2.5" />
           <h2 className="text-base font-semibold leading-7 text-primary uppercase tracking-wider">Pricing Plans</h2>
-          <p className="mt-1.5 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+          <p className="font-heading mt-1.5 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
             Connect & Create with Goldsmith Connect
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function PricingPage() {
                 </div>
               )}
               <CardHeader className="pb-4 pt-6 px-5">
-                <CardTitle className="text-xl font-semibold leading-6 text-foreground">{tier.name}</CardTitle>
+                <CardTitle className="font-heading text-xl font-semibold leading-6 text-foreground">{tier.name}</CardTitle>
                 <p className="mt-3">
                   <span className="text-3xl font-extrabold tracking-tight text-foreground">{tier.priceMonthly}</span>
                   {tier.priceMonthly !== 'Free' && <span className="text-sm font-semibold leading-6 text-muted-foreground">/month</span>}
@@ -114,7 +114,7 @@ export default function PricingPage() {
                   href={tier.href}
                   className={cn(
                       buttonVariants({ 
-                        variant: tier.mostPopular ? 'default' : 'outline', // Default for popular, outline for others for better contrast
+                        variant: tier.mostPopular ? 'default' : 'outline', 
                         size: 'lg' 
                       }),
                       'w-full shadow-md rounded-full text-sm py-2.5',

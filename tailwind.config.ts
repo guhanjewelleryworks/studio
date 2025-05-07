@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+const defaultTheme = require('tailwindcss/defaultTheme'); // Import defaultTheme
 
 export default {
     darkMode: ["class"],
@@ -10,8 +11,11 @@ export default {
   theme: {
   	extend: {
       fontFamily: {
-        sans: ['var(--font-geist-sans)'],
-        poppins: ['var(--font-poppins)'], // Add Poppins
+        sans: ['var(--font-poppins)', 'var(--font-geist-sans)', ...defaultTheme.fontFamily.sans],
+        heading: ['var(--font-cinzel)', ...defaultTheme.fontFamily.serif],
+        'geist-sans': ['var(--font-geist-sans)'],
+        'poppins': ['var(--font-poppins)'],
+        'cinzel': ['var(--font-cinzel)'],
       },
   		colors: {
   			background: 'hsl(var(--background))',

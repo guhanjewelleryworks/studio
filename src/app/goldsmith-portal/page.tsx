@@ -17,7 +17,7 @@ export default function GoldsmithPortalPage() {
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2.5">
                  <div className="inline-block rounded-full bg-primary/10 px-3.5 py-1.5 text-sm font-semibold text-primary shadow-sm">Goldsmith Partner Portal</div>
-                <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl/none text-foreground leading-tight">
+                <h1 className="font-heading text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-6xl/none text-foreground leading-tight">
                   Showcase Your Artistry, Expand Your Reach
                 </h1>
                 <p className="max-w-[600px] text-foreground/80 md:text-lg leading-relaxed">
@@ -62,7 +62,7 @@ export default function GoldsmithPortalPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-3 text-center">
             <div className="space-y-1.5">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Why Partner with Goldsmith Connect?</h2>
+              <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Why Partner with Goldsmith Connect?</h2>
               <p className="max-w-[850px] text-foreground/75 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed">
                 Expand your reach, streamline your custom orders, and focus on what you do best – creating beautiful, timeless jewelry.
               </p>
@@ -79,7 +79,7 @@ export default function GoldsmithPortalPage() {
                   <div className="p-2.5 rounded-full bg-primary/10 text-primary mb-2.5 shadow-md">
                     <benefit.icon className="h-6 w-6" />
                   </div>
-                  <CardTitle className="text-lg font-semibold text-foreground">{benefit.title}</CardTitle>
+                  <CardTitle className="font-heading text-lg font-semibold text-foreground">{benefit.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <p className="text-sm text-muted-foreground leading-relaxed">
@@ -97,7 +97,7 @@ export default function GoldsmithPortalPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-3 text-center">
             <div className="space-y-1.5">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Joining is Simple</h2>
+              <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Joining is Simple</h2>
                <p className="max-w-[850px] text-foreground/75 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed">
                 Start connecting with customers in just a few easy steps.
               </p>
@@ -113,7 +113,7 @@ export default function GoldsmithPortalPage() {
                   <div className="flex justify-center items-center mb-2.5">
                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">{item.step}</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground">{item.title}</h3>
+                  <h3 className="font-heading text-lg font-semibold text-foreground">{item.title}</h3>
                   <p className="text-sm text-foreground/70 leading-relaxed">
                     {item.description}
                   </p>
@@ -128,7 +128,7 @@ export default function GoldsmithPortalPage() {
         <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
           <div className="space-y-3">
              <Handshake className="h-10 w-10 mx-auto text-primary mb-1.5" />
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl/tight text-foreground">
+            <h2 className="font-heading text-3xl font-bold tracking-tight md:text-4xl/tight text-foreground">
               Ready to Elevate Your Goldsmith Business?
             </h2>
             <p className="mx-auto max-w-[600px] text-foreground/75 md:text-base/relaxed lg:text-md/relaxed xl:text-lg/relaxed">

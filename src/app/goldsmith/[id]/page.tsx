@@ -1,7 +1,7 @@
 // src/app/goldsmith/[id]/page.tsx
 'use client';
 
-import type { Goldsmith } from '@/types/goldsmith';
+import type { Goldsmith as GoldsmithProfile } from '@/types/goldsmith'; // Renamed Goldsmith to GoldsmithProfile
 import * as React from 'react';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,11 +24,11 @@ interface PageParams {
 }
 
 
-const fetchGoldsmithProfile = async (id: string): Promise<Goldsmith | null> => {
+const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | null> => {
   console.log("Fetching profile for ID:", id);
   await new Promise(resolve => setTimeout(resolve, 700)); 
 
-  const mockProfiles: { [key: string]: Goldsmith } = {
+  const mockProfiles: { [key: string]: GoldsmithProfile } = { // Renamed Goldsmith to GoldsmithProfile
       'artisan-1': { id: 'artisan-1', name: 'Lumière Jewels', tagline: "Crafting Brilliance, One Gem at a Time", address: '123 Diamond St, Cityville', specialty: ['Engagement Rings', 'Custom Designs', 'Ethically Sourced Gems'], rating: 4.9, bio: 'At Lumière Jewels, we believe every piece of jewelry tells a story. With over 20 years of experience, our master artisans dedicate themselves to crafting unique and timeless pieces that capture life\'s most precious moments. We specialize in bespoke engagement rings and fine jewelry, using only ethically sourced diamonds and gemstones to ensure beauty with a conscience.', profileImageUrl: 'https://picsum.photos/seed/lumiere-profile/120/120', portfolioImages: ['https://picsum.photos/seed/lumiere-work1/600/450', 'https://picsum.photos/seed/lumiere-work2/600/450', 'https://picsum.photos/seed/lumiere-work3/600/450'], yearsExperience: 22, certifications: ['GIA Graduate Gemologist'], responseTime: 'Within 24 hours', ordersCompleted: 150, location: { lat: 34.0522, lng: -118.2437 } },
       'artisan-2': { id: 'artisan-2', name: 'Aura & Gold', tagline: "Your Story, Forged in Gold", address: '456 Sapphire Ave, Townsville', specialty: ['Custom Pendants', 'Personalized Necklaces', 'Gold & Platinum'], rating: 4.7, bio: 'Aura & Gold blends modern design sensibilities with traditional goldsmithing techniques. We specialize in creating personalized pendants and necklaces that reflect your unique aura. Each piece is meticulously handcrafted to become a cherished extension of your identity.', profileImageUrl: 'https://picsum.photos/seed/aura-profile/120/120', portfolioImages: ['https://picsum.photos/seed/aura-work1/600/450', 'https://picsum.photos/seed/aura-work2/600/450'], yearsExperience: 15, responseTime: '1-2 business days', ordersCompleted: 85, location: { lat: 34.0530, lng: -118.2445 } },
       'artisan-3': { id: 'artisan-3', name: 'Heritage Metalsmiths', tagline: "Preserving Legacies, Restoring Beauty", address: '789 Ruby Ln, Villagetown', specialty: ['Antique Restoration', 'Heirloom Redesign', 'Intricate Repairs'], rating: 4.8, bio: 'Heritage Metalsmiths is dedicated to the art of jewelry restoration and preservation. We are experts in bringing heirlooms and antique pieces back to their former glory, combining meticulous care with profound respect for craftsmanship of the past.', profileImageUrl: 'https://picsum.photos/seed/heritage-profile/120/120', portfolioImages: ['https://picsum.photos/seed/heritage-work1/600/450', 'https://picsum.photos/seed/heritage-work2/600/450', 'https://picsum.photos/seed/heritage-work3/600/450', 'https://picsum.photos/seed/heritage-work4/600/450'], yearsExperience: 30, certifications: ['Master Goldsmith Certification'], responseTime: 'Within 48 hours', ordersCompleted: 200, location: { lat: 34.0515, lng: -118.2430 } },
@@ -39,11 +39,10 @@ const fetchGoldsmithProfile = async (id: string): Promise<Goldsmith | null> => {
 }
 
 // Make the component accept a promise for params
-export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
-  const params = use(paramsPromise);
-  const { id } = params; 
+export default function GoldsmithProfilePage({ params }: { params: PageParams }) {
+  const { id } = params; // Accessing id directly (adjust based on framework specifics if needed)
 
-  const [profile, setProfile] = useState<Goldsmith | null>(null);
+  const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -139,7 +138,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                 <AvatarImage src={profile.profileImageUrl} alt={profile.name} data-ai-hint="artisan portrait" />
                 <AvatarFallback className="text-3xl bg-primary/20 text-primary-foreground">{profile.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              <CardTitle className="text-2xl font-bold text-foreground">{profile.name}</CardTitle>
+              <CardTitle className="font-heading text-2xl font-bold text-foreground">{profile.name}</CardTitle>
               {profile.tagline && <p className="text-sm text-primary font-medium">{profile.tagline}</p>}
               <div className="flex items-center text-amber-500 mt-1">
                 <Star className="h-4 w-4 mr-1.5 fill-current" /> <span className="text-sm text-foreground">{profile.rating.toFixed(1)}</span>
@@ -196,7 +195,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
         <div className="md:col-span-2 space-y-6">
             <Card className="shadow-xl border-primary/10 rounded-xl bg-card">
                 <CardHeader className="p-5">
-                    <CardTitle className="text-xl font-semibold text-foreground">About {profile.name}</CardTitle>
+                    <CardTitle className="font-heading text-xl font-semibold text-foreground">About {profile.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 pt-0">
                     {profile.bio && <p className="text-base text-foreground/80 leading-relaxed whitespace-pre-line">{profile.bio}</p>}
@@ -205,7 +204,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
           <Card className="shadow-xl border-primary/10 rounded-xl bg-card">
             <CardHeader className="p-5">
-              <CardTitle className="text-xl font-semibold text-foreground">Portfolio Showcase</CardTitle>
+              <CardTitle className="font-heading text-xl font-semibold text-foreground">Portfolio Showcase</CardTitle>
                <CardDescription className="text-sm text-muted-foreground mt-0.5">A glimpse into the artisan&apos;s craft.</CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
@@ -235,22 +234,23 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
            <Card className="shadow-xl border-primary/10 rounded-xl bg-card">
             <CardHeader className="p-5">
-              <CardTitle className="text-xl font-semibold text-foreground">Connect with {profile.name}</CardTitle>
+              <CardTitle className="font-heading text-xl font-semibold text-foreground">Connect with {profile.name}</CardTitle>
                <CardDescription className="text-sm text-muted-foreground mt-0.5">Initiate a conversation or request a custom piece through our secure admin-mediated process.</CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
               <form className="space-y-4" onSubmit={handleRequestIntroduction}>
-                 <div className="space-y-1.5">
-                    <Label htmlFor="contact-name" className="text-foreground">Your Name</Label>
-                    <Input id="contact-name" placeholder="John Doe" required className="py-2.5 text-foreground"/>
+                 {/* TODO: Add form handling with react-hook-form */}
+                 <div className="space-y-2">
+                    <Label htmlFor="contact-name">Your Name</Label>
+                    <Input id="contact-name" placeholder="John Doe" required/>
                  </div>
-                 <div className="space-y-1.5">
-                    <Label htmlFor="contact-email" className="text-foreground">Your Email</Label>
-                    <Input id="contact-email" type="email" placeholder="john.doe@example.com" required className="py-2.5 text-foreground"/>
+                 <div className="space-y-2">
+                    <Label htmlFor="contact-email">Your Email</Label>
+                    <Input id="contact-email" type="email" placeholder="john.doe@example.com" required/>
                  </div>
-                 <div className="space-y-1.5">
-                    <Label htmlFor="contact-message" className="text-foreground">Your Inquiry / Project Idea</Label>
-                    <Textarea id="contact-message" placeholder="Briefly explain your jewelry idea or why you'd like to connect..." required rows={4} className="py-2.5 text-foreground"/>
+                 <div className="space-y-2">
+                    <Label htmlFor="contact-message">Your Inquiry / Project Idea</Label>
+                    <Textarea id="contact-message" placeholder="Briefly explain your jewelry idea or why you'd like to connect..." required rows={4}/>
                  </div>
                  <Button type="submit" size="default" className="shadow-md rounded-full text-sm py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground">
                     <Send className="mr-2 h-4 w-4"/> Send Inquiry to Admin

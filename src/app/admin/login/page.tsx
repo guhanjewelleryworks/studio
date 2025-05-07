@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-lg shadow-xl border-destructive/30 rounded-xl bg-card">
         <CardHeader className="text-center pt-8 pb-5">
            <ShieldAlert className="h-16 w-16 mx-auto text-destructive mb-4" />
-          <CardTitle className="text-3xl font-bold text-foreground">Admin Login</CardTitle>
+          <CardTitle className="font-heading text-3xl font-bold text-foreground">Admin Login</CardTitle>
           <CardDescription className="text-muted-foreground mt-1 text-sm">Restricted Access. Authorized Personnel Only.</CardDescription>
         </CardHeader>
         <CardContent className="px-8 pb-8 pt-5">

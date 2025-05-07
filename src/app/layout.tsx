@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
-import { Poppins } from 'next/font/google'; // Import Poppins
+import { Poppins, Cinzel } from 'next/font/google'; // Import Poppins and Cinzel
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/layout/header';
@@ -13,8 +13,15 @@ const geistSans = GeistSans;
 // Initialize Poppins font with desired weights and subsets
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'], // Include ExtraBold (800)
+  weight: ['300', '400', '500', '600', '700', '800'], // Added more weights
   variable: '--font-poppins', // CSS variable name
+});
+
+// Initialize Cinzel font
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['400', '700', '900'], // Available weights for Cinzel
+  variable: '--font-cinzel', // CSS variable name
 });
 
 export const metadata: Metadata = {
@@ -31,11 +38,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("h-full antialiased", poppins.variable, geistSans.variable)}>
+    <html lang="en" className={cn("h-full antialiased", poppins.variable, cinzel.variable, geistSans.variable)}>
       <body
         className={cn(
           'min-h-full font-sans flex flex-col text-foreground'
-          // Removed geistSans.variable from here as it's on html tag
         )}
       >
         <div className="relative flex min-h-dvh flex-col bg-transparent z-0">

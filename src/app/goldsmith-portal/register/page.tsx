@@ -19,7 +19,7 @@ export default function GoldsmithRegisterPage() {
       <Card className="w-full max-w-2xl shadow-xl border-primary/15 rounded-xl bg-card">
         <CardHeader className="text-center pt-8 pb-5">
           <Briefcase className="h-14 w-14 mx-auto text-primary mb-3.5" />
-          <CardTitle className="text-3xl font-bold text-foreground">Register Your Goldsmith Workshop</CardTitle>
+          <CardTitle className="font-heading text-3xl font-bold text-foreground">Register Your Goldsmith Workshop</CardTitle>
           <CardDescription className="text-muted-foreground mt-1 text-sm">Join our curated network of skilled artisans. Please fill in your details below.</CardDescription>
         </CardHeader>
         <CardContent className="px-8 pb-8 pt-5">

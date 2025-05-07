@@ -21,7 +21,7 @@ export default function SignUpPage() {
       <Card className="w-full max-w-md shadow-xl border-primary/10 rounded-xl bg-card">
         <CardHeader className="text-center pt-8 pb-4">
            <UserPlus className="h-12 w-12 mx-auto text-primary mb-3" />
-          <CardTitle className="text-3xl font-bold text-foreground">Create Your Account</CardTitle>
+          <CardTitle className="font-heading text-3xl font-bold text-foreground">Create Your Account</CardTitle>
           <CardDescription className="text-muted-foreground">Join Goldsmith Connect to discover artisans and craft your story.</CardDescription>
         </CardHeader>
         <CardContent className="px-8 pb-8 pt-4">

@@ -10,7 +10,7 @@ export default function AdminPortalPage() {
     <div className="flex flex-col items-center py-8 md:py-10 lg:py-12 bg-gradient-to-br from-secondary/20 to-background min-h-[calc(100vh-8rem)]">
       <div className="container px-4 md:px-6 text-center">
         <ShieldCheck className="h-14 w-14 mx-auto text-primary mb-3" />
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-foreground mb-3">
+        <h1 className="font-heading text-4xl font-extrabold tracking-tight sm:text-5xl text-foreground mb-3">
           Admin Dashboard
         </h1>
         <p className="max-w-[700px] mx-auto text-foreground/75 md:text-lg mb-6 leading-relaxed">
@@ -19,7 +19,7 @@ export default function AdminPortalPage() {
 
         <Card className="max-w-lg mx-auto shadow-xl bg-card border-primary/20 rounded-xl">
           <CardHeader className="pt-6 pb-3">
-            <CardTitle className="text-2xl text-foreground">Platform Management Tools</CardTitle>
+            <CardTitle className="font-heading text-2xl text-foreground">Platform Management Tools</CardTitle>
             <CardDescription className="text-muted-foreground text-sm mt-0.5">Secure access to critical platform operations.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3.5 px-6 pb-6 pt-1.5">

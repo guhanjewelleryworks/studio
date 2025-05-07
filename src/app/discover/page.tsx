@@ -85,9 +85,9 @@ export default function DiscoverPage() {
   const goldsmithLocations = goldsmiths.map(g => g.location);
 
   return (
-    <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-background text-foreground">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-6">
-        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Find a Goldsmith</h1>
+    <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)]"> {/* Reduced py */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-6"> {/* Reduced gap and mb */}
+        <h1 className="font-heading text-3xl font-extrabold text-foreground tracking-tight">Find a Goldsmith</h1> {/* Changed to text-foreground */}
         <div className="flex gap-2">
           <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} aria-label="List View" className="rounded-lg px-4 py-2 text-sm shadow-md">
             <List className="mr-1.5 h-4 w-4" /> List
@@ -129,7 +129,7 @@ export default function DiscoverPage() {
               <Card key={goldsmith.id} className="shadow-lg hover:shadow-2xl transition-all duration-300 bg-card border-primary/15 flex flex-col rounded-xl overflow-hidden group">
                 <CardHeader className="p-0 relative">
                   <Image
-                    src={goldsmith.imageUrl}
+                    src={goldsmith.imageUrl!}
                     alt={goldsmith.name}
                     width={400}
                     height={200}
@@ -142,7 +142,7 @@ export default function DiscoverPage() {
                 </CardHeader>
                 <CardContent className="p-3 flex-grow flex flex-col justify-between">
                   <div>
-                    <CardTitle className="text-md text-foreground mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
+                    <CardTitle className="font-heading text-md text-foreground mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
                     <CardDescription className="text-xs text-muted-foreground mb-0.5 line-clamp-1">
                       <MapPin className="inline-block h-3 w-3 mr-0.5" /> {goldsmith.address}
                     </CardDescription>
