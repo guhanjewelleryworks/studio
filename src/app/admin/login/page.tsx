@@ -11,28 +11,28 @@ export default function AdminLoginPage() {
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/20 to-background">
       <Card className="w-full max-w-lg shadow-xl border-destructive/30 rounded-xl bg-card">
-        <CardHeader className="text-center pt-6 pb-4"> {/* Reduced pt/pb */}
-           <ShieldAlert className="h-14 w-14 mx-auto text-destructive mb-3" /> {/* Reduced mb */}
-          <CardTitle className="text-3xl text-foreground">Admin Login</CardTitle>
+        <CardHeader className="text-center pt-6 pb-4"> 
+           <ShieldAlert className="h-14 w-14 mx-auto text-destructive mb-3" /> 
+          <CardTitle className="text-3xl text-accent">Admin Login</CardTitle> {/* Updated to text-accent */}
           <CardDescription className="text-muted-foreground mt-1 text-sm">Restricted Access. Authorized Personnel Only.</CardDescription>
         </CardHeader>
-        <CardContent className="px-8 pb-6 pt-4"> {/* Reduced pb/pt */}
-          <form className="space-y-4"> {/* Reduced space-y */}
+        <CardContent className="px-8 pb-6 pt-4"> 
+          <form className="space-y-4"> 
             <div className="space-y-1.5">
               <Label htmlFor="username" className="text-foreground">Username or Email</Label>
-              <Input id="username" type="text" placeholder="admin_user" required className="text-base py-2 text-foreground" /> {/* Reduced py */}
+              <Input id="username" type="text" placeholder="admin_user" required className="text-base py-2 text-foreground" /> 
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-foreground">Password</Label>
-              <Input id="password" type="password" required className="text-base py-2 text-foreground" /> {/* Reduced py */}
+              <Input id="password" type="password" required className="text-base py-2 text-foreground" /> 
             </div>
 
-            <Button type="submit" variant="destructive" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-3 mt-2"> {/* Reduced py and mt */}
+            <Button type="submit" variant="destructive" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-3 mt-2"> 
               Secure Login
             </Button>
 
-              <p className="text-center text-sm text-muted-foreground pt-4"> {/* Reduced pt */}
+              <p className="text-center text-sm text-muted-foreground pt-4"> 
                  For security reasons, password recovery options are limited.
                  <br /> Contact system administrator if you have issues logging in.
                  <br />

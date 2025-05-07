@@ -11,11 +11,11 @@ export default {
   theme: {
   	extend: {
       fontFamily: {
-        sans: ['var(--font-open-sans)', 'var(--font-geist-sans)', ...defaultTheme.fontFamily.sans],
-        heading: ['var(--font-poppins)', ...defaultTheme.fontFamily.sans],
+        sans: ['var(--font-poppins)', 'var(--font-geist-sans)', ...defaultTheme.fontFamily.sans], // Poppins as default sans-serif
+        heading: ['var(--font-playfair-display)', ...defaultTheme.fontFamily.serif], // Playfair Display for headings
         'geist-sans': ['var(--font-geist-sans)'],
         'poppins': ['var(--font-poppins)'],
-        'open-sans': ['var(--font-open-sans)'],
+        'playfair-display': ['var(--font-playfair-display)'], // Added Playfair Display
       },
   		colors: {
   			background: 'hsl(var(--background))',

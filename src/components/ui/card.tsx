@@ -10,7 +10,7 @@ const Card = React.forwardRef<
     ref={ref}
     className={cn(
       "rounded-xl border bg-card text-card-foreground shadow-lg transition-all duration-300 ease-in-out hover:shadow-xl", 
-      className
+      className // Default rounded-xl is already quite rounded, matches var(--radius) if radius is 0.75rem
     )}
     {...props}
   />
@@ -36,7 +36,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-2xl font-heading font-semibold leading-none tracking-tight text-foreground", // Use text-foreground, font-heading will apply Poppins
+      "text-2xl font-heading font-semibold leading-none tracking-tight text-accent", // Use text-accent for headings as per globals.css
       className
     )}
     {...props}

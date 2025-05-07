@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 
 // Placeholder for Map Component
 const MapPlaceholder = ({ locations }: { locations: Location[] }) => (
-  <div className="w-full h-[300px] md:h-full bg-muted/30 rounded-xl flex flex-col items-center justify-center text-muted-foreground border border-border shadow-inner">
+  <div className="w-full h-[300px] md:h-full bg-card/70 rounded-xl flex flex-col items-center justify-center text-muted-foreground border border-border shadow-inner"> {/* Changed bg-muted/30 to bg-card/70 for theme */}
     <MapPin className="h-16 w-16 text-primary/70 mb-4" />
     <p className="text-xl font-semibold text-foreground">Interactive Map View</p>
     <p className="text-base mt-1 text-muted-foreground">(Displaying {locations.length} locations)</p>
@@ -85,10 +85,10 @@ export default function DiscoverPage() {
   const goldsmithLocations = goldsmiths.map(g => g.location);
 
   return (
-    <div className="container py-10 md:py-14 px-4 md:px-6 min-h-[calc(100vh-8rem)]">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Find a Goldsmith</h1>
-        <div className="flex gap-2.5"> {/* Increased gap slightly */}
+    <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)]"> {/* Reduced py */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-6"> {/* Reduced gap and mb */}
+        <h1 className="text-3xl font-extrabold text-accent tracking-tight">Find a Goldsmith</h1> {/* Changed to text-accent */}
+        <div className="flex gap-2">
           <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} aria-label="List View" className="rounded-lg px-4 py-2 text-sm shadow-md">
             <List className="mr-1.5 h-4 w-4" /> List
           </Button>
@@ -98,31 +98,31 @@ export default function DiscoverPage() {
         </div>
       </div>
 
-      <form onSubmit={handleSearch} className="mb-8 flex flex-col sm:flex-row gap-3 items-center"> {/* Increased mb and gap */}
+      <form onSubmit={handleSearch} className="mb-6 flex flex-col sm:flex-row gap-2.5 items-center"> {/* Reduced mb and gap */}
         <Input
           type="search"
           placeholder="Search by name, specialty, or location..."
-          className="flex-grow rounded-lg text-sm px-4 py-2.5 shadow-md border-border focus:ring-primary focus:border-primary text-foreground"
+          className="flex-grow rounded-lg text-sm px-4 py-2 shadow-md border-border focus:ring-primary focus:border-primary text-foreground"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button type="button" variant="outline" size="icon" className="sm:ml-2 hidden sm:inline-flex p-2.5 rounded-lg shadow-md border-border hover:bg-muted/50"> {/* Increased ml */}
+        <Button type="button" variant="outline" size="icon" className="sm:ml-2 hidden sm:inline-flex p-2.5 rounded-lg shadow-md border-border hover:bg-secondary/30"> {/* Adjusted hover color */}
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
             <span className="sr-only">Filters</span>
         </Button>
-        <Button type="submit" disabled={isLoading} size="default" className="rounded-lg px-6 py-2.5 text-sm w-full sm:w-auto shadow-md bg-primary hover:bg-primary/90 text-primary-foreground">
+        <Button type="submit" disabled={isLoading} size="default" className="rounded-lg px-6 py-2 text-sm w-full sm:w-auto shadow-md bg-primary hover:bg-primary/90 text-primary-foreground">
           {isLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Search className="mr-1.5 h-4 w-4" />}
           Search
         </Button>
       </form>
 
-       {error && <p className="text-destructive text-center mb-4 text-sm">{error}</p>}
+       {error && <p className="text-destructive text-center mb-3 text-sm">{error}</p>} {/* Reduced mb */}
 
-      <div className={`grid gap-4 ${viewMode === 'map' ? 'grid-cols-1 md:grid-cols-[2fr_3fr]' : ''}`}> {/* Increased gap */}
-        <div className={`${viewMode === 'map' ? 'hidden md:block' : ''} ${viewMode === 'list' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'overflow-y-auto max-h-[calc(100vh-18rem)] pr-2 space-y-3'}`}> {/* Increased gap and pr */}
+      <div className={`grid gap-3 ${viewMode === 'map' ? 'grid-cols-1 md:grid-cols-[2fr_3fr]' : ''}`}> {/* Reduced gap */}
+        <div className={`${viewMode === 'map' ? 'hidden md:block' : ''} ${viewMode === 'list' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'overflow-y-auto max-h-[calc(100vh-18rem)] pr-1.5 space-y-2.5'}`}> {/* Reduced gap, pr, and space-y */}
           {isLoading ? (
              Array.from({ length: viewMode === 'list' ? 8 : 3 }).map((_, index) => (
-              <Card key={index} className="animate-pulse bg-card h-[320px] rounded-xl shadow-md border-border"></Card> /* Increased h */
+              <Card key={index} className="animate-pulse bg-card h-[300px] rounded-xl shadow-md border-border"></Card> /* Reduced h */
              ))
           ) : goldsmiths.length > 0 ? (
              goldsmiths.map((goldsmith) => (
@@ -140,22 +140,22 @@ export default function DiscoverPage() {
                      <Star className="h-3 w-3 mr-0.5 fill-current" /> {goldsmith.rating.toFixed(1)}
                   </div>
                 </CardHeader>
-                <CardContent className="p-4 flex-grow flex flex-col justify-between"> {/* Increased p-3 to p-4 */}
+                <CardContent className="p-3 flex-grow flex flex-col justify-between"> {/* Reduced p */}
                   <div>
-                    <CardTitle className="font-heading text-md text-foreground mb-1 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Increased mb */}
-                    <CardDescription className="text-xs text-muted-foreground mb-1 line-clamp-1"> {/* Increased mb */}
+                    <CardTitle className="font-heading text-md text-accent mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Use text-accent */}
+                    <CardDescription className="text-xs text-muted-foreground mb-0.5 line-clamp-1"> 
                       <MapPin className="inline-block h-3 w-3 mr-0.5" /> {goldsmith.address}
                     </CardDescription>
-                    <p className="text-xs text-foreground/80 mb-1.5 font-medium flex items-center"> {/* Increased mb */}
-                      <Palette className="inline-block h-3 w-3 mr-0.5 text-accent"/>Specialty: {goldsmith.specialty}
+                    <p className="text-xs text-muted-foreground mb-1 font-medium flex items-center"> {/* Use text-muted-foreground */}
+                      <Palette className="inline-block h-3 w-3 mr-0.5 text-primary"/>Specialty: {goldsmith.specialty} {/* Use text-primary for icon */}
                     </p>
-                    <p className="text-xs text-muted-foreground leading-snug line-clamp-2 mb-2.5">{goldsmith.shortBio}</p> {/* Increased mb */}
+                    <p className="text-xs text-muted-foreground leading-snug line-clamp-2 mb-2">{goldsmith.shortBio}</p> {/* Reduced mb */}
                   </div>
                   <NextLink
                     href={`/goldsmith/${goldsmith.id}`}
                     className={cn(
                        buttonVariants({ variant: "outline", size: "xs" }),
-                       'text-accent-foreground border-accent hover:bg-accent/20 mt-2 w-full rounded-lg text-xs py-1.5 shadow-md' // Increased mt
+                       'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-1.5 w-full rounded-lg text-xs py-1.5 shadow-md' // Adjusted outline button to primary colors
                     )}
                   >
                     <LinkIcon className="mr-1 h-3 w-3"/>View Profile & Connect
@@ -164,14 +164,14 @@ export default function DiscoverPage() {
               </Card>
             ))
           ) : (
-             !isLoading && !error && <p className="col-span-full text-center text-muted-foreground py-8 text-base">No goldsmiths found based on your criteria.</p> /* Increased py and text size */
+             !isLoading && !error && <p className="col-span-full text-center text-muted-foreground py-6 text-sm">No goldsmiths found based on your criteria.</p> /* Reduced py and text size */
           )}
         </div>
 
         {viewMode === 'map' && (
           <div className="md:col-span-1">
             {isLoading && !currentLocation ? (
-                <div className="w-full h-[300px] md:h-full bg-muted/40 rounded-xl flex items-center justify-center text-muted-foreground border border-border shadow-inner">
+                <div className="w-full h-[300px] md:h-full bg-card/80 rounded-xl flex items-center justify-center text-muted-foreground border border-border shadow-inner"> {/* Changed bg-muted/40 to bg-card/80 */}
                     <Loader2 className="h-8 w-8 animate-spin mr-2 text-primary" /> Loading Map Data...
                 </div>
             ) : (

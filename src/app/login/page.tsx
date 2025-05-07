@@ -18,27 +18,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background"> {/* Reduced py-12 */}
+    <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
       <Card className="w-full max-w-md shadow-xl border-primary/10 rounded-xl bg-card">
-        <CardHeader className="text-center pt-6 pb-3"> {/* Reduced pt/pb */}
-           <LogIn className="h-10 w-10 mx-auto text-primary mb-2.5" /> {/* Reduced icon size and mb */}
-          <CardTitle className="text-3xl text-foreground">Welcome Back!</CardTitle>
-          <CardDescription className="text-muted-foreground mt-1">Log in to continue your Goldsmith Connect journey.</CardDescription> {/* Reduced mt */}
+        <CardHeader className="text-center pt-6 pb-3">
+           <LogIn className="h-10 w-10 mx-auto text-primary mb-2.5" />
+          <CardTitle className="text-3xl text-accent">Welcome Back!</CardTitle> {/* Updated to text-accent */}
+          <CardDescription className="text-muted-foreground mt-1">Log in to continue your Goldsmith Connect journey.</CardDescription>
         </CardHeader>
-        <CardContent className="px-6 pb-6 pt-3"> {/* Reduced px/pb/pt */}
-          <form className="space-y-4" onSubmit={handleSubmit}> {/* Reduced space-y */}
+        <CardContent className="px-6 pb-6 pt-3">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-foreground">Email Address</Label>
-              <Input id="email" type="email" placeholder="you@example.com" required className="text-base text-foreground py-2" /> {/* Reduced py */}
+              <Input id="email" type="email" placeholder="you@example.com" required className="text-base text-foreground py-2" />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-foreground">Password</Label>
-              <Input id="password" type="password" required className="text-base text-foreground py-2" /> {/* Reduced py */}
+              <Input id="password" type="password" required className="text-base text-foreground py-2" />
             </div>
 
-             <div className="flex items-center justify-between pt-0.5"> {/* Reduced pt */}
-                <div className="flex items-center space-x-1.5"> {/* Reduced space-x */}
+             <div className="flex items-center justify-between pt-0.5">
+                <div className="flex items-center space-x-1.5">
                   <Checkbox id="remember-me" />
                   <label
                     htmlFor="remember-me"
@@ -55,15 +55,15 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground"> {/* Reduced py */}
+            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground">
               Login
             </Button>
 
-            <Separator className="my-5" /> {/* Reduced my-6 */}
+            <Separator className="my-5" />
             <SocialAuthButtons mode="login" />
 
 
-             <p className="text-center text-sm text-muted-foreground pt-3.5"> {/* Reduced pt */}
+             <p className="text-center text-sm text-muted-foreground pt-3.5">
                 Don&apos;t have an account?{' '}
                 <Link href="/signup" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
                   Sign up here

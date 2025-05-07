@@ -10,16 +10,16 @@ const navLinkClasses = "relative text-sm font-medium text-foreground/80 transiti
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/20 bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 shadow-sm">
-      <div className="container flex h-20 max-w-screen-xl items-center px-4 md:px-6"> {/* Increased h-16 to h-20 */}
+      <div className="container flex h-20 max-w-screen-xl items-center px-4 md:px-6">
         {/* Desktop Navigation */}
         <div className="mr-6 hidden md:flex items-center">
-          <Link href="/" className="mr-8 flex items-center space-x-2"> {/* Increased mr-6 to mr-8 */}
+          <Link href="/" className="mr-8 flex items-center space-x-2">
             <Gem className="h-7 w-7 text-primary" />
-            <span className="font-bold text-lg text-primary-foreground">
+            <span className="font-bold text-lg text-accent"> {/* Updated to text-accent */}
               Goldsmith Connect
             </span>
           </Link>
-          <nav className="flex items-center gap-8 text-sm"> {/* Increased gap-6 to gap-8 */}
+          <nav className="flex items-center gap-8 text-sm">
             <Link href="/discover" className={cn(navLinkClasses)}>Discover</Link>
             <Link href="/#how-it-works" className={cn(navLinkClasses)}>How It Works</Link>
             <Link href="/pricing" className={cn(navLinkClasses)}>Pricing</Link>
@@ -30,31 +30,31 @@ export function Header() {
         {/* Mobile Menu Trigger */}
         <Sheet>
           <SheetTrigger asChild>
-             <Button variant="ghost" size="icon" className="md:hidden mr-2 p-2"> {/* Standardized p-1.5 to p-2 */}
+             <Button variant="ghost" size="icon" className="md:hidden mr-2 p-2">
                 <span className="flex items-center">
-                    <Menu className="h-6 w-6" /> {/* Ensured consistent icon size */}
+                    <Menu className="h-6 w-6 text-foreground" /> {/* Ensure icon color is visible */}
                     <span className="sr-only">Toggle Menu</span>
                 </span>
             </Button>
           </SheetTrigger>
-           <SheetContent side="left" className="pr-0 bg-background w-[280px] sm:w-[320px] border-r border-border/20 shadow-xl p-0"> {/* Increased width slightly */}
+           <SheetContent side="left" className="pr-0 bg-background w-[280px] sm:w-[320px] border-r border-border/20 shadow-xl p-0">
              <div className="flex flex-col h-full">
                 <Link
                   href="/"
-                  className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20" /* Increased px/py and space-x */
+                  className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
                 >
                   <Gem className="h-7 w-7 text-primary" />
-                  <span className="font-bold text-lg text-primary-foreground">Goldsmith Connect</span>
+                  <span className="font-bold text-lg text-accent">Goldsmith Connect</span> {/* Updated to text-accent */}
                 </Link>
-              <nav className="flex-grow flex flex-col space-y-3 px-6 pt-6"> {/* Increased space-y, px, pt */}
+              <nav className="flex-grow flex flex-col space-y-3 px-6 pt-6">
                 <Link href="/discover" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Discover</Link>
                 <Link href="/#how-it-works" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">How It Works</Link>
                 <Link href="/pricing" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Pricing</Link>
                 <Link href="/goldsmith-portal" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Goldsmith Portal</Link>
                  <Link href="/admin" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Admin Portal</Link>
               </nav>
-               <div className="px-6 pb-8 mt-auto flex flex-col gap-3 border-t border-border/20 pt-6"> {/* Increased px/pb/gap/pt */}
-                  <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base")}> {/* Ensured consistent size */}
+               <div className="px-6 pb-8 mt-auto flex flex-col gap-3 border-t border-border/20 pt-6">
+                  <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base")}>
                     <LogIn className="mr-2 h-4 w-4" /> Login
                   </Link>
                   <Link href="/signup" className={cn(buttonVariants({ size: "lg" }), "w-full rounded-full text-base bg-primary hover:bg-primary/90 text-primary-foreground")}>
@@ -66,22 +66,22 @@ export function Header() {
         </Sheet>
 
         {/* Mobile Logo */}
-        <div className="flex flex-1 items-center justify-start md:hidden pl-2"> {/* Added pl-2 for spacing from menu icon */}
+        <div className="flex flex-1 items-center justify-start md:hidden pl-2">
             <Link href="/" className="flex items-center space-x-2">
               <Gem className="h-7 w-7 text-primary" />
-               <span className="font-bold text-lg sm:inline-block text-primary-foreground">
+               <span className="font-bold text-lg sm:inline-block text-accent"> {/* Updated to text-accent */}
                     Goldsmith Connect
                 </span>
             </Link>
           </div>
 
         {/* Login/Signup Buttons (Desktop) */}
-        <div className="hidden md:flex flex-1 items-center justify-end space-x-3"> {/* Increased space-x-2 to space-x-3 */}
+        <div className="hidden md:flex flex-1 items-center justify-end space-x-3">
              <Link
                 href="/login"
                 className={cn(
-                   buttonVariants({ variant: "ghost", size: "default" }), /* Changed size to default */
-                   'hover:bg-accent/80 text-foreground/80 hover:text-primary rounded-full px-6 py-2' /* Increased px */
+                   buttonVariants({ variant: "ghost", size: "default" }),
+                   'hover:bg-accent/10 text-foreground/80 hover:text-accent-foreground rounded-full px-6 py-2' // Updated hover colors
                 )}
               >
                 <span>Login</span>
@@ -89,8 +89,8 @@ export function Header() {
              <Link
                 href="/signup"
                 className={cn(
-                  buttonVariants({ size: 'default', variant: 'default' }), /* Changed size to default */
-                  'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2' /* Increased px */
+                  buttonVariants({ size: 'default', variant: 'default' }), 
+                  'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2'
                 )}
               >
                 <span>Sign Up</span>

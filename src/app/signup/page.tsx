@@ -17,18 +17,18 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background"> {/* Reduced py-12 */}
+    <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
       <Card className="w-full max-w-md shadow-xl border-primary/10 rounded-xl bg-card">
-        <CardHeader className="text-center pt-6 pb-3"> {/* Reduced pt/pb */}
-           <UserPlus className="h-10 w-10 mx-auto text-primary mb-2.5" /> {/* Reduced icon size and mb */}
-          <CardTitle className="text-3xl text-foreground">Create Your Account</CardTitle>
-          <CardDescription className="text-muted-foreground mt-1">Join Goldsmith Connect to discover artisans and craft your story.</CardDescription> {/* Reduced mt */}
+        <CardHeader className="text-center pt-6 pb-3">
+           <UserPlus className="h-10 w-10 mx-auto text-primary mb-2.5" />
+          <CardTitle className="text-3xl text-accent">Create Your Account</CardTitle> {/* Updated to text-accent */}
+          <CardDescription className="text-muted-foreground mt-1">Join Goldsmith Connect to discover artisans and craft your story.</CardDescription>
         </CardHeader>
-        <CardContent className="px-6 pb-6 pt-3"> {/* Reduced px/pb/pt */}
-          <form className="space-y-4" onSubmit={handleSubmit}> {/* Reduced space-y */}
+        <CardContent className="px-6 pb-6 pt-3">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
               <Label htmlFor="name" className="text-foreground">Full Name</Label>
-              <Input id="name" placeholder="e.g., Alex Smith" required className="text-base text-foreground py-2" /> {/* Reduced py */}
+              <Input id="name" placeholder="e.g., Alex Smith" required className="text-base text-foreground py-2" />
             </div>
 
             <div className="space-y-1.5">
@@ -46,15 +46,15 @@ export default function SignUpPage() {
               <Input id="confirmPassword" type="password" required className="text-base text-foreground py-2" />
             </div>
             
-            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground"> {/* Reduced py */}
+            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground">
               Sign Up
             </Button>
             
-            <Separator className="my-5" /> {/* Reduced my-6 */}
+            <Separator className="my-5" />
             <SocialAuthButtons mode="signup" />
 
 
-             <p className="text-center text-sm text-muted-foreground pt-3.5"> {/* Reduced pt */}
+             <p className="text-center text-sm text-muted-foreground pt-3.5">
                 Already have an account?{' '}
                 <Link href="/login" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
                   Login here

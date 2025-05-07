@@ -17,17 +17,17 @@ export default function GoldsmithRegisterPage() {
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/20 to-background">
       <Card className="w-full max-w-2xl shadow-xl border-primary/15 rounded-xl bg-card">
-        <CardHeader className="text-center pt-6 pb-4"> {/* Reduced pt/pb */}
-          <Briefcase className="h-12 w-12 mx-auto text-primary mb-3" /> {/* Reduced icon size and mb */}
-          <CardTitle className="text-3xl text-foreground">Register Your Goldsmith Workshop</CardTitle>
+        <CardHeader className="text-center pt-6 pb-4">
+          <Briefcase className="h-12 w-12 mx-auto text-primary mb-3" />
+          <CardTitle className="text-3xl text-accent">Register Your Goldsmith Workshop</CardTitle> {/* Updated to text-accent */}
           <CardDescription className="text-muted-foreground mt-1 text-sm">Join our curated network of skilled artisans. Please fill in your details below.</CardDescription>
         </CardHeader>
-        <CardContent className="px-6 pb-6 pt-4"> {/* Reduced px/pb/pt */}
-          <form className="space-y-4" onSubmit={handleSubmit}> {/* Reduced space-y */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3"> {/* Reduced gap */}
-               <div className="space-y-1"> {/* Reduced space-y */}
+        <CardContent className="px-6 pb-6 pt-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
+               <div className="space-y-1">
                 <Label htmlFor="workshopName" className="text-foreground">Workshop Name</Label>
-                <Input id="workshopName" placeholder="e.g., Aura & Gold Creations" required className="text-base py-2 text-foreground"/> {/* Reduced py */}
+                <Input id="workshopName" placeholder="e.g., Aura & Gold Creations" required className="text-base py-2 text-foreground"/>
               </div>
                <div className="space-y-1">
                 <Label htmlFor="contactPerson" className="text-foreground">Contact Person</Label>
@@ -49,13 +49,13 @@ export default function GoldsmithRegisterPage() {
 
             <div className="space-y-1">
               <Label htmlFor="address" className="text-foreground">Workshop Address</Label>
-              <Textarea id="address" placeholder="Full address of your workshop or studio" required rows={2} className="text-base py-2 text-foreground"/> {/* Reduced rows */}
+              <Textarea id="address" placeholder="Full address of your workshop or studio" required rows={2} className="text-base py-2 text-foreground"/>
             </div>
 
              <div className="space-y-1">
               <Label htmlFor="specialties" className="text-foreground">Specialties & Techniques</Label>
               <Input id="specialties" placeholder="e.g., Custom Engagement Rings, Hand Engraving, Gemstone Setting" required className="text-base py-2 text-foreground"/>
-               <p className="text-xs text-muted-foreground pt-0.5">Separate multiple specialties with commas.</p> {/* Reduced pt */}
+               <p className="text-xs text-muted-foreground pt-0.5">Separate multiple specialties with commas.</p>
             </div>
 
             <div className="space-y-1">
@@ -75,10 +75,10 @@ export default function GoldsmithRegisterPage() {
             </div>
             
 
-            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-3 bg-primary hover:bg-primary/90 text-primary-foreground mt-3"> {/* Reduced py and mt */}
+            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-3 bg-primary hover:bg-primary/90 text-primary-foreground mt-3">
               <CheckCircle className="mr-2 h-5 w-5"/> Submit Registration
             </Button>
-             <p className="text-center text-sm text-muted-foreground pt-4"> {/* Reduced pt */}
+             <p className="text-center text-sm text-muted-foreground pt-4">
                 Already a partner?{' '}
                 <Link href="/goldsmith-portal/login" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
                   Login to your portal
