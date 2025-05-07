@@ -13,7 +13,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/85 shadow-sm",
         outline:
-          "border border-primary bg-transparent text-primary hover:bg-primary/10 hover:text-primary-foreground shadow-sm", // Outline uses primary color
+          "border border-primary bg-transparent text-primary hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary-foreground dark:hover:text-card-foreground shadow-sm", // Updated dark mode hover
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm",
         ghost: "hover:bg-accent/10 hover:text-accent-foreground",
@@ -23,7 +23,7 @@ const buttonVariants = cva(
       size: {
         default: "h-10 px-5 py-2",
         sm: "h-9 rounded-md px-4 text-xs",
-        lg: "h-12 rounded-md px-8 text-base", 
+        lg: "h-12 rounded-md px-8 text-base",
         xs: "h-8 rounded-md px-3 text-xs",
         icon: "h-10 w-10",
       },

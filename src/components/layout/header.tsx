@@ -15,7 +15,7 @@ export function Header() {
         <div className="mr-6 hidden md:flex items-center">
           <Link href="/" className="mr-8 flex items-center space-x-2">
             <Gem className="h-7 w-7 text-primary" />
-            <span className="font-bold text-lg text-accent"> {/* Updated to text-accent */}
+            <span className="font-bold text-lg text-primary-foreground"> {/* Ensure this is visible; was text-accent */}
               Goldsmith Connect
             </span>
           </Link>
@@ -27,74 +27,74 @@ export function Header() {
           </nav>
         </div>
 
-        {/* Mobile Menu Trigger */}
-        <Sheet>
-          <SheetTrigger asChild>
-             <Button variant="ghost" size="icon" className="md:hidden mr-2 p-2">
-                <span className="flex items-center">
-                    <Menu className="h-6 w-6 text-foreground" /> {/* Ensure icon color is visible */}
-                    <span className="sr-only">Toggle Menu</span>
-                </span>
-            </Button>
-          </SheetTrigger>
-           <SheetContent side="left" className="pr-0 bg-background w-[280px] sm:w-[320px] border-r border-border/20 shadow-xl p-0">
-             <div className="flex flex-col h-full">
+        {/* Mobile Menu Trigger & Logo grouping for mobile */}
+        <div className="flex flex-1 items-center justify-between md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="p-2">
+                <Menu className="h-6 w-6 text-foreground" /> {/* Ensure icon color is visible */}
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="pr-0 bg-background w-[280px] sm:w-[320px] border-r border-border/20 shadow-xl p-0">
+              <div className="flex flex-col h-full">
                 <Link
                   href="/"
                   className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
                 >
                   <Gem className="h-7 w-7 text-primary" />
-                  <span className="font-bold text-lg text-accent">Goldsmith Connect</span> {/* Updated to text-accent */}
+                  <span className="font-bold text-lg text-primary-foreground">Goldsmith Connect</span> {/* Ensure this is visible */}
                 </Link>
-              <nav className="flex-grow flex flex-col space-y-3 px-6 pt-6">
-                <Link href="/discover" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Discover</Link>
-                <Link href="/#how-it-works" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">How It Works</Link>
-                <Link href="/pricing" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Pricing</Link>
-                <Link href="/goldsmith-portal" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Goldsmith Portal</Link>
-                 <Link href="/admin" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Admin Portal</Link>
-              </nav>
-               <div className="px-6 pb-8 mt-auto flex flex-col gap-3 border-t border-border/20 pt-6">
-                  <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base")}>
+                <nav className="flex-grow flex flex-col space-y-3 px-6 pt-6">
+                  <Link href="/discover" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Discover</Link>
+                  <Link href="/#how-it-works" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">How It Works</Link>
+                  <Link href="/pricing" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Pricing</Link>
+                  <Link href="/goldsmith-portal" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Goldsmith Portal</Link>
+                  <Link href="/admin" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2">Admin Portal</Link>
+                </nav>
+                <div className="px-6 pb-8 mt-auto flex flex-col gap-3 border-t border-border/20 pt-6">
+                  <Link href="/login" className={cn(buttonVariants({ variant: "secondary", size: "lg" }), "w-full rounded-full text-base")}> {/* Changed to secondary */}
                     <LogIn className="mr-2 h-4 w-4" /> Login
                   </Link>
-                  <Link href="/signup" className={cn(buttonVariants({ size: "lg" }), "w-full rounded-full text-base bg-primary hover:bg-primary/90 text-primary-foreground")}>
+                  <Link href="/signup" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}> {/* Kept as default */}
                     <UserPlus className="mr-2 h-4 w-4" /> Sign Up
                   </Link>
-               </div>
-             </div>
-           </SheetContent>
-        </Sheet>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
 
-        {/* Mobile Logo */}
-        <div className="flex flex-1 items-center justify-start md:hidden pl-2">
-            <Link href="/" className="flex items-center space-x-2">
-              <Gem className="h-7 w-7 text-primary" />
-               <span className="font-bold text-lg sm:inline-block text-accent"> {/* Updated to text-accent */}
-                    Goldsmith Connect
-                </span>
-            </Link>
-          </div>
+          <Link href="/" className="flex items-center space-x-2">
+            <Gem className="h-7 w-7 text-primary" />
+            <span className="font-bold text-lg sm:inline-block text-primary-foreground"> {/* Ensure this is visible */}
+              Goldsmith Connect
+            </span>
+          </Link>
+          {/* Spacer to balance the trigger icon, or for future right-aligned mobile icons */}
+          <div className="w-10 h-10" /> 
+        </div>
+
 
         {/* Login/Signup Buttons (Desktop) */}
         <div className="hidden md:flex flex-1 items-center justify-end space-x-3">
-             <Link
-                href="/login"
-                className={cn(
-                   buttonVariants({ variant: "ghost", size: "default" }),
-                   'hover:bg-accent/10 text-foreground/80 hover:text-accent-foreground rounded-full px-6 py-2' // Updated hover colors
-                )}
-              >
-                <span>Login</span>
-             </Link>
-             <Link
-                href="/signup"
-                className={cn(
-                  buttonVariants({ size: 'default', variant: 'default' }), 
-                  'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2'
-                )}
-              >
-                <span>Sign Up</span>
-             </Link>
+          <Link
+            href="/login"
+            className={cn(
+              buttonVariants({ variant: 'ghost', size: 'default' }),
+              'hover:bg-accent/10 text-foreground/80 hover:text-accent-foreground rounded-full px-4 py-2'
+            )}
+          >
+            <span>Login</span>
+          </Link>
+          <Link
+            href="/signup"
+            className={cn(
+              buttonVariants({ size: 'default', variant: 'default' }),
+              'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-4 py-2'
+            )}
+          >
+            <span>Sign Up</span>
+          </Link>
         </div>
       </div>
     </header>
