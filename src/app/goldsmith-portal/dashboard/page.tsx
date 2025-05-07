@@ -3,25 +3,29 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { 
-  LayoutGrid, 
   UserCog, 
   Package, 
   MessageSquare, 
   GalleryHorizontal, 
   Settings,
   Bell,
-  DollarSign,
   BarChart3
 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function GoldsmithDashboardPage() {
-  // Simulated data - replace with actual data fetching in a real application
-  const goldsmithName = "Artisan Goldworks"; 
-  const newOrdersCount = 3;
-  const pendingInquiriesCount = 5;
-  const profileCompletion = 85; // Percentage
+// Simulated data - replace with actual data fetching in a real application
+const goldsmithName = "Artisan Goldworks"; 
+const newOrdersCount = 3;
+const pendingInquiriesCount = 5;
+const profileCompletion = 85; // Percentage
 
+const mockNotifications = [
+  { id: 1, message: "New order request #ORD12345 received.", time: "2 hours ago", read: false },
+  { id: 2, message: "Customer Inquiry: 'Can you make a custom ring?'", time: "1 day ago", read: false },
+  { id: 3, message: "Profile view increased by 15% this week.", time: "3 days ago", read: true },
+];
+
+export default function GoldsmithDashboardPage() {
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8 px-4 md:px-6">
       <header className="mb-8">
@@ -189,14 +193,18 @@ export default function GoldsmithDashboardPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                  {/* Placeholder for notifications list */}
-                  <p className="text-sm text-muted-foreground">No new notifications.</p>
-                  {/* Example Notification item:
-                  <div className="py-2 border-b border-border/30">
-                      <p className="text-sm text-foreground">New order request #12345 received.</p>
-                      <p className="text-xs text-muted-foreground">2 hours ago</p>
-                  </div> 
-                  */}
+                  {mockNotifications.length > 0 ? (
+                    <ul className="space-y-3">
+                      {mockNotifications.map(notification => (
+                        <li key={notification.id} className={`py-2.5 px-3 rounded-md border-l-4 ${notification.read ? 'border-border/30 bg-card/50' : 'border-primary bg-primary/5'}`}>
+                            <p className={`text-sm ${notification.read ? 'text-muted-foreground' : 'text-foreground font-medium'}`}>{notification.message}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{notification.time}</p>
+                        </li> 
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No new notifications.</p>
+                  )}
               </CardContent>
           </Card>
       </section>
