@@ -17,7 +17,7 @@ export default function GoldsmithPortalPage() {
             <div className="flex flex-col justify-center space-y-3">
               <div className="space-y-1.5">
                  <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary shadow-sm font-poppins">Goldsmith Partner Portal</div>
-                <h1 className="font-heading text-foreground leading-tight"> {/* Changed text-accent to text-foreground */}
+                <h1 className="font-heading text-foreground leading-tight">
                   Showcase Your Artistry, Expand Your Reach
                 </h1>
                 <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed">
@@ -29,7 +29,7 @@ export default function GoldsmithPortalPage() {
                   href="/goldsmith-portal/register"
                   className={cn(
                     buttonVariants({ size: 'lg', variant: 'default' }),
-                    'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-6 py-2 text-base'
+                    'shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-2 text-base bg-primary text-primary-foreground hover:bg-primary/90' // Removed transform
                   )}
                 >
                   <span>Register Your Workshop</span>
@@ -38,7 +38,7 @@ export default function GoldsmithPortalPage() {
                   href="/goldsmith-portal/login"
                   className={cn(
                     buttonVariants({ variant: 'outline', size: 'lg' }),
-                    'shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 text-base'
+                    'shadow-lg hover:shadow-xl transition-all duration-300 border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 text-base' // Removed transform
                   )}
                 >
                   <span>Login to Dashboard</span>
@@ -65,7 +65,7 @@ export default function GoldsmithPortalPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8">
             <div className="space-y-1">
-              <h2 className="font-heading text-foreground">Why Partner with Goldsmith Connect?</h2> {/* Changed text-accent to text-foreground */}
+              <h2 className="font-heading text-foreground">Why Partner with Goldsmith Connect?</h2>
               <p className="max-w-[850px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-lg/relaxed">
                 Expand your reach, streamline your custom orders, and focus on what you do best – creating beautiful, timeless jewelry.
               </p>
@@ -100,7 +100,7 @@ export default function GoldsmithPortalPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8">
             <div className="space-y-1">
-              <h2 className="font-heading text-foreground">Joining is Simple</h2> {/* Changed text-accent to text-foreground */}
+              <h2 className="font-heading text-foreground">Joining is Simple</h2>
                <p className="max-w-[850px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-lg/relaxed">
                 Start connecting with customers in just a few easy steps.
               </p>
@@ -131,7 +131,7 @@ export default function GoldsmithPortalPage() {
         <div className="container grid items-center justify-center gap-2 px-4 text-center md:px-6">
           <div className="space-y-1.5">
              <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
-            <h2 className="font-heading text-foreground"> {/* Changed text-accent to text-foreground */}
+            <h2 className="font-heading text-foreground">
               Ready to Elevate Your Goldsmith Business?
             </h2>
             <p className="mx-auto max-w-[600px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-lg/relaxed">
@@ -143,7 +143,7 @@ export default function GoldsmithPortalPage() {
                 href="/goldsmith-portal/register"
                 className={cn(
                     buttonVariants({ size: 'lg', variant: 'default' }),
-                    'shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 rounded-full px-6 py-2 text-base'
+                    'shadow-xl hover:shadow-2xl transition-all duration-300 rounded-full px-6 py-2 text-base bg-primary text-primary-foreground hover:bg-primary/90' // Removed transform
                 )}
               >
                 <span>
