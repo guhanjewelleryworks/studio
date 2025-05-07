@@ -1,5 +1,4 @@
 
-
 import Link from 'next/link';
 import { Gem } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,7 +16,7 @@ export function Footer() {
           <div className="md:col-span-4 flex flex-col items-center md:items-start gap-2 text-center md:text-left">
             <Link href="/" className="flex items-center space-x-2 mb-1">
                <Gem className="h-6 w-6 text-primary" />
-               <span className="font-semibold text-lg text-primary">Goldsmith Connect</span>
+               <span className="font-semibold text-lg text-foreground">Goldsmith Connect</span>
              </Link>
             <p className="text-xs text-foreground/70 max-w-xs leading-relaxed">
               Connecting you with local artisans to craft your dream jewelry through a secure, mediated process.
@@ -27,7 +26,7 @@ export function Footer() {
              </p>
           </div>
 
-          {/* Navigation Links - More balanced distribution */}
+          {/* Navigation Links */}
           <div className="md:col-span-2">
             <h3 className="font-semibold text-foreground mb-2 text-sm">Company</h3>
             <nav className="flex flex-col gap-1.5">

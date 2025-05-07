@@ -1,231 +1,199 @@
 
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Award, Gem, Search, ShieldCheck, Sparkles, ShoppingBag, Star, Heart, Tag, ArrowRight } from 'lucide-react';
+import { Gem, Search, Lock, Sparkles, Users, Handshake, Edit3, Award, ArrowRight, UserCheck } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { GoldsmithIcon } from '@/components/icons/goldsmith-icon';
 
+// Subtle pattern for hero section
+const HeroPattern = () => (
+  <div className="absolute inset-0 opacity-[0.02] [mask-image:radial-gradient(farthest-side_at_top_left,white,transparent)]">
+    <svg aria-hidden="true" className="absolute inset-0 h-full w-full">
+      <defs>
+        <pattern
+          id="hero-pattern"
+          width="80"
+          height="80"
+          patternUnits="userSpaceOnUse"
+          patternContentUnits="userSpaceOnUse"
+        >
+          <path d="M0 80L80 0ZM80 80L0 0Z" className="stroke-primary/30 fill-none" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hero-pattern)" />
+    </svg>
+  </div>
+);
+
 
 export default function Home() {
-  const categories = [
-    { name: 'Rings', icon: <Gem className="h-8 w-8" />, href: '/category/rings', dataAiHint: "gold rings" },
-    { name: 'Necklaces', icon: <Sparkles className="h-8 w-8" />, href: '/category/necklaces', dataAiHint: "diamond necklace" },
-    { name: 'Earrings', icon: <Heart className="h-8 w-8" />, href: '/category/earrings', dataAiHint: "pearl earrings" },
-    { name: 'Bracelets', icon: <ShoppingBag className="h-8 w-8" />, href: '/category/bracelets', dataAiHint: "silver bracelet" },
+  const featuredGoldsmiths = [
+    { id: 'artisan-1', name: 'Lumière Jewels', location: 'Cityville, ST', specialty: 'Engagement Rings, Custom Designs', imageUrl: 'https://picsum.photos/seed/goldsmith1/400/250', dataAiHint: "jewelry goldsmith profile" },
+    { id: 'artisan-2', name: 'Aura & Gold', location: 'Townsville, ST', specialty: 'Custom Pendants, Gold & Platinum', imageUrl: 'https://picsum.photos/seed/goldsmith2/400/250', dataAiHint: "jewelry goldsmith workshop" },
+    { id: 'artisan-3', name: 'Heritage Metalsmiths', location: 'Villagetown, ST', specialty: 'Antique Restoration, Heirloom Redesign', imageUrl: 'https://picsum.photos/seed/goldsmith3/400/250', dataAiHint: "goldsmith tools" },
   ];
 
-  const featuredProducts = [
-    { id: 'fp1', name: 'The Elysian Diamond Ring', price: '$1,250', imageUrl: 'https://picsum.photos/seed/elysian-ring/600/600', dataAiHint: "diamond ring" },
-    { id: 'fp2', name: 'Aurora Gold Pendant', price: '$890', imageUrl: 'https://picsum.photos/seed/aurora-pendant/600/600', dataAiHint: "gold pendant" },
-    { id: 'fp3', name: 'Celestial Pearl Earrings', price: '$670', imageUrl: 'https://picsum.photos/seed/celestial-earrings/600/600', dataAiHint: "pearl earrings" },
-    { id: 'fp4', name: 'Infinity Silver Bracelet', price: '$450', imageUrl: 'https://picsum.photos/seed/infinity-bracelet/600/600', dataAiHint: "silver bracelet" },
-  ];
-
-  const newArrivals = [
-    { id: 'na1', name: 'Orion Star Necklace', price: '$950', imageUrl: 'https://picsum.photos/seed/orion-necklace/600/600', dataAiHint: "star necklace" },
-    { id: 'na2', name: 'Nova Stud Earrings', price: '$320', imageUrl: 'https://picsum.photos/seed/nova-earrings/600/600', dataAiHint: "stud earrings" },
-    { id: 'na3', name: 'Helios Signet Ring', price: '$780', imageUrl: 'https://picsum.photos/seed/helios-ring/600/600', dataAiHint: "signet ring" },
-  ];
-
-  const brandPromises = [
-    { icon: <Award className="h-10 w-10 text-primary" />, title: "Impeccable Craftsmanship", description: "Each piece meticulously handcrafted by skilled artisans." },
-    { icon: <ShieldCheck className="h-10 w-10 text-primary" />, title: "Certified Authenticity", description: "Ethically sourced materials and certified quality guaranteed." },
-    { icon: <Sparkles className="h-10 w-10 text-primary" />, title: "Timeless Designs", description: "Exquisite jewelry that transcends trends, cherished for generations." },
+  const howItWorksSteps = [
+    { icon: Search, title: "1. Discover & Inquire", description: "Browse verified goldsmith profiles. Submit an introduction or custom order request through our elegant platform." },
+    { icon: Lock, title: "2. Admin Mediation", description: "Our team reviews your request, ensuring a secure and smooth process. We facilitate introductions and order details." },
+    { icon: Sparkles, title: "3. Create & Cherish", description: "Collaborate with your chosen artisan. They craft your piece with passion, and you receive your dream jewelry." },
   ];
 
   return (
     <div className="flex flex-col items-center bg-background text-foreground">
       {/* Hero Section */}
-      <section className="w-full bg-gradient-to-b from-secondary/30 to-background py-16 md:py-20 lg:py-28">
-        <div className="container px-4 md:px-6">
-          <div className="grid gap-6 md:grid-cols-2 items-center">
-            <div className="flex flex-col justify-center space-y-4 text-center md:text-left">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight">
-                Elegance Redefined.
-                <br />
-                <span className="text-primary">Craftsmanship Unmatched.</span>
-              </h1>
-              <p className="max-w-lg text-foreground/80 md:text-xl leading-relaxed mx-auto md:mx-0">
-                Discover exquisite gold and silver ornaments, handcrafted for your timeless moments. Find the perfect piece that tells your story.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 pt-2 mx-auto md:mx-0">
+      <section className="relative w-full py-12 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/30 via-background to-background overflow-hidden">
+        <HeroPattern />
+        <div className="container px-4 md:px-6 relative z-10">
+          <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-8 xl:grid-cols-[1fr_550px] items-center">
+            <div className="flex flex-col justify-center space-y-2">
+              <div className="space-y-1.5">
+                <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl xl:text-5xl/none text-primary-foreground leading-tight">
+                  Discover Local Goldsmiths,
+                  <br />
+                  <span className="text-primary">Craft Your Dreams.</span>
+                </h1>
+                <p className="max-w-[600px] text-foreground/75 md:text-lg leading-relaxed">
+                  Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 min-[400px]:flex-row pt-1">
                 <Link
                   href="/discover"
-                  className={cn(buttonVariants({ size: 'lg', variant: 'default' }), "shadow-lg hover:shadow-xl transition-shadow transform hover:-translate-y-0.5")}
+                  className={cn(buttonVariants({ size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2 text-base")}
                 >
-                  Explore Collections <ArrowRight className="ml-2 h-5 w-5" />
+                  <span>Find a Goldsmith <ArrowRight className="ml-2 h-4 w-4 inline" /></span>
                 </Link>
                 <Link
-                  href="/#categories"
-                  className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), "shadow-lg hover:shadow-xl transition-shadow transform hover:-translate-y-0.5 border-primary text-primary hover:bg-primary/10")}
+                  href="/goldsmith-portal"
+                  className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10 hover:text-accent-foreground rounded-full px-6 py-2 text-base")}
                 >
-                  Shop by Category
+                   <span>Join as a Goldsmith <UserCheck className="ml-2 h-4 w-4 inline" /></span>
                 </Link>
               </div>
             </div>
-            <div className="relative h-64 md:h-auto md:aspect-[4/3] group">
-              <Image
-                src="https://picsum.photos/seed/jewelry-hero/800/600"
-                alt="Luxury Jewelry Collection"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-xl shadow-2xl border-2 border-primary/20 transition-transform duration-500 group-hover:scale-105"
-                data-ai-hint="luxury jewelry lifestyle"
-                priority
-              />
-               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300 rounded-xl"></div>
+            <Image
+              src="https://picsum.photos/seed/goldsmith-main-hero/600/550"
+              alt="Goldsmith working on jewelry"
+              width={600}
+              height={550}
+              className="mx-auto aspect-[6/5.5] overflow-hidden rounded-xl object-cover sm:w-full lg:order-last shadow-xl border-2 border-primary/10 transition-transform duration-300 hover:scale-105"
+              data-ai-hint="goldsmith hands crafting"
+              priority
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="w-full py-12 md:py-16 lg:py-20 bg-background">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-2 text-center">
+            <div className="space-y-1">
+              <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-sm font-medium text-secondary-foreground shadow-sm">How It Works</div>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-primary-foreground">Your Secure Path to Custom Jewelry</h2>
+              <p className="max-w-[800px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
+                We connect you with talented goldsmiths through a verified and mediated process, ensuring quality and trust.
+              </p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Shop by Category Section */}
-      <section id="categories" className="w-full py-12 md:py-16 lg:py-20 bg-secondary/20">
-        <div className="container px-4 md:px-6 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">Shop by Category</h2>
-          <p className="max-w-2xl mx-auto text-foreground/70 md:text-lg mb-8 md:mb-10">
-            Find your perfect piece from our curated collections.
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
-            {categories.map((category) => (
-              <Link key={category.name} href={category.href} className="group">
-                <Card className="bg-card/70 hover:bg-card shadow-md hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 border-transparent hover:border-primary/30">
-                  <CardContent className="flex flex-col items-center justify-center p-6 aspect-square">
-                    <div className="p-4 bg-primary/10 text-primary rounded-full mb-3 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                      {category.icon}
-                    </div>
-                    <CardTitle className="text-md md:text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {category.name}
-                    </CardTitle>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Collection Section */}
-      <section className="w-full py-12 md:py-16 lg:py-20 bg-background">
-        <div className="container px-4 md:px-6 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">Our Signature Pieces</h2>
-          <p className="max-w-2xl mx-auto text-foreground/70 md:text-lg mb-8 md:mb-10">
-            Handpicked designs that embody elegance and artistry.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {featuredProducts.map((product) => (
-              <Card key={product.id} className="overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group border-border/20 rounded-xl">
-                <CardHeader className="p-0">
-                  <div className="aspect-square relative">
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.name}
-                      layout="fill"
-                      objectFit="cover"
-                      className="group-hover:scale-105 transition-transform duration-300"
-                      data-ai-hint={product.dataAiHint}
-                    />
+          <div className="mx-auto grid max-w-5xl items-start gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:max-w-none pt-8 md:pt-10">
+            {howItWorksSteps.map((step, index) => (
+              <div key={index} className="grid gap-1 text-center group p-3 rounded-xl bg-card hover:shadow-lg transition-shadow duration-300 border border-transparent hover:border-primary/20">
+                <div className="flex justify-center items-center mb-1.5">
+                  <div className="p-2 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-105">
+                    <step.icon className="h-5 w-5" />
                   </div>
-                </CardHeader>
-                <CardContent className="p-4 text-left">
-                  <CardTitle className="text-lg font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">{product.name}</CardTitle>
-                  <p className="text-primary font-medium text-md mb-2">{product.price}</p>
-                  <Button variant="outline" size="sm" className="w-full border-primary text-primary hover:bg-primary/10 rounded-full text-xs py-2">
-                    View Details
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Brand Promise Section */}
-      <section className="w-full py-12 md:py-16 lg:py-20 bg-secondary/30">
-        <div className="container px-4 md:px-6 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">The Goldsmith Connect Promise</h2>
-          <p className="max-w-2xl mx-auto text-foreground/70 md:text-lg mb-8 md:mb-10">
-            Experience the pinnacle of quality and design with every creation.
-          </p>
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {brandPromises.map((promise) => (
-              <div key={promise.title} className="flex flex-col items-center p-6 bg-card rounded-xl shadow-lg border border-primary/10">
-                {promise.icon}
-                <h3 className="text-xl font-semibold text-foreground mt-4 mb-2">{promise.title}</h3>
-                <p className="text-sm text-foreground/70">{promise.description}</p>
+                </div>
+                <h3 className="text-md font-semibold text-primary-foreground">{step.title}</h3>
+                <p className="text-xs text-foreground/70 leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* New Arrivals Section */}
-      <section className="w-full py-12 md:py-16 lg:py-20 bg-background">
-        <div className="container px-4 md:px-6 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">Fresh From The Anvil</h2>
-          <p className="max-w-2xl mx-auto text-foreground/70 md:text-lg mb-8 md:mb-10">
-            Explore our latest creations, designed to inspire and enchant.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {newArrivals.map((product) => (
-               <Card key={product.id} className="overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group border-border/20 rounded-xl">
-                <CardHeader className="p-0">
-                  <div className="aspect-[4/3] relative">
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.name}
-                      layout="fill"
-                      objectFit="cover"
-                      className="group-hover:scale-105 transition-transform duration-300"
-                      data-ai-hint={product.dataAiHint}
-                    />
+      {/* Featured Goldsmiths Section */}
+      <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/20 to-background">
+        <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
+          <div className="space-y-1.5">
+            <h2 className="text-2xl font-bold tracking-tight md:text-3xl/tight text-primary-foreground">Meet Our Talented Artisans</h2>
+            <p className="mx-auto max-w-[600px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
+              Discover skilled goldsmiths ready to craft your next masterpiece.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-6">
+            {featuredGoldsmiths.map((goldsmith) => (
+              <Card key={goldsmith.id} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/10 overflow-hidden group rounded-xl">
+                <CardHeader className="p-0 relative">
+                  <Image
+                    src={goldsmith.imageUrl}
+                    alt={goldsmith.name}
+                    width={400}
+                    height={200}
+                    className="object-cover w-full aspect-video group-hover:scale-105 transition-transform duration-300"
+                    data-ai-hint={goldsmith.dataAiHint}
+                  />
+                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2.5">
+                    <h3 className="text-md font-semibold text-white">{goldsmith.name}</h3>
                   </div>
                 </CardHeader>
-                <CardContent className="p-4 text-left">
-                  <CardTitle className="text-lg font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">{product.name}</CardTitle>
-                  <p className="text-primary font-medium text-md mb-2">{product.price}</p>
-                   <Button variant="outline" size="sm" className="w-full border-primary text-primary hover:bg-primary/10 rounded-full text-xs py-2">
-                    Shop Now
-                  </Button>
+                <CardContent className="p-2.5 text-left space-y-0.5">
+                  <CardTitle className="text-md text-primary-foreground mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
+                  <p className="flex items-center text-foreground/70 text-[0.7rem]">
+                    <Gem className="mr-1 h-3 w-3 text-muted-foreground" /> {goldsmith.specialty}
+                  </p>
+                  <p className="text-[0.7rem] text-foreground/80 leading-relaxed line-clamp-2">
+                    {/* Placeholder description - replace with actual short bio if available */}
+                    A master of timeless designs and intricate details, located in {goldsmith.location}.
+                  </p>
+                  <Link href={`/goldsmith/${goldsmith.id}`} className={cn(buttonVariants({ variant: "outline", size: "xs" }), "text-accent border-accent hover:bg-accent/10 mt-1.5 w-full rounded-full text-[0.65rem] py-1")}>
+                    <span>View Profile</span>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
           </div>
-           <div className="mt-8 md:mt-10">
-              <Link
-                 href="/discover?filter=new"
-                 className={cn(buttonVariants({ size: 'lg', variant: 'default' }), "shadow-md hover:shadow-lg transition-shadow")}
-               >
-                 View All New Arrivals
-               </Link>
+          <div className="mt-6 md:mt-8">
+            <Link
+              href="/discover"
+              className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), "border-primary text-primary hover:bg-primary/10 shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2 text-sm")}
+            >
+              <span>Explore All Goldsmiths</span>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Newsletter CTA Section */}
-      <section className="w-full py-12 md:py-16 lg:py-20 bg-secondary/20 border-t border-border/10">
-        <div className="container text-center max-w-2xl px-4 md:px-6">
-           <Sparkles className="h-10 w-10 mx-auto text-primary mb-2" />
-          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">
-            Stay Golden
-          </h2>
-          <p className="text-foreground/70 md:text-lg mb-6">
-            Subscribe for exclusive offers, new arrivals, and insider jewelry tips from Goldsmith Connect.
-          </p>
-          <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <Input 
-              type="email" 
-              placeholder="Enter your email address" 
-              className="flex-grow text-base shadow-sm focus:ring-2 focus:ring-primary" 
-              aria-label="Email for newsletter"
-            />
-            <Button type="submit" size="lg" className="shadow-md hover:shadow-lg transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground">
-              Subscribe
-            </Button>
-          </form>
+      {/* Call to Action Section */}
+      <section className="w-full py-12 md:py-16 lg:py-20 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background">
+        <div className="container grid items-center justify-center gap-2.5 px-4 text-center md:px-6">
+          <div className="space-y-1.5">
+            <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
+            <h2 className="text-2xl font-bold tracking-tight md:text-3xl/tight text-primary-foreground">
+              Ready to Create or Connect?
+            </h2>
+            <p className="mx-auto max-w-[600px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
+              Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmith Connect is your platform.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center pt-1">
+            <Link
+              href="/discover"
+              className={cn(buttonVariants({ size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2 text-sm")}
+            >
+              <span>Start Your Search <Search className="ml-2 h-4 w-4 inline" /></span>
+            </Link>
+            <Link
+              href="/goldsmith-portal/register"
+              className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/10 hover:text-accent-foreground rounded-full px-6 py-2 text-sm")}
+            >
+               <span>Register as a Goldsmith <UserCheck className="ml-2 h-4 w-4 inline" /></span>
+            </Link>
+          </div>
         </div>
       </section>
     </div>
