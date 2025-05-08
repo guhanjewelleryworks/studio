@@ -2,18 +2,18 @@
 'use client';
 
 import type { Goldsmith as GoldsmithProfile } from '@/types/goldsmith';
-import * as React from 'react'; // Keep this for React namespace if other React features are used explicitly
+import * as React from 'react'; 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from '@/components/ui/label';
-import { MapPin, Star, MessageSquare, Send, ShieldCheck, Sparkles, Award, Eye, User, Edit3 } from "lucide-react";
+import { MapPin, Star, MessageSquare, Send, ShieldCheck, Sparkles, Award, Eye, User, Edit3, Paperclip, ImagePlus } from "lucide-react"; // Added Paperclip, ImagePlus
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect, use } from "react"; // 'use' is already here
+import { useState, useEffect, use } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from '@/lib/utils';
@@ -33,6 +33,37 @@ const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | nul
       'artisan-3': { id: 'artisan-3', name: 'Heritage Metalsmiths', tagline: "Preserving Legacies, Restoring Beauty", address: '789 Ruby Ln, Villagetown', specialty: ['Antique Restoration', 'Heirloom Redesign', 'Intricate Repairs'], rating: 4.8, bio: 'Heritage Metalsmiths is dedicated to the art of jewelry restoration and preservation. We are experts in bringing heirlooms and antique pieces back to their former glory, combining meticulous care with profound respect for craftsmanship of the past.', profileImageUrl: 'https://picsum.photos/seed/heritage-profile/120/120', portfolioImages: ['https://picsum.photos/seed/heritage-work1/600/450', 'https://picsum.photos/seed/heritage-work2/600/450', 'https://picsum.photos/seed/heritage-work3/600/450', 'https://picsum.photos/seed/heritage-work4/600/450'], yearsExperience: 30, certifications: ['Master Goldsmith Certification'], responseTime: 'Within 48 hours', ordersCompleted: 200, location: { lat: 34.0515, lng: -118.2430 }, shortBio: 'Preserving history through expert restoration of antique and heirloom jewelry.' },
        'default': { id: 'default', name: 'Example Goldsmith', tagline: "Artistry in Every Detail", address: '1 Example Rd, Sample City', specialty: ['General Craftsmanship', 'Fine Repairs'], rating: 4.2, bio: 'This is a sample profile for a talented goldsmith, showcasing a commitment to quality and artistry in every piece created or restored.', profileImageUrl: 'https://picsum.photos/seed/goldsmith-default-profile/120/120', portfolioImages: ['https://picsum.photos/seed/goldsmith-default-work1/600/450'], responseTime: 'Varies', ordersCompleted: 30, location: { lat: 34.0540, lng: -118.2450 }, shortBio: 'Elegant necklaces and bracelets designed to adorn and inspire.' }
   };
+  
+  // Attempt to load from localStorage first
+  if (typeof window !== 'undefined') {
+    const storedData = localStorage.getItem('goldsmiths-data');
+    if (storedData) {
+      try {
+        const storedGoldsmiths: GoldsmithProfile[] = JSON.parse(storedData);
+        const foundProfile = storedGoldsmiths.find(g => g.id === id);
+        if (foundProfile) {
+          // Ensure all optional fields have defaults if not present in stored data
+          const completeProfile: GoldsmithProfile = {
+            tagline: "Bespoke Creations",
+            bio: "Talented artisan ready to create your unique piece.",
+            portfolioImages: [`https://picsum.photos/seed/${id}-work-default/600/450`],
+            yearsExperience: 1,
+            certifications: [],
+            responseTime: "Within 2 days",
+            ordersCompleted: 1,
+            ...foundProfile, // Spread stored profile to override defaults
+            profileImageUrl: foundProfile.profileImageUrl || `https://picsum.photos/seed/${id}-profile/120/120`,
+            imageUrl: foundProfile.imageUrl || `https://picsum.photos/seed/${id}/400/300`,
+            location: foundProfile.location || { lat: 34.0522, lng: -118.2437 },
+            shortBio: foundProfile.shortBio || `Specializing in ${Array.isArray(foundProfile.specialty) ? foundProfile.specialty.join(', ') : foundProfile.specialty || 'fine jewelry'}`
+          };
+          return completeProfile;
+        }
+      } catch (e) {
+        console.error("Error parsing goldsmiths from localStorage for profile page", e);
+      }
+    }
+  }
 
   return mockProfiles[id] || mockProfiles['default'];
 };
@@ -41,12 +72,14 @@ const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | nul
 // Make the component accept a promise for params
 export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
   const params = use(paramsPromise);
-  const { id } = params;
+  const { id } = params; // Accessing id directly
 
   const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
    useEffect(() => {
     const loadProfile = async () => {
@@ -75,6 +108,20 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
     loadProfile();
   }, [id]);
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setSelectedImage(null);
+      setImagePreview(null);
+    }
+  };
 
   if (isLoading) {
      return (
@@ -115,11 +162,27 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
   const handleRequestIntroduction = (e: React.FormEvent) => {
      e.preventDefault();
+     // Simulate form data collection
+     const form = e.target as HTMLFormElement;
+     const contactName = (form.elements.namedItem('contact-name') as HTMLInputElement)?.value;
+     const contactEmail = (form.elements.namedItem('contact-email') as HTMLInputElement)?.value;
+     const contactMessage = (form.elements.namedItem('contact-message') as HTMLTextAreaElement)?.value;
+
+     let description = `Your inquiry for ${profile.name} has been sent to an administrator.`;
+     if (selectedImage) {
+       description += ` Image "${selectedImage.name}" was included.`;
+     }
+     description += ' You will be notified once confirmed.';
+
      toast({
         title: 'Introduction Request Sent',
-        description: 'Your request has been sent to an administrator for review and approval. You will be notified once confirmed.',
-        duration: 5000,
+        description: description,
+        duration: 7000, // Increased duration for longer message
       });
+      // Reset form fields and image preview
+      form.reset();
+      setSelectedImage(null);
+      setImagePreview(null);
    };
 
    const handleRequestCustomOrder = () => {
@@ -152,7 +215,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
               <CardTitle className="text-xl text-accent">{profile.name}</CardTitle>
               {profile.tagline && <p className="text-xs text-primary font-medium font-poppins mt-0.5">{profile.tagline}</p>}
               <div className="flex items-center text-amber-500 mt-1">
-                <Star className="h-3.5 w-3.5 mr-1 fill-current" /> <span className="text-xs text-foreground font-poppins">{profile.rating.toFixed(1)}</span>
+                <Star className="h-3.5 w-3.5 mr-1 fill-current text-yellow-400" /> <span className="text-xs text-foreground font-poppins">{profile.rating > 0 ? profile.rating.toFixed(1) : 'New'}</span>
                  <span className="text-[0.65rem] text-muted-foreground ml-1">(Based on X reviews)</span>
               </div>
               <CardDescription className="flex items-center justify-center text-muted-foreground text-xs pt-1">
@@ -195,7 +258,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                <Button size="default" className="w-full shadow-md rounded-full text-xs py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground mt-1.5" onClick={handleRequestCustomOrder}>
                   <Send className="mr-1.5 h-3.5 w-3.5"/> Request Custom Order
                </Button>
-                <Button variant="outline" size="default" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full text-xs py-2.5 shadow-sm" onClick={handleRequestIntroduction}>
+                <Button variant="outline" size="default" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full text-xs py-2.5 shadow-sm" onClick={(e) => { document.getElementById('contact-form-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
                   <User className="mr-1.5 h-3.5 w-3.5"/> Request Introduction
                </Button>
             </CardContent>
@@ -243,26 +306,44 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
             </CardContent>
           </Card>
 
-           <Card className="shadow-xl border-primary/10 rounded-xl bg-card">
+           <Card id="contact-form-section" className="shadow-xl border-primary/10 rounded-xl bg-card">
             <CardHeader className="p-5">
               <CardTitle className="text-lg text-accent">Connect with {profile.name}</CardTitle>
                <CardDescription className="text-xs text-muted-foreground mt-0.5">Initiate a conversation or request a custom piece through our secure admin-mediated process.</CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
               <form className="space-y-3.5" onSubmit={handleRequestIntroduction}>
-                 {/* TODO: Add form handling with react-hook-form */}
                  <div className="space-y-1">
                     <Label htmlFor="contact-name" className="text-foreground text-xs font-medium">Your Name</Label>
-                    <Input id="contact-name" placeholder="John Doe" required className="text-foreground text-sm py-2"/>
+                    <Input id="contact-name" name="contact-name" placeholder="John Doe" required className="text-foreground text-sm py-2"/>
                  </div>
                  <div className="space-y-1">
                     <Label htmlFor="contact-email" className="text-foreground text-xs font-medium">Your Email</Label>
-                    <Input id="contact-email" type="email" placeholder="john.doe@example.com" required className="text-foreground text-sm py-2"/>
+                    <Input id="contact-email" name="contact-email" type="email" placeholder="john.doe@example.com" required className="text-foreground text-sm py-2"/>
                  </div>
                  <div className="space-y-1">
                     <Label htmlFor="contact-message" className="text-foreground text-xs font-medium">Your Inquiry / Project Idea</Label>
-                    <Textarea id="contact-message" placeholder="Briefly explain your jewelry idea or why you'd like to connect..." required rows={3} className="text-foreground text-sm py-2"/>
+                    <Textarea id="contact-message" name="contact-message" placeholder="Briefly explain your jewelry idea or why you'd like to connect..." required rows={3} className="text-foreground text-sm py-2"/>
                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="ornament-image" className="text-foreground text-xs font-medium">Attach Image (Optional)</Label>
+                    <div className="flex items-center gap-3">
+                      <Input 
+                        id="ornament-image" 
+                        name="ornament-image"
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleImageChange}
+                        className="text-foreground text-sm py-1.5 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                      />
+                    </div>
+                    {imagePreview && (
+                      <div className="mt-2 p-2 border border-muted rounded-md inline-block">
+                        <Image src={imagePreview} alt="Ornament preview" width={80} height={80} className="rounded object-contain" />
+                      </div>
+                    )}
+                  </div>
+
                  <Button type="submit" size="default" className="shadow-md rounded-full text-xs py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground">
                     <Send className="mr-1.5 h-3.5 w-3.5"/> Send Inquiry to Admin
                  </Button>
@@ -275,4 +356,3 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
     </div>
   );
 }
-
