@@ -10,7 +10,7 @@ export default function AdminPortalPage() {
     <div className="flex flex-col items-center py-8 md:py-10 bg-gradient-to-br from-secondary/20 to-background min-h-[calc(100vh-8rem)]">
       <div className="container px-4 md:px-6 text-center">
         <ShieldCheck className="h-12 w-12 mx-auto text-primary mb-2.5" />
-        <h1 className="font-heading text-foreground mb-2.5"> {/* Changed to text-foreground */}
+        <h1 className="font-heading text-accent mb-2.5"> 
           Admin Dashboard
         </h1>
         <p className="max-w-[700px] mx-auto text-muted-foreground md:text-lg mb-5 leading-relaxed">
@@ -34,9 +34,10 @@ export default function AdminPortalPage() {
                 <li className="flex items-center text-base"><Database className="h-4 w-4 mr-2 text-primary"/>View & Manage Database Records</li>
                 <li className="flex items-center text-base"><Settings className="h-4 w-4 mr-2 text-primary"/>Platform Configuration & Settings</li>
              </ul>
+            {/* This button now links to /admin/login. The login page will handle redirection to /admin/dashboard */}
             <Button asChild size="lg" className={cn(buttonVariants({variant: 'default'}), "w-full shadow-lg hover:shadow-xl transition-shadow mt-4 rounded-full text-base py-3 bg-primary text-primary-foreground hover:bg-primary/90")}>
               <Link href="/admin/login">
-                <span>Admin Login</span>
+                <span>Access Admin Portal</span>
               </Link>
             </Button>
           </CardContent>
