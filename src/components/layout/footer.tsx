@@ -1,13 +1,12 @@
 
 import Link from 'next/link';
-import { Gem } from 'lucide-react'; 
+import Image from 'next/image'; 
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
-  const footerLinkClasses = "text-muted-foreground transition-colors hover:text-primary hover:underline underline-offset-4 text-xs";
+  const footerLinkClasses = "text-xs text-muted-foreground transition-colors hover:text-primary hover:underline underline-offset-4";
 
   return (
     <footer className="w-full border-t border-border/20 bg-gradient-to-t from-background via-background to-secondary/10 py-8 mt-auto"> {/* Reduced padding */}
@@ -16,7 +15,7 @@ export function Footer() {
           {/* Logo and Description */}
           <div className="md:col-span-4 flex flex-col items-center md:items-start gap-2 text-center md:text-left"> {/* Reduced gap */}
             <Link href="/" className="flex items-center space-x-2 mb-1.5"> {/* Reduced mb */}
-               <Image src="/logo.png" alt="Goldsmith Connect Logo" width={28} height={28} className="h-7 w-7" />
+               <Image src="/logo.png" alt="Goldsmith Connect Logo" width={28} height={28} className="h-7 w-7 text-primary" />
                <div className="flex flex-col">
                 <span className="font-semibold text-lg text-accent">Goldsmith Connect</span>
                 <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
