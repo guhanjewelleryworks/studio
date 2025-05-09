@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from "@/components/ui/toaster";
-import { FloatingContactButton } from '@/components/layout/FloatingContactButton'; // Added import
+// import { FloatingContactButton } from '@/components/layout/FloatingContactButton'; // Added import
 import '@/lib/firebase/firebase'; // Initialize Firebase
 
 const geistSans = GeistSans;
