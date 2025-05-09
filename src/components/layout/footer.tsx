@@ -15,7 +15,7 @@ export function Footer() {
           {/* Logo and Description */}
           <div className="md:col-span-4 flex flex-col items-center md:items-start gap-2 text-center md:text-left"> {/* Reduced gap */}
             <Link href="/" className="flex items-center space-x-2 mb-1.5"> {/* Reduced mb */}
-               <Image src="/logo.png" alt="Goldsmith Connect Logo" width={28} height={28} className="h-7 w-7 text-primary" />
+               <Image src="/new_logo.png" alt="Goldsmith Connect Logo" width={28} height={28} className="h-7 w-7 text-primary" />
                <div className="flex flex-col">
                 <span className="font-semibold text-lg text-accent">Goldsmith Connect</span>
                 <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
