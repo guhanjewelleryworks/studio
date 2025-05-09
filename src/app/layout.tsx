@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from "@/components/ui/toaster";
-// import { FloatingContactButton } from '@/components/layout/FloatingContactButton'; // Added import
 import '@/lib/firebase/firebase'; // Initialize Firebase
 
 const geistSans = GeistSans;
@@ -48,7 +47,6 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
-        <FloatingContactButton /> {/* Added component */}
         <Toaster />
       </body>
     </html>
