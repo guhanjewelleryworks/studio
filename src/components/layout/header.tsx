@@ -16,7 +16,7 @@ export function Header() {
         <div className="mr-6 hidden md:flex items-center">
           <Link href="/" className="mr-8 flex items-center space-x-2">
             {/* <Gem className="h-7 w-7 text-primary" /> Reverted to Gem icon */}
-            { <Image src="/new_logo.png" alt="Goldsmith Connect Logo" width={36} height={36} className="h-9 w-9 text-primary" /> }
+            { <Image src="/logo_header.png" alt="Goldsmith Connect Logo" width={36} height={36} className="h-9 w-9 text-primary" /> }
             <div className="flex flex-col">
               <span className="font-bold text-lg text-accent">
                 Goldsmith Connect
@@ -48,7 +48,7 @@ export function Header() {
                   className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
                 >
                   {/* <Gem className="h-7 w-7 text-primary" /> Reverted to Gem icon */}
-                  <Image src="/new_logo.png" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary" />
+                  <Image src="/logo_header.png" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary" />
                   <div className="flex flex-col">
                     <span className="font-bold text-lg text-accent">Goldsmith Connect</span>
                     <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
@@ -75,7 +75,7 @@ export function Header() {
 
           <Link href="/" className="flex items-center space-x-2">
             {/* <Gem className="h-7 w-7 text-primary md:hidden" /> Reverted to Gem icon for mobile center logo */}
-            <Image src="/new_logo.png" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary md:hidden" />
+            <Image src="/logo_header.png" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary md:hidden" />
             <div className="flex flex-col md:hidden"> {/* md:hidden to hide on larger screens where full logo is shown */}
               <span className="font-bold text-lg text-accent">
                 Goldsmith Connect
