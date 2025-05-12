@@ -1,16 +1,13 @@
 // src/app/admin/reports/page.tsx
+import dynamic from 'next/dynamic';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart3, ArrowLeft, Download, FileText } from 'lucide-react';
 import Link from 'next/link';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Label } from '@/components/ui/label';
+// Label is often a client component but usually safe for SSR. If it causes issues, it can also be dynamic.
+import { Label } from '@/components/ui/label'; 
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 const reportTypes = [
     { value: "user_activity", label: "User Activity Report" },
@@ -18,6 +15,22 @@ const reportTypes = [
     { value: "goldsmith_performance", label: "Goldsmith Performance Report" },
     { value: "platform_traffic", label: "Platform Traffic Analysis" },
 ];
+
+// Dynamically import components that might cause issues with static export
+const DynamicSelect = dynamic(() => import('@/components/ui/select').then(mod => mod.Select), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-10 w-full md:w-[300px]" />
+});
+const DynamicSelectTrigger = dynamic(() => import('@/components/ui/select').then(mod => mod.SelectTrigger), { ssr: false });
+const DynamicSelectValue = dynamic(() => import('@/components/ui/select').then(mod => mod.SelectValue), { ssr: false });
+const DynamicSelectContent = dynamic(() => import('@/components/ui/select').then(mod => mod.SelectContent), { ssr: false });
+const DynamicSelectItem = dynamic(() => import('@/components/ui/select').then(mod => mod.SelectItem), { ssr: false });
+
+const DynamicInput = dynamic(() => import('@/components/ui/input').then(mod => mod.Input), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-10 w-full" />
+});
+
 
 export default function AdminReportsPage() {
   return (
@@ -45,24 +58,23 @@ export default function AdminReportsPage() {
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="report-type" className="text-foreground">Select Report Type</Label>
-            <Select>
-                <SelectTrigger id="report-type" className="w-full md:w-[300px] text-foreground">
-                    <SelectValue placeholder="Choose a report..." />
-                </SelectTrigger>
-                <SelectContent>
+            <DynamicSelect>
+                <DynamicSelectTrigger id="report-type" className="w-full md:w-[300px] text-foreground">
+                    <DynamicSelectValue placeholder="Choose a report..." />
+                </DynamicSelectTrigger>
+                <DynamicSelectContent>
                     {reportTypes.map(report => (
-                        <SelectItem key={report.value} value={report.value}>{report.label}</SelectItem>
+                        <DynamicSelectItem key={report.value} value={report.value}>{report.label}</DynamicSelectItem>
                     ))}
-                </SelectContent>
-            </Select>
+                </DynamicSelectContent>
+            </DynamicSelect>
           </div>
 
-          {/* Placeholder for date range pickers or other filters */}
           <div className="space-y-2">
             <Label className="text-foreground">Date Range (Placeholder)</Label>
             <div className="flex gap-2">
-                <Input type="date" className="text-foreground" />
-                <Input type="date" className="text-foreground" />
+                <DynamicInput type="date" className="text-foreground" />
+                <DynamicInput type="date" className="text-foreground" />
             </div>
           </div>
           
