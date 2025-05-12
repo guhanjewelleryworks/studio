@@ -1,10 +1,13 @@
+'use client';
 
+import type { SVGProps } from 'react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Search, ShieldCheck, Gift, MapPin, Handshake, UserCheck, TrendingUp, Gem } from 'lucide-react'; // Added TrendingUp, Gem
+import { Search, ShieldCheck, Gift, MapPin, Handshake, UserCheck, Gem } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
 
 // Subtle pattern for hero section
@@ -33,27 +36,65 @@ const metalPricesData = [
   { metal: "Platinum", price: "$1,050/oz", change: "+0.05%", icon: Gem },
 ];
 
-const SingleMetalPriceCard = ({ prices }: { prices: typeof metalPricesData }) => (
-  <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-md hover:shadow-lg transition-shadow rounded-lg mb-4 w-full sm:max-w-xs">
-    <CardHeader className="pb-2 pt-3 px-4">
-      <CardTitle className="text-sm font-semibold text-accent uppercase tracking-wider text-center">Precious Metal Prices</CardTitle>
-    </CardHeader>
-    <CardContent className="px-4 pb-3 pt-1 space-y-1.5">
-      {prices.map(metal => (
-        <div key={metal.metal} className="flex justify-between items-center text-xs">
-          <div className="flex items-center">
-            <metal.icon className="h-3.5 w-3.5 text-primary mr-1.5" />
-            <span className="text-foreground/80">{metal.metal}:</span>
+interface MetalPrice {
+  metal: string;
+  price: string;
+  change: string;
+  icon: React.ElementType<SVGProps<SVGSVGElement>>;
+}
+
+interface MetalPricesWidgetProps {
+  prices: MetalPrice[];
+}
+
+const MetalPricesWidget: React.FC<MetalPricesWidgetProps> = ({ prices }) => {
+  const [currentDateTime, setCurrentDateTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    const now = new Date();
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'Asia/Kolkata',
+    };
+    const timeOptions: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZone: 'Asia/Kolkata',
+    };
+    const formattedDate = now.toLocaleDateString('en-IN', dateOptions);
+    const formattedTime = now.toLocaleTimeString('en-IN', timeOptions);
+    setCurrentDateTime(`Prices - ${formattedDate} - ${formattedTime}`);
+  }, []);
+
+
+  return (
+    <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-md hover:shadow-lg transition-shadow rounded-lg w-full sm:max-w-xs">
+      <CardHeader className="pb-2 pt-3 px-4">
+        <CardTitle className="text-xs font-semibold text-accent uppercase tracking-wider text-center">
+          {currentDateTime || 'Loading prices...'}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-4 pb-3 pt-1 space-y-1.5">
+        {prices.map(metal => (
+          <div key={metal.metal} className="flex justify-between items-center text-xs">
+            <div className="flex items-center">
+              <metal.icon className="h-3.5 w-3.5 text-primary mr-1.5" />
+              <span className="text-foreground/80">{metal.metal}:</span>
+            </div>
+            <div className='text-right'>
+              <span className="font-semibold text-foreground">{metal.price}</span>
+              <span className={`ml-1.5 text-[0.65rem] ${metal.change.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>{metal.change}</span>
+            </div>
           </div>
-          <div className='text-right'>
-            <span className="font-semibold text-foreground">{metal.price}</span>
-            <span className={`ml-1.5 text-[0.65rem] ${metal.change.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>{metal.change}</span>
-          </div>
-        </div>
-      ))}
-    </CardContent>
-  </Card>
-);
+        ))}
+      </CardContent>
+    </Card>
+  );
+};
 
 
 export default function Home() {
@@ -76,8 +117,10 @@ export default function Home() {
         <HeroPattern />
         <div className="container px-4 md:px-6 relative z-10">
           <div className="grid gap-4 lg:grid-cols-[1fr_500px] lg:gap-6 xl:grid-cols-[1fr_550px] items-center"> {/* Adjusted gap */}
-            <div className="flex flex-col justify-center space-y-2"> {/* Reduced space-y */}
-              <SingleMetalPriceCard prices={metalPricesData} />
+            <div className="flex flex-col justify-center"> {/* Removed space-y-2 here */}
+              <div className="mb-3"> {/* Added margin-bottom to price card for spacing */}
+                 <MetalPricesWidget prices={metalPricesData} />
+              </div>
               <div className="space-y-1.5"> {/* Reduced space-y */}
                 <h1 className="font-heading text-accent leading-tight text-3xl sm:text-4xl xl:text-5xl/none"> {/* Use text-accent */}
                   Discover Local Goldsmiths,
@@ -169,7 +212,7 @@ export default function Home() {
                     data-ai-hint={goldsmith.dataAiHint}
                   />
                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2.5"> {/* Reduced p */}
-                    <h3 className="text-md font-semibold text-white">{goldsmith.name}</h3> {/* Use text-white for overlay */}
+                    <h3 className="text-md font-semibold text-primary-foreground">{goldsmith.name}</h3> {/* Use text-white for overlay */}
                   </div>
                 </CardHeader>
                 <CardContent className="p-2.5 text-left space-y-0.5"> {/* Reduced p */}
