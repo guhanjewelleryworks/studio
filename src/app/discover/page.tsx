@@ -12,6 +12,7 @@ import { Link as LinkIcon } from 'lucide-react';
 import Image from 'next/image';
 import NextLink from 'next/link';
 import { cn } from '@/lib/utils';
+import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions'; // Server Action
 
 // Placeholder for Map Component
 const MapPlaceholder = ({ locations }: { locations: Location[] }) => (
@@ -26,19 +27,11 @@ const MapPlaceholder = ({ locations }: { locations: Location[] }) => (
 export default function DiscoverPage() {
   const [viewMode, setViewMode] = useState<'map' | 'list'>('list');
   const [searchTerm, setSearchTerm] = useState('');
-  const [allGoldsmiths, setAllGoldsmiths] = useState<Goldsmith[]>([]); // Holds combined mock and localStorage goldsmiths
-  const [displayedGoldsmiths, setDisplayedGoldsmiths] = useState<Goldsmith[]>([]); // Holds goldsmiths to display after filtering
+  const [allGoldsmiths, setAllGoldsmiths] = useState<Goldsmith[]>([]); 
+  const [displayedGoldsmiths, setDisplayedGoldsmiths] = useState<Goldsmith[]>([]); 
   const [isLoading, setIsLoading] = useState(true);
   const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const mockGoldsmiths: Goldsmith[] = [
-    { id: 'artisan-1', name: 'Lumière Jewels', address: '123 Diamond St, Cityville', specialty: ['Engagement Rings'], rating: 4.9, imageUrl: 'https://picsum.photos/seed/lumiere-discover/400/300', location: { lat: 34.0522, lng: -118.2437 }, shortBio: 'Crafting timeless elegance with ethically sourced diamonds and gemstones.' },
-    { id: 'artisan-2', name: 'Aura & Gold', address: '456 Sapphire Ave, Townsville', specialty: ['Custom Pendants'], rating: 4.7, imageUrl: 'https://picsum.photos/seed/aura-discover/400/300', location: { lat: 34.0530, lng: -118.2445 }, shortBio: 'Unique, handcrafted pendants that tell your personal story with artistry.' },
-    { id: 'artisan-3', name: 'Heritage Metalsmiths', address: '789 Ruby Ln, Villagetown', specialty: ['Antique Restoration'], rating: 4.8, imageUrl: 'https://picsum.photos/seed/heritage-discover/400/300', location: { lat: 34.0515, lng: -118.2430 }, shortBio: 'Preserving history through expert restoration of antique and heirloom jewelry.' },
-    { id: 'artisan-4', name: 'Elysian Gems', address: '101 Emerald Rd, Hamlet City', specialty: ['Necklaces & Bracelets'], rating: 4.6, imageUrl: 'https://picsum.photos/seed/elysian-discover/400/300', location: { lat: 34.0540, lng: -118.2450 }, shortBio: 'Elegant necklaces and bracelets designed to adorn and inspire.' },
-  ];
-
 
   useEffect(() => {
     setIsLoading(true);
@@ -54,40 +47,20 @@ export default function DiscoverPage() {
       }
     );
 
-    // Load goldsmiths from localStorage
-    let storedGoldsmiths: Goldsmith[] = [];
-    if (typeof window !== 'undefined') { // Ensure localStorage is accessed only on the client
-        const storedData = localStorage.getItem('goldsmiths-data');
-        if (storedData) {
-          try {
-            storedGoldsmiths = JSON.parse(storedData);
-          } catch (e) {
-            console.error("Error parsing goldsmiths from localStorage", e);
-          }
-        }
-    }
+    const loadGoldsmiths = async () => {
+      try {
+        const fetchedGoldsmiths = await fetchAllGoldsmiths();
+        setAllGoldsmiths(fetchedGoldsmiths);
+        setDisplayedGoldsmiths(fetchedGoldsmiths); // Initially display all
+      } catch (e) {
+        console.error("Error fetching goldsmiths from database", e);
+        setError("Failed to load goldsmiths. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    // Combine mock and stored goldsmiths, ensuring no duplicates by ID
-    const combinedGoldsmithsMap = new Map<string, Goldsmith>();
-    mockGoldsmiths.forEach(g => combinedGoldsmithsMap.set(g.id, g));
-    storedGoldsmiths.forEach(sg => {
-        // Ensure stored goldsmiths have default values for optional fields if missing
-        const completeStoredGoldsmith: Goldsmith = {
-            rating: 0, // Default rating
-            imageUrl: `https://picsum.photos/seed/${sg.id}/400/300`, // Default image
-            profileImageUrl: `https://picsum.photos/seed/${sg.id}-profile/120/120`, // Default profile image
-            location: sg.location || { lat: 34.0522, lng: -118.2437 }, // Default location
-            shortBio: sg.shortBio || `Specializing in ${Array.isArray(sg.specialty) ? sg.specialty.join(', ') : sg.specialty}`,
-            ...sg, // Spread the stored goldsmith to override defaults if present
-        };
-        combinedGoldsmithsMap.set(sg.id, completeStoredGoldsmith);
-    });
-
-
-    const combinedGoldsmiths = Array.from(combinedGoldsmithsMap.values());
-    setAllGoldsmiths(combinedGoldsmiths);
-    setDisplayedGoldsmiths(combinedGoldsmiths); // Initially display all
-    setIsLoading(false);
+    loadGoldsmiths();
 
   }, []);
 
@@ -96,7 +69,8 @@ export default function DiscoverPage() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    setTimeout(() => {
+    // Simulate search delay for better UX, in real app filtering might be faster or done server-side
+    setTimeout(() => { 
        const filtered = allGoldsmiths.filter(g => {
          const searchTermLower = searchTerm.toLowerCase();
          const nameMatch = g.name.toLowerCase().includes(searchTermLower);
@@ -113,7 +87,7 @@ export default function DiscoverPage() {
        if (filtered.length === 0) {
          setError(`No goldsmiths found matching "${searchTerm}". Try a different term.`);
        }
-     }, 500);
+     }, 300); // Reduced delay
   };
 
   const goldsmithLocations = displayedGoldsmiths.map(g => g.location).filter(loc => loc !== undefined) as Location[];
@@ -122,7 +96,7 @@ export default function DiscoverPage() {
   return (
     <div className="container py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)]"> {/* Reduced py */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-6"> {/* Reduced gap and mb */}
-        <h1 className="text-3xl font-heading text-foreground tracking-tight">Find a Goldsmith</h1> {/* Changed to text-foreground */}
+        <h1 className="text-3xl font-heading text-accent tracking-tight">Find a Goldsmith</h1> {/* Use text-accent */}
         <div className="flex gap-2">
           <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} aria-label="List View" className="rounded-lg px-4 py-2 text-sm shadow-md">
             <List className="mr-1.5 h-4 w-4" /> List
@@ -145,7 +119,7 @@ export default function DiscoverPage() {
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
             <span className="sr-only">Filters</span>
         </Button>
-        <Button type="submit" disabled={isLoading} size="default" className="rounded-lg px-6 py-2 text-sm w-full sm:w-auto shadow-md bg-primary hover:bg-primary/90 text-primary-foreground">
+        <Button type="submit" disabled={isLoading && displayedGoldsmiths.length === 0} size="default" className="rounded-lg px-6 py-2 text-sm w-full sm:w-auto shadow-md bg-primary hover:bg-primary/90 text-primary-foreground">
           {isLoading && displayedGoldsmiths.length === 0 ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Search className="mr-1.5 h-4 w-4" />}
           Search
         </Button>
@@ -218,4 +192,3 @@ export default function DiscoverPage() {
     </div>
   );
 }
-

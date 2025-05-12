@@ -10,16 +10,21 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
     ```
 
 2.  **Environment Variables:**
-    *   Create a `.env` file in the project root.
-    *   If using Genkit features, add your Google Generative AI API key:
+    *   Create a `.env` file in the project root (or `.env.local` for local development, which should be in `.gitignore`).
+    *   **MongoDB Connection:** Add your MongoDB connection string (preferably from MongoDB Atlas):
+        ```env
+        MONGODB_URI="your_mongodb_connection_string_here"
         ```
-        GOOGLE_GENAI_API_KEY=YOUR_API_KEY
+        Replace `your_mongodb_connection_string_here` with your actual connection string, including your username, password, cluster address, and database name. Example: `mongodb+srv://user:password@cluster.mongodb.net/goldsmith_connect_db?retryWrites=true&w=majority`
+    *   If using Genkit features, add your Google Generative AI API key:
+        ```env
+        GOOGLE_GENAI_API_KEY=YOUR_API_KEY_HERE
         ```
     *   For real-time metal prices, add your chosen API provider's key:
+        ```env
+        NEXT_PUBLIC_METALS_API_KEY=YOUR_METALS_API_KEY_HERE
         ```
-        NEXT_PUBLIC_METALS_API_KEY=YOUR_METALS_API_KEY
-        ```
-        (Note: Using `NEXT_PUBLIC_` prefix makes it available on the client-side. If your API is called server-side only, you might not need the prefix, but for a widget often updated client-side, it's common.)
+
 
 3.  **Run Development Server:**
     ```bash
@@ -68,9 +73,10 @@ Follow the steps provided in the AWS EC2 deployment guide. Key steps involve:
 2.  Connecting via SSH.
 3.  Installing Node.js, npm, and PM2.
 4.  Transferring the application code to the EC2 instance (e.g., via `git clone`).
-5.  Running `npm install` and `npm run build`.
-6.  Starting the app with PM2: `pm2 start npm --name "goldsmith-connect" -- start`.
-7.  Configuring a reverse proxy like Nginx.
-8.  Setting up HTTPS with Certbot.
+5.  Setting up environment variables on the EC2 instance (e.g., in a `.env.production` file or through PM2 ecosystem file), including `MONGODB_URI`.
+6.  Running `npm install` and `npm run build`.
+7.  Starting the app with PM2: `pm2 start npm --name "goldsmith-connect" -- start`.
+8.  Configuring a reverse proxy like Nginx.
+9.  Setting up HTTPS with Certbot.
 
 Refer to the detailed guide for specific commands and configurations.

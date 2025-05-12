@@ -1,80 +1,57 @@
 // src/app/goldsmith/[id]/page.tsx
 'use client';
 
-import type { Goldsmith as GoldsmithProfile } from '@/types/goldsmith';
-import * as React from 'react'; 
+import type { Goldsmith as GoldsmithProfileType } from '@/types/goldsmith';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Label } from '@/components/ui/label';
-import { MapPin, Star, MessageSquare, Send, ShieldCheck, Sparkles, Award, Eye, User, Edit3, Paperclip, ImagePlus } from "lucide-react"; // Added Paperclip, ImagePlus
+import { Label } from '@/components/ui/label'; // Corrected: Ensure Label is imported
+import { MapPin, Star, MessageSquare, Send, ShieldCheck, Sparkles, Award, Eye, User, Edit3, ImagePlus } from "lucide-react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect, use } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { fetchGoldsmithById } from '@/actions/goldsmith-actions'; // Server Action
 
 interface PageParams {
   id: string;
 }
 
-const fetchGoldsmithProfile = async (id: string): Promise<GoldsmithProfile | null> => {
-  console.log("Fetching profile for ID:", id);
-  await new Promise(resolve => setTimeout(resolve, 700));
-
-  const mockProfiles: { [key: string]: GoldsmithProfile } = {
-      'artisan-1': { id: 'artisan-1', name: 'Lumière Jewels', tagline: "Crafting Brilliance, One Gem at a Time", address: '123 Diamond St, Cityville', specialty: ['Engagement Rings', 'Custom Designs', 'Ethically Sourced Gems'], rating: 4.9, bio: 'At Lumière Jewels, we believe every piece of jewelry tells a story. With over 20 years of experience, our master artisans dedicate themselves to crafting unique and timeless pieces that capture life\'s most precious moments. We specialize in bespoke engagement rings and fine jewelry, using only ethically sourced diamonds and gemstones to ensure beauty with a conscience.', profileImageUrl: 'https://picsum.photos/seed/lumiere-profile/120/120', portfolioImages: ['https://picsum.photos/seed/lumiere-work1/600/450', 'https://picsum.photos/seed/lumiere-work2/600/450', 'https://picsum.photos/seed/lumiere-work3/600/450'], yearsExperience: 22, certifications: ['GIA Graduate Gemologist'], responseTime: 'Within 24 hours', ordersCompleted: 150, location: { lat: 34.0522, lng: -118.2437 }, shortBio: 'Crafting timeless elegance with ethically sourced diamonds and gemstones.' },
-      'artisan-2': { id: 'artisan-2', name: 'Aura & Gold', tagline: "Your Story, Forged in Gold", address: '456 Sapphire Ave, Townsville', specialty: ['Custom Pendants', 'Personalized Necklaces', 'Gold & Platinum'], rating: 4.7, bio: 'Aura & Gold blends modern design sensibilities with traditional goldsmithing techniques. We specialize in creating personalized pendants and necklaces that reflect your unique aura. Each piece is meticulously handcrafted to become a cherished extension of your identity.', profileImageUrl: 'https://picsum.photos/seed/aura-profile/120/120', portfolioImages: ['https://picsum.photos/seed/aura-work1/600/450', 'https://picsum.photos/seed/aura-work2/600/450'], yearsExperience: 15, responseTime: '1-2 business days', ordersCompleted: 85, location: { lat: 34.0530, lng: -118.2445 }, shortBio: 'Unique, handcrafted pendants that tell your personal story with artistry.' },
-      'artisan-3': { id: 'artisan-3', name: 'Heritage Metalsmiths', tagline: "Preserving Legacies, Restoring Beauty", address: '789 Ruby Ln, Villagetown', specialty: ['Antique Restoration', 'Heirloom Redesign', 'Intricate Repairs'], rating: 4.8, bio: 'Heritage Metalsmiths is dedicated to the art of jewelry restoration and preservation. We are experts in bringing heirlooms and antique pieces back to their former glory, combining meticulous care with profound respect for craftsmanship of the past.', profileImageUrl: 'https://picsum.photos/seed/heritage-profile/120/120', portfolioImages: ['https://picsum.photos/seed/heritage-work1/600/450', 'https://picsum.photos/seed/heritage-work2/600/450', 'https://picsum.photos/seed/heritage-work3/600/450', 'https://picsum.photos/seed/heritage-work4/600/450'], yearsExperience: 30, certifications: ['Master Goldsmith Certification'], responseTime: 'Within 48 hours', ordersCompleted: 200, location: { lat: 34.0515, lng: -118.2430 }, shortBio: 'Preserving history through expert restoration of antique and heirloom jewelry.' },
-       'default': { id: 'default', name: 'Example Goldsmith', tagline: "Artistry in Every Detail", address: '1 Example Rd, Sample City', specialty: ['General Craftsmanship', 'Fine Repairs'], rating: 4.2, bio: 'This is a sample profile for a talented goldsmith, showcasing a commitment to quality and artistry in every piece created or restored.', profileImageUrl: 'https://picsum.photos/seed/goldsmith-default-profile/120/120', portfolioImages: ['https://picsum.photos/seed/goldsmith-default-work1/600/450'], responseTime: 'Varies', ordersCompleted: 30, location: { lat: 34.0540, lng: -118.2450 }, shortBio: 'Elegant necklaces and bracelets designed to adorn and inspire.' }
+// Helper function to ensure profile has all necessary fields with defaults
+const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id: string): GoldsmithProfileType | null => {
+  if (!profile) return null;
+  return {
+    id: profile.id || id,
+    name: profile.name || "Goldsmith Name Not Available",
+    address: profile.address || "Address Not Available",
+    specialty: profile.specialty || ["Fine Jewelry"],
+    rating: profile.rating || 0,
+    imageUrl: profile.imageUrl || `https://picsum.photos/seed/${id}-discover/400/300`,
+    profileImageUrl: profile.profileImageUrl || `https://picsum.photos/seed/${id}-profile/120/120`,
+    location: profile.location || { lat: 34.0522, lng: -118.2437 }, // Default location
+    shortBio: profile.shortBio || `Specializing in ${Array.isArray(profile.specialty) ? profile.specialty.join(', ') : profile.specialty || 'fine jewelry'}.`,
+    tagline: profile.tagline || "Bespoke Creations",
+    bio: profile.bio || "Talented artisan ready to create your unique piece.",
+    portfolioImages: profile.portfolioImages || [`https://picsum.photos/seed/${id}-work-default/600/450`],
+    yearsExperience: profile.yearsExperience || 0,
+    certifications: profile.certifications || [],
+    responseTime: profile.responseTime || "Within 2 business days",
+    ordersCompleted: profile.ordersCompleted || 0,
+    ...profile, // Spread the fetched profile to override defaults if present
   };
-  
-  // Attempt to load from localStorage first
-  if (typeof window !== 'undefined') {
-    const storedData = localStorage.getItem('goldsmiths-data');
-    if (storedData) {
-      try {
-        const storedGoldsmiths: GoldsmithProfile[] = JSON.parse(storedData);
-        const foundProfile = storedGoldsmiths.find(g => g.id === id);
-        if (foundProfile) {
-          // Ensure all optional fields have defaults if not present in stored data
-          const completeProfile: GoldsmithProfile = {
-            tagline: "Bespoke Creations",
-            bio: "Talented artisan ready to create your unique piece.",
-            portfolioImages: [`https://picsum.photos/seed/${id}-work-default/600/450`],
-            yearsExperience: 1,
-            certifications: [],
-            responseTime: "Within 2 days",
-            ordersCompleted: 1,
-            ...foundProfile, // Spread stored profile to override defaults
-            profileImageUrl: foundProfile.profileImageUrl || `https://picsum.photos/seed/${id}-profile/120/120`,
-            imageUrl: foundProfile.imageUrl || `https://picsum.photos/seed/${id}/400/300`,
-            location: foundProfile.location || { lat: 34.0522, lng: -118.2437 },
-            shortBio: foundProfile.shortBio || `Specializing in ${Array.isArray(foundProfile.specialty) ? foundProfile.specialty.join(', ') : foundProfile.specialty || 'fine jewelry'}`
-          };
-          return completeProfile;
-        }
-      } catch (e) {
-        console.error("Error parsing goldsmiths from localStorage for profile page", e);
-      }
-    }
-  }
-
-  return mockProfiles[id] || mockProfiles['default'];
 };
 
 
-// Make the component accept a promise for params
 export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
-  const params = use(paramsPromise);
-  const { id } = params; // Accessing id directly
+  const params = use(paramsPromise); // Correctly use `use` hook
+  const { id } = params;
 
-  const [profile, setProfile] = useState<GoldsmithProfile | null>(null);
+  const [profile, setProfile] = useState<GoldsmithProfileType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -91,9 +68,11 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
       setIsLoading(true);
       setError(null);
       try {
-        const fetchedProfile = await fetchGoldsmithProfile(id);
-        if (fetchedProfile) {
-          setProfile(fetchedProfile);
+        const fetchedProfileData = await fetchGoldsmithById(id);
+        const completeProfile = ensureCompleteProfile(fetchedProfileData, id);
+
+        if (completeProfile) {
+          setProfile(completeProfile);
         } else {
           setError("Goldsmith profile not found.");
         }
@@ -174,21 +153,25 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
      }
      description += ' You will be notified once confirmed.';
 
+     // TODO: Implement actual server action to send this data to admin
+     console.log("Introduction Request:", { contactName, contactEmail, contactMessage, imageName: selectedImage?.name, goldsmithId: profile.id });
+
      toast({
-        title: 'Introduction Request Sent',
+        title: 'Introduction Request Sent (Simulated)',
         description: description,
-        duration: 7000, // Increased duration for longer message
+        duration: 7000, 
       });
-      // Reset form fields and image preview
       form.reset();
       setSelectedImage(null);
       setImagePreview(null);
    };
 
    const handleRequestCustomOrder = () => {
+    // TODO: Implement actual server action for custom order request
+     console.log("Custom Order Request for:", profile.name, "ID:", profile.id);
      toast({
-        title: 'Custom Order Request Submitted',
-        description: 'Your custom order request has been submitted to an administrator for review. They will contact you or the goldsmith soon.',
+        title: 'Custom Order Request Submitted (Simulated)',
+        description: `Your custom order request for ${profile.name} has been sent. An admin will review it.`,
         duration: 5000,
       });
    };
@@ -196,8 +179,8 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
   return (
     <div className="container py-10 md:py-14 px-4 md:px-6 bg-background text-foreground">
-        <Alert variant="default" className="mb-6 border-accent/50 text-accent-foreground bg-accent/10 rounded-lg p-3 shadow-sm">
-          <ShieldCheck className="h-4 w-4 !text-accent mr-1.5" />
+        <Alert variant="default" className="mb-6 border-accent/50 text-accent-foreground bg-accent/10 rounded-lg p-3 shadow-sm"> {/* Reduced mb and p */}
+          <ShieldCheck className="h-4 w-4 !text-accent mr-1.5" /> {/* Reduced mr */}
           <AlertTitle className="font-poppins font-semibold text-sm text-foreground">Secure & Mediated Connection</AlertTitle>
           <AlertDescription className="text-xs mt-0.5 text-muted-foreground">
             All initial communications and custom order requests are facilitated through Goldsmith Connect administrators.
