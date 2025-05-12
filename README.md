@@ -25,7 +25,6 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
         NEXT_PUBLIC_METALS_API_KEY=YOUR_METALS_API_KEY_HERE
         ```
 
-
 3.  **Run Development Server:**
     ```bash
     npm run dev
@@ -37,6 +36,50 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
     ```bash
     npm run genkit:watch
     ```
+
+## Connecting to MongoDB
+
+To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
+
+1.  **Create a MongoDB Atlas Account and Cluster:**
+    *   Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and sign up for a free account (or log in if you already have one).
+    *   Create a new project.
+    *   Build a new cluster. The free tier (M0 Sandbox) is sufficient for development and small applications. Choose your preferred cloud provider and region.
+    *   Wait for the cluster to be provisioned (this might take a few minutes).
+
+2.  **Configure Database Access:**
+    *   In your Atlas cluster, navigate to "Database Access" under the "Security" section.
+    *   Click "Add New Database User".
+    *   Create a username and password. **Store these credentials securely.** Choose "Read and write to any database" as the user privilege (or more specific privileges if you prefer).
+    *   Click "Add User".
+
+3.  **Configure Network Access:**
+    *   In your Atlas cluster, navigate to "Network Access" under the "Security" section.
+    *   Click "Add IP Address".
+    *   For development, you can "Allow Access From Anywhere" (0.0.0.0/0). **For production, it's highly recommended to add specific IP addresses or ranges that will access your database (e.g., your application server's IP).**
+    *   Click "Confirm".
+
+4.  **Get Your Connection String:**
+    *   In your Atlas cluster, navigate to "Database" (or "Clusters").
+    *   Click the "Connect" button for your cluster.
+    *   Choose "Drivers" (or "Connect your application").
+    *   Select "Node.js" as your driver and the latest version.
+    *   You will see a connection string similar to this:
+        `mongodb+srv://<username>:<password>@<cluster-address>/<database-name>?retryWrites=true&w=majority`
+    *   **Copy this connection string.**
+
+5.  **Set the MONGODB_URI Environment Variable:**
+    *   In your project's `.env` file (create one if it doesn't exist at the root of your project), add the connection string:
+        ```env
+        MONGODB_URI="mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER_ADDRESS/YOUR_DATABASE_NAME?retryWrites=true&w=majority"
+        ```
+    *   **Replace `YOUR_USERNAME`, `YOUR_PASSWORD`, `YOUR_CLUSTER_ADDRESS`, and `YOUR_DATABASE_NAME` with your actual credentials and cluster details.**
+        *   `YOUR_DATABASE_NAME` can be any name you choose for your database (e.g., `goldsmith_connect_db`). MongoDB will create it if it doesn't exist.
+
+6.  **Restart Your Application:**
+    *   If your application is running, restart it to pick up the new environment variable.
+
+Now, your Next.js application (`src/lib/mongodb.ts`) will use this connection string to connect to your live MongoDB Atlas database. The existing server actions (like `saveGoldsmith` in `src/actions/goldsmith-actions.ts`) are already set up to use this database connection.
 
 ## Configuring Real-Time Metal Prices
 
