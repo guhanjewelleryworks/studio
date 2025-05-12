@@ -27,15 +27,30 @@ const HeroPattern = () => (
   </div>
 );
 
-const MetalPriceCard = ({ metal, price, change, icon: Icon }: { metal: string, price: string, change: string, icon: React.ElementType }) => (
-  <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-md hover:shadow-lg transition-shadow rounded-lg">
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-2 px-3">
-      <CardTitle className="text-xs font-medium text-accent uppercase tracking-wider">{metal}</CardTitle>
-      <Icon className="h-4 w-4 text-primary" />
+const metalPricesData = [
+  { metal: "Gold (24K)", price: "$2,350/oz", change: "+0.25%", icon: Gem },
+  { metal: "Silver", price: "$29.50/oz", change: "-0.10%", icon: Gem },
+  { metal: "Platinum", price: "$1,050/oz", change: "+0.05%", icon: Gem },
+];
+
+const SingleMetalPriceCard = ({ prices }: { prices: typeof metalPricesData }) => (
+  <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-md hover:shadow-lg transition-shadow rounded-lg mb-4 w-full sm:max-w-xs">
+    <CardHeader className="pb-2 pt-3 px-4">
+      <CardTitle className="text-sm font-semibold text-accent uppercase tracking-wider text-center">Precious Metal Prices</CardTitle>
     </CardHeader>
-    <CardContent className="pb-2 px-3 pt-0">
-      <div className="text-xl font-bold text-foreground">{price}</div>
-      <p className={`text-[0.7rem] ${change.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>{change}</p>
+    <CardContent className="px-4 pb-3 pt-1 space-y-1.5">
+      {prices.map(metal => (
+        <div key={metal.metal} className="flex justify-between items-center text-xs">
+          <div className="flex items-center">
+            <metal.icon className="h-3.5 w-3.5 text-primary mr-1.5" />
+            <span className="text-foreground/80">{metal.metal}:</span>
+          </div>
+          <div className='text-right'>
+            <span className="font-semibold text-foreground">{metal.price}</span>
+            <span className={`ml-1.5 text-[0.65rem] ${metal.change.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>{metal.change}</span>
+          </div>
+        </div>
+      ))}
     </CardContent>
   </Card>
 );
@@ -54,29 +69,15 @@ export default function Home() {
     { icon: Gift, title: "3. Create & Cherish", description: "Collaborate with your chosen artisan. They craft your piece with passion, and you receive your dream jewelry." },
   ];
 
-  const metalPrices = [
-    { metal: "Gold (24K)", price: "$2,350/oz", change: "+0.25%", icon: Gem },
-    { metal: "Silver", price: "$29.50/oz", change: "-0.10%", icon: Gem },
-    { metal: "Platinum", price: "$1,050/oz", change: "+0.05%", icon: Gem },
-  ];
-
   return (
     <div className="flex flex-col items-center bg-background text-foreground">
       {/* Hero Section */}
       <section className="relative w-full py-8 md:py-10 lg:py-12 bg-gradient-to-br from-secondary/30 via-background to-background overflow-hidden"> {/* Adjusted py */}
         <HeroPattern />
         <div className="container px-4 md:px-6 relative z-10">
-          {/* Metal Prices Card Section */}
-          <div className="mb-6 md:mb-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 max-w-3xl mx-auto">
-              {metalPrices.map(metal => (
-                <MetalPriceCard key={metal.metal} metal={metal.metal} price={metal.price} change={metal.change} icon={metal.icon} />
-              ))}
-            </div>
-          </div>
-
           <div className="grid gap-4 lg:grid-cols-[1fr_500px] lg:gap-6 xl:grid-cols-[1fr_550px] items-center"> {/* Adjusted gap */}
             <div className="flex flex-col justify-center space-y-2"> {/* Reduced space-y */}
+              <SingleMetalPriceCard prices={metalPricesData} />
               <div className="space-y-1.5"> {/* Reduced space-y */}
                 <h1 className="font-heading text-accent leading-tight text-3xl sm:text-4xl xl:text-5xl/none"> {/* Use text-accent */}
                   Discover Local Goldsmiths,
@@ -104,7 +105,7 @@ export default function Home() {
             </div>
             <div className="relative mx-auto aspect-[6/5.5] w-full lg:order-last group rounded-xl shadow-xl overflow-hidden border-2 border-primary/10">
               <Image
-                src="https://images.unsplash.com/photo-1610500795055-206091564d31?q=80&w=800&auto=format&fit=crop"
+                src="https://picsum.photos/seed/hero-jewelry/800/600" 
                 alt="Elegant Jewelry Background"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
