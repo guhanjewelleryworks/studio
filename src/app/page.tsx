@@ -1,3 +1,4 @@
+// src/app/page.tsx
 'use client';
 
 import type { SVGProps } from 'react';
@@ -116,8 +117,8 @@ export default function Home() {
       <section className="relative w-full py-8 md:py-10 lg:py-12 bg-gradient-to-br from-secondary/30 via-background to-background overflow-hidden"> {/* Adjusted py */}
         <HeroPattern />
         <div className="container px-4 md:px-6 relative z-10">
-          <div className="grid gap-4 lg:grid-cols-[1fr_500px] lg:gap-6 xl:grid-cols-[1fr_550px] items-center"> {/* Adjusted gap */}
-            <div className="flex flex-col justify-center"> {/* Removed space-y-2 here */}
+          <div className="grid gap-4 lg:grid-cols-[1fr_500px] lg:gap-6 xl:grid-cols-[1fr_550px] items-start"> {/* Changed items-center to items-start */}
+            <div className="flex flex-col justify-start space-y-3"> {/* Changed justify-center to justify-start and added space-y-3 */}
               <div className="mb-3"> {/* Added margin-bottom to price card for spacing */}
                  <MetalPricesWidget prices={metalPricesData} />
               </div>
@@ -272,3 +273,4 @@ export default function Home() {
     </div>
   );
 }
+
