@@ -5,10 +5,10 @@ import type { SVGProps } from 'react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Search, ShieldCheck, Gift, MapPin, Handshake, UserCheck, Gem } from 'lucide-react';
+import { Search, ShieldCheck, Gift, MapPin, Handshake, UserCheck, Gem } from 'lucide-react'; // Gem is already here
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { MetalPricesWidget } from '@/components/metal-prices-widget'; // Import the new widget
 
 
 // Subtle pattern for hero section
@@ -30,72 +30,6 @@ const HeroPattern = () => (
     </svg>
   </div>
 );
-
-const metalPricesData = [
-  { metal: "Gold (24K)", price: "$2,350/oz", change: "+0.25%", icon: Gem },
-  { metal: "Silver", price: "$29.50/oz", change: "-0.10%", icon: Gem },
-  { metal: "Platinum", price: "$1,050/oz", change: "+0.05%", icon: Gem },
-];
-
-interface MetalPrice {
-  metal: string;
-  price: string;
-  change: string;
-  icon: React.ElementType<SVGProps<SVGSVGElement>>;
-}
-
-interface MetalPricesWidgetProps {
-  prices: MetalPrice[];
-}
-
-const MetalPricesWidget: React.FC<MetalPricesWidgetProps> = ({ prices }) => {
-  const [currentDateTime, setCurrentDateTime] = useState<string | null>(null);
-
-  useEffect(() => {
-    const now = new Date();
-    const dateOptions: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      timeZone: 'Asia/Kolkata',
-    };
-    const timeOptions: Intl.DateTimeFormatOptions = {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true,
-      timeZone: 'Asia/Kolkata',
-    };
-    const formattedDate = now.toLocaleDateString('en-IN', dateOptions);
-    const formattedTime = now.toLocaleTimeString('en-IN', timeOptions);
-    setCurrentDateTime(`Prices - ${formattedDate} - ${formattedTime}`);
-  }, []);
-
-
-  return (
-    <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-md hover:shadow-lg transition-shadow rounded-lg w-full sm:max-w-xs">
-      <CardHeader className="pb-2 pt-3 px-4">
-        <CardTitle className="text-xs font-semibold text-accent uppercase tracking-wider text-center">
-          {currentDateTime || 'Loading prices...'}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="px-4 pb-3 pt-1 space-y-1.5">
-        {prices.map(metal => (
-          <div key={metal.metal} className="flex justify-between items-center text-xs">
-            <div className="flex items-center">
-              <metal.icon className="h-3.5 w-3.5 text-primary mr-1.5" />
-              <span className="text-foreground/80">{metal.metal}:</span>
-            </div>
-            <div className='text-right'>
-              <span className="font-semibold text-foreground">{metal.price}</span>
-              <span className={`ml-1.5 text-[0.65rem] ${metal.change.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>{metal.change}</span>
-            </div>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  );
-};
 
 
 export default function Home() {
@@ -119,8 +53,8 @@ export default function Home() {
         <div className="container px-4 md:px-6 relative z-10">
           <div className="grid gap-4 lg:grid-cols-[1fr_500px] lg:gap-6 xl:grid-cols-[1fr_550px] items-start"> {/* Changed items-center to items-start */}
             <div className="flex flex-col justify-start space-y-3"> {/* Changed justify-center to justify-start and added space-y-3 */}
-              <div className="mb-3"> {/* Added margin-bottom to price card for spacing */}
-                 <MetalPricesWidget prices={metalPricesData} />
+              <div className="mb-3 self-start lg:self-auto"> {/* Added self-start for left alignment on small screens */}
+                 <MetalPricesWidget />
               </div>
               <div className="space-y-1.5"> {/* Reduced space-y */}
                 <h1 className="font-heading text-accent leading-tight text-3xl sm:text-4xl xl:text-5xl/none"> {/* Use text-accent */}
@@ -128,28 +62,28 @@ export default function Home() {
                   <br />
                   <span className="text-primary">Craft Your Dreams.</span>
                 </h1>
-                <p className="max-w-[600px] text-foreground/75 md:text-lg leading-relaxed"> {/* Adjusted text size for md */}
+                <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed"> {/* Adjusted text-foreground/75 to text-foreground/85 */}
                   Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row pt-1">
                 <Link
                   href="/discover"
-                  className={cn(buttonVariants({ size: 'lg', variant: 'default' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2.5 text-sm")}  /* Adjusted py and text size */
+                  className={cn(buttonVariants({ size: 'lg', variant: 'default' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2.5 text-base")}  /* Adjusted text size to base */
                 >
                   <span>Find a Goldsmith <MapPin className="ml-1.5 h-4 w-4 inline" /></span> {/* Adjusted icon margin */}
                 </Link>
                 <Link
                   href="/goldsmith-portal"
-                  className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2.5 text-sm")}  /* Adjusted py, text size and hover:text-primary-foreground */
+                  className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2.5 text-base")}  /* Adjusted text size to base and hover:text-primary-foreground */
                 >
                    <span>Join as a Goldsmith <UserCheck className="ml-1.5 h-4 w-4 inline" /></span> {/* Adjusted icon margin */}
                 </Link>
               </div>
             </div>
-            <div className="relative mx-auto aspect-[6/5.5] w-full lg:order-last group rounded-xl shadow-xl overflow-hidden border-2 border-primary/10">
+             <div className="relative mx-auto aspect-[6/5] w-full lg:order-last group rounded-xl shadow-xl overflow-hidden border-2 border-primary/10"> {/* Adjusted aspect ratio to 6/5 from 6/5.5 */}
               <Image
-                src="https://picsum.photos/seed/hero-jewelry/800/600" 
+                src="https://picsum.photos/seed/hero-jewelry-main/800/667" // Adjusted seed for variety
                 alt="Elegant Jewelry Background"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -170,7 +104,7 @@ export default function Home() {
             <div className="space-y-1"> {/* Reduced space-y */}
               <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-xs font-medium text-secondary-foreground shadow-sm">How It Works</div>
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Your Secure Path to Custom Jewelry</h2> {/* Use text-accent */}
-              <p className="max-w-[800px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size */}
+              <p className="max-w-[800px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size and text-foreground/70 to 85 */}
                 We connect you with talented goldsmiths through a verified and mediated process, ensuring quality and trust.
               </p>
             </div>
@@ -183,8 +117,8 @@ export default function Home() {
                     <step.icon className="h-5 w-5" />
                   </div>
                 </div>
-                <h3 className="text-md font-semibold text-accent">{step.title}</h3> {/* Use text-accent */}
-                <p className="text-xs text-foreground/70 leading-relaxed">{step.description}</p>
+                <h3 className="text-md font-heading text-accent">{step.title}</h3> {/* Use text-accent */}
+                <p className="text-xs text-foreground/85 leading-relaxed">{step.description}</p> {/* Adjusted text-foreground/70 to 85 */}
               </div>
             ))}
           </div>
@@ -196,7 +130,7 @@ export default function Home() {
         <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
           <div className="space-y-1.5 mb-4 md:mb-6"> {/* Reduced mb */}
             <h2 className="font-heading text-accent text-2xl sm:text-3xl">Meet Our Talented Artisans</h2> {/* Use text-accent */}
-            <p className="mx-auto max-w-[600px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size */}
+            <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size and text-foreground/70 to 85 */}
               Discover skilled goldsmiths ready to craft your next masterpiece.
             </p>
           </div>
@@ -213,15 +147,15 @@ export default function Home() {
                     data-ai-hint={goldsmith.dataAiHint}
                   />
                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2.5"> {/* Reduced p */}
-                    <h3 className="text-md font-semibold text-primary-foreground">{goldsmith.name}</h3> {/* Use text-white for overlay */}
+                    <h3 className="text-md font-heading text-primary-foreground">{goldsmith.name}</h3> {/* Use text-white for overlay */}
                   </div>
                 </CardHeader>
                 <CardContent className="p-2.5 text-left space-y-0.5"> {/* Reduced p */}
-                  <CardTitle className="text-md text-accent mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Use text-accent */}
-                  <p className="flex items-center text-foreground/70 text-[0.7rem]">
+                  <CardTitle className="text-md font-heading text-accent mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Use text-accent */}
+                  <p className="flex items-center text-foreground/85 text-[0.7rem]"> {/* Adjusted text-foreground/70 to 85 */}
                      <MapPin className="mr-1 h-3 w-3 text-muted-foreground" /> {goldsmith.specialty}
                   </p>
-                  <p className="text-[0.7rem] text-foreground/80 leading-relaxed line-clamp-2">
+                  <p className="text-[0.7rem] text-foreground/85 leading-relaxed line-clamp-2"> {/* Adjusted text-foreground/80 to 85 */}
                     A master of timeless designs and intricate details, located in {goldsmith.location}.
                   </p>
                   <Link href={`/goldsmith/${goldsmith.id}`} className={cn(buttonVariants({ variant: "outline", size: "xs" }), "text-accent border-accent hover:bg-accent/10 mt-1.5 w-full rounded-full text-[0.65rem] py-1")}> {/* Adjusted mt and py */}
@@ -250,7 +184,7 @@ export default function Home() {
             <h2 className="font-heading text-accent text-2xl sm:text-3xl"> {/* Use text-accent */}
               Ready to Create or Connect?
             </h2>
-            <p className="mx-auto max-w-[600px] text-foreground/70 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size */}
+            <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size and text-foreground/70 to 85 */}
               Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmith Connect is your platform.
             </p>
           </div>
@@ -273,4 +207,3 @@ export default function Home() {
     </div>
   );
 }
-
