@@ -1,6 +1,5 @@
 # **App Name**: Goldsmith Connect
 
-
 ## Core Features:
 
 - Goldsmith Discovery: Enable customers to find nearby goldsmiths via map integration and list views.
