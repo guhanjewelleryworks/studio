@@ -3,12 +3,12 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Gem, TrendingUp, TrendingDown, Minus } from 'lucide-react'; // Added Minus for neutral change
+import { Gem, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface MetalPrice {
   metal: string;
-  price: string; // Will be formatted string like "₹XXX,XXX.XX"
-  change: string; // Will be formatted string like "+X.XX%"
+  price: string;
+  change: string;
   changeType: 'up' | 'down' | 'neutral';
   icon: React.ElementType;
 }
@@ -16,24 +16,61 @@ interface MetalPrice {
 // Simulated API fetch function - REPLACE THIS WITH YOUR ACTUAL API CALL
 async function fetchMetalsData(): Promise<Omit<MetalPrice, 'icon' | 'changeType'>[]> {
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // await new Promise(resolve => setTimeout(resolve, 1000));
 
   // **IMPORTANT**: This is where you would call your chosen precious metals API.
   // You'll need an API key, and the API response structure will vary.
-  // For example: const response = await fetch('https://yourapi.com/prices?metals=gold,silver,platinum&currency=INR', { headers: { 'Authorization': `Bearer YOUR_API_KEY` } });
-  // const data = await response.json();
-  // Then, map the data to the MetalPrice structure.
+  // Store your API key in an environment variable (e.g., process.env.NEXT_PUBLIC_METALS_API_KEY)
+  // and ensure it's available during the build/runtime as needed.
+
+  const apiKey = process.env.NEXT_PUBLIC_METALS_API_KEY; // Example environment variable
+
+  if (apiKey) {
+    try {
+      // Replace with your actual API endpoint and request structure
+      // const response = await fetch(`https://api.examplemetalprovider.com/latest?access_key=${apiKey}&symbols=XAU,XAG,XPT&base=INR`);
+      // if (!response.ok) {
+      //   throw new Error(`API error: ${response.statusText}`);
+      // }
+      // const data = await response.json();
+
+      // Example of how you might parse the data (this WILL VARY based on your API)
+      // const goldPrice = data.rates.XAU ? (1 / data.rates.XAU * SOME_CONVERSION_FACTOR_TO_10G_INR).toFixed(2) : 'N/A';
+      // const silverPrice = data.rates.XAG ? (1 / data.rates.XAG * SOME_CONVERSION_FACTOR_TO_10G_INR).toFixed(2) : 'N/A';
+      // const platinumPrice = data.rates.XPT ? (1 / data.rates.XPT * SOME_CONVERSION_FACTOR_TO_10G_INR).toFixed(2) : 'N/A';
+
+      // This is still simulated as I cannot make live API calls here.
+      // You would replace these with actual parsed data from your API.
+      console.warn("API Key found, but using simulated data for demonstration. Implement actual API call.");
+      const simulatedPricesFromApi = [
+        { metal: "Gold (24K)", priceRaw: 72050.00 + (Math.random() * 500 - 250), changeRaw: (Math.random() * 0.5 - 0.25) },
+        { metal: "Silver", priceRaw: 850.00 + (Math.random() * 20 - 10), changeRaw: (Math.random() * 1.0 - 0.5) },
+        { metal: "Platinum", priceRaw: 28500.00 + (Math.random() * 300 - 150), changeRaw: (Math.random() * 0.3 - 0.15) },
+      ];
+       return simulatedPricesFromApi.map(p => ({
+        metal: p.metal,
+        price: `₹${(p.priceRaw).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/10g`,
+        change: `${p.changeRaw >= 0 ? '+' : ''}${p.changeRaw.toFixed(2)}%`,
+      }));
+
+    } catch (error) {
+      console.error("Failed to fetch real metal prices:", error);
+      // Fallback to simulated data if API call fails
+    }
+  } else {
+    console.warn("Metals API key not found. Using simulated data.");
+  }
 
   // Simulated data for Bangalore, India (INR) - prices are illustrative
+  // These will be used if API key is missing or API call fails
   const simulatedPrices = [
-    { metal: "Gold (24K)", priceRaw: 63000 + (Math.random() * 500 - 250), changeRaw: (Math.random() * 0.5 - 0.25) }, // Price per 10g
-    { metal: "Silver", priceRaw: 750 + (Math.random() * 20 - 10), changeRaw: (Math.random() * 1.0 - 0.5) }, // Price per 10g
-    { metal: "Platinum", priceRaw: 25000 + (Math.random() * 300 - 150), changeRaw: (Math.random() * 0.3 - 0.15) }, // Price per 10g
+    { metal: "Gold (24K)", priceRaw: 72000.00 + (Math.random() * 500 - 250), changeRaw: (Math.random() * 0.5 - 0.25) }, // Price per 10g
+    { metal: "Silver", priceRaw: 800.00 + (Math.random() * 20 - 10), changeRaw: (Math.random() * 1.0 - 0.5) }, // Price per 10g
+    { metal: "Platinum", priceRaw: 28000.00 + (Math.random() * 300 - 150), changeRaw: (Math.random() * 0.3 - 0.15) }, // Price per 10g
   ];
 
   return simulatedPrices.map(p => ({
     metal: p.metal,
-    // Format price to INR currency style - you might need a more robust formatting library for production
     price: `₹${(p.priceRaw).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/10g`,
     change: `${p.changeRaw >= 0 ? '+' : ''}${p.changeRaw.toFixed(2)}%`,
   }));
@@ -57,7 +94,6 @@ export const MetalPricesWidget: React.FC = () => {
       const timeOptions: Intl.DateTimeFormatOptions = {
         hour: '2-digit',
         minute: '2-digit',
-        // second: '2-digit', // Seconds might be too frequent for a price update
         hour12: true,
         timeZone: 'Asia/Kolkata',
       };
@@ -69,7 +105,7 @@ export const MetalPricesWidget: React.FC = () => {
     const loadMetalPrices = async () => {
       setIsLoading(true);
       try {
-        const fetchedData = await fetchMetalsData(); // Replace with your actual API call
+        const fetchedData = await fetchMetalsData();
         const formattedPrices: MetalPrice[] = fetchedData.map(p => {
           const changeValue = parseFloat(p.change.replace('%', ''));
           return {
@@ -80,8 +116,8 @@ export const MetalPricesWidget: React.FC = () => {
         });
         setMetalPrices(formattedPrices);
       } catch (error) {
-        console.error("Failed to fetch metal prices:", error);
-        // Optionally, set some error state to display to the user
+        console.error("Failed to load metal prices for widget:", error);
+        setMetalPrices([]); // Set to empty or keep stale data on error
       } finally {
         setIsLoading(false);
       }
@@ -90,13 +126,12 @@ export const MetalPricesWidget: React.FC = () => {
     updateDateTime();
     loadMetalPrices();
 
-    // Refresh data every 1 minute (60000 ms) - adjust as needed based on API limits and desired freshness
     const intervalId = setInterval(() => {
         loadMetalPrices();
         updateDateTime();
-    }, 60000);
+    }, 60000); // Refresh every 1 minute
 
-    return () => clearInterval(intervalId); // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
 
