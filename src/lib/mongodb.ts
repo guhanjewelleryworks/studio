@@ -5,6 +5,8 @@ import type { Goldsmith } from '@/types/goldsmith'; // Ensure Goldsmith type is 
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
+console.log("Full MONGODB_URI being used from .env:", MONGODB_URI); // Log the URI as seen by the app
+
 if (!MONGODB_URI) {
   console.error("MONGODB_URI environment variable is not defined.");
   throw new Error(
@@ -22,12 +24,12 @@ try {
         DB_NAME = pathnameParts[1];
         console.log(`Database name parsed from MONGODB_URI: ${DB_NAME}`);
     } else {
-        DB_NAME = process.env.DB_NAME || 'goldsmithconnect';
-        console.log(`Database name not found in MONGODB_URI, using default/DB_NAME env var: ${DB_NAME}`);
+        DB_NAME = process.env.DB_NAME || 'goldsmithconnect'; // Fallback DB name
+        console.warn(`Database name not found in MONGODB_URI path, using default or DB_NAME env var: ${DB_NAME}`);
     }
 } catch (error) {
     console.warn("Could not parse MONGODB_URI to extract database name. Using default or DB_NAME env var.", error);
-    DB_NAME = process.env.DB_NAME || 'goldsmithconnect';
+    DB_NAME = process.env.DB_NAME || 'goldsmithconnect'; // Fallback DB name
     console.log(`Using database name: ${DB_NAME}`);
 }
 
@@ -62,10 +64,12 @@ if (process.env.NODE_ENV === 'development') {
 export async function getDb(): Promise<Db> {
   try {
     const mongoClient = await clientPromise;
-    console.log(`Successfully connected to MongoDB and accessing database: ${DB_NAME}`);
+    console.log(`Successfully connected to MongoDB. Accessing database: ${DB_NAME}`);
     return mongoClient.db(DB_NAME);
   } catch (error) {
-    console.error("Error getting database instance:", error);
+    console.error("Error getting database instance from clientPromise:", error);
+    // Log the URI again here in case of failure for easier debugging
+    console.error("Failed to connect with MONGODB_URI:", MONGODB_URI);
     throw error; // Re-throw the error to be caught by the caller
   }
 }
@@ -75,4 +79,5 @@ export async function getGoldsmithsCollection(): Promise<Collection<Goldsmith>> 
   return db.collection<Goldsmith>('goldsmiths');
 }
 
+// Optional: Export the client promise for specific use cases, though getDb is preferred
 export default clientPromise;

@@ -16,7 +16,7 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
         *   It will look like: `mongodb+srv://<username>:<password>@<cluster-name>.<cluster-id>.mongodb.net/<database-name>?retryWrites=true&w=majority&appName=<appName>`
         *   Replace `<username>` with your database username (e.g., `guhanjewelleryworks`).
         *   Replace `<password>` with YOUR ACTUAL DATABASE USER PASSWORD. **Do NOT leave `<password>` as a placeholder.**
-        *   Replace `<cluster-name>.<cluster-id>.mongodb.net` with the hostname provided by Atlas (e.g., `goldsmithconnect.01ffnmh.mongodb.net`).
+        *   Replace `<cluster-name>.<cluster-id>.mongodb.net` with the hostname provided by Atlas (e.g., `goldsmithconnect.01ffnmh.mongodb.net`). **This is the MOST LIKELY place for an error if you see `_mongodb._tcp.121` or similar in error messages.**
         *   Replace `<database-name>` with your desired database name (e.g., `goldsmithconnect`). If not specified in the URI, the application defaults to `goldsmithconnect`.
         *   Replace `<appName>` with the application name specified in Atlas (e.g., `goldsmithconnect`).
 
@@ -63,7 +63,7 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
 
 5.  **Set the `MONGODB_URI` Environment Variable:**
     *   In your project's `.env` file, add the **exact** connection string copied from Atlas, replacing `<password>` with your actual database user password. See the "Environment Variables" section above for an example.
-    *   **CRITICAL:** The most common error `querySrv ENOTFOUND _mongodb._tcp.<hostname>` (e.g., `_mongodb._tcp.121`) happens because the `<hostname>` part of your `MONGODB_URI` is incorrect in your `.env` file. Ensure the part after `@` and before `/` is the correct Atlas cluster address (e.g., `goldsmithconnect.01ffnmh.mongodb.net`) and NOT just a number or an incomplete address.
+    *   **CRITICAL:** The most common error `querySrv ENOTFOUND _mongodb._tcp.<hostname>` (e.g., `_mongodb._tcp.121`) happens because the `<hostname>` part of your `MONGODB_URI` is incorrect in your `.env` file. Ensure the part after `@` and before `/` is the correct Atlas cluster address (e.g., `goldsmithconnect.01ffnmh.mongodb.net`) and NOT just a number or an incomplete address like `121`.
 
 6.  **Restart Your Application:**
     *   If your application is running, restart it to pick up the new environment variable.
@@ -73,14 +73,15 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
 
 *   **`querySrv ENOTFOUND _mongodb._tcp.<hostname>` (e.g., `_mongodb._tcp.121`) or `failed to connect to server ... on first connect`**:
     1.  **VERIFY `MONGODB_URI` in `.env` (Most Common Cause):**
-        *   This is the **primary suspect**. Double, triple-check the connection string in your `.env` file.
+        *   This is the **PRIMARY SUSPECT**. Double, triple-check the connection string in your `.env` file.
         *   Ensure it's copied **exactly** from MongoDB Atlas.
-        *   Make sure the hostname part (e.g., `goldsmithconnect.01ffnmh.mongodb.net`) is correct and not a partial value or an incorrect placeholder like `121`.
+        *   Make sure the hostname part (e.g., `goldsmithconnect.01ffnmh.mongodb.net`) is correct and not a partial value or an incorrect placeholder like `121`. The `_mongodb._tcp.121` in the error strongly suggests your hostname is being misinterpreted as `121`.
         *   Ensure you've replaced `<password>` with your actual database user password.
+        *   Check your `src/lib/mongodb.ts` file logs (when the server starts) for the `Full MONGODB_URI being used:` message to see exactly what URI your application is using.
     2.  **Network Access in Atlas:** Confirm that the IP address of the machine running your Next.js application (e.g., your EC2 instance's public IP, or 0.0.0.0/0 for initial testing) is whitelisted in MongoDB Atlas under "Network Access".
     3.  **DNS Resolution (for EC2/Servers):**
         *   SSH into your server.
-        *   Try to look up your Atlas cluster hostname: `nslookup your-cluster-name.01ffnmh.mongodb.net` (replace with your actual cluster hostname).
+        *   Try to look up your Atlas cluster hostname: `nslookup your-cluster-name.01ffnmh.mongodb.net` (replace with your actual cluster hostname, e.g., `goldsmithconnect.01ffnmh.mongodb.net`).
         *   Also try the SRV record lookup: `nslookup -type=SRV _mongodb._tcp.your-cluster-name.01ffnmh.mongodb.net`.
         *   If these commands fail or show errors, there might be a DNS configuration issue on your server or with your VPC settings.
     4.  **Firewall:** Ensure no local or network firewalls are blocking outbound connections on port 27017.
