@@ -11,11 +11,10 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
 
 2.  **Environment Variables:**
     *   Create a `.env` file in the project root (or `.env.local` for local development, which should be in `.gitignore`).
-    *   **MongoDB Connection:** Add your MongoDB connection string (preferably from MongoDB Atlas):
+    *   **MongoDB Connection:** Add your MongoDB connection string. Replace `YOUR_MONGODB_PASSWORD_HERE` with your actual database password:
         ```env
-        MONGODB_URI="your_mongodb_connection_string_here"
+        MONGODB_URI="mongodb+srv://guhanjewelleryworks:YOUR_MONGODB_PASSWORD_HERE@goldsmithconnect.01ffnmh.mongodb.net/?retryWrites=true&w=majority&appName=goldsmithconnect"
         ```
-        Replace `your_mongodb_connection_string_here` with your actual connection string, including your username, password, cluster address, and database name. Example: `mongodb+srv://user:password@cluster.mongodb.net/goldsmith_connect_db?retryWrites=true&w=majority`
     *   If using Genkit features, add your Google Generative AI API key:
         ```env
         GOOGLE_GENAI_API_KEY=YOUR_API_KEY_HERE
@@ -50,7 +49,7 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
 2.  **Configure Database Access:**
     *   In your Atlas cluster, navigate to "Database Access" under the "Security" section.
     *   Click "Add New Database User".
-    *   Create a username and password. **Store these credentials securely.** Choose "Read and write to any database" as the user privilege (or more specific privileges if you prefer).
+    *   Create a username and password. **Store these credentials securely.** You will use this password in your connection string. Choose "Read and write to any database" as the user privilege (or more specific privileges if you prefer).
     *   Click "Add User".
 
 3.  **Configure Network Access:**
@@ -64,17 +63,16 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
     *   Click the "Connect" button for your cluster.
     *   Choose "Drivers" (or "Connect your application").
     *   Select "Node.js" as your driver and the latest version.
-    *   You will see a connection string similar to this:
-        `mongodb+srv://<username>:<password>@<cluster-address>/<database-name>?retryWrites=true&w=majority`
-    *   **Copy this connection string.**
+    *   You will see a connection string. **Copy this connection string.** It will look similar to:
+        `mongodb+srv://<username>:<password>@<cluster-address>/<database-name>?retryWrites=true&w=majority&appName=<appName>`
 
 5.  **Set the MONGODB_URI Environment Variable:**
-    *   In your project's `.env` file (create one if it doesn't exist at the root of your project), add the connection string:
+    *   In your project's `.env` file (create one if it doesn't exist at the root of your project), add the connection string, replacing `<db_password>` with the password you created in step 2:
         ```env
-        MONGODB_URI="mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@YOUR_CLUSTER_ADDRESS/YOUR_DATABASE_NAME?retryWrites=true&w=majority"
+        MONGODB_URI="mongodb+srv://guhanjewelleryworks:YOUR_MONGODB_PASSWORD_HERE@goldsmithconnect.01ffnmh.mongodb.net/?retryWrites=true&w=majority&appName=goldsmithconnect"
         ```
-    *   **Replace `YOUR_USERNAME`, `YOUR_PASSWORD`, `YOUR_CLUSTER_ADDRESS`, and `YOUR_DATABASE_NAME` with your actual credentials and cluster details.**
-        *   `YOUR_DATABASE_NAME` can be any name you choose for your database (e.g., `goldsmith_connect_db`). MongoDB will create it if it doesn't exist.
+    *   **Ensure `guhanjewelleryworks` is the correct username for your database user.**
+    *   **The database name is implicitly part of the connection string or will use the default database if not specified in the string directly.** MongoDB will create it if it doesn't exist when data is first written.
 
 6.  **Restart Your Application:**
     *   If your application is running, restart it to pick up the new environment variable.
