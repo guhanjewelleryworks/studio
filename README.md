@@ -11,10 +11,21 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
 
 2.  **Environment Variables:**
     *   Create a `.env` file in the project root (or `.env.local` for local development, which should be in `.gitignore`).
-    *   **MongoDB Connection:** Add your MongoDB connection string. Replace `YOUR_MONGODB_PASSWORD_HERE` with your actual database password:
+    *   **MongoDB Connection (CRITICAL):** Add your MongoDB connection string.
+        *   **Obtain this string directly from your MongoDB Atlas cluster's "Connect" -> "Drivers" section.**
+        *   It will look like: `mongodb+srv://<username>:<password>@<cluster-name>.<cluster-id>.mongodb.net/<database-name>?retryWrites=true&w=majority&appName=<appName>`
+        *   Replace `<username>` with your database username (e.g., `guhanjewelleryworks`).
+        *   Replace `<password>` with YOUR ACTUAL DATABASE USER PASSWORD.
+        *   Replace `<cluster-name>.<cluster-id>.mongodb.net` with the hostname provided by Atlas.
+        *   Replace `<database-name>` with your desired database name (e.g., `goldsmithconnect`). If not specified in the URI, the application defaults to `goldsmithconnect`.
+        *   Replace `<appName>` with the application name specified in Atlas (e.g., `goldsmithconnect`).
+
+        **Example for `.env` file:**
         ```env
-        MONGODB_URI="mongodb+srv://guhanjewelleryworks:YOUR_MONGODB_PASSWORD_HERE@goldsmithconnect.01ffnmh.mongodb.net/?retryWrites=true&w=majority&appName=goldsmithconnect"
+        MONGODB_URI="mongodb+srv://guhanjewelleryworks:YOUR_MONGODB_PASSWORD_HERE@goldsmithconnect.01ffnmh.mongodb.net/goldsmithconnect?retryWrites=true&w=majority&appName=goldsmithconnect"
         ```
+        **Ensure there are no typos or extra characters in this string.** An incorrect URI is the most common cause of connection errors like `ENOTFOUND` or `querySrv ENOTFOUND`.
+
     *   If using Genkit features, add your Google Generative AI API key:
         ```env
         GOOGLE_GENAI_API_KEY=YOUR_API_KEY_HERE
@@ -40,44 +51,37 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
 
 To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
 
-1.  **Create a MongoDB Atlas Account and Cluster:**
-    *   Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and sign up for a free account (or log in if you already have one).
-    *   Create a new project.
-    *   Build a new cluster. The free tier (M0 Sandbox) is sufficient for development and small applications. Choose your preferred cloud provider and region.
-    *   Wait for the cluster to be provisioned (this might take a few minutes).
-
-2.  **Configure Database Access:**
-    *   In your Atlas cluster, navigate to "Database Access" under the "Security" section.
-    *   Click "Add New Database User".
-    *   Create a username and password. **Store these credentials securely.** You will use this password in your connection string. Choose "Read and write to any database" as the user privilege (or more specific privileges if you prefer).
-    *   Click "Add User".
-
-3.  **Configure Network Access:**
-    *   In your Atlas cluster, navigate to "Network Access" under the "Security" section.
-    *   Click "Add IP Address".
-    *   For development, you can "Allow Access From Anywhere" (0.0.0.0/0). **For production, it's highly recommended to add specific IP addresses or ranges that will access your database (e.g., your application server's IP).**
-    *   Click "Confirm".
-
+1.  **Create a MongoDB Atlas Account and Cluster:** (Follow official Atlas documentation)
+2.  **Configure Database Access:** (Follow official Atlas documentation - create a user with password authentication)
+3.  **Configure Network Access:** (Follow official Atlas documentation - ensure your application server's IP or 0.0.0.0/0 for development is whitelisted)
 4.  **Get Your Connection String:**
     *   In your Atlas cluster, navigate to "Database" (or "Clusters").
     *   Click the "Connect" button for your cluster.
     *   Choose "Drivers" (or "Connect your application").
     *   Select "Node.js" as your driver and the latest version.
-    *   You will see a connection string. **Copy this connection string.** It will look similar to:
-        `mongodb+srv://<username>:<password>@<cluster-address>/<database-name>?retryWrites=true&w=majority&appName=<appName>`
+    *   **Copy the provided connection string.**
 
-5.  **Set the MONGODB_URI Environment Variable:**
-    *   In your project's `.env` file (create one if it doesn't exist at the root of your project), add the connection string, replacing `<db_password>` with the password you created in step 2:
-        ```env
-        MONGODB_URI="mongodb+srv://guhanjewelleryworks:YOUR_MONGODB_PASSWORD_HERE@goldsmithconnect.01ffnmh.mongodb.net/?retryWrites=true&w=majority&appName=goldsmithconnect"
-        ```
-    *   **Ensure `guhanjewelleryworks` is the correct username for your database user.**
-    *   **The database name is implicitly part of the connection string or will use the default database if not specified in the string directly.** MongoDB will create it if it doesn't exist when data is first written.
+5.  **Set the `MONGODB_URI` Environment Variable:**
+    *   In your project's `.env` file, add the **exact** connection string copied from Atlas, replacing `<password>` with your actual database user password. See the "Environment Variables" section above for an example.
 
 6.  **Restart Your Application:**
     *   If your application is running, restart it to pick up the new environment variable.
+    *   If using PM2 on EC2, use `pm2 restart <your_app_name> --update-env`.
 
-Now, your Next.js application (`src/lib/mongodb.ts`) will use this connection string to connect to your live MongoDB Atlas database. The existing server actions (like `saveGoldsmith` in `src/actions/goldsmith-actions.ts`) are already set up to use this database connection.
+## Troubleshooting MongoDB Connection Errors
+
+*   **`querySrv ENOTFOUND _mongodb._tcp.<hostname>` or `failed to connect to server ... on first connect`**:
+    1.  **Verify `MONGODB_URI`:** This is the most common cause. Double, triple-check the connection string in your `.env` file against the one provided by MongoDB Atlas. Ensure there are no typos, extra spaces, or missing parts.
+    2.  **Password:** Make sure you've replaced `<password>` with your actual database user password.
+    3.  **Network Access in Atlas:** Confirm that the IP address of the machine running your Next.js application (e.g., your EC2 instance's public IP, or 0.0.0.0/0 for initial testing) is whitelisted in MongoDB Atlas under "Network Access".
+    4.  **DNS Resolution (for EC2/Servers):**
+        *   SSH into your server.
+        *   Try to ping your Atlas cluster hostname (e.g., `ping your-cluster-name.mongodb.net`).
+        *   Use `nslookup your-cluster-name.mongodb.net` and `nslookup -type=SRV _mongodb._tcp.your-cluster-name.mongodb.net` to check DNS resolution. If these fail, there might be a DNS configuration issue on your server or with your VPC settings.
+    5.  **Firewall:** Ensure no local or network firewalls are blocking outbound connections on port 27017.
+*   **Authentication Errors (`MongoNetworkError: failed to connect to server ... on first connect [MongoError: bad auth : Authentication failed.]`)**:
+    1.  Verify your database username and password in the `MONGODB_URI`.
+    2.  Ensure the database user has the correct permissions for the specified database.
 
 ## Configuring Real-Time Metal Prices
 
@@ -104,6 +108,13 @@ npm run build
 
 ```bash
 npm start
+```
+Or if using PM2:
+```bash
+pm2 start npm --name "goldsmith-connect" -- start
+# To ensure it restarts on server reboot
+pm2 save
+pm2 startup
 ```
 
 ## Deployment (Example: AWS EC2)
