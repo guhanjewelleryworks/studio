@@ -15,8 +15,8 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
         *   **Obtain this string directly from your MongoDB Atlas cluster's "Connect" -> "Drivers" section.**
         *   It will look like: `mongodb+srv://<username>:<password>@<cluster-name>.<cluster-id>.mongodb.net/<database-name>?retryWrites=true&w=majority&appName=<appName>`
         *   Replace `<username>` with your database username (e.g., `guhanjewelleryworks`).
-        *   Replace `<password>` with YOUR ACTUAL DATABASE USER PASSWORD.
-        *   Replace `<cluster-name>.<cluster-id>.mongodb.net` with the hostname provided by Atlas.
+        *   Replace `<password>` with YOUR ACTUAL DATABASE USER PASSWORD. **Do NOT leave `<password>` as a placeholder.**
+        *   Replace `<cluster-name>.<cluster-id>.mongodb.net` with the hostname provided by Atlas (e.g., `goldsmithconnect.01ffnmh.mongodb.net`).
         *   Replace `<database-name>` with your desired database name (e.g., `goldsmithconnect`). If not specified in the URI, the application defaults to `goldsmithconnect`.
         *   Replace `<appName>` with the application name specified in Atlas (e.g., `goldsmithconnect`).
 
@@ -24,7 +24,7 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
         ```env
         MONGODB_URI="mongodb+srv://guhanjewelleryworks:YOUR_MONGODB_PASSWORD_HERE@goldsmithconnect.01ffnmh.mongodb.net/goldsmithconnect?retryWrites=true&w=majority&appName=goldsmithconnect"
         ```
-        **Ensure there are no typos or extra characters in this string.** An incorrect URI is the most common cause of connection errors like `ENOTFOUND` or `querySrv ENOTFOUND`.
+        **Ensure there are no typos, extra characters, or missing parts in this string.** An incorrect URI is the most common cause of connection errors.
 
     *   If using Genkit features, add your Google Generative AI API key:
         ```env
@@ -59,10 +59,11 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
     *   Click the "Connect" button for your cluster.
     *   Choose "Drivers" (or "Connect your application").
     *   Select "Node.js" as your driver and the latest version.
-    *   **Copy the provided connection string.**
+    *   **Carefully copy the provided connection string.**
 
 5.  **Set the `MONGODB_URI` Environment Variable:**
     *   In your project's `.env` file, add the **exact** connection string copied from Atlas, replacing `<password>` with your actual database user password. See the "Environment Variables" section above for an example.
+    *   **CRITICAL:** The most common error `querySrv ENOTFOUND _mongodb._tcp.<hostname>` (e.g., `_mongodb._tcp.121`) happens because the `<hostname>` part of your `MONGODB_URI` is incorrect in your `.env` file. Ensure the part after `@` and before `/` is the correct Atlas cluster address (e.g., `goldsmithconnect.01ffnmh.mongodb.net`) and NOT just a number or an incomplete address.
 
 6.  **Restart Your Application:**
     *   If your application is running, restart it to pick up the new environment variable.
@@ -70,18 +71,27 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
 
 ## Troubleshooting MongoDB Connection Errors
 
-*   **`querySrv ENOTFOUND _mongodb._tcp.<hostname>` or `failed to connect to server ... on first connect`**:
-    1.  **Verify `MONGODB_URI`:** This is the most common cause. Double, triple-check the connection string in your `.env` file against the one provided by MongoDB Atlas. Ensure there are no typos, extra spaces, or missing parts.
-    2.  **Password:** Make sure you've replaced `<password>` with your actual database user password.
-    3.  **Network Access in Atlas:** Confirm that the IP address of the machine running your Next.js application (e.g., your EC2 instance's public IP, or 0.0.0.0/0 for initial testing) is whitelisted in MongoDB Atlas under "Network Access".
-    4.  **DNS Resolution (for EC2/Servers):**
+*   **`querySrv ENOTFOUND _mongodb._tcp.<hostname>` (e.g., `_mongodb._tcp.121`) or `failed to connect to server ... on first connect`**:
+    1.  **VERIFY `MONGODB_URI` in `.env` (Most Common Cause):**
+        *   This is the **primary suspect**. Double, triple-check the connection string in your `.env` file.
+        *   Ensure it's copied **exactly** from MongoDB Atlas.
+        *   Make sure the hostname part (e.g., `goldsmithconnect.01ffnmh.mongodb.net`) is correct and not a partial value or an incorrect placeholder like `121`.
+        *   Ensure you've replaced `<password>` with your actual database user password.
+    2.  **Network Access in Atlas:** Confirm that the IP address of the machine running your Next.js application (e.g., your EC2 instance's public IP, or 0.0.0.0/0 for initial testing) is whitelisted in MongoDB Atlas under "Network Access".
+    3.  **DNS Resolution (for EC2/Servers):**
         *   SSH into your server.
-        *   Try to ping your Atlas cluster hostname (e.g., `ping your-cluster-name.mongodb.net`).
-        *   Use `nslookup your-cluster-name.mongodb.net` and `nslookup -type=SRV _mongodb._tcp.your-cluster-name.mongodb.net` to check DNS resolution. If these fail, there might be a DNS configuration issue on your server or with your VPC settings.
-    5.  **Firewall:** Ensure no local or network firewalls are blocking outbound connections on port 27017.
+        *   Try to look up your Atlas cluster hostname: `nslookup your-cluster-name.01ffnmh.mongodb.net` (replace with your actual cluster hostname).
+        *   Also try the SRV record lookup: `nslookup -type=SRV _mongodb._tcp.your-cluster-name.01ffnmh.mongodb.net`.
+        *   If these commands fail or show errors, there might be a DNS configuration issue on your server or with your VPC settings.
+    4.  **Firewall:** Ensure no local or network firewalls are blocking outbound connections on port 27017.
 *   **Authentication Errors (`MongoNetworkError: failed to connect to server ... on first connect [MongoError: bad auth : Authentication failed.]`)**:
     1.  Verify your database username and password in the `MONGODB_URI`.
     2.  Ensure the database user has the correct permissions for the specified database.
+*   **SSL/TLS Errors (e.g., `ssl3_read_bytes:tlsv1 alert internal error`)**:
+    1.  **Check Node.js Version:** Ensure you're using a recent Node.js version (LTS recommended).
+    2.  **MongoDB Atlas TLS Settings:** In Atlas, under Security > TLS/SSL Configuration, ensure TLS 1.2 or higher is enabled.
+    3.  **Network Security:** Confirm firewalls or proxies aren't interfering with TLS/SSL traffic.
+    4.  **System Time:** Ensure your server's system time is accurate, as large discrepancies can cause SSL handshake failures.
 
 ## Configuring Real-Time Metal Prices
 
