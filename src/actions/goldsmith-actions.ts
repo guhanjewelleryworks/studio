@@ -19,16 +19,27 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...goldsmithDataToStore } = data;
 
+    // Ensure name is defined and not empty for URL generation, and provide a fallback
+    const safeNameSeed = (goldsmithDataToStore.name && goldsmithDataToStore.name.trim() !== "")
+      ? goldsmithDataToStore.name.trim().replace(/\s+/g, '-').toLowerCase()
+      : `goldsmith-${uuidv4().substring(0, 8)}`; // Fallback seed if name is empty
+
+    const workshopNameOrDefault = goldsmithDataToStore.name && goldsmithDataToStore.name.trim() !== "" ? goldsmithDataToStore.name.trim() : "Artisan";
+
+    const specialtyText = (Array.isArray(goldsmithDataToStore.specialty) && goldsmithDataToStore.specialty.length > 0)
+        ? goldsmithDataToStore.specialty.join(', ')
+        : 'fine jewelry';
+
     const newGoldsmith: Goldsmith = {
       ...goldsmithDataToStore,
       id: uuidv4(), // Generate a unique ID
       rating: 0, // Default rating
-      imageUrl: `https://picsum.photos/seed/${goldsmithDataToStore.name.replace(/\s+/g, '-').toLowerCase()}/400/300`,
-      profileImageUrl: `https://picsum.photos/seed/${goldsmithDataToStore.name.replace(/\s+/g, '-').toLowerCase()}-profile/120/120`,
+      imageUrl: `https://picsum.photos/seed/${safeNameSeed}/400/300`,
+      profileImageUrl: `https://picsum.photos/seed/${safeNameSeed}-profile/120/120`,
       location: defaultLocation, // Placeholder, ideally get from address or separate input
-      shortBio: `Specializing in ${Array.isArray(data.specialty) ? data.specialty.join(', ') : data.specialty || 'fine jewelry'}.`,
-      tagline: `Bespoke creations by ${data.name}`,
-      bio: `Discover the craftsmanship of ${data.name}.`,
+      shortBio: `Specializing in ${specialtyText}.`,
+      tagline: `Bespoke creations by ${workshopNameOrDefault}`,
+      bio: `Discover the craftsmanship of ${workshopNameOrDefault}.`,
       yearsExperience: 0, // Default, should be part of form
       responseTime: "Varies", // Default
       ordersCompleted: 0, // Default
@@ -45,7 +56,13 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     }
   } catch (error) {
     console.error('Error saving goldsmith:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' };
+    // Provide more specific error feedback if possible
+    let errorMessage = 'An unknown error occurred while saving goldsmith data.';
+    if (error instanceof Error) {
+        errorMessage = error.message;
+    }
+    // You might want to log the full error for server-side debugging but return a more generic message to the client
+    return { success: false, error: `Failed to save goldsmith: ${errorMessage}` };
   }
 }
 
