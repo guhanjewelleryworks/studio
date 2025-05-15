@@ -7,9 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LogIn } from 'lucide-react';
+import { LogIn, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions';
+import type { Goldsmith } from '@/types/goldsmith';
+
+const SIMULATED_CORRECT_PASSWORD = 'password123'; // For simulation purposes
 
 export default function GoldsmithLoginPage() {
   const router = useRouter();
@@ -22,22 +26,43 @@ export default function GoldsmithLoginPage() {
     event.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Simulate fetching all registered goldsmiths
+      const registeredGoldsmiths: Goldsmith[] = await fetchAllGoldsmiths();
+      
+      const foundGoldsmith = registeredGoldsmiths.find(
+        (goldsmith) => goldsmith.email?.toLowerCase() === email.toLowerCase()
+      );
 
-    // Basic validation simulation (in a real app, this would be more robust)
-    if (email && password) {
+      // Simulate credential check
+      if (foundGoldsmith && password === SIMULATED_CORRECT_PASSWORD) {
+        toast({
+          title: 'Login Successful (Simulated)',
+          description: 'Redirecting to your dashboard...',
+        });
+        // In a real app, you'd set up a session or token here
+        router.push('/goldsmith-portal/dashboard');
+      } else if (foundGoldsmith && password !== SIMULATED_CORRECT_PASSWORD) {
+        toast({
+          title: 'Login Failed (Simulated)',
+          description: 'Incorrect password. Please try again.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Login Failed (Simulated)',
+          description: `No goldsmith found with email ${email}. Please check your email or register.`,
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
       toast({
-        title: 'Login Successful (Simulated)',
-        description: 'Redirecting to your dashboard...',
-      });
-      router.push('/goldsmith-portal/dashboard');
-    } else {
-      toast({
-        title: 'Login Failed (Simulated)',
-        description: 'Please enter both email and password.',
+        title: 'Login Error (Simulated)',
+        description: 'An unexpected error occurred during login. Please try again.',
         variant: 'destructive',
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -71,6 +96,7 @@ export default function GoldsmithLoginPage() {
               <Input 
                 id="password" 
                 type="password" 
+                placeholder={`Simulated: ${SIMULATED_CORRECT_PASSWORD}`}
                 required 
                 className="text-base py-2 text-foreground"
                 value={password}
@@ -94,6 +120,7 @@ export default function GoldsmithLoginPage() {
               className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-3 bg-primary hover:bg-primary/90 text-primary-foreground mt-1.5"
               disabled={isLoading}
             >
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {isLoading ? 'Logging in...' : 'Login to Portal'}
             </Button>
 
