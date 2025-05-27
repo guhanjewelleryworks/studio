@@ -11,7 +11,7 @@ import { CheckCircle, Briefcase, Loader2, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ChangeEvent } from 'react';
 import { saveGoldsmith } from '@/actions/goldsmith-actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -33,6 +33,16 @@ export default function GoldsmithRegisterPage() {
   const [yearsExperience, setYearsExperience] = useState<number | undefined>(undefined);
   const [responseTime, setResponseTime] = useState('');
 
+
+  const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    // Remove non-digit characters
+    const numericValue = value.replace(/[^0-9]/g, '');
+    // Restrict to 10 digits
+    if (numericValue.length <= 10) {
+      setPhone(numericValue);
+    }
+  };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -69,6 +79,17 @@ export default function GoldsmithRegisterPage() {
       setIsSubmitting(false);
       return;
     }
+    
+    if (trimmedPhone && trimmedPhone.length !== 10) {
+      toast({
+        title: 'Registration Error',
+        description: 'Phone number must be exactly 10 digits.',
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
 
     if (trimmedPassword !== trimmedConfirmPassword) {
       toast({ title: 'Registration Error', description: 'Passwords do not match.', variant: 'destructive' });
@@ -88,7 +109,6 @@ export default function GoldsmithRegisterPage() {
         password: trimmedPassword,
         yearsExperience: yearsExperience || 0,
         responseTime: trimmedResponseTime || "Varies",
-        // ordersCompleted will default in the server action if not provided
       };
 
       const result = await saveGoldsmith(newGoldsmithData);
@@ -97,7 +117,7 @@ export default function GoldsmithRegisterPage() {
         toast({
           title: 'Registration Submitted Successfully!',
           description: "Awaiting for the approval, once approved you'll be part of the Goldsmith Connect Community.",
-          duration: 7000, // Keep message longer
+          duration: 7000, 
         });
         // Clear form fields
         setWorkshopName('');
@@ -166,8 +186,19 @@ export default function GoldsmithRegisterPage() {
                   <Input id="email" type="email" placeholder="contact@auragold.com" required className="text-foreground" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isFormDisabled}/>
               </div>
               <div className="space-y-1">
-                  <Label htmlFor="phone" className="text-foreground">Business Phone Number</Label>
-                  <Input id="phone" type="tel" placeholder="e.g., 9876543210" className="text-foreground" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={isFormDisabled}/>
+                  <Label htmlFor="phone" className="text-foreground">Business Phone Number (10 digits)</Label>
+                  <Input 
+                    id="phone" 
+                    type="tel" 
+                    placeholder="e.g., 9876543210" 
+                    className="text-foreground" 
+                    value={phone} 
+                    onChange={handlePhoneChange} 
+                    maxLength={10} // HTML5 attribute for max length
+                    pattern="[0-9]{10}" // Suggests numeric input and 10 digits
+                    title="Please enter a 10-digit phone number"
+                    disabled={isFormDisabled}
+                  />
               </div>
             </div>
 
@@ -201,7 +232,7 @@ export default function GoldsmithRegisterPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
               <div className="space-y-1">
-                <Label htmlFor="password" className="text-foreground">Create Password</Label>
+                <Label htmlFor="password" className="text-foreground">Create Password (min. 8 characters)</Label>
                 <Input id="password" type="password" placeholder="Min. 8 characters" required className="text-foreground" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isFormDisabled}/>
               </div>
                <div className="space-y-1">
