@@ -6,14 +6,14 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from "@/components/ui/toaster";
-import '@/lib/firebase/firebase'; // Initialize Firebase
+// Removed: import '@/lib/firebase/firebase'; // Initialize Firebase
 
 const geistSans = GeistSans;
 
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-poppins', 
+  variable: '--font-poppins',
 });
 
 const playfairDisplay = Playfair_Display({

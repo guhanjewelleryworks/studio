@@ -1,22 +1,60 @@
 // src/app/signup/page.tsx
 'use client';
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { UserPlus } from 'lucide-react'
-import Link from 'next/link'
-import { Separator } from '@/components/ui/separator'
-import { SocialAuthButtons } from '@/components/auth/social-auth-buttons'
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { UserPlus, Loader2 } from 'lucide-react'; // Added Loader2
+import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
+import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
+import { useState, type FormEvent } from 'react'; // Added useState and FormEvent
+import { useRouter } from 'next/navigation'; // Added useRouter
+import { useToast } from '@/hooks/use-toast'; // Added useToast
 
 export default function SignUpPage() {
-  // TODO: Implement actual form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Simulate signup
-    alert("Signup functionality (simulated). Actual implementation needed.");
-  }
+    setIsLoading(true);
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Signup Error",
+        description: "Passwords do not match.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate signup - Firebase is removed
+    console.log("Simulating customer signup for:", email, "Name:", name);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    if (email && password) { // Basic check
+        toast({
+          title: "Signup Successful (Simulated)",
+          description: "Account created. Redirecting to login... (Firebase Auth Removed)",
+        });
+        router.push('/login');
+    } else {
+         toast({
+          title: "Signup Failed (Simulated)",
+          description: "Please fill all required fields. (Firebase Auth Removed)",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
@@ -30,28 +68,68 @@ export default function SignUpPage() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
               <Label htmlFor="name" className="text-foreground">Full Name</Label>
-              <Input id="name" placeholder="e.g., Alex Smith" required className="text-base text-foreground py-2" />
+              <Input
+                id="name"
+                placeholder="e.g., Alex Smith"
+                required
+                className="text-base text-foreground py-2"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-foreground">Email Address</Label>
-              <Input id="email" type="email" placeholder="alex.smith@example.com" required className="text-base text-foreground py-2" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="alex.smith@example.com"
+                required
+                className="text-base text-foreground py-2"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-foreground">Create Password</Label>
-              <Input id="password" type="password" required className="text-base text-foreground py-2" />
+              <Input
+                id="password"
+                type="password"
+                placeholder="Choose a strong password"
+                required
+                className="text-base text-foreground py-2"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
 
              <div className="space-y-1.5">
               <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
-              <Input id="confirmPassword" type="password" required className="text-base text-foreground py-2" />
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Re-enter your password"
+                required
+                className="text-base text-foreground py-2"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
-            
-            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground">
-              Sign Up
+
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground"
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Sign Up"}
             </Button>
-            
+
             <Separator className="my-5" />
             <SocialAuthButtons mode="signup" />
 
@@ -68,4 +146,3 @@ export default function SignUpPage() {
     </div>
   )
 }
-

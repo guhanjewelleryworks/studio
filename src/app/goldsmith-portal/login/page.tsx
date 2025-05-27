@@ -10,10 +10,10 @@ import { Label } from '@/components/ui/label';
 import { LogIn, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions';
-import type { Goldsmith } from '@/types/goldsmith';
-
-const SIMULATED_CORRECT_PASSWORD = 'password123'; // For simulation purposes
+// Removed Firebase Auth imports and fetchGoldsmithByEmailForLogin
+// import { auth } from '@/lib/firebase/firebase';
+// import { signInWithEmailAndPassword, type AuthError } from 'firebase/auth';
+// import { fetchGoldsmithByEmailForLogin } from '@/actions/goldsmith-actions';
 
 export default function GoldsmithLoginPage() {
   const router = useRouter();
@@ -26,45 +26,28 @@ export default function GoldsmithLoginPage() {
     event.preventDefault();
     setIsLoading(true);
 
-    try {
-      // Simulate fetching all registered goldsmiths
-      const registeredGoldsmiths: Goldsmith[] = await fetchAllGoldsmiths();
-      
-      const foundGoldsmith = registeredGoldsmiths.find(
-        (goldsmith) => goldsmith.email?.toLowerCase() === email.toLowerCase()
-      );
+    // Simulate login - Firebase is removed
+    console.log("Simulating login for:", email);
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
 
-      // Simulate credential check
-      if (foundGoldsmith && password === SIMULATED_CORRECT_PASSWORD) {
+    // Placeholder for non-Firebase login logic if you implement one later
+    // For now, it will just simulate success if any email/password is entered
+    // or you can use specific dummy credentials for testing.
+    if (email && password) { // Basic check that fields are not empty
         toast({
           title: 'Login Successful (Simulated)',
-          description: 'Redirecting to your dashboard...',
+          description: 'Redirecting to your dashboard... (Firebase Auth Removed)',
         });
-        // In a real app, you'd set up a session or token here
         router.push('/goldsmith-portal/dashboard');
-      } else if (foundGoldsmith && password !== SIMULATED_CORRECT_PASSWORD) {
+    } else {
         toast({
-          title: 'Login Failed (Simulated)',
-          description: 'Incorrect password. Please try again.',
-          variant: 'destructive',
+            title: 'Login Failed (Simulated)',
+            description: 'Please enter email and password. (Firebase Auth Removed)',
+            variant: 'destructive',
         });
-      } else {
-        toast({
-          title: 'Login Failed (Simulated)',
-          description: `No goldsmith found with email ${email}. Please check your email or register.`,
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      toast({
-        title: 'Login Error (Simulated)',
-        description: 'An unexpected error occurred during login. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
+    // setIsLoading(false); // Already handled in the success path by router.push
   };
 
   return (
@@ -79,11 +62,11 @@ export default function GoldsmithLoginPage() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-foreground">Email Address</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="your.workshop@example.com" 
-                required 
+              <Input
+                id="email"
+                type="email"
+                placeholder="your.workshop@example.com"
+                required
                 className="text-base py-2 text-foreground"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -93,11 +76,11 @@ export default function GoldsmithLoginPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-foreground">Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                placeholder={`Simulated: ${SIMULATED_CORRECT_PASSWORD}`}
-                required 
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                required
                 className="text-base py-2 text-foreground"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -107,16 +90,16 @@ export default function GoldsmithLoginPage() {
 
              <div className="flex items-center justify-end pt-0.5">
                 <Link
-                  href="/goldsmith-portal/forgot-password" // Placeholder, implement if needed
+                  href="#" // Placeholder, "Forgot password" relies on an auth system
                   className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
                 >
                   Forgot password?
                 </Link>
               </div>
 
-            <Button 
-              type="submit" 
-              size="lg" 
+            <Button
+              type="submit"
+              size="lg"
               className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-3 bg-primary hover:bg-primary/90 text-primary-foreground mt-1.5"
               disabled={isLoading}
             >

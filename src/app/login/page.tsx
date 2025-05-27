@@ -1,23 +1,49 @@
 // src/app/login/page.tsx
 'use client';
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import { LogIn } from 'lucide-react'
-import Link from 'next/link'
-import { Separator } from '@/components/ui/separator'
-import { SocialAuthButtons } from '@/components/auth/social-auth-buttons'
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { LogIn, Loader2 } from 'lucide-react'; // Added Loader2
+import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
+import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
+import { useState, type FormEvent } from 'react'; // Added useState and FormEvent
+import { useRouter } from 'next/navigation'; // Added useRouter
+import { useToast } from '@/hooks/use-toast'; // Added useToast
 
 export default function LoginPage() {
-  // TODO: Implement actual form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Simulate login
-    alert("Login functionality (simulated). Actual implementation needed.");
-  }
+    setIsLoading(true);
+    // Simulate login - Firebase is removed
+    console.log("Simulating customer login for:", email);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    if (email && password) { // Basic check
+        toast({
+          title: "Login Successful (Simulated)",
+          description: "Redirecting... (Firebase Auth Removed)",
+        });
+        // Redirect to homepage or a customer dashboard if one exists
+        router.push('/');
+    } else {
+        toast({
+          title: "Login Failed (Simulated)",
+          description: "Please enter email and password. (Firebase Auth Removed)",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
@@ -31,12 +57,30 @@ export default function LoginPage() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-foreground">Email Address</Label>
-              <Input id="email" type="email" placeholder="you@example.com" required className="text-base text-foreground py-2" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+                className="text-base text-foreground py-2"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-foreground">Password</Label>
-              <Input id="password" type="password" required className="text-base text-foreground py-2" />
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                required
+                className="text-base text-foreground py-2"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
 
              <div className="flex items-center justify-between pt-0.5">
@@ -50,15 +94,20 @@ export default function LoginPage() {
                   </label>
                 </div>
                 <Link
-                  href="/forgot-password"
+                  href="#" // Placeholder for "Forgot password"
                   className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
                 >
                   Forgot password?
                 </Link>
               </div>
 
-            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground">
-              Login
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground"
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
             </Button>
 
             <Separator className="my-5" />

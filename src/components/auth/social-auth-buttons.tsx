@@ -1,21 +1,22 @@
 // src/components/auth/social-auth-buttons.tsx
 'use client';
 
-import type { AuthError } from 'firebase/auth';
-import {
-  signInWithPopup,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-} from 'firebase/auth';
+// Removed Firebase imports:
+// import type { AuthError } from 'firebase/auth';
+// import {
+//   signInWithPopup,
+//   GoogleAuthProvider,
+//   FacebookAuthProvider,
+// } from 'firebase/auth';
+// import { auth } from '@/lib/firebase/firebase';
 
-import { Button, buttonVariants } from '@/components/ui/button'; // Import buttonVariants
-import { useToast } from '@/hooks/use-toast'; 
-import { auth } from '@/lib/firebase/firebase'; 
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+// import { cn } from '@/lib/utils'; // cn might not be needed if variants aren't used
 
 // Inline SVG for Google Icon
 const GoogleIcon = () => (
-  <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2.5"> {/* Slightly larger icon, adjusted margin */}
+  <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2.5">
     <path
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
       fill="#4285F4"
@@ -38,7 +39,7 @@ const GoogleIcon = () => (
 
 // Inline SVG for Facebook Icon
 const FacebookIcon = () => (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2.5" fill="currentColor"> {/* Slightly larger icon, adjusted margin */}
+    <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2.5" fill="currentColor">
         <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878V14.89H8.078V12.376h2.36V10.47c0-2.336 1.393-3.632 3.526-3.632.997 0 1.855.074 2.104.107v2.213H14.89c-1.142 0-1.363.542-1.363 1.333v1.885h2.473l-.32 2.513H13.526v7.008C18.343 21.128 22 16.991 22 12z"></path>
     </svg>
 );
@@ -52,37 +53,43 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
   const { toast } = useToast();
 
   const handleGoogleAuth = async () => {
-    console.log("Simulating successful Google login...");
+    // Firebase Auth is removed - Simulate or do nothing
+    console.log(`Simulating Google ${mode}... (Firebase Auth Removed)`);
     toast({
-      title: "Authentication Successful (Simulated)",
-      description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} with Google.`,
+      title: `Google ${mode} (Simulated)`,
+      description: `This would normally trigger Google Sign-In. Firebase Auth has been removed.`,
     });
-    setTimeout(() => {
-      window.location.href = '/'; 
-    }, 1000);
+    // In a real scenario without Firebase, you'd redirect to Google's OAuth endpoint.
+    // Example: window.location.href = '/api/auth/google'; (if you had a custom backend)
   };
 
   const handleFacebookAuth = async () => {
-    alert('Facebook login is not fully implemented in this simulation.');
+    // Firebase Auth is removed - Simulate or do nothing
+    console.log(`Simulating Facebook ${mode}... (Firebase Auth Removed)`);
+    toast({
+      title: `Facebook ${mode} (Simulated)`,
+      description: `This would normally trigger Facebook Sign-In. Firebase Auth has been removed.`,
+      variant: "default",
+    });
   };
 
   const buttonTextPrefix = mode === 'login' ? 'Continue' : 'Sign up';
 
   return (
-    <div className="space-y-3"> {/* Adjusted spacing */}
-      <Button 
-        variant="outline" 
-        size="lg" // Using lg for better touch target & visual weight
-        className="w-full rounded-full text-base py-3 shadow-sm" 
+    <div className="space-y-3">
+      <Button
+        variant="outline"
+        size="lg"
+        className="w-full rounded-full text-base py-3 shadow-sm"
         onClick={handleGoogleAuth}
       >
         <GoogleIcon />
         {buttonTextPrefix} with Google
       </Button>
-      <Button 
-        variant="outline" 
+      <Button
+        variant="outline"
         size="lg"
-        className="w-full rounded-full text-base py-3 shadow-sm" 
+        className="w-full rounded-full text-base py-3 shadow-sm" // Consider different styling for Facebook if desired
         onClick={handleFacebookAuth}
       >
         <FacebookIcon />
