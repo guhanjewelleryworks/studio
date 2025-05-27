@@ -14,23 +14,27 @@ import { Badge } from '@/components/ui/badge';
 export default function AdminGoldsmithsPage() {
   const [goldsmiths, setGoldsmiths] = useState<Goldsmith[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({}); // Track updating status per goldsmith
+  const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
   const loadGoldsmiths = async () => {
+    console.log('[AdminGoldsmithsPage] loadGoldsmiths called');
     setIsLoading(true);
     try {
       const data = await fetchAdminGoldsmiths();
-      setGoldsmiths(data);
+      console.log('[AdminGoldsmithsPage] Fetched data for admin:', data);
+      setGoldsmiths(data || []); // Ensure data is an array, default to empty if null/undefined
     } catch (error) {
-      console.error("Failed to fetch goldsmiths:", error);
+      console.error("[AdminGoldsmithsPage] Failed to fetch goldsmiths:", error);
       toast({
-        title: "Error",
-        description: "Could not fetch goldsmiths data. Please try again.",
+        title: "Error Loading Data",
+        description: "Could not fetch goldsmiths data. Please try refreshing the page or check server logs.",
         variant: "destructive",
       });
+      setGoldsmiths([]); // Set to empty array on error
     } finally {
       setIsLoading(false);
+      console.log('[AdminGoldsmithsPage] loadGoldsmiths finished');
     }
   };
 
@@ -39,6 +43,7 @@ export default function AdminGoldsmithsPage() {
   }, []);
 
   const handleUpdateStatus = async (id: string, newStatus: Goldsmith['status']) => {
+    console.log(`[AdminGoldsmithsPage] handleUpdateStatus called for ID: ${id}, New Status: ${newStatus}`);
     setIsUpdating(prev => ({ ...prev, [id]: true }));
     const result = await updateGoldsmithStatus(id, newStatus);
     if (result.success) {
@@ -46,7 +51,7 @@ export default function AdminGoldsmithsPage() {
         title: "Status Updated",
         description: `Goldsmith status successfully changed to ${newStatus}.`,
       });
-      loadGoldsmiths(); // Refresh the list
+      await loadGoldsmiths(); // Refresh the list
     } else {
       toast({
         title: "Update Failed",
@@ -60,11 +65,11 @@ export default function AdminGoldsmithsPage() {
   const getStatusBadgeVariant = (status: Goldsmith['status']) => {
     switch (status) {
       case 'verified':
-        return 'default'; // Primary color (usually green if theme is set up that way)
+        return 'default'; 
       case 'pending_verification':
-        return 'secondary'; // Secondary color (e.g., yellow/orange)
+        return 'secondary'; 
       case 'rejected':
-        return 'destructive'; // Destructive color (e.g., red)
+        return 'destructive'; 
       default:
         return 'outline';
     }
@@ -96,7 +101,7 @@ export default function AdminGoldsmithsPage() {
         <CardHeader>
           <CardTitle className="text-xl text-accent font-heading">Goldsmith Partner Management</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Review and manage goldsmith registrations and their statuses.
+            Review and manage goldsmith registrations and their statuses. Current goldsmith count: {goldsmiths.length}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -120,6 +125,12 @@ export default function AdminGoldsmithsPage() {
                         </Badge>
                     </div>
                   </CardHeader>
+                  <CardContent className="text-xs text-muted-foreground px-4 py-2">
+                    <p>Contact: {goldsmith.contactPerson || 'N/A'}</p>
+                    <p>Phone: {goldsmith.phone || 'N/A'}</p>
+                    <p>Address: {goldsmith.address || 'N/A'}</p>
+                    <p>Specialty: {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty || 'N/A'}</p>
+                  </CardContent>
                   <CardFooter className="px-4 pb-4 pt-2 flex justify-end gap-2">
                     {goldsmith.status === 'pending_verification' && (
                       <>
@@ -173,7 +184,7 @@ export default function AdminGoldsmithsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-muted-foreground text-center py-10">No goldsmiths found or none pending verification.</p>
+            <p className="text-muted-foreground text-center py-10">No goldsmiths found. This could mean no goldsmiths are registered yet, or there was an issue loading them.</p>
           )}
         </CardContent>
       </Card>
