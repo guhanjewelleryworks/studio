@@ -16,6 +16,11 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
         return { success: false, error: 'Workshop name, email, and password are required.' };
     }
 
+    // Password length validation
+    if (data.password.trim().length < 8) {
+        return { success: false, error: 'Password must be at least 8 characters long.' };
+    }
+
     const safeNameSeed = (data.name && data.name.trim() !== "")
       ? data.name.trim().replace(/\s+/g, '-').toLowerCase()
       : `goldsmith-${uuidv4().substring(0, 8)}`;
@@ -34,7 +39,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       address: data.address.trim(),
       specialty: Array.isArray(data.specialty) ? data.specialty.map(s => s.trim()) : data.specialty.trim(),
       portfolioLink: data.portfolioLink?.trim(),
-      password: data.password.trim(), // Trim password before storing
+      password: data.password.trim(), // Store trimmed password
       id: uuidv4(),
       rating: 0,
       imageUrl: `https://picsum.photos/seed/${safeNameSeed}/400/300`,
@@ -46,7 +51,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       yearsExperience: data.yearsExperience || 0, // Default to 0 if not provided
       responseTime: data.responseTime || "Varies",
       ordersCompleted: data.ordersCompleted || 0,
-      status: 'pending_verification', // Default status
+      status: 'pending_verification', // Default status for new registrations
     };
 
     const result = await collection.insertOne(newGoldsmith);
@@ -54,6 +59,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     if (result.insertedId) {
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
       if (insertedDoc) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { _id, ...goldsmithWithoutMongoId } = insertedDoc;
         return { success: true, data: goldsmithWithoutMongoId as Goldsmith };
       }
@@ -77,7 +83,8 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
 export async function fetchAllGoldsmiths(): Promise<Goldsmith[]> {
   try {
     const collection = await getGoldsmithsCollection();
-    const goldsmiths = await collection.find({ status: 'verified' }).toArray();
+    // Only fetch verified goldsmiths for public display
+    const goldsmiths = await collection.find({ status: 'verified' }).toArray(); 
     return goldsmiths.map(g => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, password, ...rest } = g; // Exclude MongoDB's _id AND password for public listings

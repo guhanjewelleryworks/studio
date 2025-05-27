@@ -37,7 +37,7 @@ export default function GoldsmithRegisterPage() {
 
     const trimmedWorkshopName = workshopName.trim();
     const trimmedEmail = email.trim().toLowerCase();
-    const trimmedPassword = password.trim(); // Password state is already trimmed via onChange typically, but explicit trim is safer
+    const trimmedPassword = password.trim();
     const trimmedConfirmPassword = confirmPassword.trim();
     const trimmedContactPerson = contactPerson.trim();
     const trimmedPhone = phone.trim();
@@ -45,10 +45,21 @@ export default function GoldsmithRegisterPage() {
     const trimmedSpecialtiesArray = specialties.split(',').map(s => s.trim()).filter(s => s);
     const trimmedPortfolioLink = portfolioLink.trim();
 
+    // Client-side validation
     if (!trimmedWorkshopName || !trimmedEmail || !trimmedPassword) {
       toast({
         title: 'Registration Error',
-        description: 'Workshop name, email, and password are required. Please fill all fields.',
+        description: 'Workshop name, email, and password are required.',
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (trimmedPassword.length < 8) {
+      toast({
+        title: 'Registration Error',
+        description: 'Password must be at least 8 characters long.',
         variant: 'destructive',
       });
       setIsSubmitting(false);
@@ -70,7 +81,7 @@ export default function GoldsmithRegisterPage() {
         address: trimmedAddress,
         specialty: trimmedSpecialtiesArray,
         portfolioLink: trimmedPortfolioLink,
-        password: trimmedPassword,
+        password: trimmedPassword, // Password is now handled by the server action
       };
 
       const result = await saveGoldsmith(newGoldsmithData);
@@ -114,7 +125,7 @@ export default function GoldsmithRegisterPage() {
       <Card className="w-full max-w-2xl shadow-xl border-primary/15 rounded-xl bg-card">
         <CardHeader className="text-center pt-6 pb-4">
           <Briefcase className="h-12 w-12 mx-auto text-primary mb-3" />
-          <CardTitle className="text-3xl text-accent font-heading">Register Your Goldsmith Workshop</CardTitle>
+          <CardTitle className="text-3xl font-heading text-accent">Register Your Goldsmith Workshop</CardTitle>
           <CardDescription className="text-muted-foreground mt-1 text-sm font-poppins">Join our curated network of skilled artisans. Please fill in your details below.</CardDescription>
         </CardHeader>
         <CardContent className="px-6 pb-6 pt-4">
@@ -159,7 +170,7 @@ export default function GoldsmithRegisterPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
               <div className="space-y-1">
                 <Label htmlFor="password" className="text-foreground">Create Password</Label>
-                <Input id="password" type="password" placeholder="Create a secure password" required className="text-foreground" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isFormDisabled}/>
+                <Input id="password" type="password" placeholder="Min. 8 characters" required className="text-foreground" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isFormDisabled}/>
               </div>
                <div className="space-y-1">
                 <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
