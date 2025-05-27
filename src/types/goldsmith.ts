@@ -21,14 +21,16 @@ export interface Goldsmith {
   responseTime?: string;
   ordersCompleted?: number;
   contactPerson?: string;
-  email: string; // Keep email as it's a primary identifier
+  email: string;
   phone?: string;
   portfolioLink?: string;
-  // Removed: firebaseUID: string;
+  password?: string; // This should be present for the plain-text password simulation
   status: 'pending_verification' | 'verified' | 'rejected';
-  // Password is not stored in this type, it was for simulation earlier
 }
 
 // Input type for new goldsmith registration
-// Removed firebaseUID from Omit as it's removed from Goldsmith type
-export type NewGoldsmithInput = Omit<Goldsmith, '_id' | 'id' | 'rating' | 'imageUrl' | 'profileImageUrl' | 'location' | 'shortBio' | 'tagline' | 'bio' | 'yearsExperience' | 'responseTime' | 'ordersCompleted' | 'status'>;
+// This will include 'password' if it's defined in Goldsmith interface (even if optional, but we expect it for registration)
+export type NewGoldsmithInput = Omit<
+  Goldsmith,
+  '_id' | 'id' | 'rating' | 'imageUrl' | 'profileImageUrl' | 'location' | 'shortBio' | 'tagline' | 'bio' | 'yearsExperience' | 'responseTime' | 'ordersCompleted' | 'status'
+>;

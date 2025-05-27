@@ -34,6 +34,7 @@ export default function GoldsmithLoginPage() {
     }
 
     try {
+      // Fetch goldsmith by email (email will be lowercased and trimmed by the action)
       const goldsmith = await fetchGoldsmithByEmailForLogin(email);
 
       if (!goldsmith) {
@@ -48,7 +49,8 @@ export default function GoldsmithLoginPage() {
 
       // IMPORTANT: This is plain text password comparison for simulation ONLY.
       // DO NOT USE THIS IN PRODUCTION. Use a secure hashing mechanism.
-      if (goldsmith.password !== password) {
+      // Trim password from form input before comparison
+      if (goldsmith.password !== password.trim()) { 
         toast({
           title: 'Login Failed',
           description: 'Incorrect password. Please try again.',
@@ -83,7 +85,7 @@ export default function GoldsmithLoginPage() {
         <CardHeader className="text-center pt-6 pb-4">
            <LogIn className="h-12 w-12 mx-auto text-primary mb-3" />
           <CardTitle className="text-3xl text-accent">Goldsmith Portal Login</CardTitle>
-          <CardDescription className="text-muted-foreground mt-1 text-sm">Access your dashboard to manage your profile and orders.</CardDescription>
+          <CardDescription className="text-muted-foreground mt-1 text-sm font-poppins">Access your dashboard to manage your profile and orders.</CardDescription>
         </CardHeader>
         <CardContent className="px-8 pb-6 pt-4">
           <form className="space-y-4" onSubmit={handleSubmit}>

@@ -5,11 +5,16 @@ import { getGoldsmithsCollection } from '@/lib/mongodb';
 import type { Goldsmith, NewGoldsmithInput } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 
-const defaultLocation = { lat: 34.0522, lng: -118.2437 };
+const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Example: Los Angeles
 
 export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success: boolean; data?: Goldsmith; error?: string }> {
   try {
     const collection = await getGoldsmithsCollection();
+
+    // Basic validation
+    if (!data.name || !data.email || !data.password) {
+        return { success: false, error: 'Workshop name, email, and password are required.' };
+    }
 
     const safeNameSeed = (data.name && data.name.trim() !== "")
       ? data.name.trim().replace(/\s+/g, '-').toLowerCase()
@@ -22,38 +27,37 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
         : 'fine jewelry';
 
     const newGoldsmith: Goldsmith = {
-      name: data.name,
-      contactPerson: data.contactPerson,
-      email: data.email.toLowerCase(),
-      phone: data.phone,
-      address: data.address,
-      specialty: data.specialty,
-      portfolioLink: data.portfolioLink,
-      password: data.password, // Storing plain-text password (for simulation only!)
+      name: data.name.trim(),
+      contactPerson: data.contactPerson?.trim(),
+      email: data.email.toLowerCase().trim(),
+      phone: data.phone?.trim(),
+      address: data.address.trim(),
+      specialty: Array.isArray(data.specialty) ? data.specialty.map(s => s.trim()) : data.specialty.trim(),
+      portfolioLink: data.portfolioLink?.trim(),
+      password: data.password.trim(), // Trim password before storing
       id: uuidv4(),
       rating: 0,
       imageUrl: `https://picsum.photos/seed/${safeNameSeed}/400/300`,
       profileImageUrl: `https://picsum.photos/seed/${safeNameSeed}-profile/120/120`,
-      location: defaultLocation,
+      location: defaultLocation, // Default location for now
       shortBio: `Specializing in ${specialtyText}.`,
       tagline: `Bespoke creations by ${workshopNameOrDefault}`,
-      bio: `Discover the craftsmanship of ${workshopNameOrDefault}.`,
-      yearsExperience: 0,
-      responseTime: "Varies",
-      ordersCompleted: 0,
-      status: 'pending_verification',
+      bio: `Discover the craftsmanship of ${workshopNameOrDefault}. This artisan brings years of dedication and a passion for unique jewelry to every piece, ensuring meticulous attention to detail and a personal touch. From initial design to final polish, experience the art of bespoke jewelry.`,
+      yearsExperience: data.yearsExperience || 0, // Default to 0 if not provided
+      responseTime: data.responseTime || "Varies",
+      ordersCompleted: data.ordersCompleted || 0,
+      status: 'pending_verification', // Default status
     };
 
     const result = await collection.insertOne(newGoldsmith);
 
     if (result.insertedId) {
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
-      // Ensure the returned object matches the Goldsmith type structure, removing _id if necessary before casting
       if (insertedDoc) {
         const { _id, ...goldsmithWithoutMongoId } = insertedDoc;
         return { success: true, data: goldsmithWithoutMongoId as Goldsmith };
       }
-      return { success: true, data: undefined }; // Or handle as an error if doc not found post-insert
+      return { success: true, data: undefined }; 
     } else {
       return { success: false, error: 'Failed to insert goldsmith data.' };
     }
@@ -62,6 +66,9 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     let errorMessage = 'An unknown error occurred while saving goldsmith data.';
     if (error instanceof Error) {
         errorMessage = error.message;
+         if ((error as any).code === 11000) { // MongoDB duplicate key error
+            errorMessage = 'An account with this email already exists.';
+        }
     }
     return { success: false, error: `Failed to save goldsmith: ${errorMessage}` };
   }
@@ -70,10 +77,10 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
 export async function fetchAllGoldsmiths(): Promise<Goldsmith[]> {
   try {
     const collection = await getGoldsmithsCollection();
-    // Fetch only verified goldsmiths for the discover page
     const goldsmiths = await collection.find({ status: 'verified' }).toArray();
     return goldsmiths.map(g => {
-      const { _id, ...rest } = g; // Exclude MongoDB's _id
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, password, ...rest } = g; // Exclude MongoDB's _id AND password for public listings
       return rest as Goldsmith;
     });
   } catch (error) {
@@ -87,7 +94,8 @@ export async function fetchGoldsmithById(id: string): Promise<Goldsmith | null> 
     const collection = await getGoldsmithsCollection();
     const goldsmithDoc = await collection.findOne({ id: id });
     if (goldsmithDoc) {
-      const { _id, ...goldsmith } = goldsmithDoc;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, password, ...goldsmith } = goldsmithDoc; // Exclude password for public profile view
       return goldsmith as Goldsmith;
     }
     return null;
@@ -97,16 +105,16 @@ export async function fetchGoldsmithById(id: string): Promise<Goldsmith | null> 
   }
 }
 
-// New function to fetch goldsmith by email for login, including the password
+// Fetches goldsmith by email for login, including the password
 export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Goldsmith | null> {
   try {
     const collection = await getGoldsmithsCollection();
-    const goldsmithDoc = await collection.findOne({ email: email.toLowerCase() });
+    // Ensure the email query is also lowercased to match the stored format
+    const goldsmithDoc = await collection.findOne({ email: email.toLowerCase().trim() });
     if (goldsmithDoc) {
-      // For login, we need the password, so we don't exclude it here.
-      // Still, it's good practice to transform away the MongoDB _id if not needed by the caller.
-      const { _id, ...goldsmith } = goldsmithDoc;
-      return goldsmith as Goldsmith; // This will include the password field
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, ...goldsmith } = goldsmithDoc; // We need the password field from the doc
+      return goldsmith as Goldsmith; 
     }
     return null;
   } catch (error) {
