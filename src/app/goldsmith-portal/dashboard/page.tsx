@@ -28,12 +28,6 @@ interface DashboardStats {
   profileCompletion: number;
 }
 
-const mockNotifications = [
-  { id: 1, message: "New order request #ORD12345 received.", time: "2 hours ago", read: false },
-  { id: 2, message: "Customer Inquiry: 'Can you make a custom ring?'", time: "1 day ago", read: false },
-  { id: 3, message: "Profile view increased by 15% this week.", time: "3 days ago", read: true },
-];
-
 // Function to calculate profile completion
 const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
   if (!goldsmith) return 0;
@@ -53,7 +47,7 @@ const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
 
 export default function GoldsmithDashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({
-    goldsmithName: "Artisan Goldworks",
+    goldsmithName: "Loading...",
     newOrdersCount: 0, 
     pendingInquiriesCount: 0,
     profileCompletion: 0,
@@ -67,44 +61,50 @@ export default function GoldsmithDashboardPage() {
       setIsLoading(true);
       try {
         // For simulation, fetch the first verified goldsmith to represent the "logged-in" user.
+        // In a real app, you'd get the logged-in goldsmith's ID from session/auth state.
         const allVerifiedGoldsmiths = await fetchAllGoldsmiths(); 
         const activeGoldsmith = allVerifiedGoldsmiths.length > 0 ? allVerifiedGoldsmiths[0] : null;
-        setCurrentGoldsmith(activeGoldsmith);
-
-        if (activeGoldsmith) {
+        
+        if (activeGoldsmith && activeGoldsmith.id) {
+          setCurrentGoldsmith(activeGoldsmith);
           const [ordersCount, inquiriesCount] = await Promise.all([
             getNewOrderCountForGoldsmith(activeGoldsmith.id),
             getPendingInquiriesCountForGoldsmith(activeGoldsmith.id)
           ]);
 
-          setStats(prevStats => ({
-            ...prevStats,
+          setStats({
             goldsmithName: activeGoldsmith.name,
             profileCompletion: calculateProfileCompletion(activeGoldsmith),
             newOrdersCount: ordersCount,
             pendingInquiriesCount: inquiriesCount,
-          }));
+          });
         } else {
            toast({
-            title: "Simulation Info",
-            description: "Displaying default dashboard data. No verified goldsmith found for dynamic content.",
+            title: "No Verified Goldsmith Found",
+            description: "Dashboard data requires a verified goldsmith profile. Please register or await verification.",
             variant: "default",
+            duration: 7000,
           });
-          setStats(prevStats => ({
-            ...prevStats,
-            goldsmithName: "Default Artisan",
-            profileCompletion: calculateProfileCompletion(null),
+          setStats({
+            goldsmithName: "Artisan",
+            profileCompletion: 0,
             newOrdersCount: 0,
             pendingInquiriesCount: 0,
-          }));
+          });
         }
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
         toast({
-          title: "Error",
-          description: "Could not load dashboard data.",
+          title: "Error Loading Dashboard",
+          description: "Could not load dashboard data. Please try again later.",
           variant: "destructive",
         });
+         setStats({ // Fallback stats on error
+            goldsmithName: "Error Loading",
+            profileCompletion: 0,
+            newOrdersCount: 0,
+            pendingInquiriesCount: 0,
+          });
       } finally {
         setIsLoading(false);
       }
@@ -118,11 +118,13 @@ export default function GoldsmithDashboardPage() {
       <header className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-heading text-accent">
-            {isLoading ? <Loader2 className="h-8 w-8 animate-spin inline-block" /> : `Welcome, ${stats.goldsmithName}!`}
+            {isLoading && stats.goldsmithName === "Loading..." ? <Loader2 className="h-8 w-8 animate-spin inline-block mr-2" /> : null}
+            Welcome, {stats.goldsmithName}!
           </h1>
           <p className="text-muted-foreground text-lg">Manage your workshop and connect with customers.</p>
         </div>
         <Button variant="destructive" size="sm" asChild className="text-xs rounded-full">
+            {/* This should ideally log out the user, for now it just links to homepage */}
             <Link href="/">
                 <LogOut className="mr-1.5 h-3.5 w-3.5" /> Logout (Simulated)
             </Link>
@@ -171,7 +173,7 @@ export default function GoldsmithDashboardPage() {
           title="Manage Profile"
           description="Update your workshop details, bio, specialties, and contact information."
           icon={UserCog}
-          linkHref="/goldsmith-portal/profile/edit"
+          linkHref={`/goldsmith-portal/profile/edit${currentGoldsmith ? '?id=' + currentGoldsmith.id : ''}`} // Pass ID if available
           linkText="Edit Your Profile"
           variant="outline"
         />
@@ -179,17 +181,17 @@ export default function GoldsmithDashboardPage() {
           title="Order Management"
           description="View new, active, and completed custom order requests."
           icon={Package}
-          linkHref="/goldsmith-portal/orders?status=new" 
+          linkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=new`} 
           linkText="View New Orders"
           variant="default"
-          secondaryLinkHref="/goldsmith-portal/orders?status=active"
+          secondaryLinkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=active`}
           secondaryLinkText="Manage Active Orders"
         />
         <DashboardActionCard
           title="Communication Hub"
           description="Respond to customer inquiries and manage conversations."
           icon={MessageSquare}
-          linkHref="/goldsmith-portal/messages"
+          linkHref={`/goldsmith-portal/messages?goldsmithId=${currentGoldsmith?.id || ''}`}
           linkText="Access Messages"
           variant="default"
         />
@@ -197,7 +199,7 @@ export default function GoldsmithDashboardPage() {
           title="Portfolio Showcase"
           description="Manage images of your work to attract customers."
           icon={GalleryHorizontal}
-          linkHref="/goldsmith-portal/portfolio/manage"
+          linkHref={`/goldsmith-portal/portfolio/manage?goldsmithId=${currentGoldsmith?.id || ''}`}
           linkText="Update Portfolio"
           variant="outline"
         />
@@ -205,7 +207,7 @@ export default function GoldsmithDashboardPage() {
           title="Performance Analytics"
           description="View insights on profile views, inquiries, and order trends."
           icon={BarChart3}
-          linkHref="/goldsmith-portal/analytics"
+          linkHref={`/goldsmith-portal/analytics?goldsmithId=${currentGoldsmith?.id || ''}`}
           linkText="View Analytics"
           variant="outline"
         />
@@ -213,41 +215,15 @@ export default function GoldsmithDashboardPage() {
           title="Account Settings"
           description="Manage login, notifications, and payment details."
           icon={Settings}
-          linkHref="/goldsmith-portal/settings"
+          linkHref={`/goldsmith-portal/settings?goldsmithId=${currentGoldsmith?.id || ''}`}
           linkText="Go to Settings"
           variant="outline"
         />
       </section>
+      
+      {/* Removed simulated notifications section */}
+      {/* If you want real notifications, this would be a separate feature to implement */}
 
-      {/* Notifications Section - Still Mocked */}
-      <section className="mt-10">
-          <Card className="shadow-lg bg-card border-primary/10">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-1">
-                    <Bell className="h-6 w-6 text-primary" />
-                    <CardTitle className="text-lg text-accent font-heading">Recent Notifications (Simulated)</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                  {isLoading ? (
-                     <div className="space-y-3">
-                        {[1,2,3].map(i => <Loader2 key={i} className="h-5 w-5 animate-spin text-muted-foreground" />)}
-                     </div>
-                  ) : mockNotifications.length > 0 ? (
-                    <ul className="space-y-3">
-                      {mockNotifications.map(notification => (
-                        <li key={notification.id} className={`py-2.5 px-3 rounded-md border-l-4 ${notification.read ? 'border-border/30 bg-card/50' : 'border-primary bg-primary/5'}`}>
-                            <p className={`text-sm ${notification.read ? 'text-muted-foreground' : 'text-foreground font-medium'}`}>{notification.message}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5">{notification.time}</p>
-                        </li> 
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No new notifications.</p>
-                  )}
-              </CardContent>
-          </Card>
-      </section>
     </div>
   );
 }
@@ -287,3 +263,4 @@ const DashboardActionCard: React.FC<DashboardActionCardProps> = ({ title, descri
     </CardContent>
   </Card>
 );
+
