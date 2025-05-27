@@ -4,12 +4,12 @@
 import { getGoldsmithsCollection } from '@/lib/mongodb';
 import type { Goldsmith, NewGoldsmithInput } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
-import type { Collection, Filter, ObjectId } from 'mongodb';
+import type { Collection, Filter } from 'mongodb';
 
 const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Example: Los Angeles
 
 export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success: boolean; data?: Goldsmith; error?: string }> {
-  console.log('[Action: saveGoldsmith] Received data:', JSON.stringify(data));
+  console.log('[Action: saveGoldsmith] Received data for registration:', JSON.stringify(data));
   try {
     const collection: Collection<Goldsmith> = await getGoldsmithsCollection();
 
@@ -24,11 +24,23 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
         return { success: false, error: 'Password must be at least 8 characters long.' };
     }
 
+    const normalizedEmail = data.email.toLowerCase().trim();
+    const normalizedPhone = data.phone ? data.phone.trim() : undefined; // Use undefined if phone is not provided
+
     // Check if email already exists
-    const existingGoldsmith = await collection.findOne({ email: data.email.toLowerCase().trim() });
-    if (existingGoldsmith) {
-        console.error('[Action: saveGoldsmith] Validation failed: Email already exists.');
-        return { success: false, error: 'An account with this email already exists.' };
+    const existingGoldsmithByEmail = await collection.findOne({ email: normalizedEmail });
+    if (existingGoldsmithByEmail) {
+        console.error(`[Action: saveGoldsmith] Validation failed: Email ${normalizedEmail} already exists.`);
+        return { success: false, error: 'An account with this email already exists. Please use a different email or log in.' };
+    }
+
+    // Check if phone number already exists (only if a non-empty phone is provided)
+    if (normalizedPhone && normalizedPhone !== '') {
+        const existingGoldsmithByPhone = await collection.findOne({ phone: normalizedPhone });
+        if (existingGoldsmithByPhone) {
+            console.error(`[Action: saveGoldsmith] Validation failed: Phone number ${normalizedPhone} already exists.`);
+            return { success: false, error: 'An account with this phone number already exists. Please use a different phone number.' };
+        }
     }
 
     const safeNameSeed = (data.name && data.name.trim() !== "")
@@ -44,8 +56,8 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     const newGoldsmith: Goldsmith = {
       name: data.name.trim(),
       contactPerson: data.contactPerson?.trim() || '',
-      email: data.email.toLowerCase().trim(),
-      phone: data.phone?.trim() || '',
+      email: normalizedEmail,
+      phone: normalizedPhone || '', // Store empty string if phone is undefined, or as per your DB schema preference
       address: data.address?.trim() || '',
       specialty: Array.isArray(data.specialty) ? data.specialty.map(s => s.trim()).filter(s => s) : (data.specialty?.trim() || ''),
       portfolioLink: data.portfolioLink?.trim() || '',
@@ -64,7 +76,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       status: 'pending_verification', // Default status for new registrations
     };
     
-    console.log('[Action: saveGoldsmith] Attempting to insert:', JSON.stringify(newGoldsmith));
+    console.log('[Action: saveGoldsmith] Attempting to insert new goldsmith:', JSON.stringify(newGoldsmith));
     const result = await collection.insertOne(newGoldsmith);
     console.log('[Action: saveGoldsmith] MongoDB insert result:', JSON.stringify(result));
 
@@ -76,7 +88,6 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
         console.log('[Action: saveGoldsmith] Successfully inserted and retrieved doc:', JSON.stringify(goldsmithWithoutMongoId));
         return { success: true, data: goldsmithWithoutMongoId as Goldsmith };
       }
-      // This case might indicate a race condition or an unexpected state if findOne fails immediately after insert.
       console.warn('[Action: saveGoldsmith] InsertedId was present, but document not found immediately after insert. ID:', result.insertedId.toString());
       return { success: true, data: undefined }; 
     } else {
@@ -84,15 +95,15 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       return { success: false, error: 'Failed to insert goldsmith data.' };
     }
   } catch (error) {
-    console.error('[Action: saveGoldsmith] Error saving goldsmith:', error);
-    let errorMessage = 'An unknown error occurred while saving goldsmith data.';
+    console.error('[Action: saveGoldsmith] Error during goldsmith registration:', error);
+    let errorMessage = 'An unknown error occurred while registering goldsmith.';
     if (error instanceof Error) {
         errorMessage = error.message;
          if ((error as any).code === 11000) { 
-            errorMessage = 'An account with this email already exists.';
+            errorMessage = 'A duplicate record error occurred. This email or phone number might already be in use.';
         }
     }
-    return { success: false, error: `Failed to save goldsmith: ${errorMessage}` };
+    return { success: false, error: `Failed to register goldsmith: ${errorMessage}` };
   }
 }
 
@@ -203,14 +214,13 @@ export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Gold
   console.log(`[Action: fetchGoldsmithByEmailForLogin] Attempting to fetch goldsmith by email ${normalizedEmail}.`);
   try {
     const collection = await getGoldsmithsCollection();
-    const goldsmithDoc = await collection.findOne({ email: normalizedEmail });
+    // Fetch the full document including the password for login comparison
+    const goldsmithDoc = await collection.findOne({ email: normalizedEmail }); 
     if (goldsmithDoc) {
-      // For login, we need to return the document including the password.
-      // The password exclusion should happen where the data is displayed if sensitive.
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { _id, ...goldsmith } = goldsmithDoc; 
-      console.log(`[Action: fetchGoldsmithByEmailForLogin] Found goldsmith:`, JSON.stringify(goldsmith));
-      return goldsmith as Goldsmith; // Return the full document including password for login check
+      const { _id, ...goldsmith } = goldsmithDoc;
+      console.log(`[Action: fetchGoldsmithByEmailForLogin] Found goldsmith with matching email.`); // Don't log sensitive data like password
+      return goldsmith as Goldsmith; 
     }
     console.log(`[Action: fetchGoldsmithByEmailForLogin] Goldsmith with email ${normalizedEmail} not found.`);
     return null;

@@ -30,6 +30,9 @@ export default function GoldsmithRegisterPage() {
   const [portfolioLink, setPortfolioLink] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [yearsExperience, setYearsExperience] = useState<number | undefined>(undefined);
+  const [responseTime, setResponseTime] = useState('');
+
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -44,6 +47,7 @@ export default function GoldsmithRegisterPage() {
     const trimmedAddress = address.trim();
     const trimmedSpecialtiesArray = specialties.split(',').map(s => s.trim()).filter(s => s);
     const trimmedPortfolioLink = portfolioLink.trim();
+    const trimmedResponseTime = responseTime.trim();
 
     // Client-side validation
     if (!trimmedWorkshopName || !trimmedEmail || !trimmedPassword) {
@@ -81,23 +85,38 @@ export default function GoldsmithRegisterPage() {
         address: trimmedAddress,
         specialty: trimmedSpecialtiesArray,
         portfolioLink: trimmedPortfolioLink,
-        password: trimmedPassword, // Password is now handled by the server action
+        password: trimmedPassword,
+        yearsExperience: yearsExperience || 0,
+        responseTime: trimmedResponseTime || "Varies",
+        // ordersCompleted will default in the server action if not provided
       };
 
       const result = await saveGoldsmith(newGoldsmithData);
 
       if (result.success && result.data) {
         toast({
-          title: 'Registration Submitted',
-          description: 'Your workshop details have been submitted for review. Redirecting to login...',
+          title: 'Registration Submitted Successfully!',
+          description: "Awaiting for the approval, once approved you'll be part of the Goldsmith Connect Community.",
+          duration: 7000, // Keep message longer
         });
-        setTimeout(() => {
-          router.push('/goldsmith-portal/login');
-        }, 2000);
+        // Clear form fields
+        setWorkshopName('');
+        setContactPerson('');
+        setEmail('');
+        setPhone('');
+        setAddress('');
+        setSpecialties('');
+        setPortfolioLink('');
+        setPassword('');
+        setConfirmPassword('');
+        setYearsExperience(undefined);
+        setResponseTime('');
+        
+        router.push('/'); // Redirect to homepage
       } else {
         console.error("Failed to save goldsmith profile to MongoDB:", result.error);
         toast({
-          title: 'Profile Save Failed',
+          title: 'Registration Failed',
           description: result.error || 'Could not save your profile. Please contact support.',
           variant: 'destructive',
         });
@@ -141,15 +160,17 @@ export default function GoldsmithRegisterPage() {
               </div>
             </div>
 
-            <div className="space-y-1">
-                <Label htmlFor="email" className="text-foreground">Business Email Address</Label>
-                <Input id="email" type="email" placeholder="contact@auragold.com" required className="text-foreground flex-grow" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isFormDisabled}/>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
+              <div className="space-y-1">
+                  <Label htmlFor="email" className="text-foreground">Business Email Address</Label>
+                  <Input id="email" type="email" placeholder="contact@auragold.com" required className="text-foreground" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isFormDisabled}/>
+              </div>
+              <div className="space-y-1">
+                  <Label htmlFor="phone" className="text-foreground">Business Phone Number</Label>
+                  <Input id="phone" type="tel" placeholder="e.g., 9876543210" className="text-foreground" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={isFormDisabled}/>
+              </div>
             </div>
 
-             <div className="space-y-1">
-                <Label htmlFor="phone" className="text-foreground">Business Phone Number</Label>
-                <Input id="phone" type="tel" placeholder="e.g., 9876543210" required className="text-foreground flex-grow" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={isFormDisabled}/>
-            </div>
 
             <div className="space-y-1">
               <Label htmlFor="address" className="text-foreground">Workshop Address</Label>
@@ -158,8 +179,19 @@ export default function GoldsmithRegisterPage() {
 
              <div className="space-y-1">
               <Label htmlFor="specialties" className="text-foreground">Specialties & Techniques</Label>
-              <Input id="specialties" placeholder="e.g., Custom Engagement Rings, Hand Engraving, Gemstone Setting" required className="text-foreground" value={specialties} onChange={(e) => setSpecialties(e.target.value)} disabled={isFormDisabled}/>
+              <Input id="specialties" placeholder="e.g., Custom Engagement Rings, Hand Engraving" required className="text-foreground" value={specialties} onChange={(e) => setSpecialties(e.target.value)} disabled={isFormDisabled}/>
                <p className="text-xs text-muted-foreground pt-0.5">Separate multiple specialties with commas.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
+              <div className="space-y-1">
+                <Label htmlFor="yearsExperience" className="text-foreground">Years of Experience</Label>
+                <Input id="yearsExperience" type="number" placeholder="e.g., 10" className="text-foreground" value={yearsExperience === undefined ? '' : yearsExperience} onChange={(e) => setYearsExperience(e.target.value === '' ? undefined : parseInt(e.target.value, 10))} disabled={isFormDisabled}/>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="responseTime" className="text-foreground">Typical Response Time</Label>
+                <Input id="responseTime" placeholder="e.g., Within 24 hours" className="text-foreground" value={responseTime} onChange={(e) => setResponseTime(e.target.value)} disabled={isFormDisabled}/>
+              </div>
             </div>
 
             <div className="space-y-1">
