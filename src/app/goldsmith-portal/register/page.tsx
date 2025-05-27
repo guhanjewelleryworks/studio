@@ -12,17 +12,12 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
-import { saveGoldsmith } from '@/actions/goldsmith-actions'; // Corrected import name
+import { saveGoldsmith } from '@/actions/goldsmith-actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-// Removed Firebase Auth imports:
-// import { auth } from '@/lib/firebase/firebase';
-// import { createUserWithEmailAndPassword, type UserCredential, type AuthError } from 'firebase/auth';
-
 
 export default function GoldsmithRegisterPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false); // Kept for general loading state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form state
@@ -33,32 +28,49 @@ export default function GoldsmithRegisterPage() {
   const [address, setAddress] = useState('');
   const [specialties, setSpecialties] = useState('');
   const [portfolioLink, setPortfolioLink] = useState('');
-  const [password, setPassword] = useState(''); // Still collecting for now, but won't be used with Firebase
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsSubmitting(true);
 
-    if (password !== confirmPassword) {
+    const trimmedWorkshopName = workshopName.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim(); // Password state is already trimmed via onChange typically, but explicit trim is safer
+    const trimmedConfirmPassword = confirmPassword.trim();
+    const trimmedContactPerson = contactPerson.trim();
+    const trimmedPhone = phone.trim();
+    const trimmedAddress = address.trim();
+    const trimmedSpecialtiesArray = specialties.split(',').map(s => s.trim()).filter(s => s);
+    const trimmedPortfolioLink = portfolioLink.trim();
+
+    if (!trimmedWorkshopName || !trimmedEmail || !trimmedPassword) {
+      toast({
+        title: 'Registration Error',
+        description: 'Workshop name, email, and password are required. Please fill all fields.',
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (trimmedPassword !== trimmedConfirmPassword) {
       toast({ title: 'Registration Error', description: 'Passwords do not match.', variant: 'destructive' });
       setIsSubmitting(false);
       return;
     }
 
     try {
-      // Firebase user creation step is removed.
-      // We'll directly prepare data for MongoDB.
-
       const newGoldsmithData: NewGoldsmithInput = {
-        name: workshopName,
-        contactPerson,
-        email: email.toLowerCase(), // Store email consistently
-        phone,
-        address,
-        specialty: specialties.split(',').map(s => s.trim()).filter(s => s),
-        portfolioLink,
-        // No firebaseUID, status will be set by saveGoldsmith action
+        name: trimmedWorkshopName,
+        contactPerson: trimmedContactPerson,
+        email: trimmedEmail,
+        phone: trimmedPhone,
+        address: trimmedAddress,
+        specialty: trimmedSpecialtiesArray,
+        portfolioLink: trimmedPortfolioLink,
+        password: trimmedPassword,
       };
 
       const result = await saveGoldsmith(newGoldsmithData);
@@ -80,9 +92,8 @@ export default function GoldsmithRegisterPage() {
         });
       }
     } catch (error) {
-      // This catch block might now primarily catch errors from saveGoldsmith or network issues
-      console.error("Registration failed:", error);
-      let description = 'An unexpected error occurred during registration.';
+      console.error("Registration submission failed:", error);
+      let description = 'An unexpected error occurred during registration submission.';
       if (error instanceof Error) {
         description = error.message;
       }
@@ -96,7 +107,7 @@ export default function GoldsmithRegisterPage() {
     }
   };
 
-  const isFormDisabled = isLoading || isSubmitting;
+  const isFormDisabled = isSubmitting;
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/20 to-background">
@@ -147,12 +158,12 @@ export default function GoldsmithRegisterPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
               <div className="space-y-1">
-                <Label htmlFor="password" className="text-foreground">Create Password (for portal access)</Label>
-                <Input id="password" type="password" required className="text-foreground" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isFormDisabled}/>
+                <Label htmlFor="password" className="text-foreground">Create Password</Label>
+                <Input id="password" type="password" placeholder="Create a secure password" required className="text-foreground" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isFormDisabled}/>
               </div>
                <div className="space-y-1">
                 <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
-                <Input id="confirmPassword" type="password" required className="text-foreground" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isFormDisabled}/>
+                <Input id="confirmPassword" type="password" placeholder="Re-enter your password" required className="text-foreground" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isFormDisabled}/>
               </div>
             </div>
 
@@ -168,7 +179,7 @@ export default function GoldsmithRegisterPage() {
                 type="submit"
                 size="lg"
                 className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-3 mt-2.5 bg-primary hover:bg-primary/90 text-primary-foreground"
-                disabled={isFormDisabled || isSubmitting}
+                disabled={isFormDisabled}
             >
               {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <CheckCircle className="mr-2 h-5 w-5"/>}
               {isSubmitting ? 'Submitting...' : 'Submit Registration'}

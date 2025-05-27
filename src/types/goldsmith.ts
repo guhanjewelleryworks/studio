@@ -24,13 +24,25 @@ export interface Goldsmith {
   email: string;
   phone?: string;
   portfolioLink?: string;
-  password?: string; // This should be present for the plain-text password simulation
+  password: string; // Made password non-optional
   status: 'pending_verification' | 'verified' | 'rejected';
 }
 
 // Input type for new goldsmith registration
-// This will include 'password' if it's defined in Goldsmith interface (even if optional, but we expect it for registration)
+// Password is now non-optional here as well due to the change in Goldsmith type
 export type NewGoldsmithInput = Omit<
   Goldsmith,
-  '_id' | 'id' | 'rating' | 'imageUrl' | 'profileImageUrl' | 'location' | 'shortBio' | 'tagline' | 'bio' | 'yearsExperience' | 'responseTime' | 'ordersCompleted' | 'status'
+  | '_id'
+  | 'id'
+  | 'rating'
+  | 'imageUrl'
+  | 'profileImageUrl'
+  | 'location'
+  | 'shortBio'
+  | 'tagline'
+  | 'bio'
+  | 'yearsExperience'
+  | 'responseTime'
+  | 'ordersCompleted'
+  | 'status'
 >;
