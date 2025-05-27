@@ -116,7 +116,7 @@ export async function fetchGoldsmithById(id: string): Promise<Goldsmith | null> 
 export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Goldsmith | null> {
   try {
     const collection = await getGoldsmithsCollection();
-    // Ensure the email query is also lowercased to match the stored format
+    // Ensure the email query is also lowercased and trimmed to match the stored format
     const goldsmithDoc = await collection.findOne({ email: email.toLowerCase().trim() });
     if (goldsmithDoc) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
