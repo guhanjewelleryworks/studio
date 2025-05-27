@@ -62,7 +62,7 @@ export default function AdminGoldsmithsPage() {
     setIsUpdating(prev => ({ ...prev, [id]: false }));
   };
 
-  const getStatusBadgeVariant = (status: Goldsmith['status']) => {
+  const getStatusBadgeVariant = (status?: Goldsmith['status'] | string | null) => {
     switch (status) {
       case 'verified':
         return 'default'; 
@@ -71,7 +71,7 @@ export default function AdminGoldsmithsPage() {
       case 'rejected':
         return 'destructive'; 
       default:
-        return 'outline';
+        return 'outline'; // Fallback for unknown or undefined status
     }
   };
 
@@ -112,16 +112,19 @@ export default function AdminGoldsmithsPage() {
             </div>
           ) : goldsmiths.length > 0 ? (
             <div className="space-y-4">
-              {goldsmiths.map((goldsmith) => (
+              {goldsmiths.filter(g => g && typeof g === 'object').map((goldsmith) => ( // Ensure goldsmith is an object
                 <Card key={goldsmith.id} className="bg-card/80 border-border/50 shadow-sm rounded-lg">
                   <CardHeader className="pb-3 pt-4 px-4">
                     <div className="flex justify-between items-start">
                         <div>
-                            <CardTitle className="text-lg text-accent font-heading">{goldsmith.name}</CardTitle>
-                            <CardDescription className="text-xs text-muted-foreground pt-0.5">{goldsmith.email} | ID: {goldsmith.id}</CardDescription>
+                            <CardTitle className="text-lg text-accent font-heading">{goldsmith.name || 'Unnamed Goldsmith'}</CardTitle>
+                            <CardDescription className="text-xs text-muted-foreground pt-0.5">{(goldsmith.email || 'No Email')} | ID: {goldsmith.id}</CardDescription>
                         </div>
-                        <Badge variant={getStatusBadgeVariant(goldsmith.status)} className="capitalize text-xs">
-                            {goldsmith.status.replace('_', ' ')}
+                        <Badge 
+                          variant={getStatusBadgeVariant(goldsmith.status)} 
+                          className="capitalize text-xs"
+                        >
+                          {typeof goldsmith.status === 'string' ? goldsmith.status.replace('_', ' ') : 'unknown'}
                         </Badge>
                     </div>
                   </CardHeader>
@@ -129,7 +132,7 @@ export default function AdminGoldsmithsPage() {
                     <p>Contact: {goldsmith.contactPerson || 'N/A'}</p>
                     <p>Phone: {goldsmith.phone || 'N/A'}</p>
                     <p>Address: {goldsmith.address || 'N/A'}</p>
-                    <p>Specialty: {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty || 'N/A'}</p>
+                    <p>Specialty: {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : (typeof goldsmith.specialty === 'string' ? goldsmith.specialty : 'N/A')}</p>
                   </CardContent>
                   <CardFooter className="px-4 pb-4 pt-2 flex justify-end gap-2">
                     {goldsmith.status === 'pending_verification' && (
