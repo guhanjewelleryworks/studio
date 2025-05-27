@@ -10,10 +10,7 @@ import { Label } from '@/components/ui/label';
 import { LogIn, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-// Removed Firebase Auth imports and fetchGoldsmithByEmailForLogin
-// import { auth } from '@/lib/firebase/firebase';
-// import { signInWithEmailAndPassword, type AuthError } from 'firebase/auth';
-// import { fetchGoldsmithByEmailForLogin } from '@/actions/goldsmith-actions';
+import { fetchGoldsmithByEmailForLogin } from '@/actions/goldsmith-actions'; // Action to fetch goldsmith by email
 
 export default function GoldsmithLoginPage() {
   const router = useRouter();
@@ -26,28 +23,58 @@ export default function GoldsmithLoginPage() {
     event.preventDefault();
     setIsLoading(true);
 
-    // Simulate login - Firebase is removed
-    console.log("Simulating login for:", email);
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+    if (!email || !password) {
+      toast({
+        title: 'Login Failed',
+        description: 'Please enter both email and password.',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
 
-    // Placeholder for non-Firebase login logic if you implement one later
-    // For now, it will just simulate success if any email/password is entered
-    // or you can use specific dummy credentials for testing.
-    if (email && password) { // Basic check that fields are not empty
+    try {
+      const goldsmith = await fetchGoldsmithByEmailForLogin(email);
+
+      if (!goldsmith) {
         toast({
-          title: 'Login Successful (Simulated)',
-          description: 'Redirecting to your dashboard... (Firebase Auth Removed)',
-        });
-        router.push('/goldsmith-portal/dashboard');
-    } else {
-        toast({
-            title: 'Login Failed (Simulated)',
-            description: 'Please enter email and password. (Firebase Auth Removed)',
-            variant: 'destructive',
+          title: 'Login Failed',
+          description: 'Email not registered. Please check your email or register.',
+          variant: 'destructive',
         });
         setIsLoading(false);
+        return;
+      }
+
+      // IMPORTANT: This is plain text password comparison for simulation ONLY.
+      // DO NOT USE THIS IN PRODUCTION. Use a secure hashing mechanism.
+      if (goldsmith.password !== password) {
+        toast({
+          title: 'Login Failed',
+          description: 'Incorrect password. Please try again.',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // If email and password match (for simulation)
+      toast({
+        title: 'Login Successful',
+        description: 'Redirecting to your dashboard...',
+      });
+      // In a real app, you'd set up a session here (e.g., with cookies, JWT)
+      router.push('/goldsmith-portal/dashboard');
+
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: 'Login Failed',
+        description: 'An unexpected error occurred. Please try again later.',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
     }
-    // setIsLoading(false); // Already handled in the success path by router.push
   };
 
   return (
@@ -90,7 +117,7 @@ export default function GoldsmithLoginPage() {
 
              <div className="flex items-center justify-end pt-0.5">
                 <Link
-                  href="#" // Placeholder, "Forgot password" relies on an auth system
+                  href="#" // Placeholder, "Forgot password" would need a proper reset flow
                   className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
                 >
                   Forgot password?

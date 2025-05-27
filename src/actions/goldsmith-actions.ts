@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 
 const defaultLocation = { lat: 34.0522, lng: -118.2437 };
 
-// NewGoldsmithInput now doesn't expect firebaseUID
 export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success: boolean; data?: Goldsmith; error?: string }> {
   try {
     const collection = await getGoldsmithsCollection();
@@ -23,7 +22,14 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
         : 'fine jewelry';
 
     const newGoldsmith: Goldsmith = {
-      ...data,
+      name: data.name,
+      contactPerson: data.contactPerson,
+      email: data.email.toLowerCase(),
+      phone: data.phone,
+      address: data.address,
+      specialty: data.specialty,
+      portfolioLink: data.portfolioLink,
+      password: data.password, // Storing plain-text password (for simulation only!)
       id: uuidv4(),
       rating: 0,
       imageUrl: `https://picsum.photos/seed/${safeNameSeed}/400/300`,
@@ -35,15 +41,19 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       yearsExperience: 0,
       responseTime: "Varies",
       ordersCompleted: 0,
-      status: 'pending_verification', // Default status
-      // Removed firebaseUID field
+      status: 'pending_verification',
     };
 
     const result = await collection.insertOne(newGoldsmith);
 
     if (result.insertedId) {
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
-      return { success: true, data: insertedDoc ? { ...insertedDoc, _id: insertedDoc._id.toString(), id: insertedDoc.id } as Goldsmith : undefined };
+      // Ensure the returned object matches the Goldsmith type structure, removing _id if necessary before casting
+      if (insertedDoc) {
+        const { _id, ...goldsmithWithoutMongoId } = insertedDoc;
+        return { success: true, data: goldsmithWithoutMongoId as Goldsmith };
+      }
+      return { success: true, data: undefined }; // Or handle as an error if doc not found post-insert
     } else {
       return { success: false, error: 'Failed to insert goldsmith data.' };
     }
@@ -60,10 +70,14 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
 export async function fetchAllGoldsmiths(): Promise<Goldsmith[]> {
   try {
     const collection = await getGoldsmithsCollection();
-    const goldsmiths = await collection.find({}).toArray();
-    return goldsmiths.map(g => ({ ...g, _id: g._id?.toString() })) as Goldsmith[];
+    // Fetch only verified goldsmiths for the discover page
+    const goldsmiths = await collection.find({ status: 'verified' }).toArray();
+    return goldsmiths.map(g => {
+      const { _id, ...rest } = g; // Exclude MongoDB's _id
+      return rest as Goldsmith;
+    });
   } catch (error) {
-    console.error('Error fetching all goldsmiths:', error);
+    console.error('Error fetching all verified goldsmiths:', error);
     return [];
   }
 }
@@ -71,9 +85,10 @@ export async function fetchAllGoldsmiths(): Promise<Goldsmith[]> {
 export async function fetchGoldsmithById(id: string): Promise<Goldsmith | null> {
   try {
     const collection = await getGoldsmithsCollection();
-    const goldsmith = await collection.findOne({ id: id });
-    if (goldsmith) {
-      return { ...goldsmith, _id: goldsmith._id?.toString() } as Goldsmith;
+    const goldsmithDoc = await collection.findOne({ id: id });
+    if (goldsmithDoc) {
+      const { _id, ...goldsmith } = goldsmithDoc;
+      return goldsmith as Goldsmith;
     }
     return null;
   } catch (error) {
@@ -82,18 +97,20 @@ export async function fetchGoldsmithById(id: string): Promise<Goldsmith | null> 
   }
 }
 
-// This function is no longer relevant as Firebase Auth is removed.
-// It can be deleted or commented out.
-// export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Goldsmith | null> {
-//   try {
-//     const collection = await getGoldsmithsCollection();
-//     const goldsmith = await collection.findOne({ email: email.toLowerCase() });
-//     if (goldsmith) {
-//       return { ...goldsmith, _id: goldsmith._id?.toString() } as Goldsmith;
-//     }
-//     return null;
-//   } catch (error) {
-//     console.error(`Error fetching goldsmith by email ${email}:`, error);
-//     return null;
-//   }
-// }
+// New function to fetch goldsmith by email for login, including the password
+export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Goldsmith | null> {
+  try {
+    const collection = await getGoldsmithsCollection();
+    const goldsmithDoc = await collection.findOne({ email: email.toLowerCase() });
+    if (goldsmithDoc) {
+      // For login, we need the password, so we don't exclude it here.
+      // Still, it's good practice to transform away the MongoDB _id if not needed by the caller.
+      const { _id, ...goldsmith } = goldsmithDoc;
+      return goldsmith as Goldsmith; // This will include the password field
+    }
+    return null;
+  } catch (error) {
+    console.error(`Error fetching goldsmith by email ${email} for login:`, error);
+    return null;
+  }
+}
