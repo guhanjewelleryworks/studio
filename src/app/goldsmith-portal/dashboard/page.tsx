@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import type { Goldsmith } from '@/types/goldsmith';
-import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions'; // To get a sample goldsmith
+import { fetchAllGoldsmiths, getNewOrderCountForGoldsmith, getPendingInquiriesCountForGoldsmith } from '@/actions/goldsmith-actions';
 import { useToast } from '@/hooks/use-toast';
 
 interface DashboardStats {
@@ -42,7 +42,7 @@ const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
 
   if (goldsmith.name && goldsmith.name.trim() !== '') completedFields++;
   if (goldsmith.address && goldsmith.address.trim() !== '') completedFields++;
-  if (goldsmith.specialty && (Array.isArray(goldsmith.specialty) ? goldsmith.specialty.length > 0 : goldsmith.specialty.trim() !== '')) completedFields++;
+  if (goldsmith.specialty && (Array.isArray(goldsmith.specialty) ? goldsmith.specialty.length > 0 : (typeof goldsmith.specialty === 'string' && goldsmith.specialty.trim() !== ''))) completedFields++;
   if (goldsmith.bio && goldsmith.bio.trim() !== '') completedFields++;
   if (goldsmith.portfolioLink && goldsmith.portfolioLink.trim() !== '') completedFields++;
   if (goldsmith.yearsExperience && goldsmith.yearsExperience > 0) completedFields++;
@@ -53,11 +53,12 @@ const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
 
 export default function GoldsmithDashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({
-    goldsmithName: "Artisan Goldworks", // Default
-    newOrdersCount: 3, // Mocked
-    pendingInquiriesCount: 5, // Mocked
+    goldsmithName: "Artisan Goldworks",
+    newOrdersCount: 0, 
+    pendingInquiriesCount: 0,
     profileCompletion: 0,
   });
+  const [currentGoldsmith, setCurrentGoldsmith] = useState<Goldsmith | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -66,20 +67,24 @@ export default function GoldsmithDashboardPage() {
       setIsLoading(true);
       try {
         // For simulation, fetch the first verified goldsmith to represent the "logged-in" user.
-        // In a real app, you'd get the logged-in goldsmith's ID from a session.
-        const allVerifiedGoldsmiths = await fetchAllGoldsmiths(); // This fetches only 'verified'
-        const currentGoldsmith = allVerifiedGoldsmiths.length > 0 ? allVerifiedGoldsmiths[0] : null;
+        const allVerifiedGoldsmiths = await fetchAllGoldsmiths(); 
+        const activeGoldsmith = allVerifiedGoldsmiths.length > 0 ? allVerifiedGoldsmiths[0] : null;
+        setCurrentGoldsmith(activeGoldsmith);
 
-        if (currentGoldsmith) {
+        if (activeGoldsmith) {
+          const [ordersCount, inquiriesCount] = await Promise.all([
+            getNewOrderCountForGoldsmith(activeGoldsmith.id),
+            getPendingInquiriesCountForGoldsmith(activeGoldsmith.id)
+          ]);
+
           setStats(prevStats => ({
             ...prevStats,
-            goldsmithName: currentGoldsmith.name,
-            profileCompletion: calculateProfileCompletion(currentGoldsmith),
-            // newOrdersCount and pendingInquiriesCount would be fetched from respective collections
-            // e.g., fetchOrdersCount(currentGoldsmith.id), fetchInquiriesCount(currentGoldsmith.id)
+            goldsmithName: activeGoldsmith.name,
+            profileCompletion: calculateProfileCompletion(activeGoldsmith),
+            newOrdersCount: ordersCount,
+            pendingInquiriesCount: inquiriesCount,
           }));
         } else {
-          // Handle case where no verified goldsmith is found for simulation
            toast({
             title: "Simulation Info",
             description: "Displaying default dashboard data. No verified goldsmith found for dynamic content.",
@@ -87,7 +92,10 @@ export default function GoldsmithDashboardPage() {
           });
           setStats(prevStats => ({
             ...prevStats,
-            profileCompletion: calculateProfileCompletion(null), // or a default goldsmith object if needed
+            goldsmithName: "Default Artisan",
+            profileCompletion: calculateProfileCompletion(null),
+            newOrdersCount: 0,
+            pendingInquiriesCount: 0,
           }));
         }
       } catch (error) {
@@ -97,7 +105,6 @@ export default function GoldsmithDashboardPage() {
           description: "Could not load dashboard data.",
           variant: "destructive",
         });
-         // Keep default/mocked stats on error
       } finally {
         setIsLoading(false);
       }
@@ -126,7 +133,7 @@ export default function GoldsmithDashboardPage() {
       <section className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="shadow-lg bg-card border-primary/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-accent">New Orders (Simulated)</CardTitle>
+            <CardTitle className="text-sm font-medium text-accent">New Orders</CardTitle>
             <Package className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
@@ -136,7 +143,7 @@ export default function GoldsmithDashboardPage() {
         </Card>
         <Card className="shadow-lg bg-card border-primary/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-accent">Pending Inquiries (Simulated)</CardTitle>
+            <CardTitle className="text-sm font-medium text-accent">Pending Inquiries</CardTitle>
             <MessageSquare className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
@@ -158,112 +165,58 @@ export default function GoldsmithDashboardPage() {
 
       <Separator className="my-8 bg-border/50" />
 
-      {/* Main Dashboard Sections - Links are now active */}
+      {/* Main Dashboard Sections */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <UserCog className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent font-heading">Manage Profile</CardTitle>
-            </div>
-            <CardDescription className="text-muted-foreground">
-              Update your workshop details, bio, specialties, and contact information.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-              <Link href="/goldsmith-portal/profile/edit">Edit Your Profile</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
-          <CardHeader>
-             <div className="flex items-center gap-3 mb-2">
-              <Package className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent font-heading">Order Management</CardTitle>
-            </div>
-            <CardDescription className="text-muted-foreground">
-              View new, active, and completed custom order requests. (Placeholder pages)
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button asChild className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/goldsmith-portal/orders?status=new">View New Orders</Link>
-            </Button>
-            <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-              <Link href="/goldsmith-portal/orders?status=active">Manage Active Orders</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <MessageSquare className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent font-heading">Communication Hub</CardTitle>
-            </div>
-            <CardDescription className="text-muted-foreground">
-              Respond to customer inquiries and manage conversations. (Placeholder page)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-             <Button asChild className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/goldsmith-portal/messages">Access Messages</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <GalleryHorizontal className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent font-heading">Portfolio Showcase</CardTitle>
-            </div>
-            <CardDescription className="text-muted-foreground">
-              Manage images of your work to attract customers. (Placeholder page)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-              <Link href="/goldsmith-portal/portfolio/manage">Update Portfolio</Link>
-            </Button>
-          </CardContent>
-        </Card>
-        
-        <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <BarChart3 className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent font-heading">Performance Analytics</CardTitle>
-            </div>
-            <CardDescription className="text-muted-foreground">
-              View insights on profile views, inquiries, and order trends. (Placeholder page)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-              <Link href="/goldsmith-portal/analytics">View Analytics</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <Settings className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent font-heading">Account Settings</CardTitle>
-            </div>
-            <CardDescription className="text-muted-foreground">
-              Manage your login credentials, notification preferences, and payment details. (Placeholder page)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-              <Link href="/goldsmith-portal/settings">Go to Settings</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <DashboardActionCard
+          title="Manage Profile"
+          description="Update your workshop details, bio, specialties, and contact information."
+          icon={UserCog}
+          linkHref="/goldsmith-portal/profile/edit"
+          linkText="Edit Your Profile"
+          variant="outline"
+        />
+        <DashboardActionCard
+          title="Order Management"
+          description="View new, active, and completed custom order requests."
+          icon={Package}
+          linkHref="/goldsmith-portal/orders?status=new" 
+          linkText="View New Orders"
+          variant="default"
+          secondaryLinkHref="/goldsmith-portal/orders?status=active"
+          secondaryLinkText="Manage Active Orders"
+        />
+        <DashboardActionCard
+          title="Communication Hub"
+          description="Respond to customer inquiries and manage conversations."
+          icon={MessageSquare}
+          linkHref="/goldsmith-portal/messages"
+          linkText="Access Messages"
+          variant="default"
+        />
+        <DashboardActionCard
+          title="Portfolio Showcase"
+          description="Manage images of your work to attract customers."
+          icon={GalleryHorizontal}
+          linkHref="/goldsmith-portal/portfolio/manage"
+          linkText="Update Portfolio"
+          variant="outline"
+        />
+        <DashboardActionCard
+          title="Performance Analytics"
+          description="View insights on profile views, inquiries, and order trends."
+          icon={BarChart3}
+          linkHref="/goldsmith-portal/analytics"
+          linkText="View Analytics"
+          variant="outline"
+        />
+        <DashboardActionCard
+          title="Account Settings"
+          description="Manage login, notifications, and payment details."
+          icon={Settings}
+          linkHref="/goldsmith-portal/settings"
+          linkText="Go to Settings"
+          variant="outline"
+        />
       </section>
 
       {/* Notifications Section - Still Mocked */}
@@ -298,3 +251,39 @@ export default function GoldsmithDashboardPage() {
     </div>
   );
 }
+
+// Helper component for dashboard cards for consistency
+interface DashboardActionCardProps {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  linkHref: string;
+  linkText: string;
+  variant?: "default" | "outline";
+  secondaryLinkHref?: string;
+  secondaryLinkText?: string;
+}
+
+const DashboardActionCard: React.FC<DashboardActionCardProps> = ({ title, description, icon: Icon, linkHref, linkText, variant = "default", secondaryLinkHref, secondaryLinkText }) => (
+  <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
+    <CardHeader>
+      <div className="flex items-center gap-3 mb-2">
+        <Icon className="h-8 w-8 text-primary" />
+        <CardTitle className="text-xl text-accent font-heading">{title}</CardTitle>
+      </div>
+      <CardDescription className="text-muted-foreground text-sm">
+        {description}
+      </CardDescription>
+    </CardHeader>
+    <CardContent className="space-y-2">
+      <Button asChild className={`w-full ${variant === "default" ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground"}`} variant={variant}>
+        <Link href={linkHref}>{linkText}</Link>
+      </Button>
+      {secondaryLinkHref && secondaryLinkText && (
+        <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
+          <Link href={secondaryLinkHref}>{secondaryLinkText}</Link>
+        </Button>
+      )}
+    </CardContent>
+  </Card>
+);

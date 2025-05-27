@@ -1,8 +1,8 @@
 // src/actions/goldsmith-actions.ts
 'use server';
 
-import { getGoldsmithsCollection } from '@/lib/mongodb';
-import type { Goldsmith, NewGoldsmithInput } from '@/types/goldsmith';
+import { getGoldsmithsCollection, getOrderRequestsCollection, getInquiriesCollection } from '@/lib/mongodb';
+import type { Goldsmith, NewGoldsmithInput, OrderRequest, NewOrderRequestInput, Inquiry, NewInquiryInput } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 import type { Collection, Filter } from 'mongodb';
 
@@ -57,9 +57,9 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       name: data.name.trim(),
       contactPerson: data.contactPerson?.trim() || '',
       email: normalizedEmail,
-      phone: normalizedPhone || '', // Store empty string if phone is undefined, or as per your DB schema preference
+      phone: normalizedPhone || '', // Store empty string if phone is undefined
       address: data.address?.trim() || '',
-      specialty: Array.isArray(data.specialty) ? data.specialty.map(s => s.trim()).filter(s => s) : (data.specialty?.trim() || ''),
+      specialty: Array.isArray(data.specialty) ? data.specialty.map(s => s.trim()).filter(s => s) : (data.specialty?.toString().trim() || ''),
       portfolioLink: data.portfolioLink?.trim() || '',
       password: data.password.trim(), 
       id: uuidv4(),
@@ -126,66 +126,51 @@ export async function fetchAllGoldsmiths(): Promise<Goldsmith[]> {
   }
 }
 
-// New function to fetch goldsmiths for the admin panel
 export async function fetchAdminGoldsmiths(): Promise<Goldsmith[]> {
-  console.log('[Action: fetchAdminGoldsmiths] Attempting to fetch all goldsmiths for admin panel.');
+  console.log('[AdminActions] Fetching all goldsmiths for admin panel.');
   try {
     const collection = await getGoldsmithsCollection();
     const goldsmithsCursor = collection.find({}); // Fetch all, regardless of status
     const goldsmithsArray = await goldsmithsCursor.toArray();
-    console.log(`[Action: fetchAdminGoldsmiths] Found ${goldsmithsArray.length} total goldsmiths for admin panel.`);
-    if (goldsmithsArray.length > 0) {
-      console.log('[Action: fetchAdminGoldsmiths] First goldsmith fetched for admin (sample):', JSON.stringify(goldsmithsArray[0]));
-    }
+    console.log(`[AdminActions] Found ${goldsmithsArray.length} total goldsmiths for admin panel.`);
     return goldsmithsArray.map(g => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, password, ...rest } = g; 
       return rest as Goldsmith;
     });
   } catch (error) {
-    console.error('[Action: fetchAdminGoldsmiths] Error fetching goldsmiths for admin:', error);
+    console.error("[AdminActions] Error fetching all goldsmiths for admin:", error);
     return [];
   }
 }
 
-// New function to update a goldsmith's status
 export async function updateGoldsmithStatus(id: string, newStatus: Goldsmith['status']): Promise<{ success: boolean; error?: string }> {
-  console.log(`[Action: updateGoldsmithStatus] Attempting to update status for goldsmith ID ${id} to ${newStatus}.`);
+  console.log(`[AdminActions] Updating status for goldsmith ID ${id} to ${newStatus}.`);
   try {
     if (!id || !newStatus) {
-      console.error('[Action: updateGoldsmithStatus] Validation failed: Goldsmith ID and new status are required.');
       return { success: false, error: 'Goldsmith ID and new status are required.' };
     }
     const validStatuses: Goldsmith['status'][] = ['pending_verification', 'verified', 'rejected'];
     if (!validStatuses.includes(newStatus)) {
-      console.error(`[Action: updateGoldsmithStatus] Validation failed: Invalid status provided - ${newStatus}.`);
       return { success: false, error: 'Invalid status provided.' };
     }
 
     const collection = await getGoldsmithsCollection();
     const result = await collection.updateOne(
-      { id: id }, // Using the UUID 'id' field
+      { id: id },
       { $set: { status: newStatus } }
     );
-    console.log('[Action: updateGoldsmithStatus] MongoDB update result:', JSON.stringify(result));
 
     if (result.modifiedCount === 1) {
-      console.log(`[Action: updateGoldsmithStatus] Successfully updated status for goldsmith ID ${id}.`);
       return { success: true };
     } else if (result.matchedCount === 1 && result.modifiedCount === 0) {
-      console.log(`[Action: updateGoldsmithStatus] Goldsmith ID ${id} found, but status was already ${newStatus}.`);
       return { success: true, error: 'Goldsmith status is already set to the new status.' };
     } else {
-      console.warn(`[Action: updateGoldsmithStatus] Goldsmith ID ${id} not found or status not updated. Matched: ${result.matchedCount}, Modified: ${result.modifiedCount}`);
       return { success: false, error: 'Goldsmith not found or status not updated.' };
     }
   } catch (error) {
-    console.error('[Action: updateGoldsmithStatus] Error updating goldsmith status:', error);
-    let errorMessage = 'An unknown error occurred while updating status.';
-    if (error instanceof Error) {
-        errorMessage = error.message;
-    }
-    return { success: false, error: `Failed to update status: ${errorMessage}` };
+    console.error(`[AdminActions] Error updating status for ${id}:`, error);
+    return { success: false, error: 'Failed to update status due to a server error.' };
   }
 }
 
@@ -214,12 +199,11 @@ export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Gold
   console.log(`[Action: fetchGoldsmithByEmailForLogin] Attempting to fetch goldsmith by email ${normalizedEmail}.`);
   try {
     const collection = await getGoldsmithsCollection();
-    // Fetch the full document including the password for login comparison
     const goldsmithDoc = await collection.findOne({ email: normalizedEmail }); 
     if (goldsmithDoc) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, ...goldsmith } = goldsmithDoc;
-      console.log(`[Action: fetchGoldsmithByEmailForLogin] Found goldsmith with matching email.`); // Don't log sensitive data like password
+      console.log(`[Action: fetchGoldsmithByEmailForLogin] Found goldsmith with matching email.`);
       return goldsmith as Goldsmith; 
     }
     console.log(`[Action: fetchGoldsmithByEmailForLogin] Goldsmith with email ${normalizedEmail} not found.`);
@@ -227,5 +211,83 @@ export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Gold
   } catch (error) {
     console.error(`[Action: fetchGoldsmithByEmailForLogin] Error fetching goldsmith by email ${normalizedEmail} for login:`, error);
     return null;
+  }
+}
+
+// --- New Actions for Orders and Inquiries ---
+
+export async function saveOrderRequest(data: NewOrderRequestInput): Promise<{ success: boolean; error?: string; data?: OrderRequest }> {
+  console.log('[Action: saveOrderRequest] Received data:', JSON.stringify(data));
+  try {
+    const collection = await getOrderRequestsCollection();
+    const newOrderRequest: OrderRequest = {
+      ...data,
+      id: uuidv4(),
+      status: 'new',
+      requestedAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const result = await collection.insertOne(newOrderRequest);
+    if (result.insertedId) {
+      const insertedDoc = await collection.findOne({ _id: result.insertedId });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, ...orderRequestWithoutMongoId } = insertedDoc!;
+      return { success: true, data: orderRequestWithoutMongoId as OrderRequest };
+    }
+    return { success: false, error: 'Failed to save order request.' };
+  } catch (error) {
+    console.error('[Action: saveOrderRequest] Error:', error);
+    return { success: false, error: 'Server error while saving order request.' };
+  }
+}
+
+export async function saveInquiry(data: NewInquiryInput): Promise<{ success: boolean; error?: string; data?: Inquiry }> {
+  console.log('[Action: saveInquiry] Received data:', JSON.stringify(data));
+  try {
+    const collection = await getInquiriesCollection();
+    const newInquiry: Inquiry = {
+      ...data,
+      id: uuidv4(),
+      status: 'new',
+      requestedAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const result = await collection.insertOne(newInquiry);
+     if (result.insertedId) {
+      const insertedDoc = await collection.findOne({ _id: result.insertedId });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, ...inquiryWithoutMongoId } = insertedDoc!;
+      return { success: true, data: inquiryWithoutMongoId as Inquiry };
+    }
+    return { success: false, error: 'Failed to save inquiry.' };
+  } catch (error) {
+    console.error('[Action: saveInquiry] Error:', error);
+    return { success: false, error: 'Server error while saving inquiry.' };
+  }
+}
+
+export async function getNewOrderCountForGoldsmith(goldsmithId: string): Promise<number> {
+  console.log(`[Action: getNewOrderCountForGoldsmith] Fetching for goldsmithId: ${goldsmithId}`);
+  try {
+    const collection = await getOrderRequestsCollection();
+    const count = await collection.countDocuments({ goldsmithId, status: 'new' });
+    console.log(`[Action: getNewOrderCountForGoldsmith] Found ${count} new orders.`);
+    return count;
+  } catch (error) {
+    console.error(`[Action: getNewOrderCountForGoldsmith] Error fetching new order count for ${goldsmithId}:`, error);
+    return 0;
+  }
+}
+
+export async function getPendingInquiriesCountForGoldsmith(goldsmithId: string): Promise<number> {
+  console.log(`[Action: getPendingInquiriesCountForGoldsmith] Fetching for goldsmithId: ${goldsmithId}`);
+  try {
+    const collection = await getInquiriesCollection();
+    const count = await collection.countDocuments({ goldsmithId, status: 'new' });
+    console.log(`[Action: getPendingInquiriesCountForGoldsmith] Found ${count} new inquiries.`);
+    return count;
+  } catch (error) {
+    console.error(`[Action: getPendingInquiriesCountForGoldsmith] Error fetching new inquiry count for ${goldsmithId}:`, error);
+    return 0;
   }
 }

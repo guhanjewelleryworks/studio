@@ -1,36 +1,44 @@
 // src/lib/mongodb.ts
 import type { Collection, Db } from 'mongodb';
 import { MongoClient } from 'mongodb';
-import type { Goldsmith } from '@/types/goldsmith'; // Ensure Goldsmith type is correctly imported
+import type { Goldsmith, OrderRequest, Inquiry } from '@/types/goldsmith'; // Ensure Goldsmith type is correctly imported
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-console.log("Full MONGODB_URI being used from .env:", MONGODB_URI); // Log the URI as seen by the app
-
 if (!MONGODB_URI) {
-  console.error("MONGODB_URI environment variable is not defined.");
-  throw new Error(
-    'Please define the MONGODB_URI environment variable inside .env or .env.local'
-  );
+  console.error("CRITICAL: MONGODB_URI environment variable is not defined.");
+  // In a real production app, you might want to throw an error here to prevent startup
+  // For now, we log, and the app might fail later when DB operations are attempted.
+  // throw new Error('Please define the MONGODB_URI environment variable inside .env or .env.local');
+} else {
+  console.log("MONGODB_URI found in environment. Attempting to connect...");
+  // Mask password for logging
+  const maskedUri = MONGODB_URI.replace(/:([^:@]*)(?=@)/, ':********');
+  console.log("Full MONGODB_URI being used (password masked):", maskedUri);
 }
 
 // Attempt to parse the database name from the URI
 let DB_NAME: string;
-try {
-    const url = new URL(MONGODB_URI);
-    // The database name is the first part of the pathname, after the initial '/'
-    const pathnameParts = url.pathname.split('/');
-    if (pathnameParts.length > 1 && pathnameParts[1]) {
-        DB_NAME = pathnameParts[1];
-        console.log(`Database name parsed from MONGODB_URI: ${DB_NAME}`);
-    } else {
-        DB_NAME = process.env.DB_NAME || 'goldsmithconnect'; // Fallback DB name
-        console.warn(`Database name not found in MONGODB_URI path, using default or DB_NAME env var: ${DB_NAME}`);
-    }
-} catch (error) {
-    console.warn("Could not parse MONGODB_URI to extract database name. Using default or DB_NAME env var.", error);
-    DB_NAME = process.env.DB_NAME || 'goldsmithconnect'; // Fallback DB name
-    console.log(`Using database name: ${DB_NAME}`);
+if (MONGODB_URI) {
+  try {
+      const url = new URL(MONGODB_URI);
+      // The database name is the first part of the pathname, after the initial '/'
+      const pathnameParts = url.pathname.split('/');
+      if (pathnameParts.length > 1 && pathnameParts[1]) {
+          DB_NAME = pathnameParts[1];
+          console.log(`Database name parsed from MONGODB_URI: ${DB_NAME}`);
+      } else {
+          DB_NAME = process.env.DB_NAME || 'goldsmithconnect'; // Fallback DB name
+          console.warn(`Database name not found in MONGODB_URI path, using default or DB_NAME env var: ${DB_NAME}`);
+      }
+  } catch (error) {
+      console.warn("Could not parse MONGODB_URI to extract database name. Using default or DB_NAME env var.", error);
+      DB_NAME = process.env.DB_NAME || 'goldsmithconnect'; // Fallback DB name
+      console.log(`Using database name: ${DB_NAME}`);
+  }
+} else {
+  DB_NAME = process.env.DB_NAME || 'goldsmithconnect'; // Fallback if MONGODB_URI is missing
+  console.warn(`MONGODB_URI is not defined. Using default database name: ${DB_NAME}`);
 }
 
 
@@ -48,20 +56,36 @@ if (process.env.NODE_ENV === 'development') {
   // is preserved across module reloads caused by HMR (Hot Module Replacement).
   if (!global._mongoClientPromise) {
     console.log("Development: Creating new MongoDB client connection.");
-    client = new MongoClient(MONGODB_URI);
-    global._mongoClientPromise = client.connect();
+    if (!MONGODB_URI) {
+      console.error("Development: MONGODB_URI is missing, cannot create client promise.");
+      // Create a dummy promise to avoid crashing, but operations will fail
+      clientPromise = Promise.reject(new Error("MONGODB_URI is not defined in development."));
+    } else {
+      client = new MongoClient(MONGODB_URI);
+      global._mongoClientPromise = client.connect();
+      clientPromise = global._mongoClientPromise;
+    }
   } else {
     console.log("Development: Reusing existing MongoDB client promise.");
+    clientPromise = global._mongoClientPromise;
   }
-  clientPromise = global._mongoClientPromise;
 } else {
   // In production mode, it's best to not use a global variable.
   console.log("Production: Creating new MongoDB client connection.");
-  client = new MongoClient(MONGODB_URI);
-  clientPromise = client.connect();
+   if (!MONGODB_URI) {
+      console.error("Production: MONGODB_URI is missing, cannot create client promise.");
+      clientPromise = Promise.reject(new Error("MONGODB_URI is not defined in production."));
+    } else {
+      client = new MongoClient(MONGODB_URI);
+      clientPromise = client.connect();
+    }
 }
 
 export async function getDb(): Promise<Db> {
+  if (!MONGODB_URI) {
+    console.error("getDb called but MONGODB_URI is not defined. Database operations will fail.");
+    throw new Error("MONGODB_URI is not configured, cannot get database instance.");
+  }
   try {
     const mongoClient = await clientPromise;
     console.log(`Successfully connected to MongoDB. Accessing database: ${DB_NAME}`);
@@ -69,7 +93,12 @@ export async function getDb(): Promise<Db> {
   } catch (error) {
     console.error("Error getting database instance from clientPromise:", error);
     // Log the URI again here in case of failure for easier debugging
-    console.error("Failed to connect with MONGODB_URI:", MONGODB_URI);
+    if (MONGODB_URI) {
+      const maskedUri = MONGODB_URI.replace(/:([^:@]*)(?=@)/, ':********');
+      console.error("Failed to connect with MONGODB_URI (password masked):", maskedUri);
+    } else {
+      console.error("Failed to connect because MONGODB_URI was not defined.");
+    }
     throw error; // Re-throw the error to be caught by the caller
   }
 }
@@ -77,6 +106,16 @@ export async function getDb(): Promise<Db> {
 export async function getGoldsmithsCollection(): Promise<Collection<Goldsmith>> {
   const db = await getDb();
   return db.collection<Goldsmith>('goldsmiths');
+}
+
+export async function getOrderRequestsCollection(): Promise<Collection<OrderRequest>> {
+  const db = await getDb();
+  return db.collection<OrderRequest>('orderRequests');
+}
+
+export async function getInquiriesCollection(): Promise<Collection<Inquiry>> {
+  const db = await getDb();
+  return db.collection<Inquiry>('inquiries');
 }
 
 // Optional: Export the client promise for specific use cases, though getDb is preferred
