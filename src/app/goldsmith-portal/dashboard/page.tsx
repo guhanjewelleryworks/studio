@@ -1,4 +1,7 @@
 // src/app/goldsmith-portal/dashboard/page.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -9,15 +12,21 @@ import {
   GalleryHorizontal, 
   Settings,
   Bell,
-  BarChart3
+  BarChart3,
+  Loader2,
+  LogOut
 } from 'lucide-react';
 import Link from 'next/link';
+import type { Goldsmith } from '@/types/goldsmith';
+import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions'; // To get a sample goldsmith
+import { useToast } from '@/hooks/use-toast';
 
-// Simulated data - replace with actual data fetching in a real application
-const goldsmithName = "Artisan Goldworks"; 
-const newOrdersCount = 3;
-const pendingInquiriesCount = 5;
-const profileCompletion = 85; // Percentage
+interface DashboardStats {
+  goldsmithName: string;
+  newOrdersCount: number;
+  pendingInquiriesCount: number;
+  profileCompletion: number;
+}
 
 const mockNotifications = [
   { id: 1, message: "New order request #ORD12345 received.", time: "2 hours ago", read: false },
@@ -25,33 +34,113 @@ const mockNotifications = [
   { id: 3, message: "Profile view increased by 15% this week.", time: "3 days ago", read: true },
 ];
 
+// Function to calculate profile completion
+const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
+  if (!goldsmith) return 0;
+  let completedFields = 0;
+  const totalFields = 7; // name, address, specialty, bio, portfolioLink, yearsExperience, phone
+
+  if (goldsmith.name && goldsmith.name.trim() !== '') completedFields++;
+  if (goldsmith.address && goldsmith.address.trim() !== '') completedFields++;
+  if (goldsmith.specialty && (Array.isArray(goldsmith.specialty) ? goldsmith.specialty.length > 0 : goldsmith.specialty.trim() !== '')) completedFields++;
+  if (goldsmith.bio && goldsmith.bio.trim() !== '') completedFields++;
+  if (goldsmith.portfolioLink && goldsmith.portfolioLink.trim() !== '') completedFields++;
+  if (goldsmith.yearsExperience && goldsmith.yearsExperience > 0) completedFields++;
+  if (goldsmith.phone && goldsmith.phone.trim() !== '') completedFields++;
+  
+  return Math.round((completedFields / totalFields) * 100);
+};
+
 export default function GoldsmithDashboardPage() {
+  const [stats, setStats] = useState<DashboardStats>({
+    goldsmithName: "Artisan Goldworks", // Default
+    newOrdersCount: 3, // Mocked
+    pendingInquiriesCount: 5, // Mocked
+    profileCompletion: 0,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setIsLoading(true);
+      try {
+        // For simulation, fetch the first verified goldsmith to represent the "logged-in" user.
+        // In a real app, you'd get the logged-in goldsmith's ID from a session.
+        const allVerifiedGoldsmiths = await fetchAllGoldsmiths(); // This fetches only 'verified'
+        const currentGoldsmith = allVerifiedGoldsmiths.length > 0 ? allVerifiedGoldsmiths[0] : null;
+
+        if (currentGoldsmith) {
+          setStats(prevStats => ({
+            ...prevStats,
+            goldsmithName: currentGoldsmith.name,
+            profileCompletion: calculateProfileCompletion(currentGoldsmith),
+            // newOrdersCount and pendingInquiriesCount would be fetched from respective collections
+            // e.g., fetchOrdersCount(currentGoldsmith.id), fetchInquiriesCount(currentGoldsmith.id)
+          }));
+        } else {
+          // Handle case where no verified goldsmith is found for simulation
+           toast({
+            title: "Simulation Info",
+            description: "Displaying default dashboard data. No verified goldsmith found for dynamic content.",
+            variant: "default",
+          });
+          setStats(prevStats => ({
+            ...prevStats,
+            profileCompletion: calculateProfileCompletion(null), // or a default goldsmith object if needed
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to load dashboard data:", error);
+        toast({
+          title: "Error",
+          description: "Could not load dashboard data.",
+          variant: "destructive",
+        });
+         // Keep default/mocked stats on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, [toast]);
+
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8 px-4 md:px-6">
-      <header className="mb-8">
-        <h1 className="text-3xl font-heading text-accent">Welcome, {goldsmithName}!</h1>
-        <p className="text-muted-foreground text-lg">Manage your workshop and connect with customers.</p>
+      <header className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-heading text-accent">
+            {isLoading ? <Loader2 className="h-8 w-8 animate-spin inline-block" /> : `Welcome, ${stats.goldsmithName}!`}
+          </h1>
+          <p className="text-muted-foreground text-lg">Manage your workshop and connect with customers.</p>
+        </div>
+        <Button variant="destructive" size="sm" asChild className="text-xs rounded-full">
+            <Link href="/">
+                <LogOut className="mr-1.5 h-3.5 w-3.5" /> Logout (Simulated)
+            </Link>
+        </Button>
       </header>
 
       {/* Overview Stats */}
       <section className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="shadow-lg bg-card border-primary/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-accent">New Orders</CardTitle>
+            <CardTitle className="text-sm font-medium text-accent">New Orders (Simulated)</CardTitle>
             <Package className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{newOrdersCount}</div>
+            <div className="text-2xl font-bold text-foreground">{isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.newOrdersCount}</div>
             <p className="text-xs text-muted-foreground">Awaiting your review</p>
           </CardContent>
         </Card>
         <Card className="shadow-lg bg-card border-primary/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-accent">Pending Inquiries</CardTitle>
+            <CardTitle className="text-sm font-medium text-accent">Pending Inquiries (Simulated)</CardTitle>
             <MessageSquare className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{pendingInquiriesCount}</div>
+            <div className="text-2xl font-bold text-foreground">{isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.pendingInquiriesCount}</div>
             <p className="text-xs text-muted-foreground">Require your response</p>
           </CardContent>
         </Card>
@@ -61,7 +150,7 @@ export default function GoldsmithDashboardPage() {
             <UserCog className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{profileCompletion}%</div>
+            <div className="text-2xl font-bold text-foreground">{isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : `${stats.profileCompletion}%`}</div>
             <p className="text-xs text-muted-foreground">Keep your profile updated</p>
           </CardContent>
         </Card>
@@ -69,14 +158,13 @@ export default function GoldsmithDashboardPage() {
 
       <Separator className="my-8 bg-border/50" />
 
-      {/* Main Dashboard Sections */}
+      {/* Main Dashboard Sections - Links are now active */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Manage Profile */}
         <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <UserCog className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent">Manage Profile</CardTitle>
+              <CardTitle className="text-xl text-accent font-heading">Manage Profile</CardTitle>
             </div>
             <CardDescription className="text-muted-foreground">
               Update your workshop details, bio, specialties, and contact information.
@@ -89,15 +177,14 @@ export default function GoldsmithDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Order Management */}
         <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
           <CardHeader>
              <div className="flex items-center gap-3 mb-2">
               <Package className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent">Order Management</CardTitle>
+              <CardTitle className="text-xl text-accent font-heading">Order Management</CardTitle>
             </div>
             <CardDescription className="text-muted-foreground">
-              View new, active, and completed custom order requests.
+              View new, active, and completed custom order requests. (Placeholder pages)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -110,15 +197,14 @@ export default function GoldsmithDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Communication Hub */}
         <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <MessageSquare className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent">Communication Hub</CardTitle>
+              <CardTitle className="text-xl text-accent font-heading">Communication Hub</CardTitle>
             </div>
             <CardDescription className="text-muted-foreground">
-              Respond to customer inquiries and manage conversations.
+              Respond to customer inquiries and manage conversations. (Placeholder page)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -128,15 +214,14 @@ export default function GoldsmithDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Portfolio Showcase */}
         <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <GalleryHorizontal className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent">Portfolio Showcase</CardTitle>
+              <CardTitle className="text-xl text-accent font-heading">Portfolio Showcase</CardTitle>
             </div>
             <CardDescription className="text-muted-foreground">
-              Manage images of your work to attract customers.
+              Manage images of your work to attract customers. (Placeholder page)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -146,15 +231,14 @@ export default function GoldsmithDashboardPage() {
           </CardContent>
         </Card>
         
-        {/* Analytics */}
         <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <BarChart3 className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent">Performance Analytics</CardTitle>
+              <CardTitle className="text-xl text-accent font-heading">Performance Analytics</CardTitle>
             </div>
             <CardDescription className="text-muted-foreground">
-              View insights on profile views, inquiries, and order trends.
+              View insights on profile views, inquiries, and order trends. (Placeholder page)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -164,15 +248,14 @@ export default function GoldsmithDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Settings & Account */}
         <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <Settings className="h-8 w-8 text-primary" />
-              <CardTitle className="text-xl text-accent">Account Settings</CardTitle>
+              <CardTitle className="text-xl text-accent font-heading">Account Settings</CardTitle>
             </div>
             <CardDescription className="text-muted-foreground">
-              Manage your login credentials, notification preferences, and payment details.
+              Manage your login credentials, notification preferences, and payment details. (Placeholder page)
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -183,17 +266,21 @@ export default function GoldsmithDashboardPage() {
         </Card>
       </section>
 
-      {/* Quick Links / Notifications (Optional) */}
+      {/* Notifications Section - Still Mocked */}
       <section className="mt-10">
           <Card className="shadow-lg bg-card border-primary/10">
               <CardHeader>
                 <div className="flex items-center gap-3 mb-1">
                     <Bell className="h-6 w-6 text-primary" />
-                    <CardTitle className="text-lg text-accent">Recent Notifications</CardTitle>
+                    <CardTitle className="text-lg text-accent font-heading">Recent Notifications (Simulated)</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
-                  {mockNotifications.length > 0 ? (
+                  {isLoading ? (
+                     <div className="space-y-3">
+                        {[1,2,3].map(i => <Loader2 key={i} className="h-5 w-5 animate-spin text-muted-foreground" />)}
+                     </div>
+                  ) : mockNotifications.length > 0 ? (
                     <ul className="space-y-3">
                       {mockNotifications.map(notification => (
                         <li key={notification.id} className={`py-2.5 px-3 rounded-md border-l-4 ${notification.read ? 'border-border/30 bg-card/50' : 'border-primary bg-primary/5'}`}>
