@@ -1,15 +1,17 @@
 // src/app/page.tsx
-'use client';
+'use client'; // Make this a client component to fetch data
 
+import type { Goldsmith } from '@/types/goldsmith'; // Import Goldsmith type
 import type { SVGProps } from 'react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Search, ShieldCheck, Gift, MapPin, Handshake, UserCheck, Gem } from 'lucide-react'; // Gem is already here
+import { Search, ShieldCheck, Gift, MapPin, UserCheck, Handshake, Gem, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { MetalPricesWidget } from '@/components/metal-prices-widget'; // Import the new widget
-
+import { MetalPricesWidget } from '@/components/metal-prices-widget';
+import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions'; // Import the server action
+import { useEffect, useState } from 'react';
 
 // Subtle pattern for hero section
 const HeroPattern = () => (
@@ -33,11 +35,27 @@ const HeroPattern = () => (
 
 
 export default function Home() {
-  const featuredGoldsmiths = [
-    { id: 'artisan-1', name: 'Lumière Jewels', location: 'Cityville, ST', specialty: 'Engagement Rings, Custom Designs', imageUrl: 'https://picsum.photos/seed/lumiere-home/400/250', dataAiHint: "jewelry goldsmith profile" },
-    { id: 'artisan-2', name: 'Aura & Gold', location: 'Townsville, ST', specialty: 'Custom Pendants, Gold & Platinum', imageUrl: 'https://picsum.photos/seed/aura-home/400/250', dataAiHint: "jewelry goldsmith workshop" },
-    { id: 'artisan-3', name: 'Heritage Metalsmiths', location: 'Villagetown, ST', specialty: 'Antique Restoration, Heirloom Redesign', imageUrl: 'https://picsum.photos/seed/heritage-home/400/250', dataAiHint: "goldsmith tools" },
-  ];
+  const [featuredGoldsmiths, setFeaturedGoldsmiths] = useState<Goldsmith[]>([]);
+  const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
+  const [errorFeatured, setErrorFeatured] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadFeaturedGoldsmiths = async () => {
+      setIsLoadingFeatured(true);
+      setErrorFeatured(null);
+      try {
+        const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
+        // Take the first 3 verified goldsmiths, or fewer if not enough are available
+        setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 3));
+      } catch (err) {
+        console.error("Error fetching featured goldsmiths:", err);
+        setErrorFeatured("Could not load featured artisans. Please try again later.");
+      } finally {
+        setIsLoadingFeatured(false);
+      }
+    };
+    loadFeaturedGoldsmiths();
+  }, []);
 
   const howItWorksSteps = [
     { icon: Search, title: "1. Discover & Inquire", description: "Browse verified goldsmith profiles. Submit an introduction or custom order request through our elegant platform." },
@@ -62,7 +80,7 @@ export default function Home() {
                   <br />
                   <span className="text-primary">Craft Your Dreams.</span>
                 </h1>
-                <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed"> {/* Adjusted text-foreground/75 to text-foreground/85 */}
+                <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed font-poppins"> {/* Adjusted text-foreground/75 to text-foreground/85 and added font-poppins */}
                   Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
                 </p>
               </div>
@@ -83,7 +101,7 @@ export default function Home() {
             </div>
              <div className="relative mx-auto aspect-[6/5] w-full lg:order-last group rounded-xl shadow-xl overflow-hidden border-2 border-primary/10"> {/* Adjusted aspect ratio to 6/5 from 6/5.5 */}
               <Image
-                src="https://picsum.photos/seed/hero-jewelry-main/800/667" // Adjusted seed for variety
+                src="https://placehold.co/800x667.png" 
                 alt="Elegant Jewelry Background"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -102,9 +120,9 @@ export default function Home() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-2 text-center mb-6 md:mb-8"> {/* Reduced mb */}
             <div className="space-y-1"> {/* Reduced space-y */}
-              <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-xs font-medium text-secondary-foreground shadow-sm">How It Works</div>
+              <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-xs font-medium text-secondary-foreground shadow-sm font-poppins">How It Works</div>
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Your Secure Path to Custom Jewelry</h2> {/* Use text-accent */}
-              <p className="max-w-[800px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size and text-foreground/70 to 85 */}
+              <p className="max-w-[800px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins"> {/* Adjusted text size and text-foreground/70 to 85 and added font-poppins */}
                 We connect you with talented goldsmiths through a verified and mediated process, ensuring quality and trust.
               </p>
             </div>
@@ -118,7 +136,7 @@ export default function Home() {
                   </div>
                 </div>
                 <h3 className="text-md font-heading text-accent">{step.title}</h3> {/* Use text-accent */}
-                <p className="text-xs text-foreground/85 leading-relaxed">{step.description}</p> {/* Adjusted text-foreground/70 to 85 */}
+                <p className="text-xs text-foreground/85 leading-relaxed font-poppins">{step.description}</p> {/* Adjusted text-foreground/70 to 85 and added font-poppins */}
               </div>
             ))}
           </div>
@@ -130,45 +148,58 @@ export default function Home() {
         <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
           <div className="space-y-1.5 mb-4 md:mb-6"> {/* Reduced mb */}
             <h2 className="font-heading text-accent text-2xl sm:text-3xl">Meet Our Talented Artisans</h2> {/* Use text-accent */}
-            <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size and text-foreground/70 to 85 */}
+            <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins"> {/* Adjusted text size and text-foreground/70 to 85 and added font-poppins */}
               Discover skilled goldsmiths ready to craft your next masterpiece.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-3 md:pt-4"> {/* Reduced gap and pt */}
-            {featuredGoldsmiths.map((goldsmith) => (
-              <Card key={goldsmith.id} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/10 overflow-hidden group rounded-xl"> {/* Adjusted border */}
-                <CardHeader className="p-0 relative">
-                  <Image
-                    src={goldsmith.imageUrl}
-                    alt={goldsmith.name}
-                    width={400}
-                    height={200}
-                    className="object-cover w-full aspect-video group-hover:scale-105 transition-transform duration-300"
-                    data-ai-hint={goldsmith.dataAiHint}
-                  />
-                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2.5"> {/* Reduced p */}
-                    <h3 className="text-md font-heading text-primary-foreground">{goldsmith.name}</h3> {/* Use text-white for overlay */}
-                  </div>
-                </CardHeader>
-                <CardContent className="p-2.5 text-left space-y-0.5"> {/* Reduced p */}
-                  <CardTitle className="text-md font-heading text-accent mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Use text-accent */}
-                  <p className="flex items-center text-foreground/85 text-[0.7rem]"> {/* Adjusted text-foreground/70 to 85 */}
-                     <MapPin className="mr-1 h-3 w-3 text-muted-foreground" /> {goldsmith.specialty}
-                  </p>
-                  <p className="text-[0.7rem] text-foreground/85 leading-relaxed line-clamp-2"> {/* Adjusted text-foreground/80 to 85 */}
-                    A master of timeless designs and intricate details, located in {goldsmith.location}.
-                  </p>
-                  <Link href={`/goldsmith/${goldsmith.id}`} className={cn(buttonVariants({ variant: "outline", size: "xs" }), "text-accent border-accent hover:bg-accent/10 mt-1.5 w-full rounded-full text-[0.65rem] py-1")}> {/* Adjusted mt and py */}
-                    <span>View Profile</span>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {isLoadingFeatured ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-3 md:pt-4">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Card key={index} className="animate-pulse bg-muted/50 h-[300px] rounded-xl shadow-md border-border"></Card>
+              ))}
+            </div>
+          ) : errorFeatured ? (
+            <p className="text-destructive">{errorFeatured}</p>
+          ) : featuredGoldsmiths.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-3 md:pt-4"> {/* Reduced gap and pt */}
+              {featuredGoldsmiths.map((goldsmith) => (
+                <Card key={goldsmith.id} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/10 overflow-hidden group rounded-xl"> {/* Adjusted border */}
+                  <CardHeader className="p-0 relative">
+                    <Image
+                      src={goldsmith.imageUrl || `https://placehold.co/400x250.png`}
+                      alt={goldsmith.name}
+                      width={400}
+                      height={200}
+                      className="object-cover w-full aspect-video group-hover:scale-105 transition-transform duration-300"
+                      data-ai-hint="goldsmith workshop jewelry" // Updated hint
+                    />
+                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-2.5"> {/* Reduced p */}
+                      <h3 className="text-md font-heading text-primary-foreground">{goldsmith.name}</h3> {/* Use text-white for overlay */}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-2.5 text-left space-y-0.5"> {/* Reduced p */}
+                    <CardTitle className="text-md font-heading text-accent mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle> {/* Use text-accent */}
+                    <p className="flex items-center text-foreground/85 text-[0.7rem] font-poppins"> {/* Adjusted text-foreground/70 to 85 and added font-poppins */}
+                       <MapPin className="mr-1 h-3 w-3 text-muted-foreground" /> 
+                       {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty}
+                    </p>
+                    <p className="text-[0.7rem] text-foreground/85 leading-relaxed line-clamp-2 font-poppins"> {/* Adjusted text-foreground/80 to 85 and added font-poppins */}
+                      {goldsmith.shortBio || `A master of timeless designs and intricate details, located in ${goldsmith.address || 'their workshop'}.`}
+                    </p>
+                    <Link href={`/goldsmith/${goldsmith.id}`} className={cn(buttonVariants({ variant: "outline", size: "xs" }), "text-accent border-accent hover:bg-accent/10 hover:text-accent-foreground mt-1.5 w-full rounded-full text-[0.65rem] py-1")}> {/* Adjusted mt and py and hover text color */}
+                      <span>View Profile</span>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+             <p className="text-muted-foreground font-poppins">No featured artisans available at the moment. Please check back soon!</p>
+          )}
           <div className="mt-5 md:mt-6"> {/* Reduced mt */}
             <Link
               href="/discover"
-              className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), "border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2 text-sm")} /* Adjusted text size */
+              className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), "border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2 text-sm")} /* Adjusted text size and hover:text-primary-foreground */
             >
               <span>Explore All Goldsmiths</span>
             </Link>
@@ -184,7 +215,7 @@ export default function Home() {
             <h2 className="font-heading text-accent text-2xl sm:text-3xl"> {/* Use text-accent */}
               Ready to Create or Connect?
             </h2>
-            <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed"> {/* Adjusted text size and text-foreground/70 to 85 */}
+            <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins"> {/* Adjusted text size and text-foreground/70 to 85 and added font-poppins */}
               Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmith Connect is your platform.
             </p>
           </div>
