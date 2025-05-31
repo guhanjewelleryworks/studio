@@ -6,13 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { LogIn, Loader2 } from 'lucide-react'; // Added Loader2
+import { LogIn, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
-import { useState, type FormEvent } from 'react'; // Added useState and FormEvent
-import { useRouter } from 'next/navigation'; // Added useRouter
-import { useToast } from '@/hooks/use-toast'; // Added useToast
+import { useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
+import { loginCustomer } from '@/actions/customer-actions'; // Import the new action
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,25 +25,46 @@ export default function LoginPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate login - Firebase is removed
-    console.log("Simulating customer login for:", email);
-    await new Promise(resolve => setTimeout(resolve, 1000));
 
-    if (email && password) { // Basic check
+    if (!email.trim() || !password.trim()) {
         toast({
-          title: "Login Successful (Simulated)",
-          description: "Redirecting... (Firebase Auth Removed)",
+            title: "Login Error",
+            description: "Please enter both email and password.",
+            variant: "destructive",
         });
-        // Redirect to homepage or a customer dashboard if one exists
-        router.push('/');
-    } else {
+        setIsLoading(false);
+        return;
+    }
+    
+    try {
+        const result = await loginCustomer({ email, password });
+
+        if (result.success && result.data) {
+            toast({
+              title: "Login Successful!",
+              description: `Welcome back, ${result.data.name}! Redirecting...`,
+            });
+            // In a real app, you'd set up a session here (e.g., using cookies, JWT)
+            // For now, we just redirect.
+            router.push('/'); // Redirect to homepage, or a customer dashboard in the future
+        } else {
+             toast({
+              title: "Login Failed",
+              description: result.error || "Could not log you in. Please check your credentials.",
+              variant: "destructive",
+            });
+            setIsLoading(false);
+        }
+    } catch (error) {
+        console.error("Login page submission error:", error);
         toast({
-          title: "Login Failed (Simulated)",
-          description: "Please enter email and password. (Firebase Auth Removed)",
+          title: "Login Failed",
+          description: "An unexpected error occurred. Please try again later.",
           variant: "destructive",
         });
         setIsLoading(false);
     }
+    // setIsLoading(false); // Typically handled within success/error logic
   };
 
   return (
