@@ -100,10 +100,10 @@ export default function AdminDashboardPage() {
           fetchAdminGoldsmiths(),
           getPlatformPendingOrderCount(),
           getPlatformPendingInquiriesCount(),
-          fetchLatestCustomers(3), // Fetch latest 3 customers
-          fetchLatestGoldsmiths(3), // Fetch latest 3 goldsmiths
-          fetchLatestPlatformOrderRequests(3), // Fetch latest 3 orders
-          fetchLatestPlatformInquiries(3), // Fetch latest 3 inquiries
+          fetchLatestCustomers(3), 
+          fetchLatestGoldsmiths(3), 
+          fetchLatestPlatformOrderRequests(3), 
+          fetchLatestPlatformInquiries(3), 
         ]);
 
         const totalUsers = customersData.length;
@@ -116,58 +116,76 @@ export default function AdminDashboardPage() {
           { title: "Unread Messages", value: pendingInquiriesCountData, icon: MessageSquare, isLoading: false, description: `${pendingInquiriesCountData} to review` },
         ]);
 
-        // Process recent activities
         const activities: ActivityItem[] = [];
 
         latestCustomersData.forEach(customer => {
-          activities.push({
-            id: `customer-${customer.id}`,
-            type: 'newUser',
-            message: `New customer '${customer.name}' registered.`,
-            timestamp: new Date(customer.registeredAt),
-            time: formatDistanceToNow(new Date(customer.registeredAt), { addSuffix: true }),
-            icon: Users,
-            link: `/admin/customers`, // General link for now
-          });
+          const regDate = customer.registeredAt ? new Date(customer.registeredAt) : null;
+          if (regDate && !isNaN(regDate.getTime())) {
+            activities.push({
+              id: `customer-${customer.id}`,
+              type: 'newUser',
+              message: `New customer '${customer.name}' registered.`,
+              timestamp: regDate,
+              time: formatDistanceToNow(regDate, { addSuffix: true }),
+              icon: Users,
+              link: `/admin/customers`,
+            });
+          } else {
+            console.warn(`[AdminDashboard] Customer ${customer.id} has invalid or missing registeredAt: ${customer.registeredAt}`);
+          }
         });
 
         latestGoldsmithsData.forEach(goldsmith => {
-          activities.push({
-            id: `goldsmith-${goldsmith.id}`,
-            type: 'newGoldsmith',
-            message: `New goldsmith '${goldsmith.name}' registered.`,
-            timestamp: new Date(goldsmith.registeredAt), // Assuming registeredAt is added
-            time: formatDistanceToNow(new Date(goldsmith.registeredAt), { addSuffix: true }),
-            icon: Briefcase,
-            link: `/admin/goldsmiths`, // General link for now
-          });
+          const regDate = goldsmith.registeredAt ? new Date(goldsmith.registeredAt) : null;
+          if (regDate && !isNaN(regDate.getTime())) {
+            activities.push({
+              id: `goldsmith-${goldsmith.id}`,
+              type: 'newGoldsmith',
+              message: `New goldsmith '${goldsmith.name}' registered. Status: ${goldsmith.status || 'N/A'}.`,
+              timestamp: regDate,
+              time: formatDistanceToNow(regDate, { addSuffix: true }),
+              icon: Briefcase,
+              link: `/admin/goldsmiths`,
+            });
+          } else {
+             console.warn(`[AdminDashboard] Goldsmith ${goldsmith.id} has invalid or missing registeredAt: ${goldsmith.registeredAt}`);
+          }
         });
 
         latestOrdersData.forEach(order => {
-          activities.push({
-            id: `order-${order.id}`,
-            type: 'newOrder',
-            message: `New order request from '${order.customerName}' for '${order.itemDescription.substring(0,20)}...'.`,
-            timestamp: new Date(order.requestedAt),
-            time: formatDistanceToNow(new Date(order.requestedAt), { addSuffix: true }),
-            icon: ShoppingCart,
-            link: `/admin/orders`, // General link for now
-          });
+          const reqDate = order.requestedAt ? new Date(order.requestedAt) : null;
+          if (reqDate && !isNaN(reqDate.getTime())) {
+            activities.push({
+              id: `order-${order.id}`,
+              type: 'newOrder',
+              message: `New order request from '${order.customerName}' for '${order.itemDescription.substring(0,20)}...'.`,
+              timestamp: reqDate,
+              time: formatDistanceToNow(reqDate, { addSuffix: true }),
+              icon: ShoppingCart,
+              link: `/admin/orders`,
+            });
+          } else {
+            console.warn(`[AdminDashboard] Order ${order.id} has invalid or missing requestedAt: ${order.requestedAt}`);
+          }
         });
 
         latestInquiriesData.forEach(inquiry => {
-          activities.push({
-            id: `inquiry-${inquiry.id}`,
-            type: 'newInquiry',
-            message: `New inquiry from '${inquiry.customerName}' for goldsmith ID ${inquiry.goldsmithId.substring(0,8)}...`,
-            timestamp: new Date(inquiry.requestedAt),
-            time: formatDistanceToNow(new Date(inquiry.requestedAt), { addSuffix: true }),
-            icon: MessageSquare,
-            link: `/admin/communications`, // General link for now
-          });
+          const reqDate = inquiry.requestedAt ? new Date(inquiry.requestedAt) : null;
+          if (reqDate && !isNaN(reqDate.getTime())) {
+            activities.push({
+              id: `inquiry-${inquiry.id}`,
+              type: 'newInquiry',
+              message: `New inquiry from '${inquiry.customerName}' for goldsmith ID ${inquiry.goldsmithId.substring(0,8)}...`,
+              timestamp: reqDate,
+              time: formatDistanceToNow(reqDate, { addSuffix: true }),
+              icon: MessageSquare,
+              link: `/admin/communications`,
+            });
+          } else {
+            console.warn(`[AdminDashboard] Inquiry ${inquiry.id} has invalid or missing requestedAt: ${inquiry.requestedAt}`);
+          }
         });
         
-        // Sort all activities by timestamp descending and take top 5
         activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
         setRecentActivities(activities.slice(0, 5));
 
@@ -177,7 +195,6 @@ export default function AdminDashboardPage() {
         setRecentActivities([]);
       } finally {
         setIsActivityLoading(false);
-        // Ensure overview stats loading is also false
         setOverviewStats(prev => prev.map(s => ({ ...s, isLoading: false })));
       }
     };
@@ -337,3 +354,4 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+
