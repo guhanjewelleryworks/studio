@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, User, ShoppingBag, MessageCircleSquare, Edit, LogOut, Loader2 } from 'lucide-react';
+import { LayoutDashboard, User, ShoppingBag, MessageCircle, Edit, LogOut, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { fetchCustomerOrders, fetchCustomerInquiries } from '@/actions/customer-actions';
 import type { OrderRequest, Inquiry } from '@/types/goldsmith';
@@ -110,7 +110,7 @@ export default function CustomerDashboardPage() {
         <Card className="shadow-lg bg-card border-primary/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-accent">My Inquiries</CardTitle>
-            <MessageCircleSquare className="h-4 w-4 text-primary" />
+            <MessageCircle className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold text-foreground">{stats.inquiryCount}</div>}
@@ -138,7 +138,7 @@ export default function CustomerDashboardPage() {
         <DashboardActionCard
           title="View Inquiries"
           description="Check the status of your inquiries."
-          icon={MessageCircleSquare}
+          icon={MessageCircle}
           linkHref="/customer/inquiries"
           linkText="See Inquiry History"
         />
