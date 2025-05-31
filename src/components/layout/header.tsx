@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, MessageCircleSquare, Edit, LayoutDashboard } from 'lucide-react'; // Added icons
+import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, MessageCircle, Edit, LayoutDashboard } from 'lucide-react'; // Changed MessageCircleSquare to MessageCircle
 import { cn } from '@/lib/utils';
 import Image from 'next/image'; 
 import { useState, useEffect } from 'react';
@@ -169,7 +169,7 @@ export function Header() {
                   <Link href="/customer/orders"><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
                 </DropdownMenuItem>
                  <DropdownMenuItem asChild>
-                  <Link href="/customer/inquiries"><MessageCircleSquare className="mr-2 h-4 w-4" />My Inquiries</Link>
+                  <Link href="/customer/inquiries"><MessageCircle className="mr-2 h-4 w-4" />My Inquiries</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
