@@ -57,12 +57,31 @@ export default function Home() {
   //   };
   //   loadFeaturedGoldsmiths();
   // }, []);
+  // The useEffect hook is temporarily commented out to isolate parsing errors.
+  // If the parsing error is resolved, uncomment this section to restore data fetching.
+   useEffect(() => {
+    const loadFeaturedGoldsmiths = async () => {
+      setIsLoadingFeatured(true);
+      setErrorFeatured(null);
+      try {
+        const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
+        setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 3));
+      } catch (err) {
+        console.error("Error fetching featured goldsmiths:", err);
+        setErrorFeatured("Could not load featured artisans. Please try again later.");
+      } finally {
+        setIsLoadingFeatured(false);
+      }
+    };
+    // loadFeaturedGoldsmiths(); // Call commented out for debugging
+  }, []);
+
 
   const howItWorksSteps = [
     { icon: Search, title: "1. Discover & Inquire", description: "Browse verified goldsmith profiles. Submit an introduction or custom order request through our elegant platform." },
     { icon: ShieldCheck, title: "2. Admin Mediation", description: "Our team reviews your request, ensuring a secure and smooth process. We facilitate introductions and order details." },
     { icon: Gift, title: "3. Create & Cherish", description: "Collaborate with your chosen artisan. They craft your piece with passion, and you receive your dream jewelry." },
-  ]; // Added semicolon
+  ];
 
   return (
     <> {/* Changed from React.Fragment to shorthand fragment */}
@@ -95,7 +114,7 @@ export default function Home() {
                   </Link>
                   <Link
                     href="/goldsmith-portal"
-                    className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2.5 text-base")}  /* Adjusted text size to base and hover:text-primary-foreground */
+                    className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2.5 text-base")}  /* Adjusted text size and hover:text-primary-foreground */
                   >
                      <span>Join as a Goldsmith <UserCheck className="ml-1.5 h-4 w-4 inline" /></span> {/* Adjusted icon margin */}
                   </Link>
@@ -103,12 +122,12 @@ export default function Home() {
               </div>
              <div className="relative mx-auto aspect-[6/5] w-full lg:order-last group rounded-xl shadow-xl overflow-hidden border-2 border-primary/10">
               <Image
-                src="https://images.unsplash.com/photo-1610503381864-7a9f005b2953?w=800&h=667&fit=crop&q=80"
-                alt="Goldsmith crafting jewelry with precision tools"
+                src="https://placehold.co/800x667.png"
+                alt="Placeholder image for hero section jewelry"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 550px"
-                data-ai-hint="jewelry crafting artisan"
+                data-ai-hint="jewelry hero background"
                 priority
               />
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-transparent via-black/5 to-black/20 pointer-events-none group-hover:bg-black/5 transition-colors"></div>
@@ -155,44 +174,44 @@ export default function Home() {
               </p>
             </div>
             {isLoadingFeatured ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 pt-3 md:pt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 pt-4 md:pt-5"> {/* Adjusted gap and pt */}
                 {Array.from({ length: 3 }).map((_, index) => (
-                  <Card key={index} className="animate-pulse bg-muted/50 rounded-xl shadow-md border-border h-[350px]"></Card>
+                   <Card key={index} className="animate-pulse bg-card/80 rounded-xl shadow-lg border-border h-[420px]"></Card> /* Adjusted height and styling */
                 ))}
               </div>
             ) : errorFeatured ? (
               <p className="text-destructive">{errorFeatured}</p>
             ) : featuredGoldsmiths.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 pt-3 md:pt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 pt-4 md:pt-5"> {/* Adjusted gap and pt */}
                 {featuredGoldsmiths.map((goldsmith) => (
-                  <Card key={goldsmith.id} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1.5 bg-card border-primary/15 overflow-hidden group rounded-xl flex flex-col">
+                  <Card key={goldsmith.id} className="shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1.5 bg-card border-primary/20 overflow-hidden group rounded-xl flex flex-col"> {/* Adjusted border and shadow */}
                     <CardHeader className="p-0 relative">
                       <Image
-                        src={goldsmith.imageUrl || `https://placehold.co/400x300.png`}
-                        alt={goldsmith.name}
+                        src={goldsmith.imageUrl || `https://placehold.co/400x300.png`} // fallback to placeholder
+                        alt={goldsmith.name || 'Featured Goldsmith'} // fallback alt
                         width={400}
-                        height={300}
+                        height={300} // Adjusted for 4:3 ratio
                         className="object-cover w-full aspect-[4/3] group-hover:scale-105 transition-transform duration-300"
-                        data-ai-hint="goldsmith workshop jewelry"
+                        data-ai-hint="goldsmith artisan jewelry" // More generic hint
                       />
-                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                        <h3 className="text-lg font-heading text-primary-foreground">{goldsmith.name}</h3>
+                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4"> {/* Adjusted padding */}
+                        <h3 className="text-xl font-heading text-primary-foreground drop-shadow-md">{goldsmith.name}</h3> {/* Added drop-shadow */}
                       </div>
                     </CardHeader>
-                    <CardContent className="p-3 text-left space-y-1 flex-grow flex flex-col justify-between">
+                    <CardContent className="p-4 text-left space-y-1.5 flex-grow flex flex-col justify-between"> {/* Adjusted padding and space */}
                       <div>
                         <CardTitle className="text-lg font-heading text-accent mb-1 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
-                        <p className="flex items-center text-foreground/85 text-xs font-poppins mb-1">
-                           <MapPin className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" /> 
+                        <p className="flex items-center text-foreground/90 text-xs font-poppins mb-1.5"> {/* Adjusted margin and text color */}
+                           <Gem className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />  {/* Changed icon to Gem */}
                            {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty}
                         </p>
-                        <p className="text-xs text-foreground/85 leading-relaxed line-clamp-3 font-poppins mb-2">
+                        <p className="text-xs text-foreground/80 leading-relaxed line-clamp-3 font-poppins mb-2.5"> {/* Adjusted line-clamp, leading and margin */}
                           {goldsmith.shortBio || `A master of timeless designs and intricate details, located in ${goldsmith.address || 'their workshop'}.`}
                         </p>
                       </div>
-                      <NextLink 
-                        href={`/goldsmith/${goldsmith.id}`} 
-                        className={cn(buttonVariants({ variant: "outline", size: "sm" }), "text-accent border-accent hover:bg-accent/10 hover:text-accent-foreground mt-2 w-full rounded-full text-xs py-2")}
+                      <NextLink
+                        href={`/goldsmith/${goldsmith.id}`}
+                        className={cn(buttonVariants({ variant: "default", size: "sm" }), "bg-primary text-primary-foreground hover:bg-primary/90 mt-auto w-full rounded-full text-sm py-2 shadow-md hover:shadow-lg")} // Adjusted size, variant, padding and added shadow
                       >
                         <span>View Profile & Connect</span>
                       </NextLink>
@@ -201,12 +220,12 @@ export default function Home() {
                 ))}
               </div>
             ) : (
-               <p className="text-muted-foreground font-poppins py-6">No featured artisans available at the moment. Please check back soon!</p>
+               <p className="text-muted-foreground font-poppins py-8">No featured artisans available at the moment. Please check back soon!</p> /* Adjusted padding */
             )}
-            <div className="mt-6 md:mt-8">
+            <div className="mt-8 md:mt-10"> {/* Adjusted margin */}
               <Link
                 href="/discover"
-                className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), "border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2.5 text-base")}
+                className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), "border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground shadow-lg hover:shadow-xl transition-shadow rounded-full px-8 py-3 text-base")} // Adjusted padding and shadow
               >
                 <span>Explore All Goldsmiths</span>
               </Link>
