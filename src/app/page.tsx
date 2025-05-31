@@ -40,39 +40,20 @@ export default function Home() {
   const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
   const [errorFeatured, setErrorFeatured] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   const loadFeaturedGoldsmiths = async () => {
-  //     setIsLoadingFeatured(true);
-  //     setErrorFeatured(null);
-  //     try {
-  //       const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
-  //       // Take the first 3 verified goldsmiths, or fewer if not enough are available
-  //       setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 3));
-  //     } catch (err) {
-  //       console.error("Error fetching featured goldsmiths:", err);
-  //       setErrorFeatured("Could not load featured artisans. Please try again later.");
-  //     } finally {
-  //       setIsLoadingFeatured(false);
-  //     }
-  //   };
-  //   loadFeaturedGoldsmiths();
-  // }, []);
-  // The useEffect hook is temporarily commented out to isolate parsing errors.
-  // If the parsing error is resolved, uncomment this section to restore data fetching.
-   useEffect(() => {
-    const loadFeaturedGoldsmiths = async () => {
-      setIsLoadingFeatured(true);
-      setErrorFeatured(null);
-      try {
-        const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
-        setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 3));
-      } catch (err) {
-        console.error("Error fetching featured goldsmiths:", err);
-        setErrorFeatured("Could not load featured artisans. Please try again later.");
-      } finally {
-        setIsLoadingFeatured(false);
-      }
-    };
+  useEffect(() => {
+    // const loadFeaturedGoldsmiths = async () => {
+    //   setIsLoadingFeatured(true);
+    //   setErrorFeatured(null);
+    //   try {
+    //     const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
+    //     setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 3));
+    //   } catch (err) {
+    //     console.error("Error fetching featured goldsmiths:", err);
+    //     setErrorFeatured("Could not load featured artisans. Please try again later.");
+    //   } finally {
+    //     setIsLoadingFeatured(false);
+    //   }
+    // };
     // loadFeaturedGoldsmiths(); // Call commented out for debugging
   }, []);
 
@@ -91,8 +72,8 @@ export default function Home() {
           <HeroPattern />
           <div className="container px-4 md:px-6 relative z-10">
             <div className="grid gap-4 lg:grid-cols-[1fr_500px] lg:gap-6 xl:grid-cols-[1fr_550px] items-start"> {/* Changed items-center to items-start */}
-              <div className="flex flex-col justify-start space-y-3"> {/* Changed justify-center to justify-start and added space-y-3 */}
-                <div className="mb-3 self-start lg:self-auto"> {/* Added self-start for left alignment on small screens */}
+              <div className="flex flex-col justify-start space-y-4"> {/* Adjusted space-y from 3 to 4 */}
+                <div className="self-start lg:self-auto"> {/* Removed mb-3 */}
                    <MetalPricesWidget />
                 </div>
                 <div className="space-y-1.5"> {/* Reduced space-y */}
@@ -122,7 +103,7 @@ export default function Home() {
               </div>
              <div className="relative mx-auto aspect-[6/5] w-full lg:order-last group rounded-xl shadow-xl overflow-hidden border-2 border-primary/10">
               <Image
-                src="https://placehold.co/800x667.png"
+                src="/images/my-hero-image.png"
                 alt="Placeholder image for hero section jewelry"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
