@@ -83,124 +83,148 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      // Initialize loading states
       setOverviewStats(prev => prev.map(s => ({ ...s, isLoading: true })));
       setIsActivityLoading(true);
+
+      // Fetch overview stats
       try {
         const [
           customersData,
           goldsmithsData,
           pendingOrdersCountData,
           pendingInquiriesCountData,
-          latestCustomersData,
-          latestGoldsmithsData,
-          latestOrdersData,
-          latestInquiriesData,
         ] = await Promise.all([
           fetchAdminCustomers(),
           fetchAdminGoldsmiths(),
           getPlatformPendingOrderCount(),
           getPlatformPendingInquiriesCount(),
+        ]);
+
+        const totalUsers = (customersData || []).length;
+        const activeGoldsmiths = (goldsmithsData || []).filter(g => g && g.status === 'verified').length;
+
+        setOverviewStats([
+          { title: "Total Users", value: totalUsers, icon: Users, isLoading: false, description: `${totalUsers} registered` },
+          { title: "Active Goldsmiths", value: activeGoldsmiths, icon: Briefcase, isLoading: false, description: `${activeGoldsmiths} verified` },
+          { title: "Pending Orders", value: pendingOrdersCountData ?? 0, icon: ShoppingCart, isLoading: false, description: `${pendingOrdersCountData ?? 0} require action` },
+          { title: "Unread Messages", value: pendingInquiriesCountData ?? 0, icon: MessageSquare, isLoading: false, description: `${pendingInquiriesCountData ?? 0} to review` },
+        ]);
+      } catch (error) {
+        console.error("Failed to load admin dashboard overview stats:", error);
+        setOverviewStats(prevStats => prevStats.map(s => ({ ...s, value: 'Error', isLoading: false, description: 'Data unavailable' })));
+      }
+
+      // Fetch recent activity data
+      try {
+        const [
+          latestCustomersData,
+          latestGoldsmithsData,
+          latestOrdersData,
+          latestInquiriesData,
+        ] = await Promise.all([
           fetchLatestCustomers(3), 
           fetchLatestGoldsmiths(3), 
           fetchLatestPlatformOrderRequests(3), 
           fetchLatestPlatformInquiries(3), 
         ]);
 
-        const totalUsers = customersData.length;
-        const activeGoldsmiths = goldsmithsData.filter(g => g.status === 'verified').length;
-
-        setOverviewStats([
-          { title: "Total Users", value: totalUsers, icon: Users, isLoading: false, description: `${totalUsers} registered` },
-          { title: "Active Goldsmiths", value: activeGoldsmiths, icon: Briefcase, isLoading: false, description: `${activeGoldsmiths} verified` },
-          { title: "Pending Orders", value: pendingOrdersCountData, icon: ShoppingCart, isLoading: false, description: `${pendingOrdersCountData} require action` },
-          { title: "Unread Messages", value: pendingInquiriesCountData, icon: MessageSquare, isLoading: false, description: `${pendingInquiriesCountData} to review` },
-        ]);
-
         const activities: ActivityItem[] = [];
 
-        latestCustomersData.forEach(customer => {
+        (latestCustomersData || []).forEach(customer => {
+          if (!customer) return;
           const regDate = customer.registeredAt ? new Date(customer.registeredAt) : null;
           if (regDate && !isNaN(regDate.getTime())) {
             activities.push({
               id: `customer-${customer.id}`,
               type: 'newUser',
-              message: `New customer '${customer.name}' registered.`,
+              message: `New customer '${customer.name || 'N/A'}' registered.`,
               timestamp: regDate,
               time: formatDistanceToNow(regDate, { addSuffix: true }),
               icon: Users,
               link: `/admin/customers`,
             });
           } else {
-            console.warn(`[AdminDashboard] Customer ${customer.id} has invalid or missing registeredAt: ${customer.registeredAt}`);
+            console.warn(`[AdminDashboard] Customer ${customer.id || 'Unknown ID'} has invalid or missing registeredAt: ${customer.registeredAt}`);
           }
         });
 
-        latestGoldsmithsData.forEach(goldsmith => {
+        (latestGoldsmithsData || []).forEach(goldsmith => {
+          if (!goldsmith) return;
           const regDate = goldsmith.registeredAt ? new Date(goldsmith.registeredAt) : null;
           if (regDate && !isNaN(regDate.getTime())) {
             activities.push({
               id: `goldsmith-${goldsmith.id}`,
               type: 'newGoldsmith',
-              message: `New goldsmith '${goldsmith.name}' registered. Status: ${goldsmith.status || 'N/A'}.`,
+              message: `New goldsmith '${goldsmith.name || 'N/A'}' registered. Status: ${goldsmith.status || 'N/A'}.`,
               timestamp: regDate,
               time: formatDistanceToNow(regDate, { addSuffix: true }),
               icon: Briefcase,
               link: `/admin/goldsmiths`,
             });
           } else {
-             console.warn(`[AdminDashboard] Goldsmith ${goldsmith.id} has invalid or missing registeredAt: ${goldsmith.registeredAt}`);
+             console.warn(`[AdminDashboard] Goldsmith ${goldsmith.id || 'Unknown ID'} has invalid or missing registeredAt: ${goldsmith.registeredAt}`);
           }
         });
 
-        latestOrdersData.forEach(order => {
+        (latestOrdersData || []).forEach(order => {
+          if (!order) return;
           const reqDate = order.requestedAt ? new Date(order.requestedAt) : null;
           if (reqDate && !isNaN(reqDate.getTime())) {
             activities.push({
               id: `order-${order.id}`,
               type: 'newOrder',
-              message: `New order request from '${order.customerName}' for '${order.itemDescription.substring(0,20)}...'.`,
+              message: `New order request from '${order.customerName || 'N/A'}' for '${(order.itemDescription || 'N/A').substring(0,20)}...'.`,
               timestamp: reqDate,
               time: formatDistanceToNow(reqDate, { addSuffix: true }),
               icon: ShoppingCart,
               link: `/admin/orders`,
             });
           } else {
-            console.warn(`[AdminDashboard] Order ${order.id} has invalid or missing requestedAt: ${order.requestedAt}`);
+            console.warn(`[AdminDashboard] Order ${order.id || 'Unknown ID'} has invalid or missing requestedAt: ${order.requestedAt}`);
           }
         });
 
-        latestInquiriesData.forEach(inquiry => {
+        (latestInquiriesData || []).forEach(inquiry => {
+          if (!inquiry) return;
           const reqDate = inquiry.requestedAt ? new Date(inquiry.requestedAt) : null;
           if (reqDate && !isNaN(reqDate.getTime())) {
             activities.push({
               id: `inquiry-${inquiry.id}`,
               type: 'newInquiry',
-              message: `New inquiry from '${inquiry.customerName}' for goldsmith ID ${inquiry.goldsmithId.substring(0,8)}...`,
+              message: `New inquiry from '${inquiry.customerName || 'N/A'}' for goldsmith ID ${(inquiry.goldsmithId || 'N/A').substring(0,8)}...`,
               timestamp: reqDate,
               time: formatDistanceToNow(reqDate, { addSuffix: true }),
               icon: MessageSquare,
               link: `/admin/communications`,
             });
           } else {
-            console.warn(`[AdminDashboard] Inquiry ${inquiry.id} has invalid or missing requestedAt: ${inquiry.requestedAt}`);
+            console.warn(`[AdminDashboard] Inquiry ${inquiry.id || 'Unknown ID'} has invalid or missing requestedAt: ${inquiry.requestedAt}`);
           }
         });
         
-        activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+        activities.sort((a, b) => {
+            const timeA = a.timestamp ? a.timestamp.getTime() : 0;
+            const timeB = b.timestamp ? b.timestamp.getTime() : 0;
+            if (isNaN(timeA) && isNaN(timeB)) return 0;
+            if (isNaN(timeA)) return 1; // Put NaNs (invalid dates) last
+            if (isNaN(timeB)) return -1;
+            return timeB - timeA;
+        });
         setRecentActivities(activities.slice(0, 5));
 
       } catch (error) {
-        console.error("Failed to load admin dashboard data:", error);
-        setOverviewStats(prevStats => prevStats.map(s => ({ ...s, value: 'Error', isLoading: false, description: 'Data unavailable' })));
+        console.error("Failed to load admin dashboard recent activities:", error);
         setRecentActivities([]);
       } finally {
         setIsActivityLoading(false);
+        // Final check to ensure overview stats loading is false, in case first block errored but this one didn't
         setOverviewStats(prev => prev.map(s => ({ ...s, isLoading: false })));
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, []); // Empty dependency array ensures this runs once on mount
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">
@@ -354,4 +378,3 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-
