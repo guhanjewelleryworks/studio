@@ -92,6 +92,24 @@ export async function fetchAdminCustomers(): Promise<Omit<Customer, 'password' |
   }
 }
 
+export async function fetchLatestCustomers(limit: number = 3): Promise<Omit<Customer, 'password' | '_id'>[]> {
+  console.log(`[Action: fetchLatestCustomers] Attempting to fetch latest ${limit} customers.`);
+  try {
+    const collection = await getCustomersCollection();
+    const customersCursor = collection.find({}).sort({ registeredAt: -1 }).limit(limit);
+    const customersArray: WithId<Customer>[] = await customersCursor.toArray();
+    console.log(`[Action: fetchLatestCustomers] Found ${customersArray.length} customers.`);
+    return customersArray.map(c => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, password, ...customerData } = c;
+      return customerData as Omit<Customer, 'password' | '_id'>;
+    });
+  } catch (error) {
+    console.error(`[Action: fetchLatestCustomers] Error fetching latest customers:`, error);
+    return [];
+  }
+}
+
 async function fetchCustomerByEmailForAuth(email: string): Promise<Customer | null> {
   const normalizedEmail = email.toLowerCase().trim();
   console.log(`[Action: fetchCustomerByEmailForAuth] Attempting to fetch customer by email ${normalizedEmail}.`);

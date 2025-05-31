@@ -23,9 +23,10 @@ export interface Goldsmith {
   contactPerson?: string;
   email: string;
   phone?: string;
-  password?: string; // Password is now optional at the type level if managed by Firebase Auth
+  password?: string; 
   portfolioLink?: string;
   status: 'pending_verification' | 'verified' | 'rejected';
+  registeredAt: Date; // Added for tracking registration time
 }
 
 // Input type for new goldsmith registration
@@ -40,10 +41,10 @@ export type NewGoldsmithInput = Omit<
   | 'shortBio'
   | 'tagline'
   | 'bio'
-  | 'portfolioImages' // Keep these for potential future use during registration
+  | 'portfolioImages' 
   | 'certifications'
   | 'status'
-  // Password is provided by the form, but might not be directly stored if using Firebase Auth primarily
+  | 'registeredAt' // Exclude from input, will be set by server
 >;
 
 // New Types for Orders and Inquiries

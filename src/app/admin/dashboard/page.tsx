@@ -1,5 +1,5 @@
 // src/app/admin/dashboard/page.tsx
-'use client'; // Make it a client component
+'use client'; 
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,13 +15,24 @@ import {
   Bell,
   LogOut,
   ShieldCheck,
-  Loader2 // Import Loader2
+  Loader2 
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
-import { fetchAdminCustomers } from '@/actions/customer-actions';
-import { fetchAdminGoldsmiths, getPlatformPendingOrderCount, getPlatformPendingInquiriesCount } from '@/actions/goldsmith-actions';
-// Types are not directly used in this file after fetching, actions return counts/arrays.
+import { 
+  fetchAdminCustomers,
+  fetchLatestCustomers 
+} from '@/actions/customer-actions';
+import { 
+  fetchAdminGoldsmiths, 
+  getPlatformPendingOrderCount, 
+  getPlatformPendingInquiriesCount,
+  fetchLatestGoldsmiths,
+  fetchLatestPlatformOrderRequests,
+  fetchLatestPlatformInquiries
+} from '@/actions/goldsmith-actions';
+import type { Customer, Goldsmith, OrderRequest, Inquiry } from '@/types/goldsmith';
+import { formatDistanceToNow } from 'date-fns';
 
 const DashboardCard = ({ title, description, icon: Icon, linkHref, linkText }: { title: string, description: string, icon: React.ElementType, linkHref?: string, linkText?: string }) => (
   <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10 rounded-xl">
@@ -46,17 +57,19 @@ interface OverviewStatDisplay {
   title: string;
   value: string | number;
   icon: React.ElementType;
-  description: string; // Replaces 'trend' for a more descriptive subtitle
+  description: string; 
   isLoading: boolean;
 }
 
-// Mock Data for recent activity (kept as mock for now)
-const recentActivity = [
-  { message: "New user 'Jane Doe' registered.", time: "2 hours ago", icon: Users },
-  { message: "Goldsmith 'Aura & Gold' updated portfolio.", time: "5 hours ago", icon: Briefcase },
-  { message: "Order #ORD78901 marked as 'Completed'.", time: "1 day ago", icon: ShoppingCart },
-  { message: "New message from 'Customer X' regarding custom design.", time: "2 days ago", icon: MessageSquare },
-];
+interface ActivityItem {
+  id: string;
+  type: 'newUser' | 'newGoldsmith' | 'newOrder' | 'newInquiry';
+  message: string;
+  time: string; // Formatted time (e.g., "2 hours ago")
+  timestamp: Date; // Actual timestamp for sorting
+  icon: React.ElementType;
+  link?: string; // Optional link to view the item
+}
 
 export default function AdminDashboardPage() {
   const [overviewStats, setOverviewStats] = useState<OverviewStatDisplay[]>([
@@ -65,20 +78,32 @@ export default function AdminDashboardPage() {
     { title: "Pending Orders", value: "0", icon: ShoppingCart, description: "require action", isLoading: true },
     { title: "Unread Messages", value: "0", icon: MessageSquare, description: "to review", isLoading: true },
   ]);
+  const [recentActivities, setRecentActivities] = useState<ActivityItem[]>([]);
+  const [isActivityLoading, setIsActivityLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      setOverviewStats(prev => prev.map(s => ({ ...s, isLoading: true })));
+      setIsActivityLoading(true);
       try {
         const [
           customersData,
           goldsmithsData,
           pendingOrdersCountData,
           pendingInquiriesCountData,
+          latestCustomersData,
+          latestGoldsmithsData,
+          latestOrdersData,
+          latestInquiriesData,
         ] = await Promise.all([
           fetchAdminCustomers(),
           fetchAdminGoldsmiths(),
           getPlatformPendingOrderCount(),
           getPlatformPendingInquiriesCount(),
+          fetchLatestCustomers(3), // Fetch latest 3 customers
+          fetchLatestGoldsmiths(3), // Fetch latest 3 goldsmiths
+          fetchLatestPlatformOrderRequests(3), // Fetch latest 3 orders
+          fetchLatestPlatformInquiries(3), // Fetch latest 3 inquiries
         ]);
 
         const totalUsers = customersData.length;
@@ -91,9 +116,69 @@ export default function AdminDashboardPage() {
           { title: "Unread Messages", value: pendingInquiriesCountData, icon: MessageSquare, isLoading: false, description: `${pendingInquiriesCountData} to review` },
         ]);
 
+        // Process recent activities
+        const activities: ActivityItem[] = [];
+
+        latestCustomersData.forEach(customer => {
+          activities.push({
+            id: `customer-${customer.id}`,
+            type: 'newUser',
+            message: `New customer '${customer.name}' registered.`,
+            timestamp: new Date(customer.registeredAt),
+            time: formatDistanceToNow(new Date(customer.registeredAt), { addSuffix: true }),
+            icon: Users,
+            link: `/admin/customers`, // General link for now
+          });
+        });
+
+        latestGoldsmithsData.forEach(goldsmith => {
+          activities.push({
+            id: `goldsmith-${goldsmith.id}`,
+            type: 'newGoldsmith',
+            message: `New goldsmith '${goldsmith.name}' registered.`,
+            timestamp: new Date(goldsmith.registeredAt), // Assuming registeredAt is added
+            time: formatDistanceToNow(new Date(goldsmith.registeredAt), { addSuffix: true }),
+            icon: Briefcase,
+            link: `/admin/goldsmiths`, // General link for now
+          });
+        });
+
+        latestOrdersData.forEach(order => {
+          activities.push({
+            id: `order-${order.id}`,
+            type: 'newOrder',
+            message: `New order request from '${order.customerName}' for '${order.itemDescription.substring(0,20)}...'.`,
+            timestamp: new Date(order.requestedAt),
+            time: formatDistanceToNow(new Date(order.requestedAt), { addSuffix: true }),
+            icon: ShoppingCart,
+            link: `/admin/orders`, // General link for now
+          });
+        });
+
+        latestInquiriesData.forEach(inquiry => {
+          activities.push({
+            id: `inquiry-${inquiry.id}`,
+            type: 'newInquiry',
+            message: `New inquiry from '${inquiry.customerName}' for goldsmith ID ${inquiry.goldsmithId.substring(0,8)}...`,
+            timestamp: new Date(inquiry.requestedAt),
+            time: formatDistanceToNow(new Date(inquiry.requestedAt), { addSuffix: true }),
+            icon: MessageSquare,
+            link: `/admin/communications`, // General link for now
+          });
+        });
+        
+        // Sort all activities by timestamp descending and take top 5
+        activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+        setRecentActivities(activities.slice(0, 5));
+
       } catch (error) {
         console.error("Failed to load admin dashboard data:", error);
         setOverviewStats(prevStats => prevStats.map(s => ({ ...s, value: 'Error', isLoading: false, description: 'Data unavailable' })));
+        setRecentActivities([]);
+      } finally {
+        setIsActivityLoading(false);
+        // Ensure overview stats loading is also false
+        setOverviewStats(prev => prev.map(s => ({ ...s, isLoading: false })));
       }
     };
 
@@ -196,20 +281,37 @@ export default function AdminDashboardPage() {
             <CardHeader className="pb-3 pt-4 px-4">
                 <div className="flex items-center gap-3 mb-1">
                     <BarChart3 className="h-6 w-6 text-primary" />
-                    <CardTitle className="text-xl text-accent font-heading">Recent Platform Activity (Mock Data)</CardTitle>
+                    <CardTitle className="text-xl text-accent font-heading">Recent Platform Activity</CardTitle>
                 </div>
-                 <CardDescription className="text-muted-foreground text-xs">This section currently shows simulated data. Real-time activity would require further integration.</CardDescription>
+                 <CardDescription className="text-muted-foreground text-xs">Shows the latest registrations and requests on the platform.</CardDescription>
             </CardHeader>
             <CardContent className="px-4 pb-4 pt-1">
-                {recentActivity.length > 0 ? (
+                {isActivityLoading ? (
+                   <div className="space-y-2.5">
+                    {[...Array(3)].map((_, index) => (
+                      <div key={index} className="flex items-start gap-2.5 py-2 px-3 rounded-md border-l-4 border-muted bg-muted/50 animate-pulse">
+                        <Loader2 className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0 animate-spin" />
+                        <div>
+                            <div className="h-4 bg-muted-foreground/30 rounded w-3/4 mb-1"></div>
+                            <div className="h-3 bg-muted-foreground/20 rounded w-1/2"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : recentActivities.length > 0 ? (
                 <ul className="space-y-2.5">
-                    {recentActivity.map((activity, index) => (
-                    <li key={index} className="flex items-start gap-2.5 py-2 px-3 rounded-md border-l-4 border-primary/60 bg-primary/5 text-xs">
+                    {recentActivities.map((activity) => (
+                    <li key={activity.id} className="flex items-start gap-2.5 py-2 px-3 rounded-md border-l-4 border-primary/60 bg-primary/5 text-xs">
                         <activity.icon className="h-4 w-4 text-primary/80 mt-0.5 shrink-0" />
                         <div>
                             <p className="text-foreground/90">{activity.message}</p>
                             <p className="text-muted-foreground/70 text-[0.65rem] mt-0.5">{activity.time}</p>
                         </div>
+                         {activity.link && (
+                           <Button variant="ghost" size="xs" asChild className="ml-auto self-center !h-6 !px-1.5 !py-0.5 !text-[0.6rem]">
+                              <Link href={activity.link}>View</Link>
+                           </Button>
+                         )}
                     </li> 
                     ))}
                 </ul>

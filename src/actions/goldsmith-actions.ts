@@ -4,7 +4,7 @@
 import { getGoldsmithsCollection, getOrderRequestsCollection, getInquiriesCollection } from '@/lib/mongodb';
 import type { Goldsmith, NewGoldsmithInput, OrderRequest, NewOrderRequestInput, Inquiry, NewInquiryInput, OrderRequestStatus, InquiryStatus } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
-import type { Collection, Filter } from 'mongodb';
+import type { Collection, Filter, WithId } from 'mongodb';
 
 const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Example: Los Angeles
 
@@ -25,16 +25,14 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     }
 
     const normalizedEmail = data.email.toLowerCase().trim();
-    const normalizedPhone = data.phone ? data.phone.trim() : undefined; // Use undefined if phone is not provided
+    const normalizedPhone = data.phone ? data.phone.trim() : undefined; 
 
-    // Check if email already exists
     const existingGoldsmithByEmail = await collection.findOne({ email: normalizedEmail });
     if (existingGoldsmithByEmail) {
         console.error(`[Action: saveGoldsmith] Validation failed: Email ${normalizedEmail} already exists.`);
         return { success: false, error: 'An account with this email already exists. Please use a different email or log in.' };
     }
 
-    // Check if phone number already exists (only if a non-empty phone is provided)
     if (normalizedPhone && normalizedPhone !== '') {
         const existingGoldsmithByPhone = await collection.findOne({ phone: normalizedPhone });
         if (existingGoldsmithByPhone) {
@@ -57,7 +55,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       name: data.name.trim(),
       contactPerson: data.contactPerson?.trim() || '',
       email: normalizedEmail,
-      phone: normalizedPhone || '', // Store empty string if phone is undefined
+      phone: normalizedPhone || '', 
       address: data.address?.trim() || '',
       specialty: Array.isArray(data.specialty) ? data.specialty.map(s => s.trim()).filter(s => s) : (data.specialty?.toString().trim() || ''),
       portfolioLink: data.portfolioLink?.trim() || '',
@@ -73,7 +71,8 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       yearsExperience: data.yearsExperience || 0,
       responseTime: data.responseTime || "Varies",
       ordersCompleted: data.ordersCompleted || 0,
-      status: 'pending_verification', // Default status for new registrations
+      status: 'pending_verification', 
+      registeredAt: new Date(), // Set registration date
     };
     
     console.log('[Action: saveGoldsmith] Attempting to insert new goldsmith:', JSON.stringify(newGoldsmith));
@@ -111,7 +110,6 @@ export async function fetchAllGoldsmiths(): Promise<Goldsmith[]> {
   console.log('[Action: fetchAllGoldsmiths] Attempting to fetch verified goldsmiths for discover page.');
   try {
     const collection = await getGoldsmithsCollection();
-    // Only fetch verified goldsmiths for public display
     const goldsmithsCursor = collection.find({ status: 'verified' } as Filter<Goldsmith>); 
     const goldsmithsArray = await goldsmithsCursor.toArray();
     console.log(`[Action: fetchAllGoldsmiths] Found ${goldsmithsArray.length} verified goldsmiths.`);
@@ -130,7 +128,7 @@ export async function fetchAdminGoldsmiths(): Promise<Goldsmith[]> {
   console.log('[AdminActions] Fetching all goldsmiths for admin panel.');
   try {
     const collection = await getGoldsmithsCollection();
-    const goldsmithsCursor = collection.find({}); // Fetch all, regardless of status
+    const goldsmithsCursor = collection.find({}); 
     const goldsmithsArray = await goldsmithsCursor.toArray();
     console.log(`[AdminActions] Found ${goldsmithsArray.length} total goldsmiths for admin panel.`);
     return goldsmithsArray.map(g => {
@@ -143,6 +141,25 @@ export async function fetchAdminGoldsmiths(): Promise<Goldsmith[]> {
     return [];
   }
 }
+
+export async function fetchLatestGoldsmiths(limit: number = 5): Promise<Goldsmith[]> {
+  console.log(`[Action: fetchLatestGoldsmiths] Attempting to fetch latest ${limit} goldsmiths.`);
+  try {
+    const collection = await getGoldsmithsCollection();
+    const goldsmithsCursor = collection.find({}).sort({ registeredAt: -1 }).limit(limit);
+    const goldsmithsArray: WithId<Goldsmith>[] = await goldsmithsCursor.toArray();
+    console.log(`[Action: fetchLatestGoldsmiths] Found ${goldsmithsArray.length} goldsmiths.`);
+    return goldsmithsArray.map(g => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, password, ...rest } = g;
+      return rest as Goldsmith;
+    });
+  } catch (error) {
+    console.error(`[Action: fetchLatestGoldsmiths] Error fetching latest goldsmiths:`, error);
+    return [];
+  }
+}
+
 
 export async function updateGoldsmithStatus(id: string, newStatus: Goldsmith['status']): Promise<{ success: boolean; error?: string }> {
   console.log(`[AdminActions] Updating status for goldsmith ID ${id} to ${newStatus}.`);
@@ -179,7 +196,7 @@ export async function fetchGoldsmithById(id: string): Promise<Goldsmith | null> 
   console.log(`[Action: fetchGoldsmithById] Attempting to fetch goldsmith by ID ${id}.`);
   try {
     const collection = await getGoldsmithsCollection();
-    const goldsmithDoc = await collection.findOne({ id: id }); // Using the UUID 'id' field
+    const goldsmithDoc = await collection.findOne({ id: id }); 
     if (goldsmithDoc) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, password, ...goldsmith } = goldsmithDoc; 
@@ -297,7 +314,6 @@ export async function getPlatformPendingOrderCount(): Promise<number> {
   console.log('[Action: getPlatformPendingOrderCount] Fetching count of pending orders for admin dashboard.');
   try {
     const collection = await getOrderRequestsCollection();
-    // Define statuses that are considered "pending" from an admin/platform perspective
     const pendingStatuses: OrderRequestStatus[] = ['new', 'pending_goldsmith_review'];
     const count = await collection.countDocuments({ status: { $in: pendingStatuses } });
     console.log(`[Action: getPlatformPendingOrderCount] Found ${count} pending orders.`);
@@ -312,7 +328,6 @@ export async function getPlatformPendingInquiriesCount(): Promise<number> {
   console.log('[Action: getPlatformPendingInquiriesCount] Fetching count of pending inquiries for admin dashboard.');
   try {
     const collection = await getInquiriesCollection();
-    // Define statuses that are considered "pending"
     const pendingStatuses: InquiryStatus[] = ['new', 'admin_review']; 
     const count = await collection.countDocuments({ status: { $in: pendingStatuses } });
     console.log(`[Action: getPlatformPendingInquiriesCount] Found ${count} pending inquiries.`);
@@ -320,5 +335,36 @@ export async function getPlatformPendingInquiriesCount(): Promise<number> {
   } catch (error) {
     console.error(`[Action: getPlatformPendingInquiriesCount] Error fetching pending inquiry count:`, error);
     return 0;
+  }
+}
+
+// --- Actions for Admin Dashboard Recent Activity ---
+export async function fetchLatestPlatformOrderRequests(limit: number = 3): Promise<OrderRequest[]> {
+  console.log(`[Action: fetchLatestPlatformOrderRequests] Fetching latest ${limit} platform order requests.`);
+  try {
+    const collection = await getOrderRequestsCollection();
+    const ordersCursor = collection.find({}).sort({ requestedAt: -1 }).limit(limit);
+    const ordersArray: WithId<OrderRequest>[] = await ordersCursor.toArray();
+    console.log(`[Action: fetchLatestPlatformOrderRequests] Found ${ordersArray.length} orders.`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return ordersArray.map(({ _id, ...order }) => order as OrderRequest);
+  } catch (error) {
+    console.error(`[Action: fetchLatestPlatformOrderRequests] Error fetching latest orders:`, error);
+    return [];
+  }
+}
+
+export async function fetchLatestPlatformInquiries(limit: number = 3): Promise<Inquiry[]> {
+  console.log(`[Action: fetchLatestPlatformInquiries] Fetching latest ${limit} platform inquiries.`);
+  try {
+    const collection = await getInquiriesCollection();
+    const inquiriesCursor = collection.find({}).sort({ requestedAt: -1 }).limit(limit);
+    const inquiriesArray: WithId<Inquiry>[] = await inquiriesCursor.toArray();
+    console.log(`[Action: fetchLatestPlatformInquiries] Found ${inquiriesArray.length} inquiries.`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return inquiriesArray.map(({ _id, ...inquiry }) => inquiry as Inquiry);
+  } catch (error) {
+    console.error(`[Action: fetchLatestPlatformInquiries] Error fetching latest inquiries:`, error);
+    return [];
   }
 }
