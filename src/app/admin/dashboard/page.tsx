@@ -1,4 +1,7 @@
 // src/app/admin/dashboard/page.tsx
+'use client'; // Make it a client component
+
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,10 +14,14 @@ import {
   BarChart3,
   Bell,
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  Loader2 // Import Loader2
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
+import { fetchAdminCustomers } from '@/actions/customer-actions';
+import { fetchAdminGoldsmiths, getPlatformPendingOrderCount, getPlatformPendingInquiriesCount } from '@/actions/goldsmith-actions';
+// Types are not directly used in this file after fetching, actions return counts/arrays.
 
 const DashboardCard = ({ title, description, icon: Icon, linkHref, linkText }: { title: string, description: string, icon: React.ElementType, linkHref?: string, linkText?: string }) => (
   <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10 rounded-xl">
@@ -35,14 +42,15 @@ const DashboardCard = ({ title, description, icon: Icon, linkHref, linkText }: {
   </Card>
 );
 
-// Mock Data
-const overviewStats = [
-  { title: "Total Users", value: "1,250", icon: Users, trend: "+5% this month" },
-  { title: "Active Goldsmiths", value: "78", icon: Briefcase, trend: "+2 new" },
-  { title: "Pending Orders", value: "15", icon: ShoppingCart, trend: "3 urgent" },
-  { title: "Unread Messages", value: "8", icon: MessageSquare, trend: "New inquiry" },
-];
+interface OverviewStatDisplay {
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+  description: string; // Replaces 'trend' for a more descriptive subtitle
+  isLoading: boolean;
+}
 
+// Mock Data for recent activity (kept as mock for now)
 const recentActivity = [
   { message: "New user 'Jane Doe' registered.", time: "2 hours ago", icon: Users },
   { message: "Goldsmith 'Aura & Gold' updated portfolio.", time: "5 hours ago", icon: Briefcase },
@@ -51,6 +59,47 @@ const recentActivity = [
 ];
 
 export default function AdminDashboardPage() {
+  const [overviewStats, setOverviewStats] = useState<OverviewStatDisplay[]>([
+    { title: "Total Users", value: "0", icon: Users, description: "registered users", isLoading: true },
+    { title: "Active Goldsmiths", value: "0", icon: Briefcase, description: "verified partners", isLoading: true },
+    { title: "Pending Orders", value: "0", icon: ShoppingCart, description: "require action", isLoading: true },
+    { title: "Unread Messages", value: "0", icon: MessageSquare, description: "to review", isLoading: true },
+  ]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const [
+          customersData,
+          goldsmithsData,
+          pendingOrdersCountData,
+          pendingInquiriesCountData,
+        ] = await Promise.all([
+          fetchAdminCustomers(),
+          fetchAdminGoldsmiths(),
+          getPlatformPendingOrderCount(),
+          getPlatformPendingInquiriesCount(),
+        ]);
+
+        const totalUsers = customersData.length;
+        const activeGoldsmiths = goldsmithsData.filter(g => g.status === 'verified').length;
+
+        setOverviewStats([
+          { title: "Total Users", value: totalUsers, icon: Users, isLoading: false, description: `${totalUsers} registered` },
+          { title: "Active Goldsmiths", value: activeGoldsmiths, icon: Briefcase, isLoading: false, description: `${activeGoldsmiths} verified` },
+          { title: "Pending Orders", value: pendingOrdersCountData, icon: ShoppingCart, isLoading: false, description: `${pendingOrdersCountData} require action` },
+          { title: "Unread Messages", value: pendingInquiriesCountData, icon: MessageSquare, isLoading: false, description: `${pendingInquiriesCountData} to review` },
+        ]);
+
+      } catch (error) {
+        console.error("Failed to load admin dashboard data:", error);
+        setOverviewStats(prevStats => prevStats.map(s => ({ ...s, value: 'Error', isLoading: false, description: 'Data unavailable' })));
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">
       <header className="mb-6 flex items-center justify-between">
@@ -80,8 +129,12 @@ export default function AdminDashboardPage() {
               <stat.icon className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent className="pb-3 px-3">
-              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-              <p className="text-[0.7rem] text-muted-foreground/80">{stat.trend}</p>
+              {stat.isLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              ) : (
+                <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+              )}
+              <p className="text-[0.7rem] text-muted-foreground/80">{stat.isLoading ? 'Loading...' : stat.description}</p>
             </CardContent>
           </Card>
         ))}
@@ -96,42 +149,42 @@ export default function AdminDashboardPage() {
           description="Manage customer profiles, view activity, and handle account-related issues."
           icon={Users}
           linkText="Manage Customers"
-          linkHref="/admin/customers" // Placeholder link
+          linkHref="/admin/customers"
         />
         <DashboardCard
           title="Goldsmith Partners"
           description="Oversee goldsmith profiles, manage verification status, and view partner performance."
           icon={Briefcase}
           linkText="Manage Goldsmiths"
-          linkHref="/admin/goldsmiths" // Placeholder link
+          linkHref="/admin/goldsmiths"
         />
         <DashboardCard
           title="Order Management"
           description="Track custom orders, mediate communications, and manage order statuses."
           icon={ShoppingCart}
           linkText="View Orders"
-          linkHref="/admin/orders" // Placeholder link
+          linkHref="/admin/orders"
         />
         <DashboardCard
           title="Communications"
           description="Facilitate and monitor introductions and communications between users and goldsmiths."
           icon={MessageSquare}
           linkText="Access Messages"
-          linkHref="/admin/communications" // Placeholder link
+          linkHref="/admin/communications"
         />
         <DashboardCard
           title="Database Records"
           description="View and manage raw data records for users, goldsmiths, and orders (requires caution)."
           icon={Database}
           linkText="View Database"
-          linkHref="/admin/database" // Placeholder link
+          linkHref="/admin/database"
         />
         <DashboardCard
           title="Platform Settings"
           description="Configure global platform settings, manage content, and adjust operational parameters."
           icon={Settings}
           linkText="Configure Settings"
-          linkHref="/admin/settings" // Placeholder link
+          linkHref="/admin/settings"
         />
       </section>
 
@@ -143,8 +196,9 @@ export default function AdminDashboardPage() {
             <CardHeader className="pb-3 pt-4 px-4">
                 <div className="flex items-center gap-3 mb-1">
                     <BarChart3 className="h-6 w-6 text-primary" />
-                    <CardTitle className="text-xl text-accent font-heading">Recent Platform Activity</CardTitle>
+                    <CardTitle className="text-xl text-accent font-heading">Recent Platform Activity (Mock Data)</CardTitle>
                 </div>
+                 <CardDescription className="text-muted-foreground text-xs">This section currently shows simulated data. Real-time activity would require further integration.</CardDescription>
             </CardHeader>
             <CardContent className="px-4 pb-4 pt-1">
                 {recentActivity.length > 0 ? (

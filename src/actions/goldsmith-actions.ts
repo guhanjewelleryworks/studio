@@ -2,7 +2,7 @@
 'use server';
 
 import { getGoldsmithsCollection, getOrderRequestsCollection, getInquiriesCollection } from '@/lib/mongodb';
-import type { Goldsmith, NewGoldsmithInput, OrderRequest, NewOrderRequestInput, Inquiry, NewInquiryInput } from '@/types/goldsmith';
+import type { Goldsmith, NewGoldsmithInput, OrderRequest, NewOrderRequestInput, Inquiry, NewInquiryInput, OrderRequestStatus, InquiryStatus } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 import type { Collection, Filter } from 'mongodb';
 
@@ -288,6 +288,37 @@ export async function getPendingInquiriesCountForGoldsmith(goldsmithId: string):
     return count;
   } catch (error) {
     console.error(`[Action: getPendingInquiriesCountForGoldsmith] Error fetching new inquiry count for ${goldsmithId}:`, error);
+    return 0;
+  }
+}
+
+// --- New Actions for Admin Dashboard Stats ---
+export async function getPlatformPendingOrderCount(): Promise<number> {
+  console.log('[Action: getPlatformPendingOrderCount] Fetching count of pending orders for admin dashboard.');
+  try {
+    const collection = await getOrderRequestsCollection();
+    // Define statuses that are considered "pending" from an admin/platform perspective
+    const pendingStatuses: OrderRequestStatus[] = ['new', 'pending_goldsmith_review'];
+    const count = await collection.countDocuments({ status: { $in: pendingStatuses } });
+    console.log(`[Action: getPlatformPendingOrderCount] Found ${count} pending orders.`);
+    return count;
+  } catch (error) {
+    console.error(`[Action: getPlatformPendingOrderCount] Error fetching pending order count:`, error);
+    return 0;
+  }
+}
+
+export async function getPlatformPendingInquiriesCount(): Promise<number> {
+  console.log('[Action: getPlatformPendingInquiriesCount] Fetching count of pending inquiries for admin dashboard.');
+  try {
+    const collection = await getInquiriesCollection();
+    // Define statuses that are considered "pending"
+    const pendingStatuses: InquiryStatus[] = ['new', 'admin_review']; 
+    const count = await collection.countDocuments({ status: { $in: pendingStatuses } });
+    console.log(`[Action: getPlatformPendingInquiriesCount] Found ${count} pending inquiries.`);
+    return count;
+  } catch (error) {
+    console.error(`[Action: getPlatformPendingInquiriesCount] Error fetching pending inquiry count:`, error);
     return 0;
   }
 }
