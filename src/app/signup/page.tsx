@@ -5,13 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UserPlus, Loader2 } from 'lucide-react'; // Added Loader2
+import { UserPlus, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
-import { useState, type FormEvent } from 'react'; // Added useState and FormEvent
-import { useRouter } from 'next/navigation'; // Added useRouter
-import { useToast } from '@/hooks/use-toast'; // Added useToast
+import { useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
+import { saveCustomer } from '@/actions/customer-actions'; // Import the action
+import type { NewCustomerInput } from '@/types/goldsmith';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -26,6 +28,16 @@ export default function SignUpPage() {
     e.preventDefault();
     setIsLoading(true);
 
+    if (!name.trim() || !email.trim() || !password.trim()) {
+        toast({
+            title: "Signup Error",
+            description: "Name, email, and password are required.",
+            variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+    }
+
     if (password !== confirmPassword) {
       toast({
         title: "Signup Error",
@@ -35,25 +47,50 @@ export default function SignUpPage() {
       setIsLoading(false);
       return;
     }
-
-    // Simulate signup - Firebase is removed
-    console.log("Simulating customer signup for:", email, "Name:", name);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    if (email && password) { // Basic check
+    if (password.length < 6) {
         toast({
-          title: "Signup Successful (Simulated)",
-          description: "Account created. Redirecting to login... (Firebase Auth Removed)",
+            title: "Signup Error",
+            description: "Password must be at least 6 characters long.",
+            variant: "destructive",
         });
-        router.push('/login');
-    } else {
-         toast({
-          title: "Signup Failed (Simulated)",
-          description: "Please fill all required fields. (Firebase Auth Removed)",
+        setIsLoading(false);
+        return;
+    }
+
+
+    const customerData: NewCustomerInput = {
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password: password.trim(), // Password will be sent to the server action
+    };
+
+    try {
+        const result = await saveCustomer(customerData);
+
+        if (result.success && result.data) {
+            toast({
+              title: "Signup Successful!",
+              description: "Your account has been created. Redirecting to login...",
+            });
+            router.push('/login');
+        } else {
+             toast({
+              title: "Signup Failed",
+              description: result.error || "Could not create your account. Please try again.",
+              variant: "destructive",
+            });
+            setIsLoading(false);
+        }
+    } catch (error) {
+        console.error("Signup submission error:", error);
+        toast({
+          title: "Signup Failed",
+          description: "An unexpected error occurred. Please try again later.",
           variant: "destructive",
         });
         setIsLoading(false);
     }
+    // setIsLoading(false); // Already handled in success/error cases typically
   };
 
   return (
@@ -98,7 +135,7 @@ export default function SignUpPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Choose a strong password"
+                placeholder="Min. 6 characters"
                 required
                 className="text-base text-foreground py-2"
                 value={password}

@@ -85,3 +85,20 @@ export interface Inquiry {
 }
 
 export type NewInquiryInput = Omit<Inquiry, '_id' | 'id' | 'status' | 'requestedAt' | 'updatedAt'>;
+
+
+// --- Customer Types ---
+export interface Customer {
+  _id?: ObjectId | string; // MongoDB ID
+  id: string; // Application-specific UUID
+  name: string;
+  email: string;
+  password?: string; // For app-specific auth, hashed in DB
+  registeredAt: Date;
+  lastLoginAt?: Date;
+  // Add other customer-specific fields as needed, e.g.,
+  // shippingAddress: string;
+  // orderHistory: string[]; // Array of Order IDs
+}
+
+export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'registeredAt' | 'lastLoginAt'>;
