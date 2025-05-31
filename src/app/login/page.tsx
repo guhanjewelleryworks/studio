@@ -44,9 +44,22 @@ export default function LoginPage() {
               title: "Login Successful!",
               description: `Welcome back, ${result.data.name}! Redirecting...`,
             });
-            // In a real app, you'd set up a session here (e.g., using cookies, JWT)
-            // For now, we just redirect.
-            router.push('/'); // Redirect to homepage, or a customer dashboard in the future
+            
+            // Store user info in localStorage
+            if (typeof window !== "undefined") {
+              localStorage.setItem('currentUser', JSON.stringify({ 
+                isLoggedIn: true, 
+                name: result.data.name, 
+                email: result.data.email 
+              }));
+            }
+            
+            // router.push('/'); // Redirect to homepage
+            // Instead of just router.push, we might need to force a reload or use router.replace to ensure header updates
+            // Forcing a full page navigation often helps components re-evaluate localStorage
+            window.location.href = '/';
+
+
         } else {
              toast({
               title: "Login Failed",
@@ -64,7 +77,6 @@ export default function LoginPage() {
         });
         setIsLoading(false);
     }
-    // setIsLoading(false); // Typically handled within success/error logic
   };
 
   return (
