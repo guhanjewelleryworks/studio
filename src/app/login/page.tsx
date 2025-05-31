@@ -6,20 +6,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { LogIn, Loader2 } from 'lucide-react';
+import { LogIn, Loader2, Eye, EyeOff } from 'lucide-react'; // Added Eye, EyeOff
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { loginCustomer } from '@/actions/customer-actions'; // Import the new action
+import { loginCustomer } from '@/actions/customer-actions';
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -45,7 +46,6 @@ export default function LoginPage() {
               description: `Welcome back, ${result.data.name}! Redirecting...`,
             });
             
-            // Store user info in localStorage
             if (typeof window !== "undefined") {
               localStorage.setItem('currentUser', JSON.stringify({ 
                 isLoggedIn: true, 
@@ -54,11 +54,7 @@ export default function LoginPage() {
               }));
             }
             
-            // router.push('/'); // Redirect to homepage
-            // Instead of just router.push, we might need to force a reload or use router.replace to ensure header updates
-            // Forcing a full page navigation often helps components re-evaluate localStorage
             window.location.href = '/';
-
 
         } else {
              toast({
@@ -103,18 +99,29 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 relative"> {/* Added relative positioning */}
               <Label htmlFor="password" className="text-foreground">Password</Label>
               <Input
                 id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'} // Dynamic type
                 placeholder="Enter your password"
                 required
-                className="text-base text-foreground py-2"
+                className="text-base text-foreground py-2 pr-10" // Added pr-10 for icon space
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
               />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" // Positioned button
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1} // Make it not focusable with Tab for better UX
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
+              </Button>
             </div>
 
              <div className="flex items-center justify-between pt-0.5">
@@ -128,7 +135,7 @@ export default function LoginPage() {
                   </label>
                 </div>
                 <Link
-                  href="#" // Placeholder for "Forgot password"
+                  href="#"
                   className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
                 >
                   Forgot password?
