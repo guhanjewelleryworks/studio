@@ -384,3 +384,18 @@ export async function fetchLatestPlatformInquiries(limit: number = 3): Promise<I
     return [];
   }
 }
+
+export async function fetchAllPlatformInquiries(): Promise<Inquiry[]> {
+  console.log(`[Action: fetchAllPlatformInquiries] Fetching all platform inquiries for admin.`);
+  try {
+    const collection = await getInquiriesCollection();
+    const inquiriesCursor = collection.find({}).sort({ requestedAt: -1 }); // Sort by most recent
+    const inquiriesArray: WithId<Inquiry>[] = await inquiriesCursor.toArray();
+    console.log(`[Action: fetchAllPlatformInquiries] Found ${inquiriesArray.length} total inquiries.`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return inquiriesArray.map(({ _id, ...inquiry }) => inquiry as Inquiry);
+  } catch (error) {
+    console.error(`[Action: fetchAllPlatformInquiries] Error fetching all inquiries:`, error);
+    return [];
+  }
+}
