@@ -1,12 +1,12 @@
 // src/app/goldsmith/[id]/page.tsx
 'use client';
 
-import type { Goldsmith as GoldsmithProfileType, NewOrderRequestInput, NewInquiryInput } from '@/types/goldsmith';
+import type { Goldsmith as GoldsmithProfileType, NewOrderRequestInput } from '@/types/goldsmith';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from '@/components/ui/label';
-import { MapPin, Star, MessageSquare, Send, ShieldCheck, Sparkles, Award, Eye, User, Edit3, ImagePlus } from "lucide-react";
+import { MapPin, Star, MessageSquare, Send, ShieldCheck, Sparkles, Award, Eye, Edit3 } from "lucide-react"; // Removed User, added Send if not already there for the form button
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,7 +15,7 @@ import { useState, useEffect, use } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from '@/hooks/use-toast';
-import { fetchGoldsmithById, saveOrderRequest, saveInquiry } from '@/actions/goldsmith-actions';
+import { fetchGoldsmithById, saveOrderRequest } from '@/actions/goldsmith-actions'; // Removed saveInquiry as it's no longer used on this page
 
 interface PageParams {
   id: string;
@@ -23,13 +23,12 @@ interface PageParams {
 
 interface CurrentUser {
   isLoggedIn: boolean;
-  id?: string; // Added id
+  id?: string; 
   name?: string;
   email?: string;
 }
 
 
-// Helper function to ensure profile has all necessary fields with defaults
 const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id: string): GoldsmithProfileType | null => {
   if (!profile) return null;
   return {
@@ -38,13 +37,13 @@ const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id
     address: profile.address || "Address Not Available",
     specialty: profile.specialty || ["Fine Jewelry"],
     rating: profile.rating || 0,
-    imageUrl: profile.imageUrl || `https://picsum.photos/seed/${id}-discover/400/300`,
-    profileImageUrl: profile.profileImageUrl || `https://picsum.photos/seed/${id}-profile/120/120`,
-    location: profile.location || { lat: 34.0522, lng: -118.2437 }, // Default location
+    imageUrl: profile.imageUrl || `https://placehold.co/400x300.png`,
+    profileImageUrl: profile.profileImageUrl || `https://placehold.co/120x120.png`,
+    location: profile.location || { lat: 34.0522, lng: -118.2437 }, 
     shortBio: profile.shortBio || `Specializing in ${Array.isArray(profile.specialty) ? profile.specialty.join(', ') : profile.specialty || 'fine jewelry'}.`,
     tagline: profile.tagline || "Bespoke Creations",
     bio: profile.bio || "Talented artisan ready to create your unique piece.",
-    portfolioImages: profile.portfolioImages || Array.from({ length: 4 }, (_, i) => `https://picsum.photos/seed/${id}-work-${i + 1}/600/450`),
+    portfolioImages: profile.portfolioImages || Array.from({ length: 4 }, (_, i) => `https://placehold.co/600x450.png`),
     yearsExperience: profile.yearsExperience || 0,
     certifications: profile.certifications || [],
     responseTime: profile.responseTime || "Within 2 business days",
@@ -65,8 +64,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   const { toast } = useToast();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
-  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false); // Renamed from isSubmittingInquiry
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
    useEffect(() => {
@@ -165,9 +163,9 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
     return <div className="container py-6 md:py-10 px-4 md:px-6 text-center text-muted-foreground text-lg">Profile not found.</div>;
   }
 
-  const handleRequestIntroduction = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleContactFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => { // Renamed from handleRequestIntroduction
      e.preventDefault();
-     setIsSubmittingInquiry(true);
+     setIsSubmittingForm(true); // Renamed state variable
      const form = e.target as HTMLFormElement;
      const customerName = (form.elements.namedItem('contact-name') as HTMLInputElement)?.value;
      const customerEmail = (form.elements.namedItem('contact-email') as HTMLInputElement)?.value;
@@ -176,26 +174,28 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
     if (!customerName || !customerEmail || !message) {
       toast({ title: "Missing Information", description: "Please fill in your name, email, and message.", variant: "destructive" });
-      setIsSubmittingInquiry(false);
+      setIsSubmittingForm(false);
       return;
     }
 
-     const inquiryData: NewInquiryInput = {
+     const orderData: NewOrderRequestInput = { // Changed to NewOrderRequestInput
         goldsmithId: profile.id,
         customerId: currentUser?.isLoggedIn && currentUser.id ? currentUser.id : undefined,
         customerName,
         customerEmail,
         customerPhone,
-        message,
+        itemDescription: `Custom Order for ${profile.name} (via profile contact)`, // Generic item description
+        details: message, // Message becomes details
+        // referenceImage: imagePreview || undefined, // If you implement image upload for orders
      };
      
-     console.log("Submitting Inquiry:", inquiryData);
-     const result = await saveInquiry(inquiryData);
+     console.log("Submitting Custom Order Request via form:", orderData);
+     const result = await saveOrderRequest(orderData); // Changed to saveOrderRequest
 
      if (result.success && result.data) {
         toast({
-          title: 'Inquiry Request Sent!',
-          description: `Your inquiry for ${profile.name} has been submitted. An admin will review it.`,
+          title: 'Custom Order Request Submitted!', // Updated toast message
+          description: `Your request for ${profile.name} has been sent to admin for review.`,
           duration: 7000,
         });
         form.reset();
@@ -203,65 +203,12 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
         setImagePreview(null);
      } else {
         toast({
-          title: 'Inquiry Submission Failed',
-          description: result.error || "Could not send your inquiry. Please try again.",
+          title: 'Order Request Submission Failed', // Updated toast message
+          description: result.error || "Could not send your order request. Please try again.",
           variant: 'destructive',
         });
      }
-     setIsSubmittingInquiry(false);
-   };
-
-   const handleRequestCustomOrder = async () => {
-    setIsSubmittingOrder(true);
-    const contactForm = document.getElementById('contact-form-section')?.querySelector('form');
-    const itemName = "Custom Order for " + profile.name; 
-    const details = (contactForm?.elements.namedItem('contact-message') as HTMLTextAreaElement)?.value || "Customer to provide more details via admin mediation.";
-    const customerNameValue = (contactForm?.elements.namedItem('contact-name') as HTMLInputElement)?.value;
-    const customerEmailValue = (contactForm?.elements.namedItem('contact-email') as HTMLInputElement)?.value;
-
-    const finalCustomerName = currentUser?.isLoggedIn ? currentUser.name : customerNameValue;
-    const finalCustomerEmail = currentUser?.isLoggedIn ? currentUser.email : customerEmailValue;
-
-
-    if (!finalCustomerName || !finalCustomerEmail || !finalCustomerEmail.includes('@')) {
-         toast({
-            title: 'Information Needed for Custom Order',
-            description: 'Please fill out the inquiry form below with your name and email before requesting a custom order, or log in.',
-            variant: 'default',
-            duration: 7000,
-        });
-        document.getElementById('contact-name')?.focus();
-        setIsSubmittingOrder(false);
-        return;
-    }
-
-    const orderData: NewOrderRequestInput = {
-        goldsmithId: profile.id,
-        customerId: currentUser?.isLoggedIn && currentUser.id ? currentUser.id : undefined,
-        customerName: finalCustomerName as string,
-        customerEmail: finalCustomerEmail as string,
-        customerPhone: (contactForm?.elements.namedItem('contact-phone') as HTMLInputElement)?.value || undefined,
-        itemDescription: itemName,
-        details: details,
-    };
-
-    console.log("Submitting Custom Order:", orderData);
-    const result = await saveOrderRequest(orderData);
-
-    if (result.success && result.data) {
-        toast({
-          title: 'Custom Order Request Submitted!',
-          description: `Your custom order request for ${profile.name} has been sent. An admin will review it.`,
-          duration: 7000,
-        });
-    } else {
-        toast({
-          title: 'Custom Order Submission Failed',
-          description: result.error || "Could not submit your custom order request. Please try again.",
-          variant: 'destructive',
-        });
-    }
-    setIsSubmittingOrder(false);
+     setIsSubmittingForm(false);
    };
 
 
@@ -326,12 +273,15 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                         <span>{profile.ordersCompleted}+ Orders Completed</span>
                     </div>
                 )}
-               <Button size="default" className="w-full shadow-md rounded-full text-xs py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground mt-1.5" onClick={handleRequestCustomOrder} disabled={isSubmittingOrder}>
-                  <Send className="mr-1.5 h-3.5 w-3.5"/> {isSubmittingOrder ? "Submitting..." : "Request Custom Order"}
-               </Button>
-                <Button variant="outline" size="default" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full text-xs py-2.5 shadow-sm" onClick={(e) => { e.preventDefault(); document.getElementById('contact-form-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
-                  <User className="mr-1.5 h-3.5 w-3.5"/> Request Introduction
-               </Button>
+                {/* Removed the first "Request Custom Order" button */}
+                <Button 
+                  variant="default" // Changed from outline to default to make it primary
+                  size="default" 
+                  className="w-full border-primary text-primary-foreground bg-primary hover:bg-primary/90 rounded-full text-xs py-2.5 shadow-sm" 
+                  onClick={(e) => { e.preventDefault(); document.getElementById('contact-form-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                >
+                  <Send className="mr-1.5 h-3.5 w-3.5"/> Request Custom Order 
+                </Button>
             </CardContent>
           </Card>
         </div>
@@ -356,7 +306,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
               {profile.portfolioImages && profile.portfolioImages.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {profile.portfolioImages.map((imgUrl, index) => (
-                    <div key={index} className="rounded-lg overflow-hidden shadow-md aspect-square group relative">
+                    <div key={index} className="rounded-lg overflow-hidden shadow-md aspect-square group relative" data-ai-hint="jewelry piece photo">
                         <Image
                           src={imgUrl}
                           alt={`Portfolio image ${index + 1} for ${profile.name}`}
@@ -379,11 +329,11 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
            <Card id="contact-form-section" className="shadow-xl border-primary/10 rounded-xl bg-card">
             <CardHeader className="p-5">
-              <CardTitle className="text-lg font-heading text-accent">Connect with {profile.name}</CardTitle>
-               <CardDescription className="text-xs text-muted-foreground mt-0.5">Initiate a conversation or request a custom piece through our secure admin-mediated process.</CardDescription>
+              <CardTitle className="text-lg font-heading text-accent">Request Custom Order from {profile.name}</CardTitle> 
+               <CardDescription className="text-xs text-muted-foreground mt-0.5">Provide details for your custom piece. This request will be sent to an admin for review.</CardDescription>
             </CardHeader>
             <CardContent className="p-5 pt-0">
-              <form className="space-y-3.5" onSubmit={handleRequestIntroduction}>
+              <form className="space-y-3.5" onSubmit={handleContactFormSubmit}>
                  <div className="space-y-1">
                     <Label htmlFor="contact-name" className="text-foreground text-xs font-medium">Your Name</Label>
                     <Input id="contact-name" name="contact-name" placeholder="John Doe" required className="text-foreground text-sm py-2" defaultValue={currentUser?.isLoggedIn ? currentUser.name : ''} />
@@ -397,8 +347,8 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                     <Input id="contact-phone" name="contact-phone" type="tel" placeholder="e.g., 9876543210" className="text-foreground text-sm py-2"/>
                  </div>
                  <div className="space-y-1">
-                    <Label htmlFor="contact-message" className="text-foreground text-xs font-medium">Your Inquiry / Project Idea</Label>
-                    <Textarea id="contact-message" name="contact-message" placeholder="Briefly explain your jewelry idea or why you'd like to connect..." required rows={3} className="text-foreground text-sm py-2"/>
+                    <Label htmlFor="contact-message" className="text-foreground text-xs font-medium">Your Custom Order Details</Label>
+                    <Textarea id="contact-message" name="contact-message" placeholder="Describe your desired jewelry piece, including type, materials, style, and any specific design ideas..." required rows={3} className="text-foreground text-sm py-2"/>
                  </div>
                   <div className="space-y-1">
                     <Label htmlFor="ornament-image" className="text-foreground text-xs font-medium">Attach Reference Image (Optional)</Label>
@@ -414,13 +364,13 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                     </div>
                     {imagePreview && (
                       <div className="mt-2 p-2 border border-muted rounded-md inline-block">
-                        <Image src={imagePreview} alt="Ornament preview" width={80} height={80} className="rounded object-contain" />
+                        <Image src={imagePreview} alt="Ornament preview" width={80} height={80} className="rounded object-contain" data-ai-hint="jewelry design sketch" />
                       </div>
                     )}
                   </div>
 
-                 <Button type="submit" size="default" className="shadow-md rounded-full text-xs py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isSubmittingInquiry}>
-                    <Send className="mr-1.5 h-3.5 w-3.5"/> {isSubmittingInquiry ? "Sending..." : "Send Inquiry to Admin"}
+                 <Button type="submit" size="default" className="shadow-md rounded-full text-xs py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isSubmittingForm}>
+                    <Send className="mr-1.5 h-3.5 w-3.5"/> {isSubmittingForm ? "Sending Request..." : "Submit Custom Order to Admin"}
                  </Button>
                  <p className="text-[0.65rem] text-muted-foreground pt-1.5">Your request will be reviewed by an administrator before being forwarded to the goldsmith if appropriate.</p>
               </form>
@@ -431,3 +381,4 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
     </div>
   );
 }
+
