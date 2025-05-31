@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, MessageCircle, Edit, LayoutDashboard } from 'lucide-react'; // Changed MessageCircleSquare to MessageCircle
+import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, MessageCircle, Edit, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image'; 
 import { useState, useEffect } from 'react';
@@ -160,16 +160,16 @@ export function Header() {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/customer/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
+                  <Link href="/customer/dashboard" onClick={(e) => e.stopPropagation()}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/customer/profile/edit"><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
+                  <Link href="/customer/profile/edit" onClick={(e) => e.stopPropagation()}><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/customer/orders"><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
+                  <Link href="/customer/orders" onClick={(e) => e.stopPropagation()}><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
                 </DropdownMenuItem>
                  <DropdownMenuItem asChild>
-                  <Link href="/customer/inquiries"><MessageCircle className="mr-2 h-4 w-4" />My Inquiries</Link>
+                  <Link href="/customer/inquiries" onClick={(e) => e.stopPropagation()}><MessageCircle className="mr-2 h-4 w-4" />My Inquiries</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
