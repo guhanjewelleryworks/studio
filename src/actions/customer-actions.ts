@@ -187,6 +187,46 @@ export async function updateCustomerProfile(id: string, data: { name?: string })
   }
 }
 
+export async function changeCustomerPassword(customerId: string, currentPasswordInput: string, newPasswordInput: string): Promise<{ success: boolean; error?: string }> {
+  console.log(`[Action: changeCustomerPassword] Attempting to change password for customer ID ${customerId}.`);
+  try {
+    if (!customerId || !currentPasswordInput || !newPasswordInput) {
+      return { success: false, error: 'Customer ID, current password, and new password are required.' };
+    }
+    if (newPasswordInput.trim().length < 6) {
+      return { success: false, error: 'New password must be at least 6 characters long.' };
+    }
+
+    const collection = await getCustomersCollection();
+    // Fetch the full customer document, including the password
+    const customer = await collection.findOne({ id: customerId });
+
+    if (!customer) {
+      return { success: false, error: 'Customer not found.' };
+    }
+
+    // IMPORTANT: Plain text password comparison. NOT FOR PRODUCTION.
+    if (customer.password !== currentPasswordInput.trim()) {
+      return { success: false, error: 'Incorrect current password.' };
+    }
+
+    // Update the password (still plain text)
+    const result = await collection.updateOne(
+      { id: customerId },
+      { $set: { password: newPasswordInput.trim() } }
+    );
+
+    if (result.modifiedCount === 1) {
+      return { success: true };
+    } else {
+      return { success: false, error: 'Password not updated. Please try again.' };
+    }
+  } catch (error) {
+    console.error(`[Action: changeCustomerPassword] Error changing password for ${customerId}:`, error);
+    return { success: false, error: 'Failed to change password due to a server error.' };
+  }
+}
+
 export async function fetchCustomerOrders(customerId: string): Promise<OrderRequest[]> {
   console.log(`[Action: fetchCustomerOrders] Fetching orders for customerId: ${customerId}`);
   try {
