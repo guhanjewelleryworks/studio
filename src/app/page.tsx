@@ -41,20 +41,20 @@ export default function Home() {
   const [errorFeatured, setErrorFeatured] = useState<string | null>(null);
 
   useEffect(() => {
-    // const loadFeaturedGoldsmiths = async () => {
-    //   setIsLoadingFeatured(true);
-    //   setErrorFeatured(null);
-    //   try {
-    //     const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
-    //     setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 3));
-    //   } catch (err) {
-    //     console.error("Error fetching featured goldsmiths:", err);
-    //     setErrorFeatured("Could not load featured artisans. Please try again later.");
-    //   } finally {
-    //     setIsLoadingFeatured(false);
-    //   }
-    // };
-    // loadFeaturedGoldsmiths(); // Call commented out for debugging
+    const loadFeaturedGoldsmiths = async () => {
+      setIsLoadingFeatured(true);
+      setErrorFeatured(null);
+      try {
+        const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
+        setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 3));
+      } catch (err) {
+        console.error("Error fetching featured goldsmiths:", err);
+        setErrorFeatured("Could not load featured artisans. Please try again later.");
+      } finally {
+        setIsLoadingFeatured(false);
+      }
+    };
+    loadFeaturedGoldsmiths();
   }, []);
 
 
@@ -73,7 +73,7 @@ export default function Home() {
           <div className="container px-4 md:px-6 relative z-10">
             <div className="grid gap-4 lg:grid-cols-[1fr_500px] lg:gap-6 xl:grid-cols-[1fr_550px] items-start"> {/* Changed items-center to items-start */}
               <div className="flex flex-col justify-start space-y-4"> {/* Adjusted space-y from 3 to 4 */}
-                <div className="self-start lg:self-auto"> {/* Removed mb-3 */}
+                <div className="self-start lg:self-auto">
                    <MetalPricesWidget />
                 </div>
                 <div className="space-y-1.5"> {/* Reduced space-y */}
