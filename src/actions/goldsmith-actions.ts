@@ -147,9 +147,9 @@ export async function fetchLatestGoldsmiths(limit: number = 5): Promise<Goldsmit
   try {
     const collection = await getGoldsmithsCollection();
     const goldsmithsCursor = collection.find({}).sort({ registeredAt: -1 }).limit(limit);
-    const goldsmithsArray: WithId<Goldsmith>[] = await goldsmithsCursor.toArray();
-    console.log(`[Action: fetchLatestGoldsmiths] Found ${goldsmithsArray.length} goldsmiths.`);
-    return goldsmithsArray.map(g => {
+    const customersArray: WithId<Goldsmith>[] = await goldsmithsCursor.toArray();
+    console.log(`[Action: fetchLatestGoldsmiths] Found ${customersArray.length} goldsmiths.`);
+    return customersArray.map(g => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, password, ...rest } = g;
       return rest as Goldsmith;
@@ -353,6 +353,22 @@ export async function fetchLatestPlatformOrderRequests(limit: number = 3): Promi
     return [];
   }
 }
+
+export async function fetchAllPlatformOrderRequests(): Promise<OrderRequest[]> {
+  console.log(`[Action: fetchAllPlatformOrderRequests] Fetching all platform order requests for admin.`);
+  try {
+    const collection = await getOrderRequestsCollection();
+    const ordersCursor = collection.find({}).sort({ requestedAt: -1 }); // Sort by most recent
+    const ordersArray: WithId<OrderRequest>[] = await ordersCursor.toArray();
+    console.log(`[Action: fetchAllPlatformOrderRequests] Found ${ordersArray.length} total orders.`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return ordersArray.map(({ _id, ...order }) => order as OrderRequest);
+  } catch (error) {
+    console.error(`[Action: fetchAllPlatformOrderRequests] Error fetching all orders:`, error);
+    return [];
+  }
+}
+
 
 export async function fetchLatestPlatformInquiries(limit: number = 3): Promise<Inquiry[]> {
   console.log(`[Action: fetchLatestPlatformInquiries] Fetching latest ${limit} platform inquiries.`);
