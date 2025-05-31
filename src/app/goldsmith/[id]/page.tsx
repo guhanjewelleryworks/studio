@@ -370,7 +370,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                   </div>
 
                  <Button type="submit" size="default" className="shadow-md rounded-full text-xs py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isSubmittingForm}>
-                    <Send className="mr-1.5 h-3.5 w-3.5"/> {isSubmittingForm ? "Sending Request..." : "Submit Custom Order to Admin"}
+                    <Send className="mr-1.5 h-3.5 w-3.5"/> {isSubmittingForm ? "Sending Request..." : "Submit Custom Order request"}
                  </Button>
                  <p className="text-[0.65rem] text-muted-foreground pt-1.5">Your request will be reviewed by an administrator before being forwarded to the goldsmith if appropriate.</p>
               </form>
