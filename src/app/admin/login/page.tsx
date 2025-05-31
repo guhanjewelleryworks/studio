@@ -1,7 +1,7 @@
 // src/app/admin/login/page.tsx
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +18,16 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    // Redirect to dashboard if already logged in
+    if (typeof window !== "undefined") {
+      const adminLoggedIn = localStorage.getItem('isAdminLoggedIn');
+      if (adminLoggedIn === 'true') {
+        router.replace('/admin/dashboard');
+      }
+    }
+  }, [router]);
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
@@ -26,7 +36,10 @@ export default function AdminLoginPage() {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Simulate admin credentials check
-    if (username === 'admin' && password === 'password') { // Replace with your desired simulated credentials
+    if (username === 'admin' && password === 'password') { 
+      if (typeof window !== "undefined") {
+        localStorage.setItem('isAdminLoggedIn', 'true');
+      }
       toast({
         title: 'Login Successful (Simulated)',
         description: 'Redirecting to the admin dashboard...',
