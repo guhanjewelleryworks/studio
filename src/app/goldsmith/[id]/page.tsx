@@ -21,6 +21,14 @@ interface PageParams {
   id: string;
 }
 
+interface CurrentUser {
+  isLoggedIn: boolean;
+  id?: string; // Added id
+  name?: string;
+  email?: string;
+}
+
+
 // Helper function to ensure profile has all necessary fields with defaults
 const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id: string): GoldsmithProfileType | null => {
   if (!profile) return null;
@@ -59,9 +67,20 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
-
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
    useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem('currentUser');
+      if (storedUser) {
+        try {
+          setCurrentUser(JSON.parse(storedUser));
+        } catch (e) {
+          console.error("Failed to parse currentUser from localStorage", e);
+        }
+      }
+    }
+
     const loadProfile = async () => {
       if (!id) {
         setError("Goldsmith ID not found in URL.");
@@ -77,8 +96,8 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
         if (completeProfile) {
           setProfile(completeProfile);
           if(completeProfile.portfolioImages && completeProfile.portfolioImages.length > 0) {
-            setSelectedImage(null); // Reset any previously selected image
-            setImagePreview(null); // Reset preview
+            setSelectedImage(null); 
+            setImagePreview(null); 
           }
         } else {
           setError("Goldsmith profile not found.");
@@ -97,8 +116,6 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      // TODO: Implement actual image upload to a service like S3 or Cloudinary
-      // For now, we'll store a preview, but this won't persist or be part of the request.
       setSelectedImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -157,7 +174,6 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
      const customerPhone = (form.elements.namedItem('contact-phone') as HTMLInputElement)?.value;
      const message = (form.elements.namedItem('contact-message') as HTMLTextAreaElement)?.value;
 
-     // Basic validation
     if (!customerName || !customerEmail || !message) {
       toast({ title: "Missing Information", description: "Please fill in your name, email, and message.", variant: "destructive" });
       setIsSubmittingInquiry(false);
@@ -166,15 +182,13 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
      const inquiryData: NewInquiryInput = {
         goldsmithId: profile.id,
+        customerId: currentUser?.isLoggedIn && currentUser.id ? currentUser.id : undefined,
         customerName,
         customerEmail,
         customerPhone,
         message,
-        // referenceImage: imagePreview || undefined, // This would be a data URI or an uploaded URL in a real app
      };
-     // In a real app, you would handle image upload first and then pass the image URL.
-     // For simulation, if imagePreview exists, you might want to include it.
-
+     
      console.log("Submitting Inquiry:", inquiryData);
      const result = await saveInquiry(inquiryData);
 
@@ -199,20 +213,20 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
    const handleRequestCustomOrder = async () => {
     setIsSubmittingOrder(true);
-    // Simulate collecting more detailed order info if a modal or separate form existed.
-    // For now, let's use details from the inquiry form as a proxy if it's filled,
-    // or prompt the user that more details are needed.
     const contactForm = document.getElementById('contact-form-section')?.querySelector('form');
-    const itemName = "Custom Order for " + profile.name; // Example
+    const itemName = "Custom Order for " + profile.name; 
     const details = (contactForm?.elements.namedItem('contact-message') as HTMLTextAreaElement)?.value || "Customer to provide more details via admin mediation.";
-    const customerName = (contactForm?.elements.namedItem('contact-name') as HTMLInputElement)?.value || "Unknown Customer";
-    const customerEmail = (contactForm?.elements.namedItem('contact-email') as HTMLInputElement)?.value || "no-email-provided@example.com";
+    const customerNameValue = (contactForm?.elements.namedItem('contact-name') as HTMLInputElement)?.value;
+    const customerEmailValue = (contactForm?.elements.namedItem('contact-email') as HTMLInputElement)?.value;
+
+    const finalCustomerName = currentUser?.isLoggedIn ? currentUser.name : customerNameValue;
+    const finalCustomerEmail = currentUser?.isLoggedIn ? currentUser.email : customerEmailValue;
 
 
-    if (!customerName || customerName === "Unknown Customer" || !customerEmail.includes('@')) {
+    if (!finalCustomerName || !finalCustomerEmail || !finalCustomerEmail.includes('@')) {
          toast({
             title: 'Information Needed for Custom Order',
-            description: 'Please fill out the inquiry form below with your name, email, and project idea before requesting a custom order.',
+            description: 'Please fill out the inquiry form below with your name and email before requesting a custom order, or log in.',
             variant: 'default',
             duration: 7000,
         });
@@ -223,12 +237,12 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
     const orderData: NewOrderRequestInput = {
         goldsmithId: profile.id,
-        customerName: customerName,
-        customerEmail: customerEmail,
+        customerId: currentUser?.isLoggedIn && currentUser.id ? currentUser.id : undefined,
+        customerName: finalCustomerName as string,
+        customerEmail: finalCustomerEmail as string,
         customerPhone: (contactForm?.elements.namedItem('contact-phone') as HTMLInputElement)?.value || undefined,
         itemDescription: itemName,
         details: details,
-        // referenceImage: imagePreview || undefined, // This would be a data URI or an uploaded URL in a real app
     };
 
     console.log("Submitting Custom Order:", orderData);
@@ -372,11 +386,11 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
               <form className="space-y-3.5" onSubmit={handleRequestIntroduction}>
                  <div className="space-y-1">
                     <Label htmlFor="contact-name" className="text-foreground text-xs font-medium">Your Name</Label>
-                    <Input id="contact-name" name="contact-name" placeholder="John Doe" required className="text-foreground text-sm py-2"/>
+                    <Input id="contact-name" name="contact-name" placeholder="John Doe" required className="text-foreground text-sm py-2" defaultValue={currentUser?.isLoggedIn ? currentUser.name : ''} />
                  </div>
                  <div className="space-y-1">
                     <Label htmlFor="contact-email" className="text-foreground text-xs font-medium">Your Email</Label>
-                    <Input id="contact-email" name="contact-email" type="email" placeholder="john.doe@example.com" required className="text-foreground text-sm py-2"/>
+                    <Input id="contact-email" name="contact-email" type="email" placeholder="john.doe@example.com" required className="text-foreground text-sm py-2" defaultValue={currentUser?.isLoggedIn ? currentUser.email : ''}/>
                  </div>
                   <div className="space-y-1">
                     <Label htmlFor="contact-phone" className="text-foreground text-xs font-medium">Your Phone (Optional)</Label>

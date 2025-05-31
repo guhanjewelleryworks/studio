@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { LogIn, Loader2, Eye, EyeOff } from 'lucide-react'; // Added Eye, EyeOff
+import { LogIn, Loader2, Eye, EyeOff } from 'lucide-react'; 
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
@@ -20,7 +20,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
+  const [showPassword, setShowPassword] = useState(false); 
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -47,8 +47,10 @@ export default function LoginPage() {
             });
             
             if (typeof window !== "undefined") {
+              // Store customer ID along with other details
               localStorage.setItem('currentUser', JSON.stringify({ 
                 isLoggedIn: true, 
+                id: result.data.id, // Add customer ID
                 name: result.data.name, 
                 email: result.data.email 
               }));
@@ -99,14 +101,14 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="space-y-1.5 relative"> {/* Added relative positioning */}
+            <div className="space-y-1.5 relative"> 
               <Label htmlFor="password" className="text-foreground">Password</Label>
               <Input
                 id="password"
-                type={showPassword ? 'text' : 'password'} // Dynamic type
+                type={showPassword ? 'text' : 'password'} 
                 placeholder="Enter your password"
                 required
-                className="text-base text-foreground py-2 pr-10" // Added pr-10 for icon space
+                className="text-base text-foreground py-2 pr-10" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
@@ -115,9 +117,9 @@ export default function LoginPage() {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" // Positioned button
+                className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" 
                 onClick={() => setShowPassword(!showPassword)}
-                tabIndex={-1} // Make it not focusable with Tab for better UX
+                tabIndex={-1} 
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>

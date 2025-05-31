@@ -1,10 +1,10 @@
 // src/actions/customer-actions.ts
 'use server';
 
-import { getCustomersCollection } from '@/lib/mongodb';
-import type { Customer, NewCustomerInput } from '@/types/goldsmith';
+import { getCustomersCollection, getOrderRequestsCollection, getInquiriesCollection } from '@/lib/mongodb';
+import type { Customer, NewCustomerInput, OrderRequest, Inquiry } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid';
-import type { Collection, WithId } from 'mongodb';
+import type { Collection, WithId, Filter } from 'mongodb';
 
 // IMPORTANT: In a real application, passwords should be hashed before saving.
 // For this simulation, we'll store it as plain text, but this is NOT secure for production.
@@ -38,7 +38,7 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
       email: normalizedEmail,
       password: data.password.trim(), // Store plain text password (NOT FOR PRODUCTION)
       registeredAt: new Date(),
-      lastLoginAt: undefined, // Initialize lastLoginAt
+      lastLoginAt: undefined, 
     };
 
     console.log('[Action: saveCustomer] Attempting to insert new customer:', JSON.stringify(newCustomer));
@@ -54,7 +54,6 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
         return { success: true, data: customerWithoutSensitiveData as Omit<Customer, 'password' | '_id'> };
       }
       console.warn('[Action: saveCustomer] InsertedId was present, but document not found after insert. ID:', result.insertedId.toString());
-      // Even if retrieval fails, signup was successful.
       return { success: true, data: {id: newCustomer.id, name: newCustomer.name, email: newCustomer.email, registeredAt: newCustomer.registeredAt } };
     } else {
       console.error('[Action: saveCustomer] Failed to insert customer data. MongoDB result did not contain insertedId.');
@@ -101,7 +100,7 @@ async function fetchCustomerByEmailForAuth(email: string): Promise<Customer | nu
     const customerDoc = await collection.findOne({ email: normalizedEmail });
     if (customerDoc) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { _id, ...customer } = customerDoc; // Return with password for login check
+      const { _id, ...customer } = customerDoc; 
       return customer as Customer;
     }
     return null;
@@ -121,15 +120,11 @@ export async function loginCustomer(credentials: Pick<NewCustomerInput, 'email' 
       return { success: false, error: 'Invalid email or password.' };
     }
 
-    // PLAIN TEXT PASSWORD COMPARISON - NOT FOR PRODUCTION
-    // In a real app, 'credentials.password' would be hashed and compared to a stored hash.
-    // Both passwords should be trimmed before comparison, as they are trimmed on save.
     if (customer.password !== credentials.password.trim()) {
       console.log('[Action: loginCustomer] Password mismatch for email:', credentials.email);
       return { success: false, error: 'Invalid email or password.' };
     }
 
-    // Login successful, update lastLoginAt
     const collection = await getCustomersCollection();
     const newLastLoginAt = new Date();
     await collection.updateOne({ id: customer.id }, { $set: { lastLoginAt: newLastLoginAt } });
@@ -146,5 +141,80 @@ export async function loginCustomer(credentials: Pick<NewCustomerInput, 'email' 
         errorMessage = error.message;
     }
     return { success: false, error: `Login failed: ${errorMessage}` };
+  }
+}
+
+// --- New Customer-Specific Actions ---
+
+export async function fetchCustomerById(id: string): Promise<Omit<Customer, 'password' | '_id'> | null> {
+  console.log(`[Action: fetchCustomerById] Attempting to fetch customer by ID ${id}.`);
+  try {
+    const collection = await getCustomersCollection();
+    const customerDoc = await collection.findOne({ id: id }); // Using the UUID 'id' field
+    if (customerDoc) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, password, ...customerData } = customerDoc;
+      return customerData as Omit<Customer, 'password' | '_id'>;
+    }
+    return null;
+  } catch (error) {
+    console.error(`[Action: fetchCustomerById] Error fetching customer by ID ${id}:`, error);
+    return null;
+  }
+}
+
+export async function updateCustomerProfile(id: string, data: { name?: string }): Promise<{ success: boolean; data?: Omit<Customer, 'password' | '_id'>; error?: string }> {
+  console.log(`[Action: updateCustomerProfile] Updating profile for customer ID ${id} with data:`, data);
+  try {
+    if (!id || !data.name || data.name.trim() === "") {
+      return { success: false, error: 'Customer ID and a valid name are required.' };
+    }
+    const collection = await getCustomersCollection();
+    const result = await collection.findOneAndUpdate(
+      { id: id },
+      { $set: { name: data.name.trim() } },
+      { returnDocument: 'after', projection: { password: 0, _id: 0 } }
+    );
+
+    if (result) {
+      return { success: true, data: result as Omit<Customer, 'password' | '_id'> };
+    } else {
+      return { success: false, error: 'Customer not found or profile not updated.' };
+    }
+  } catch (error) {
+    console.error(`[Action: updateCustomerProfile] Error updating profile for ${id}:`, error);
+    return { success: false, error: 'Failed to update profile due to a server error.' };
+  }
+}
+
+export async function fetchCustomerOrders(customerId: string): Promise<OrderRequest[]> {
+  console.log(`[Action: fetchCustomerOrders] Fetching orders for customerId: ${customerId}`);
+  try {
+    const collection = await getOrderRequestsCollection();
+    // Fetch orders where customerId matches
+    const ordersCursor = collection.find({ customerId: customerId } as Filter<OrderRequest>);
+    const ordersArray = await ordersCursor.sort({ requestedAt: -1 }).toArray();
+    console.log(`[Action: fetchCustomerOrders] Found ${ordersArray.length} orders for customerId ${customerId}.`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return ordersArray.map(({ _id, ...order }) => order as OrderRequest);
+  } catch (error) {
+    console.error(`[Action: fetchCustomerOrders] Error fetching orders for customerId ${customerId}:`, error);
+    return [];
+  }
+}
+
+export async function fetchCustomerInquiries(customerId: string): Promise<Inquiry[]> {
+  console.log(`[Action: fetchCustomerInquiries] Fetching inquiries for customerId: ${customerId}`);
+  try {
+    const collection = await getInquiriesCollection();
+    // Fetch inquiries where customerId matches
+    const inquiriesCursor = collection.find({ customerId: customerId } as Filter<Inquiry>);
+    const inquiriesArray = await inquiriesCursor.sort({ requestedAt: -1 }).toArray();
+    console.log(`[Action: fetchCustomerInquiries] Found ${inquiriesArray.length} inquiries for customerId ${customerId}.`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return inquiriesArray.map(({ _id, ...inquiry }) => inquiry as Inquiry);
+  } catch (error) {
+    console.error(`[Action: fetchCustomerInquiries] Error fetching inquiries for customerId ${customerId}:`, error);
+    return [];
   }
 }

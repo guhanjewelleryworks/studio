@@ -48,18 +48,19 @@ export type NewGoldsmithInput = Omit<
 
 // New Types for Orders and Inquiries
 
-export type OrderRequestStatus = 'new' | 'pending_goldsmith_review' | 'in_progress' | 'completed' | 'cancelled';
+export type OrderRequestStatus = 'new' | 'pending_goldsmith_review' | 'in_progress' | 'completed' | 'cancelled' | 'customer_review_requested';
 
 export interface OrderRequest {
   _id?: ObjectId | string;
   id: string; // UUID
   goldsmithId: string;
-  customerName: string; // For now, as customer accounts are not fully integrated
+  customerId?: string; // Link to Customer ID
+  customerName: string; 
   customerEmail: string;
   customerPhone?: string;
   itemDescription: string;
   details: string;
-  referenceImage?: string; // URL to an uploaded image, or data URI if handled that way
+  referenceImage?: string; 
   status: OrderRequestStatus;
   requestedAt: Date;
   updatedAt: Date;
@@ -74,11 +75,12 @@ export interface Inquiry {
   _id?: ObjectId | string;
   id: string; // UUID
   goldsmithId: string;
+  customerId?: string; // Link to Customer ID
   customerName: string;
   customerEmail: string;
   customerPhone?: string;
   message: string;
-  referenceImage?: string; // URL to an uploaded image, or data URI
+  referenceImage?: string; 
   status: InquiryStatus;
   requestedAt: Date;
   updatedAt: Date;
