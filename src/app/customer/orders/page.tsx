@@ -1,3 +1,4 @@
+
 // src/app/customer/orders/page.tsx
 'use client';
 
@@ -13,6 +14,8 @@ import type { OrderRequest, OrderRequestStatus } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { OrderStatusProgress } from '@/components/orders/OrderStatusProgress'; // Import the new component
+import { Separator } from '@/components/ui/separator';
 
 interface CurrentUser {
   isLoggedIn: boolean;
@@ -61,25 +64,25 @@ export default function CustomerOrdersPage() {
   
   const getStatusBadgeVariant = (status: OrderRequestStatus) => {
     switch (status) {
-      case 'new': return 'default'; // Blue or primary
-      case 'pending_goldsmith_review': return 'secondary'; // Yellow or orange
-      case 'in_progress': return 'outline'; // A distinct color, maybe purple
-      case 'completed': return 'default'; // Green (using default as success for now)
-      case 'cancelled': return 'destructive'; // Red
-      case 'customer_review_requested': return 'secondary'; // Amber/Yellow
+      case 'new': return 'default'; 
+      case 'pending_goldsmith_review': return 'secondary';
+      case 'in_progress': return 'outline'; 
+      case 'completed': return 'default'; 
+      case 'cancelled': return 'destructive';
+      case 'customer_review_requested': return 'secondary';
       default: return 'outline';
     }
   };
 
-  if (!currentUser && isLoading) { // Show loader only if currentUser is not yet set and still loading
+  if (!currentUser && isLoading) { 
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
-  if (!currentUser && !isLoading) { // If loading finished and still no user, means redirection is happening or failed
-    return null; // Or a message, but redirection should handle it.
+  if (!currentUser && !isLoading) { 
+    return null; 
   }
 
 
@@ -100,11 +103,11 @@ export default function CustomerOrdersPage() {
 
       {isLoading ? (
         <div className="space-y-4">
-          {[1, 2, 3].map(i => (
+          {[1, 2].map(i => (
             <Card key={i} className="shadow-md bg-card border-border/20 rounded-xl animate-pulse">
-              <CardHeader><div className="h-6 bg-muted rounded w-3/4"></div></CardHeader>
-              <CardContent><div className="h-4 bg-muted rounded w-1/2 mb-2"></div><div className="h-4 bg-muted rounded w-full"></div></CardContent>
-              <CardFooter><div className="h-8 bg-muted rounded w-1/4"></div></CardFooter>
+              <CardHeader className="p-4"><div className="h-6 bg-muted rounded w-3/4"></div><div className="h-4 bg-muted rounded w-1/2 mt-1"></div></CardHeader>
+              <CardContent className="p-4"><div className="h-10 bg-muted rounded w-full mb-3"></div><div className="h-4 bg-muted rounded w-full"></div><div className="h-4 bg-muted rounded w-5/6 mt-1"></div></CardContent>
+              <CardFooter className="p-4"><div className="h-8 bg-muted rounded w-1/4"></div></CardFooter>
             </Card>
           ))}
         </div>
@@ -130,26 +133,38 @@ export default function CustomerOrdersPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {orders.map((order) => (
-            <Card key={order.id} className="shadow-md bg-card border-border/20 rounded-xl hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg text-accent font-heading">{order.itemDescription}</CardTitle>
-                  <Badge variant={getStatusBadgeVariant(order.status)} className="capitalize text-xs">
+            <Card key={order.id} className="shadow-lg bg-card border-primary/10 rounded-xl hover:shadow-2xl transition-shadow duration-300">
+              <CardHeader className="p-4 sm:p-5">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                  <CardTitle className="text-lg sm:text-xl text-accent font-heading mb-1 sm:mb-0">{order.itemDescription}</CardTitle>
+                  <Badge variant={getStatusBadgeVariant(order.status)} className="capitalize text-xs px-2.5 py-1 rounded-full self-start sm:self-center">
                      {order.status.replace(/_/g, ' ')}
                   </Badge>
                 </div>
-                <CardDescription className="text-xs text-muted-foreground">
-                  Order ID: {order.id} | Requested: {format(new Date(order.requestedAt), 'PPp')}
+                <CardDescription className="text-xs text-muted-foreground mt-1">
+                  Order ID: {order.id.substring(0,18)}... | Requested: {format(new Date(order.requestedAt), 'PPp')}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-sm text-foreground/80 pb-4">
-                <p className="line-clamp-2">{order.details}</p>
+              
+              <Separator className="bg-border/30"/>
+
+              <CardContent className="p-4 sm:p-5">
+                <OrderStatusProgress currentStatus={order.status} />
+                {order.details && (
+                   <>
+                    <Separator className="my-3 bg-border/20"/>
+                    <p className="text-xs text-foreground/80 mt-2 line-clamp-2"><span className="font-medium text-foreground">Details:</span> {order.details}</p>
+                   </>
+                )}
               </CardContent>
-              <CardFooter className="pt-0 pb-4">
-                <Button variant="outline" size="xs" className="text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full">
-                  View Details
+
+              <Separator className="bg-border/30"/>
+              
+              <CardFooter className="p-4 sm:p-5 flex justify-end">
+                <Button variant="outline" size="sm" className="text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full text-xs">
+                  View Order Details
                 </Button>
               </CardFooter>
             </Card>
@@ -159,3 +174,4 @@ export default function CustomerOrdersPage() {
     </div>
   );
 }
+
