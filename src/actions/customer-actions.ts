@@ -261,6 +261,23 @@ export async function fetchCustomerOrders(customerId: string): Promise<OrderRequ
   }
 }
 
+export async function fetchOrderRequestById(orderId: string): Promise<OrderRequest | null> {
+  console.log(`[Action: fetchOrderRequestById] Fetching order request by ID: ${orderId}`);
+  try {
+    const collection = await getOrderRequestsCollection();
+    const orderDoc = await collection.findOne({ id: orderId });
+    if (orderDoc) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, ...orderData } = orderDoc;
+      return orderData as OrderRequest;
+    }
+    return null;
+  } catch (error) {
+    console.error(`[Action: fetchOrderRequestById] Error fetching order request by ID ${orderId}:`, error);
+    return null;
+  }
+}
+
 export async function fetchCustomerInquiries(customerId: string): Promise<Inquiry[]> {
   console.log(`[Action: fetchCustomerInquiries] Fetching inquiries for customerId: ${customerId}`);
   try {
@@ -276,3 +293,4 @@ export async function fetchCustomerInquiries(customerId: string): Promise<Inquir
     return [];
   }
 }
+

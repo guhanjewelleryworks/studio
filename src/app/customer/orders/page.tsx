@@ -7,14 +7,14 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingBag, Loader2, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ShoppingBag, Loader2, ArrowLeft, AlertTriangle, Eye } from 'lucide-react'; // Added Eye icon
 import Link from 'next/link';
 import { fetchCustomerOrders } from '@/actions/customer-actions';
 import type { OrderRequest, OrderRequestStatus } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { OrderStatusProgress } from '@/components/orders/OrderStatusProgress'; // Import the new component
+import { OrderStatusProgress } from '@/components/orders/OrderStatusProgress'; 
 import { Separator } from '@/components/ui/separator';
 
 interface CurrentUser {
@@ -163,8 +163,11 @@ export default function CustomerOrdersPage() {
               <Separator className="bg-border/30"/>
               
               <CardFooter className="p-4 sm:p-5 flex justify-end">
-                <Button variant="outline" size="sm" className="text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full text-xs">
-                  View Order Details
+                <Button asChild variant="outline" size="sm" className="text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full text-xs">
+                  <Link href={`/customer/orders/${order.id}`}>
+                    <Eye className="mr-1.5 h-3.5 w-3.5" />
+                     View Order Details
+                  </Link>
                 </Button>
               </CardFooter>
             </Card>
