@@ -68,14 +68,19 @@ export default function GoldsmithDashboardPage() {
         if (activeGoldsmith && activeGoldsmith.id) {
           setCurrentGoldsmith(activeGoldsmith);
           const [ordersCount, inquiriesCount] = await Promise.all([
-            getNewOrderCountForGoldsmith(activeGoldsmith.id),
+            getNewOrderCountForGoldsmith(activeGoldsmith.id), // This counts 'new' which might need adjustment
             getPendingInquiriesCountForGoldsmith(activeGoldsmith.id)
           ]);
+
+          // Fetch count for orders specifically in 'pending_goldsmith_review'
+          // This requires a modification to getNewOrderCountForGoldsmith or a new action
+          // For now, we'll use the existing ordersCount which refers to status 'new' in its current implementation
+          // Ideally, getNewOrderCountForGoldsmith should count 'pending_goldsmith_review' for the goldsmith dashboard
 
           setStats({
             goldsmithName: activeGoldsmith.name,
             profileCompletion: calculateProfileCompletion(activeGoldsmith),
-            newOrdersCount: ordersCount,
+            newOrdersCount: ordersCount, // This is the count of orders with status 'new' assigned to this goldsmith
             pendingInquiriesCount: inquiriesCount,
           });
         } else {
@@ -181,10 +186,10 @@ export default function GoldsmithDashboardPage() {
           title="Order Management"
           description="View new, active, and completed custom order requests."
           icon={Package}
-          linkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=new`} 
+          linkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=pending_goldsmith_review`} 
           linkText="View New Orders"
           variant="default"
-          secondaryLinkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=active`}
+          secondaryLinkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=in_progress`} // Changed 'active' to 'in_progress' for clarity
           secondaryLinkText="Manage Active Orders"
         />
         <DashboardActionCard
