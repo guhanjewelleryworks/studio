@@ -49,7 +49,15 @@ export type NewGoldsmithInput = Omit<
 
 // New Types for Orders and Inquiries
 
-export type OrderRequestStatus = 'new' | 'pending_goldsmith_review' | 'in_progress' | 'completed' | 'cancelled' | 'customer_review_requested';
+export type OrderRequestStatus = 
+  | 'new' 
+  | 'pending_goldsmith_review' 
+  | 'in_progress' 
+  | 'artwork_completed' // Goldsmith has finished the piece
+  | 'customer_review_requested' // Goldsmith requests customer feedback on the piece
+  | 'shipped' // Order is out for delivery
+  | 'completed' 
+  | 'cancelled';
 
 export interface OrderRequest {
   _id?: ObjectId | string;
