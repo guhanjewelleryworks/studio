@@ -178,23 +178,23 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
       return;
     }
 
-     const orderData: NewOrderRequestInput = { // Changed to NewOrderRequestInput
+     const orderData: NewOrderRequestInput = { 
         goldsmithId: profile.id,
         customerId: currentUser?.isLoggedIn && currentUser.id ? currentUser.id : undefined,
         customerName,
         customerEmail,
         customerPhone,
-        itemDescription: `Custom Order for ${profile.name} (via profile contact)`, // Generic item description
-        details: message, // Message becomes details
-        // referenceImage: imagePreview || undefined, // If you implement image upload for orders
+        itemDescription: `Custom Order for ${profile.name} (via profile contact)`, 
+        details: message, 
+        referenceImage: imagePreview || undefined, // THIS LINE IS NOW UNCOMMENTED
      };
      
      console.log("Submitting Custom Order Request via form:", orderData);
-     const result = await saveOrderRequest(orderData); // Changed to saveOrderRequest
+     const result = await saveOrderRequest(orderData); 
 
      if (result.success && result.data) {
         toast({
-          title: 'Custom Order Request Submitted!', // Updated toast message
+          title: 'Custom Order Request Submitted!', 
           description: `Your request for ${profile.name} has been sent to admin for review.`,
           duration: 7000,
         });
@@ -203,7 +203,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
         setImagePreview(null);
      } else {
         toast({
-          title: 'Order Request Submission Failed', // Updated toast message
+          title: 'Order Request Submission Failed', 
           description: result.error || "Could not send your order request. Please try again.",
           variant: 'destructive',
         });
@@ -273,9 +273,8 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                         <span>{profile.ordersCompleted}+ Orders Completed</span>
                     </div>
                 )}
-                {/* Removed the first "Request Custom Order" button */}
                 <Button 
-                  variant="default" // Changed from outline to default to make it primary
+                  variant="default" 
                   size="default" 
                   className="w-full border-primary text-primary-foreground bg-primary hover:bg-primary/90 rounded-full text-xs py-2.5 shadow-sm" 
                   onClick={(e) => { e.preventDefault(); document.getElementById('contact-form-section')?.scrollIntoView({ behavior: 'smooth' }); }}
