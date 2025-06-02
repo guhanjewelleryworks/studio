@@ -2,12 +2,13 @@
 // src/components/orders/OrderStatusProgress.tsx
 'use client';
 
+import * as React from 'react'; // Added this import
 import type { OrderRequestStatus } from '@/types/goldsmith';
-import { CheckCircle, Circle, Loader2, XCircle, ShoppingBag } from 'lucide-react';
+import { CheckCircle, Circle, Loader2, XCircle } from 'lucide-react'; // Removed ShoppingBag as it's not used
 import { cn } from '@/lib/utils';
 
 interface Step {
-  id: OrderRequestStatus | 'visual_review' | 'visual_final_review'; // Added visual steps for mapping
+  id: OrderRequestStatus | 'visual_review' | 'visual_final_review';
   label: string;
   statuses: OrderRequestStatus[];
 }
@@ -41,8 +42,6 @@ export const OrderStatusProgress: React.FC<OrderStatusProgressProps> = ({ curren
       break;
     }
   }
-  // If status is not directly mapped, infer based on typical flow (e.g. if it's 'in_progress', all previous steps are done)
-  // This logic primarily relies on the `currentStepIndex` correctly identifying the current stage.
 
   return (
     <div className="w-full py-3">
@@ -68,7 +67,7 @@ export const OrderStatusProgress: React.FC<OrderStatusProgressProps> = ({ curren
                   ) : isActive ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Circle className="w-3 h-3" /> // Placeholder for future steps
+                    <Circle className="w-3 h-3" /> 
                   )}
                 </div>
                 <p
@@ -84,7 +83,6 @@ export const OrderStatusProgress: React.FC<OrderStatusProgressProps> = ({ curren
                 <div
                   className={cn(
                     'flex-1 h-0.5 mx-1 sm:mx-2 transition-colors duration-500 ease-in-out',
-                     // If current step is completed, or the next step is active/completed, then the line is primary
                     (isCompleted && index + 1 <= currentStepIndex) || (isActive && index +1 <= currentStepIndex)  ? 'bg-primary' : 'bg-border'
                   )}
                 />
@@ -96,3 +94,4 @@ export const OrderStatusProgress: React.FC<OrderStatusProgressProps> = ({ curren
     </div>
   );
 };
+
