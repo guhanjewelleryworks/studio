@@ -209,8 +209,10 @@ export default function CustomerOrderDetailPage({ params: paramsPromise }: { par
             </CardHeader>
             <CardContent className="space-y-2">
               <p className="text-xs text-muted-foreground">If you have questions about this order, please contact support.</p>
-              <Button variant="default" size="sm" className="w-full text-xs bg-primary text-primary-foreground hover:bg-primary/90">
-                <Mail className="mr-2 h-3.5 w-3.5" /> Contact Support
+              <Button asChild variant="default" size="sm" className="w-full text-xs bg-primary text-primary-foreground hover:bg-primary/90">
+                <Link href="/contact">
+                  <Mail className="mr-2 h-3.5 w-3.5" /> Contact Support
+                </Link>
               </Button>
             </CardContent>
           </Card>
