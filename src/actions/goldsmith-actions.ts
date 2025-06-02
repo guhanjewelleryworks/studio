@@ -4,7 +4,7 @@
 import { getGoldsmithsCollection, getOrderRequestsCollection, getInquiriesCollection } from '@/lib/mongodb';
 import type { Goldsmith, NewGoldsmithInput, OrderRequest, NewOrderRequestInput, Inquiry, NewInquiryInput, OrderRequestStatus, InquiryStatus } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
-import type { Collection, Filter, WithId } from 'mongodb';
+import type { Collection, Filter, WithId, FindOneAndUpdateOptions } from 'mongodb';
 
 const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Example: Los Angeles
 
@@ -397,5 +397,57 @@ export async function fetchAllPlatformInquiries(): Promise<Inquiry[]> {
   } catch (error) {
     console.error(`[Action: fetchAllPlatformInquiries] Error fetching all inquiries:`, error);
     return [];
+  }
+}
+
+export async function updateOrderStatus(
+  orderId: string,
+  newStatus: OrderRequestStatus
+): Promise<{ success: boolean; error?: string; data?: OrderRequest }> {
+  console.log(`[Action: updateOrderStatus] Admin updating order ${orderId} to status ${newStatus}`);
+  try {
+    if (!orderId || !newStatus) {
+      return { success: false, error: 'Order ID and new status are required.' };
+    }
+
+    // Ensure the newStatus is a valid OrderRequestStatus
+    const validStatuses: OrderRequestStatus[] = [
+      'new', 'pending_goldsmith_review', 'in_progress', 
+      'artwork_completed', 'customer_review_requested', 'shipped', 
+      'completed', 'cancelled'
+    ];
+    if (!validStatuses.includes(newStatus)) {
+      return { success: false, error: `Invalid order status: ${newStatus}` };
+    }
+
+    const collection = await getOrderRequestsCollection();
+    const filter = { id: orderId };
+    const updateDoc = {
+      $set: {
+        status: newStatus,
+        updatedAt: new Date(),
+      },
+    };
+    const options: FindOneAndUpdateOptions = {
+      returnDocument: 'after',
+      projection: { _id: 0 } as any, // Cast to any to bypass strict BSON projection type for now
+    };
+
+    const result = await collection.findOneAndUpdate(filter, updateDoc, options);
+
+    if (result) {
+      console.log(`[Action: updateOrderStatus] Successfully updated order ${orderId} to ${newStatus}. Updated doc:`, JSON.stringify(result));
+      return { success: true, data: result as OrderRequest };
+    } else {
+      console.log(`[Action: updateOrderStatus] Order ${orderId} not found or not updated.`);
+      return { success: false, error: 'Order not found or status not updated.' };
+    }
+  } catch (error) {
+    console.error(`[Action: updateOrderStatus] Error updating order status for ${orderId}:`, error);
+    let errorMessage = 'An unknown error occurred while updating order status.';
+    if (error instanceof Error) {
+        errorMessage = error.message;
+    }
+    return { success: false, error: `Failed to update order status: ${errorMessage}` };
   }
 }

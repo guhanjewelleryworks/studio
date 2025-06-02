@@ -6,9 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, ArrowLeft, RefreshCw, Loader2, AlertTriangle } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Send } from 'lucide-react';
 import Link from 'next/link';
-import { fetchAllPlatformOrderRequests } from '@/actions/goldsmith-actions';
+import { fetchAllPlatformOrderRequests, updateOrderStatus } from '@/actions/goldsmith-actions';
 import type { OrderRequest, OrderRequestStatus } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -18,6 +18,7 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<OrderRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
   const loadOrders = async () => {
@@ -43,14 +44,39 @@ export default function AdminOrdersPage() {
     loadOrders();
   }, []);
 
+  const handleUpdateStatus = async (orderId: string, newStatus: OrderRequestStatus) => {
+    setIsUpdatingStatus(prev => ({ ...prev, [orderId]: true }));
+    const result = await updateOrderStatus(orderId, newStatus);
+    if (result.success && result.data) {
+      toast({
+        title: "Order Status Updated",
+        description: `Order ${orderId.substring(0,8)}... status changed to ${newStatus.replace(/_/g, ' ')}.`,
+      });
+      // Update the local state to reflect the change immediately
+      setOrders(prevOrders => 
+        prevOrders.map(o => o.id === orderId ? { ...o, status: newStatus, updatedAt: new Date() } : o)
+      );
+    } else {
+      toast({
+        title: "Update Failed",
+        description: result.error || "Could not update order status.",
+        variant: "destructive",
+      });
+    }
+    setIsUpdatingStatus(prev => ({ ...prev, [orderId]: false }));
+  };
+
+
   const getStatusBadgeVariant = (status: OrderRequestStatus) => {
     switch (status) {
       case 'new': return 'default'; 
       case 'pending_goldsmith_review': return 'secondary';
       case 'in_progress': return 'outline'; 
+      case 'artwork_completed': return 'outline'; // Potentially different visual
+      case 'customer_review_requested': return 'secondary';
+      case 'shipped': return 'default'; // Or another distinct variant
       case 'completed': return 'default'; 
       case 'cancelled': return 'destructive';
-      case 'customer_review_requested': return 'secondary';
       default: return 'outline';
     }
   };
@@ -63,7 +89,7 @@ export default function AdminOrdersPage() {
           <h1 className="text-3xl font-heading text-accent">Order Management</h1>
         </div>
         <div className="flex items-center gap-2">
-            <Button onClick={loadOrders} variant="outline" size="sm" disabled={isLoading} className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
+            <Button onClick={loadOrders} variant="outline" size="sm" disabled={isLoading || Object.values(isUpdatingStatus).some(s => s)} className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
                 {isLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-1.5 h-4 w-4" />}
                 Refresh Orders
             </Button>
@@ -108,7 +134,7 @@ export default function AdminOrdersPage() {
                     <TableHead className="text-foreground">Item</TableHead>
                     <TableHead className="text-foreground">Requested At</TableHead>
                     <TableHead className="text-foreground">Status</TableHead>
-                    <TableHead className="text-right text-foreground">Actions</TableHead>
+                    <TableHead className="text-right text-foreground pr-6">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -117,8 +143,8 @@ export default function AdminOrdersPage() {
                       <TableCell className="font-mono text-xs text-muted-foreground">{order.id.substring(0,8)}...</TableCell>
                       <TableCell className="font-medium text-foreground">{order.customerName}</TableCell>
                       <TableCell className="font-mono text-xs text-muted-foreground">{order.goldsmithId.substring(0,8)}...</TableCell>
-                      <TableCell className="text-foreground">{order.itemDescription}</TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-foreground text-xs max-w-[200px] truncate" title={order.itemDescription}>{order.itemDescription}</TableCell>
+                      <TableCell className="text-muted-foreground text-xs">
                         {order.requestedAt ? format(new Date(order.requestedAt), 'PPpp') : 'N/A'}
                       </TableCell>
                       <TableCell>
@@ -126,11 +152,23 @@ export default function AdminOrdersPage() {
                           {order.status.replace(/_/g, ' ')}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">
-                          View
+                      <TableCell className="text-right space-x-1 pr-2">
+                        <Button variant="ghost" size="xs" className="text-primary hover:text-primary/80 text-xs h-7 px-2">
+                          View Details
                         </Button>
-                        {/* Add more actions like Change Status if needed */}
+                        {order.status === 'new' && (
+                          <Button
+                            variant="outline"
+                            size="xs"
+                            className="text-green-600 border-green-500 hover:bg-green-500/10 hover:text-green-700 text-xs h-7 px-2"
+                            onClick={() => handleUpdateStatus(order.id, 'pending_goldsmith_review')}
+                            disabled={isUpdatingStatus[order.id]}
+                          >
+                            {isUpdatingStatus[order.id] ? <Loader2 className="mr-1 h-3 w-3 animate-spin"/> : <Send className="mr-1 h-3 w-3" />}
+                            Mark for Goldsmith Review
+                          </Button>
+                        )}
+                        {/* Add other status update buttons here as needed for the workflow */}
                       </TableCell>
                     </TableRow>
                   ))}
