@@ -34,7 +34,6 @@ export default function GoldsmithLoginPage() {
     }
 
     try {
-      // Fetch goldsmith by email (email will be lowercased and trimmed by the action)
       const goldsmith = await fetchGoldsmithByEmailForLogin(email);
 
       if (!goldsmith) {
@@ -47,9 +46,6 @@ export default function GoldsmithLoginPage() {
         return;
       }
 
-      // IMPORTANT: This is plain text password comparison for simulation ONLY.
-      // DO NOT USE THIS IN PRODUCTION. Use a secure hashing mechanism.
-      // Trim password from form input before comparison
       if (goldsmith.password !== password.trim()) { 
         toast({
           title: 'Login Failed',
@@ -60,12 +56,19 @@ export default function GoldsmithLoginPage() {
         return;
       }
       
-      // If email and password match (for simulation)
+      // Store goldsmith info in localStorage
+      if (typeof window !== "undefined") {
+        localStorage.setItem('currentGoldsmithUser', JSON.stringify({
+          isLoggedIn: true,
+          id: goldsmith.id,
+          name: goldsmith.name
+        }));
+      }
+
       toast({
         title: 'Login Successful',
         description: 'Redirecting to your dashboard...',
       });
-      // In a real app, you'd set up a session here (e.g., with cookies, JWT)
       router.push('/goldsmith-portal/dashboard');
 
     } catch (error) {
@@ -119,7 +122,7 @@ export default function GoldsmithLoginPage() {
 
              <div className="flex items-center justify-end pt-0.5">
                 <Link
-                  href="#" // Placeholder, "Forgot password" would need a proper reset flow
+                  href="#" 
                   className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
                 >
                   Forgot password?

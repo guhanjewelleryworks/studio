@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -18,7 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import type { Goldsmith } from '@/types/goldsmith';
-import { fetchAllGoldsmiths, getNewOrderCountForGoldsmith, getPendingInquiriesCountForGoldsmith } from '@/actions/goldsmith-actions';
+import { fetchGoldsmithById, getNewOrderCountForGoldsmith, getPendingInquiriesCountForGoldsmith } from '@/actions/goldsmith-actions';
 import { useToast } from '@/hooks/use-toast';
 
 interface DashboardStats {
@@ -28,11 +29,16 @@ interface DashboardStats {
   profileCompletion: number;
 }
 
-// Function to calculate profile completion
+interface CurrentGoldsmithUser {
+  isLoggedIn: boolean;
+  id: string;
+  name: string;
+}
+
 const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
   if (!goldsmith) return 0;
   let completedFields = 0;
-  const totalFields = 7; // name, address, specialty, bio, portfolioLink, yearsExperience, phone
+  const totalFields = 7; 
 
   if (goldsmith.name && goldsmith.name.trim() !== '') completedFields++;
   if (goldsmith.address && goldsmith.address.trim() !== '') completedFields++;
@@ -46,6 +52,7 @@ const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
 };
 
 export default function GoldsmithDashboardPage() {
+  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats>({
     goldsmithName: "Loading...",
     newOrdersCount: 0, 
@@ -53,49 +60,88 @@ export default function GoldsmithDashboardPage() {
     profileCompletion: 0,
   });
   const [currentGoldsmith, setCurrentGoldsmith] = useState<Goldsmith | null>(null);
+  const [loggedInGoldsmithId, setLoggedInGoldsmithId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem('currentGoldsmithUser');
+      if (storedUser) {
+        try {
+          const parsedUser: CurrentGoldsmithUser = JSON.parse(storedUser);
+          if (parsedUser.isLoggedIn && parsedUser.id) {
+            setLoggedInGoldsmithId(parsedUser.id);
+          } else {
+            toast({ title: "Session Expired", description: "Please log in again.", variant: "destructive" });
+            router.push('/goldsmith-portal/login?reason=session_expired');
+          }
+        } catch (e) {
+          console.error("Failed to parse currentGoldsmithUser from localStorage", e);
+          toast({ title: "Error", description: "Could not verify session. Please log in.", variant: "destructive" });
+          router.push('/goldsmith-portal/login?reason=parse_error');
+        }
+      } else {
+        toast({ title: "Not Logged In", description: "Please log in to access your dashboard.", variant: "destructive" });
+        router.push('/goldsmith-portal/login?reason=no_user');
+      }
+    }
+  }, [router, toast]);
+
+  useEffect(() => {
     const loadDashboardData = async () => {
+      if (!loggedInGoldsmithId) {
+        // If no ID, means the first effect is still running or user is being redirected.
+        // Only set loading to false if we definitely aren't going to fetch.
+        if (!localStorage.getItem('currentGoldsmithUser')) {
+             setIsLoading(false);
+             setStats({ goldsmithName: "Guest", newOrdersCount: 0, pendingInquiriesCount: 0, profileCompletion: 0 });
+        }
+        return;
+      }
+
       setIsLoading(true);
       try {
-        // For simulation, fetch the first verified goldsmith to represent the "logged-in" user.
-        // In a real app, you'd get the logged-in goldsmith's ID from session/auth state.
-        const allVerifiedGoldsmiths = await fetchAllGoldsmiths(); 
-        const activeGoldsmith = allVerifiedGoldsmiths.length > 0 ? allVerifiedGoldsmiths[0] : null;
+        const activeGoldsmith = await fetchGoldsmithById(loggedInGoldsmithId);
         
         if (activeGoldsmith && activeGoldsmith.id) {
           setCurrentGoldsmith(activeGoldsmith);
+          // Check if goldsmith is verified. If not, show a message.
+          if (activeGoldsmith.status !== 'verified') {
+            toast({
+              title: "Account Pending Verification",
+              description: "Your account is currently under review. Some features may be limited until verification is complete.",
+              variant: "default",
+              duration: 10000,
+            });
+          }
+
           const [ordersCount, inquiriesCount] = await Promise.all([
-            getNewOrderCountForGoldsmith(activeGoldsmith.id), // This counts 'new' which might need adjustment
+            getNewOrderCountForGoldsmith(activeGoldsmith.id), 
             getPendingInquiriesCountForGoldsmith(activeGoldsmith.id)
           ]);
-
-          // Fetch count for orders specifically in 'pending_goldsmith_review'
-          // This requires a modification to getNewOrderCountForGoldsmith or a new action
-          // For now, we'll use the existing ordersCount which refers to status 'new' in its current implementation
-          // Ideally, getNewOrderCountForGoldsmith should count 'pending_goldsmith_review' for the goldsmith dashboard
 
           setStats({
             goldsmithName: activeGoldsmith.name,
             profileCompletion: calculateProfileCompletion(activeGoldsmith),
-            newOrdersCount: ordersCount, // This is the count of orders with status 'new' assigned to this goldsmith
+            newOrdersCount: ordersCount, 
             pendingInquiriesCount: inquiriesCount,
           });
         } else {
            toast({
-            title: "No Verified Goldsmith Found",
-            description: "Dashboard data requires a verified goldsmith profile. Please register or await verification.",
-            variant: "default",
-            duration: 7000,
+            title: "Error Loading Profile",
+            description: "Could not find your goldsmith profile. Please contact support.",
+            variant: "destructive",
           });
           setStats({
-            goldsmithName: "Artisan",
+            goldsmithName: "Profile Error",
             profileCompletion: 0,
             newOrdersCount: 0,
             pendingInquiriesCount: 0,
           });
+           // Potentially log out or redirect if profile is crucial and not found
+           localStorage.removeItem('currentGoldsmithUser');
+           router.push('/goldsmith-portal/login?reason=profile_not_found');
         }
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
@@ -104,7 +150,7 @@ export default function GoldsmithDashboardPage() {
           description: "Could not load dashboard data. Please try again later.",
           variant: "destructive",
         });
-         setStats({ // Fallback stats on error
+         setStats({ 
             goldsmithName: "Error Loading",
             profileCompletion: 0,
             newOrdersCount: 0,
@@ -116,27 +162,44 @@ export default function GoldsmithDashboardPage() {
     };
 
     loadDashboardData();
-  }, [toast]);
+  }, [loggedInGoldsmithId, toast, router]);
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem('currentGoldsmithUser');
+    }
+    setCurrentGoldsmith(null);
+    setLoggedInGoldsmithId(null); // Clear the ID state
+    toast({ title: "Logged Out", description: "You have been successfully logged out." });
+    router.push('/goldsmith-portal/login');
+    // Consider router.refresh() if other parts of app depend on this state for re-render.
+  };
+
+
+  if (isLoading && !currentGoldsmith) { // Show loader if actively loading or no goldsmithId yet
+    return (
+        <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="ml-3 text-muted-foreground">Loading dashboard...</p>
+        </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8 px-4 md:px-6">
       <header className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-heading text-accent">
-            {isLoading && stats.goldsmithName === "Loading..." ? <Loader2 className="h-8 w-8 animate-spin inline-block mr-2" /> : null}
+            {stats.goldsmithName === "Loading..." && isLoading ? <Loader2 className="h-8 w-8 animate-spin inline-block mr-2" /> : null}
             Welcome, {stats.goldsmithName}!
           </h1>
           <p className="text-muted-foreground text-lg">Manage your workshop and connect with customers.</p>
         </div>
-        <Button variant="destructive" size="sm" asChild className="text-xs rounded-full">
-            {/* This should ideally log out the user, for now it just links to homepage */}
-            <Link href="/">
-                <LogOut className="mr-1.5 h-3.5 w-3.5" /> Logout (Simulated)
-            </Link>
+        <Button variant="destructive" size="sm" onClick={handleLogout} className="text-xs rounded-full">
+            <LogOut className="mr-1.5 h-3.5 w-3.5" /> Logout
         </Button>
       </header>
 
-      {/* Overview Stats */}
       <section className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="shadow-lg bg-card border-primary/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -172,13 +235,12 @@ export default function GoldsmithDashboardPage() {
 
       <Separator className="my-8 bg-border/50" />
 
-      {/* Main Dashboard Sections */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <DashboardActionCard
           title="Manage Profile"
           description="Update your workshop details, bio, specialties, and contact information."
           icon={UserCog}
-          linkHref={`/goldsmith-portal/profile/edit${currentGoldsmith ? '?id=' + currentGoldsmith.id : ''}`} // Pass ID if available
+          linkHref={`/goldsmith-portal/profile/edit${currentGoldsmith ? '?id=' + currentGoldsmith.id : ''}`}
           linkText="Edit Your Profile"
           variant="outline"
         />
@@ -189,7 +251,7 @@ export default function GoldsmithDashboardPage() {
           linkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=pending_goldsmith_review`} 
           linkText="View New Orders"
           variant="default"
-          secondaryLinkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=in_progress`} // Changed 'active' to 'in_progress' for clarity
+          secondaryLinkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=in_progress`}
           secondaryLinkText="Manage Active Orders"
         />
         <DashboardActionCard
@@ -225,15 +287,10 @@ export default function GoldsmithDashboardPage() {
           variant="outline"
         />
       </section>
-      
-      {/* Removed simulated notifications section */}
-      {/* If you want real notifications, this would be a separate feature to implement */}
-
     </div>
   );
 }
 
-// Helper component for dashboard cards for consistency
 interface DashboardActionCardProps {
   title: string;
   description: string;
@@ -268,4 +325,3 @@ const DashboardActionCard: React.FC<DashboardActionCardProps> = ({ title, descri
     </CardContent>
   </Card>
 );
-
