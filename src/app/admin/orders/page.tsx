@@ -8,31 +8,36 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Send, Eye } from 'lucide-react';
 import Link from 'next/link';
-import { fetchAllPlatformOrderRequests, updateOrderStatus } from '@/actions/goldsmith-actions';
-import type { OrderRequest, OrderRequestStatus } from '@/types/goldsmith';
+import { fetchAllPlatformOrderRequests, updateOrderStatus, fetchAdminGoldsmiths } from '@/actions/goldsmith-actions';
+import type { OrderRequest, OrderRequestStatus, Goldsmith } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<OrderRequest[]>([]);
+  const [goldsmiths, setGoldsmiths] = useState<Goldsmith[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
-  const loadOrders = async () => {
+  const loadData = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await fetchAllPlatformOrderRequests();
-      setOrders(data || []);
+      const [orderData, goldsmithData] = await Promise.all([
+        fetchAllPlatformOrderRequests(),
+        fetchAdminGoldsmiths()
+      ]);
+      setOrders(orderData || []);
+      setGoldsmiths(goldsmithData || []);
     } catch (err) {
-      console.error("Failed to fetch orders:", err);
-      setError("Could not load order data. Please try again.");
+      console.error("Failed to fetch orders or goldsmiths:", err);
+      setError("Could not load data. Please try again.");
       toast({
-        title: "Error Loading Orders",
-        description: "Failed to fetch order data from the server.",
+        title: "Error Loading Data",
+        description: "Failed to fetch data from the server.",
         variant: "destructive",
       });
     } finally {
@@ -41,7 +46,7 @@ export default function AdminOrdersPage() {
   };
 
   useEffect(() => {
-    loadOrders();
+    loadData();
   }, []);
 
   const handleUpdateStatus = async (orderId: string, newStatus: OrderRequestStatus) => {
@@ -52,7 +57,6 @@ export default function AdminOrdersPage() {
         title: "Order Status Updated",
         description: `Order ${orderId.substring(0,8)}... status changed to ${newStatus.replace(/_/g, ' ')}.`,
       });
-      // Update the local state to reflect the change immediately
       setOrders(prevOrders => 
         prevOrders.map(o => o.id === orderId ? { ...o, status: newStatus, updatedAt: new Date() } : o)
       );
@@ -65,7 +69,6 @@ export default function AdminOrdersPage() {
     }
     setIsUpdatingStatus(prev => ({ ...prev, [orderId]: false }));
   };
-
 
   const getStatusBadgeVariant = (status: OrderRequestStatus) => {
     switch (status) {
@@ -81,6 +84,11 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const getGoldsmithName = (goldsmithId: string) => {
+    const goldsmith = goldsmiths.find(g => g.id === goldsmithId);
+    return goldsmith ? goldsmith.name : 'N/A';
+  };
+
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">
       <header className="mb-6 flex items-center justify-between">
@@ -89,7 +97,7 @@ export default function AdminOrdersPage() {
           <h1 className="text-3xl font-heading text-accent">Order Management</h1>
         </div>
         <div className="flex items-center gap-2">
-            <Button onClick={loadOrders} variant="outline" size="sm" disabled={isLoading || Object.values(isUpdatingStatus).some(s => s)} className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
+            <Button onClick={loadData} variant="outline" size="sm" disabled={isLoading || Object.values(isUpdatingStatus).some(s => s)} className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
                 {isLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-1.5 h-4 w-4" />}
                 Refresh Orders
             </Button>
@@ -130,7 +138,7 @@ export default function AdminOrdersPage() {
                   <TableRow>
                     <TableHead className="text-foreground">Order ID</TableHead>
                     <TableHead className="text-foreground">Customer</TableHead>
-                    <TableHead className="text-foreground">Goldsmith ID</TableHead>
+                    <TableHead className="text-foreground">Goldsmith</TableHead>
                     <TableHead className="text-foreground">Item</TableHead>
                     <TableHead className="text-foreground">Requested At</TableHead>
                     <TableHead className="text-foreground">Status</TableHead>
@@ -142,7 +150,7 @@ export default function AdminOrdersPage() {
                     <TableRow key={order.id}>
                       <TableCell className="font-mono text-xs text-muted-foreground">{order.id.substring(0,8)}...</TableCell>
                       <TableCell className="font-medium text-foreground">{order.customerName}</TableCell>
-                      <TableCell className="font-mono text-xs text-muted-foreground">{order.goldsmithId.substring(0,8)}...</TableCell>
+                      <TableCell className="text-foreground text-xs">{getGoldsmithName(order.goldsmithId)}</TableCell>
                       <TableCell className="text-foreground text-xs max-w-[200px] truncate" title={order.itemDescription}>{order.itemDescription}</TableCell>
                       <TableCell className="text-muted-foreground text-xs">
                         {order.requestedAt ? format(new Date(order.requestedAt), 'PPpp') : 'N/A'}
@@ -171,7 +179,6 @@ export default function AdminOrdersPage() {
                             Mark for Goldsmith Review
                           </Button>
                         )}
-                        {/* Add other status update buttons here as needed for the workflow */}
                       </TableCell>
                     </TableRow>
                   ))}
