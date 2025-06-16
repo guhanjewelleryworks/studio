@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Send } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Send, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAllPlatformOrderRequests, updateOrderStatus } from '@/actions/goldsmith-actions';
 import type { OrderRequest, OrderRequestStatus } from '@/types/goldsmith';
@@ -72,9 +72,9 @@ export default function AdminOrdersPage() {
       case 'new': return 'default'; 
       case 'pending_goldsmith_review': return 'secondary';
       case 'in_progress': return 'outline'; 
-      case 'artwork_completed': return 'outline'; // Potentially different visual
+      case 'artwork_completed': return 'outline'; 
       case 'customer_review_requested': return 'secondary';
-      case 'shipped': return 'default'; // Or another distinct variant
+      case 'shipped': return 'default'; 
       case 'completed': return 'default'; 
       case 'cancelled': return 'destructive';
       default: return 'outline';
@@ -153,8 +153,11 @@ export default function AdminOrdersPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right space-x-1 pr-2">
-                        <Button variant="ghost" size="xs" className="text-primary hover:text-primary/80 text-xs h-7 px-2">
-                          View Details
+                        <Button asChild variant="ghost" size="xs" className="text-primary hover:text-primary/80 text-xs h-7 px-2">
+                          <Link href={`/admin/orders/${order.id}`}>
+                            <Eye className="mr-1 h-3 w-3" />
+                            View Details
+                          </Link>
                         </Button>
                         {order.status === 'new' && (
                           <Button
