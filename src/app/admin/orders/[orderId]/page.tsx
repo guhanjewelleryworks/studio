@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import NextImage from 'next/image';
+import { Label } from '@/components/ui/label'; // Added missing import
 import {
   Select,
   SelectContent,
