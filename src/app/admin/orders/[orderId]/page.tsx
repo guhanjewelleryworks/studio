@@ -10,13 +10,14 @@ import { OrderStatusProgress } from '@/components/orders/OrderStatusProgress';
 import { fetchOrderRequestById } from '@/actions/customer-actions'; // Reusing from customer actions
 import { fetchGoldsmithById, updateOrderStatus } from '@/actions/goldsmith-actions';
 import type { OrderRequest, Goldsmith, OrderRequestStatus } from '@/types/goldsmith';
-import { Loader2, ArrowLeft, Mail, Phone, ShoppingBag, User, CalendarDays, Edit3, Image as ImageIcon, ShieldCheck, Send, PackageCheck, Truck, CheckCircle } from 'lucide-react';
+import { Loader2, ArrowLeft, Mail, Phone, ShoppingBag, User, CalendarDays, Edit3, Image as ImageIcon, ShieldCheck, Send, PackageCheck, Truck, CheckCircle, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import NextImage from 'next/image';
-import { Label } from '@/components/ui/label'; // Added missing import
+import { Label } from '@/components/ui/label'; 
+import { Badge } from '@/components/ui/badge'; // Added missing import
 import {
   Select,
   SelectContent,
