@@ -240,7 +240,7 @@ export default function GoldsmithDashboardPage() {
           title="Manage Profile"
           description="Update your workshop details, bio, specialties, and contact information."
           icon={UserCog}
-          linkHref={`/goldsmith-portal/profile/edit${currentGoldsmith ? '?id=' + currentGoldsmith.id : ''}`}
+          linkHref="/goldsmith-portal/profile/edit"
           linkText="Edit Your Profile"
           variant="outline"
         />

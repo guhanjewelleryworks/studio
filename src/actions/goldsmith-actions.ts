@@ -287,14 +287,15 @@ export async function getNewOrderCountForGoldsmith(goldsmithId: string): Promise
   console.log(`[Action: getNewOrderCountForGoldsmith] Fetching for goldsmithId: ${goldsmithId}`);
   try {
     const collection = await getOrderRequestsCollection();
-    const count = await collection.countDocuments({ goldsmithId, status: 'new' });
-    console.log(`[Action: getNewOrderCountForGoldsmith] Found ${count} new orders.`);
+    const count = await collection.countDocuments({ goldsmithId, status: 'pending_goldsmith_review' });
+    console.log(`[Action: getNewOrderCountForGoldsmith] Found ${count} new orders for review.`);
     return count;
   } catch (error) {
     console.error(`[Action: getNewOrderCountForGoldsmith] Error fetching new order count for ${goldsmithId}:`, error);
     return 0;
   }
 }
+
 
 export async function getPendingInquiriesCountForGoldsmith(goldsmithId: string): Promise<number> {
   console.log(`[Action: getPendingInquiriesCountForGoldsmith] Fetching for goldsmithId: ${goldsmithId}`);
@@ -449,5 +450,60 @@ export async function updateOrderStatus(
         errorMessage = error.message;
     }
     return { success: false, error: `Failed to update order status: ${errorMessage}` };
+  }
+}
+
+
+export async function updateGoldsmithProfile(
+  id: string, 
+  data: Partial<Pick<Goldsmith, 'name' | 'contactPerson' | 'phone' | 'address' | 'specialty' | 'portfolioLink' | 'bio' | 'tagline' | 'yearsExperience' | 'responseTime'>>
+): Promise<{ success: boolean; data?: Goldsmith; error?: string }> {
+  console.log(`[Action: updateGoldsmithProfile] Updating profile for goldsmith ID ${id} with data:`, data);
+  try {
+    if (!id) {
+      return { success: false, error: 'Goldsmith ID is required.' };
+    }
+
+    // Sanitize and prepare the update object
+    const updateData: { [key: string]: any } = {};
+    if (data.name && data.name.trim()) updateData.name = data.name.trim();
+    if (data.contactPerson && data.contactPerson.trim()) updateData.contactPerson = data.contactPerson.trim();
+    if (data.phone && data.phone.trim()) updateData.phone = data.phone.trim();
+    if (data.address && data.address.trim()) updateData.address = data.address.trim();
+    if (data.specialty) { // specialty can be string or string[]
+        if (Array.isArray(data.specialty)) {
+            updateData.specialty = data.specialty.map(s => s.trim()).filter(s => s);
+        } else if (typeof data.specialty === 'string') {
+            updateData.specialty = data.specialty.split(',').map(s => s.trim()).filter(s => s);
+        }
+    }
+    if (data.portfolioLink) updateData.portfolioLink = data.portfolioLink.trim();
+    if (data.bio) updateData.bio = data.bio.trim();
+    if (data.tagline) updateData.tagline = data.tagline.trim();
+    if (data.yearsExperience !== undefined) updateData.yearsExperience = data.yearsExperience;
+    if (data.responseTime) updateData.responseTime = data.responseTime.trim();
+    
+    if (Object.keys(updateData).length === 0) {
+        return { success: false, error: "No valid data provided to update." };
+    }
+
+
+    const collection = await getGoldsmithsCollection();
+    const result = await collection.findOneAndUpdate(
+      { id: id },
+      { $set: updateData },
+      { returnDocument: 'after', projection: { password: 0 } } // Exclude password from result
+    );
+
+    if (result) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, ...goldsmithData } = result;
+      return { success: true, data: goldsmithData as Goldsmith };
+    } else {
+      return { success: false, error: 'Goldsmith not found or profile not updated.' };
+    }
+  } catch (error) {
+    console.error(`[Action: updateGoldsmithProfile] Error updating profile for ${id}:`, error);
+    return { success: false, error: 'Failed to update profile due to a server error.' };
   }
 }
