@@ -271,14 +271,6 @@ export default function GoldsmithDashboardPage() {
           variant="outline"
         />
         <DashboardActionCard
-          title="Performance Analytics"
-          description="View insights on profile views, inquiries, and order trends."
-          icon={BarChart3}
-          linkHref={`/goldsmith-portal/analytics?goldsmithId=${currentGoldsmith?.id || ''}`}
-          linkText="View Analytics"
-          variant="outline"
-        />
-        <DashboardActionCard
           title="Account Settings"
           description="Manage login, notifications, and payment details."
           icon={Settings}
