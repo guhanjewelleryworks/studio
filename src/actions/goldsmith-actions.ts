@@ -586,3 +586,29 @@ export async function fetchInquiriesForGoldsmith(goldsmithId: string): Promise<I
     return [];
   }
 }
+
+export async function fetchOrdersForGoldsmith(goldsmithId: string, status?: OrderRequestStatus | 'all'): Promise<OrderRequest[]> {
+  console.log(`[Action: fetchOrdersForGoldsmith] Fetching orders for goldsmithId: ${goldsmithId} with status: ${status}`);
+  try {
+    if (!goldsmithId) {
+        console.error('[Action: fetchOrdersForGoldsmith] Goldsmith ID is required.');
+        return [];
+    }
+    const collection = await getOrderRequestsCollection();
+    
+    const filter: Filter<OrderRequest> = { goldsmithId: goldsmithId };
+    if (status && status !== 'all') {
+      filter.status = status;
+    }
+    
+    const ordersCursor = collection.find(filter);
+    const ordersArray = await ordersCursor.sort({ requestedAt: -1 }).toArray();
+    
+    console.log(`[Action: fetchOrdersForGoldsmith] Found ${ordersArray.length} orders for goldsmithId ${goldsmithId}.`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return ordersArray.map(({ _id, ...order }) => order as OrderRequest);
+  } catch (error) {
+    console.error(`[Action: fetchOrdersForGoldsmith] Error fetching orders for goldsmithId ${goldsmithId}:`, error);
+    return [];
+  }
+}
