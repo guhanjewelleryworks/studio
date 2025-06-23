@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Package, Loader2, AlertTriangle, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Package, Loader2, AlertTriangle, ArrowLeft, CheckCircle, Eye } from 'lucide-react'; // Added Eye
 import Link from 'next/link';
 import { fetchOrdersForGoldsmith, updateOrderStatus } from '@/actions/goldsmith-actions';
 import type { OrderRequest, OrderRequestStatus } from '@/types/goldsmith';
@@ -146,9 +146,15 @@ function GoldsmithOrdersContent() {
                     </div>
                   </CardHeader>
                    <CardContent className="px-4 py-2 text-sm text-muted-foreground">
-                    <p>{order.details}</p>
+                    <p className="line-clamp-2">{order.details}</p>
                    </CardContent>
                   <CardFooter className="flex justify-end gap-2 px-4 pb-4 pt-2">
+                    <Button asChild variant="outline" size="sm" className="text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground">
+                        <Link href={`/goldsmith-portal/orders/${order.id}`}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Full Details
+                        </Link>
+                    </Button>
                     {order.status === 'pending_goldsmith_review' && (
                         <Button 
                             size="sm" 
@@ -159,7 +165,6 @@ function GoldsmithOrdersContent() {
                             Accept Order
                         </Button>
                     )}
-                     {/* Add other action buttons for different statuses here later */}
                   </CardFooter>
                 </Card>
               ))}
