@@ -507,3 +507,65 @@ export async function updateGoldsmithProfile(
     return { success: false, error: 'Failed to update profile due to a server error.' };
   }
 }
+
+// --- New Actions for Portfolio Management ---
+
+export async function addGoldsmithPortfolioImage(
+  goldsmithId: string, 
+  imageDataUri: string
+): Promise<{ success: boolean; error?: string; data?: Goldsmith }> {
+  console.log(`[Action: addGoldsmithPortfolioImage] Adding image for goldsmith ID ${goldsmithId}`);
+  try {
+    if (!goldsmithId || !imageDataUri) {
+      return { success: false, error: 'Goldsmith ID and image data are required.' };
+    }
+
+    const collection = await getGoldsmithsCollection();
+    const result = await collection.findOneAndUpdate(
+      { id: goldsmithId },
+      { $push: { portfolioImages: imageDataUri } },
+      { returnDocument: 'after', projection: { password: 0 } } // Exclude password from result
+    );
+
+    if (result) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, ...goldsmithData } = result;
+      return { success: true, data: goldsmithData as Goldsmith };
+    } else {
+      return { success: false, error: 'Goldsmith not found or image not added.' };
+    }
+  } catch (error) {
+    console.error(`[Action: addGoldsmithPortfolioImage] Error adding image for ${goldsmithId}:`, error);
+    return { success: false, error: 'Failed to add image due to a server error.' };
+  }
+}
+
+export async function deleteGoldsmithPortfolioImage(
+  goldsmithId: string, 
+  imageUrlToDelete: string
+): Promise<{ success: boolean; error?: string; data?: Goldsmith }> {
+  console.log(`[Action: deleteGoldsmithPortfolioImage] Deleting image for goldsmith ID ${goldsmithId}`);
+  try {
+    if (!goldsmithId || !imageUrlToDelete) {
+      return { success: false, error: 'Goldsmith ID and image URL are required.' };
+    }
+
+    const collection = await getGoldsmithsCollection();
+    const result = await collection.findOneAndUpdate(
+      { id: goldsmithId },
+      { $pull: { portfolioImages: imageUrlToDelete } },
+      { returnDocument: 'after', projection: { password: 0 } } // Exclude password from result
+    );
+
+     if (result) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, ...goldsmithData } = result;
+      return { success: true, data: goldsmithData as Goldsmith };
+    } else {
+      return { success: false, error: 'Goldsmith not found or image not deleted.' };
+    }
+  } catch (error) {
+    console.error(`[Action: deleteGoldsmithPortfolioImage] Error deleting image for ${goldsmithId}:`, error);
+    return { success: false, error: 'Failed to delete image due to a server error.' };
+  }
+}
