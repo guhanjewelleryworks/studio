@@ -147,7 +147,7 @@ export async function fetchLatestGoldsmiths(limit: number = 5): Promise<Goldsmit
   try {
     const collection = await getGoldsmithsCollection();
     const goldsmithsCursor = collection.find({}).sort({ registeredAt: -1 }).limit(limit);
-    const customersArray: WithId<Goldsmith>[] = await goldsmithsCursor.toArray();
+    const customersArray: WithId<Goldsmith>[] = await customersCursor.toArray();
     console.log(`[Action: fetchLatestGoldsmiths] Found ${customersArray.length} goldsmiths.`);
     return customersArray.map(g => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -597,8 +597,19 @@ export async function fetchOrdersForGoldsmith(goldsmithId: string, status?: Orde
     const collection = await getOrderRequestsCollection();
     
     const filter: Filter<OrderRequest> = { goldsmithId: goldsmithId };
+
+    // Security rule: Goldsmiths should NEVER see orders with 'new' status. This is for admin review only.
+    const securityFilter = { status: { $ne: 'new' as OrderRequestStatus } };
+
     if (status && status !== 'all') {
-      filter.status = status;
+      // If a specific status is requested, combine it with the security rule.
+      filter.$and = [
+        securityFilter,
+        { status: status }
+      ];
+    } else {
+      // If 'all' or no status is requested, just apply the security rule.
+      filter.status = securityFilter.status;
     }
     
     const ordersCursor = collection.find(filter);
