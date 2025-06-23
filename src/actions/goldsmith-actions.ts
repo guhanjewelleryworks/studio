@@ -569,3 +569,20 @@ export async function deleteGoldsmithPortfolioImage(
     return { success: false, error: 'Failed to delete image due to a server error.' };
   }
 }
+
+
+export async function fetchInquiriesForGoldsmith(goldsmithId: string): Promise<Inquiry[]> {
+  console.log(`[Action: fetchInquiriesForGoldsmith] Fetching inquiries for goldsmithId: ${goldsmithId}`);
+  try {
+    const collection = await getInquiriesCollection();
+    // Fetch inquiries where goldsmithId matches
+    const inquiriesCursor = collection.find({ goldsmithId: goldsmithId } as Filter<Inquiry>);
+    const inquiriesArray = await inquiriesCursor.sort({ requestedAt: -1 }).toArray();
+    console.log(`[Action: fetchInquiriesForGoldsmith] Found ${inquiriesArray.length} inquiries for goldsmithId ${goldsmithId}.`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return inquiriesArray.map(({ _id, ...inquiry }) => inquiry as Inquiry);
+  } catch (error) {
+    console.error(`[Action: fetchInquiriesForGoldsmith] Error fetching inquiries for goldsmithId ${goldsmithId}:`, error);
+    return [];
+  }
+}

@@ -1,17 +1,107 @@
 // src/app/goldsmith-portal/analytics/page.tsx
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, Eye, MessageCircle, ShoppingBag } from 'lucide-react';
+'use client'; // Make it a client component
 
-// Mock analytics data
-const mockAnalytics = {
-  profileViews: 1250,
-  inquiriesReceived: 75,
-  ordersCompleted: 32,
-  conversionRate: '2.56%', // (Orders / Profile Views) * 100 or (Orders / Inquiries)
-  mostViewedItem: "Custom Diamond Engagement Ring",
-};
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { BarChart3, Eye, MessageCircle, ShoppingBag, Loader2, AlertTriangle } from 'lucide-react';
+import { fetchGoldsmithById, fetchInquiriesForGoldsmith } from '@/actions/goldsmith-actions';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+interface CurrentGoldsmithUser {
+  isLoggedIn: boolean;
+  id: string;
+}
+
+interface AnalyticsData {
+  profileViews: number; // Will remain mocked
+  inquiriesReceived: number;
+  ordersCompleted: number;
+  conversionRate: string;
+  mostViewedItem: string; // Will remain mocked
+}
 
 export default function GoldsmithAnalyticsPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [currentUser, setCurrentUser] = useState<CurrentGoldsmithUser | null>(null);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const user = localStorage.getItem('currentGoldsmithUser');
+    if (user) {
+      const parsedUser: CurrentGoldsmithUser = JSON.parse(user);
+      if (parsedUser.isLoggedIn && parsedUser.id) {
+        setCurrentUser(parsedUser);
+      } else {
+        router.push('/goldsmith-portal/login?redirect=/goldsmith-portal/analytics');
+      }
+    } else {
+      router.push('/goldsmith-portal/login?redirect=/goldsmith-portal/analytics');
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const loadAnalyticsData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const [goldsmithProfile, allInquiries] = await Promise.all([
+          fetchGoldsmithById(currentUser.id),
+          fetchInquiriesForGoldsmith(currentUser.id)
+        ]);
+
+        if (!goldsmithProfile) {
+          throw new Error("Could not retrieve your goldsmith profile.");
+        }
+        
+        const ordersCompleted = goldsmithProfile.ordersCompleted || 0;
+        const inquiriesReceived = allInquiries.length;
+        
+        let conversionRate = '0.00%';
+        if (inquiriesReceived > 0) {
+          conversionRate = ((ordersCompleted / inquiriesReceived) * 100).toFixed(2) + '%';
+        }
+
+        setAnalyticsData({
+          ordersCompleted,
+          inquiriesReceived,
+          conversionRate,
+          profileViews: 1250, // Keep mocked
+          mostViewedItem: "Custom Diamond Engagement Ring", // Keep mocked
+        });
+
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+        console.error("Failed to load analytics data:", err);
+        setError(`Could not load your analytics. ${errorMessage}`);
+        toast({ title: "Error", description: "Failed to fetch analytics data.", variant: "destructive" });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAnalyticsData();
+  }, [currentUser, toast]);
+
+  const StatCard = ({ title, value, icon: Icon, description, isLoading }: { title: string, value: string | number, icon: React.ElementType, description: string, isLoading: boolean }) => (
+     <Card className="bg-card/70 border-border/50 shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-accent">{title}</CardTitle>
+            <Icon className="h-4 w-4 text-primary" />
+        </CardHeader>
+        <CardContent>
+            {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold text-foreground">{value}</div>}
+            <p className="text-xs text-muted-foreground">{description}</p>
+        </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8 px-4 md:px-6">
       <Card className="max-w-4xl mx-auto shadow-xl bg-card border-primary/10">
@@ -24,46 +114,46 @@ export default function GoldsmithAnalyticsPage() {
             Insights into your profile views, customer inquiries, and order trends.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="bg-card/70 border-border/50 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-accent">Profile Views</CardTitle>
-              <Eye className="h-4 w-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{mockAnalytics.profileViews}</div>
-              <p className="text-xs text-muted-foreground">+20.1% from last month</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-card/70 border-border/50 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-accent">Inquiries Received</CardTitle>
-              <MessageCircle className="h-4 w-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{mockAnalytics.inquiriesReceived}</div>
-              <p className="text-xs text-muted-foreground">+15 since last week</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-card/70 border-border/50 shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-accent">Orders Completed</CardTitle>
-              <ShoppingBag className="h-4 w-4 text-primary" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{mockAnalytics.ordersCompleted}</div>
-              <p className="text-xs text-muted-foreground">Conversion Rate: {mockAnalytics.conversionRate}</p>
-            </CardContent>
-          </Card>
-           <Card className="bg-card/70 border-border/50 shadow-md">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-accent">Most Viewed Item</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-lg font-semibold text-foreground">{mockAnalytics.mostViewedItem}</p>
-               {/* Placeholder for a chart or more detailed stats */}
-            </CardContent>
-          </Card>
+        <CardContent>
+          {error ? (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Error Loading Analytics</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <StatCard 
+                    title="Inquiries Received"
+                    value={analyticsData?.inquiriesReceived ?? '...'}
+                    icon={MessageCircle}
+                    description="Total customer inquiries sent to you."
+                    isLoading={isLoading}
+                />
+                <StatCard 
+                    title="Orders Completed"
+                    value={analyticsData?.ordersCompleted ?? '...'}
+                    icon={ShoppingBag}
+                    description={`Conversion Rate: ${analyticsData?.conversionRate ?? '...'}`}
+                    isLoading={isLoading}
+                />
+                <StatCard 
+                    title="Profile Views (Simulated)"
+                    value={analyticsData?.profileViews ?? '...'}
+                    icon={Eye}
+                    description="+20.1% from last month (demo data)"
+                    isLoading={isLoading}
+                />
+                <Card className="bg-card/70 border-border/50 shadow-md">
+                    <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-accent">Most Viewed Item (Simulated)</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <p className="text-lg font-semibold text-foreground">{analyticsData?.mostViewedItem ?? '...'}</p>}
+                    </CardContent>
+                </Card>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
