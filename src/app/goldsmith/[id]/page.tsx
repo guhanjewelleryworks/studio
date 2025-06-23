@@ -163,9 +163,9 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
     return <div className="container py-6 md:py-10 px-4 md:px-6 text-center text-muted-foreground text-lg">Profile not found.</div>;
   }
 
-  const handleContactFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => { // Renamed from handleRequestIntroduction
+  const handleContactFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
      e.preventDefault();
-     setIsSubmittingForm(true); // Renamed state variable
+     setIsSubmittingForm(true);
      const form = e.target as HTMLFormElement;
      const customerName = (form.elements.namedItem('contact-name') as HTMLInputElement)?.value;
      const customerEmail = (form.elements.namedItem('contact-email') as HTMLInputElement)?.value;
@@ -174,6 +174,12 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
     if (!customerName || !customerEmail || !message) {
       toast({ title: "Missing Information", description: "Please fill in your name, email, and message.", variant: "destructive" });
+      setIsSubmittingForm(false);
+      return;
+    }
+    
+    if (!imagePreview) {
+      toast({ title: "Missing Reference Image", description: "A reference image is required for custom orders.", variant: "destructive" });
       setIsSubmittingForm(false);
       return;
     }
@@ -186,7 +192,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
         customerPhone,
         itemDescription: `Custom Order for ${profile.name} (via profile contact)`, 
         details: message, 
-        referenceImage: imagePreview || undefined, // THIS LINE IS NOW UNCOMMENTED
+        referenceImage: imagePreview,
      };
      
      console.log("Submitting Custom Order Request via form:", orderData);
@@ -350,7 +356,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                     <Textarea id="contact-message" name="contact-message" placeholder="Describe your desired jewelry piece, including type, materials, style, and any specific design ideas..." required rows={3} className="text-foreground text-sm py-2"/>
                  </div>
                   <div className="space-y-1">
-                    <Label htmlFor="ornament-image" className="text-foreground text-xs font-medium">Attach Reference Image (Optional)</Label>
+                    <Label htmlFor="ornament-image" className="text-foreground text-xs font-medium">Attach Reference Image (Required)</Label>
                     <div className="flex items-center gap-3">
                       <Input 
                         id="ornament-image" 
@@ -358,6 +364,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                         type="file" 
                         accept="image/*" 
                         onChange={handleImageChange}
+                        required
                         className="text-foreground text-sm py-1.5 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                       />
                     </div>
@@ -380,4 +387,3 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
     </div>
   );
 }
-
