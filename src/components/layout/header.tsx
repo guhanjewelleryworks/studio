@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, MessageCircle, Edit, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image'; 
@@ -29,11 +29,14 @@ interface CurrentUser {
 
 export function Header() {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedUser = localStorage.getItem('currentUser');
+      const storedAdminStatus = localStorage.getItem('isAdminLoggedIn');
+
       if (storedUser) {
         try {
           setCurrentUser(JSON.parse(storedUser));
@@ -42,6 +45,7 @@ export function Header() {
           localStorage.removeItem('currentUser'); 
         }
       }
+      setIsAdminLoggedIn(storedAdminStatus === 'true');
     }
   }, []);
 
@@ -87,16 +91,20 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="pr-0 bg-background w-[280px] sm:w-[320px] border-r border-border/20 shadow-xl p-0">
               <div className="flex flex-col h-full">
-                <Link
-                  href="/"
-                  className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
-                >
-                  <Image src="/logo_header.png" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary" />
-                  <div className="flex flex-col">
-                    <span className="font-bold text-lg text-accent">Goldsmith Connect</span>
-                    <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
-                  </div>
-                </Link>
+                <SheetHeader className="p-0">
+                  <SheetTitle asChild>
+                    <Link
+                      href="/"
+                      className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
+                    >
+                      <Image src="/logo_header.png" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary" />
+                      <div className="flex flex-col">
+                        <span className="font-bold text-lg text-accent">Goldsmith Connect</span>
+                        <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
+                      </div>
+                    </Link>
+                  </SheetTitle>
+                </SheetHeader>
                 <nav className="flex-grow flex flex-col space-y-1 px-4 pt-4">
                   <Link href="/discover" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Discover</Link>
                   <Link href="/#how-it-works" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">How It Works</Link>
@@ -144,30 +152,31 @@ export function Header() {
 
         {/* Login/Signup or User Info/Logout Buttons (Desktop) */}
         <div className="hidden md:flex flex-1 items-center justify-end space-x-3">
-          {currentUser && currentUser.isLoggedIn ? (
-             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="default" 
-                  className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 flex items-center gap-2"
-                >
-                  <UserCircle className="h-4 w-4" />
-                  <span>{currentUser.name}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/customer/dashboard" onClick={(e) => e.stopPropagation()}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/customer/profile/edit" onClick={(e) => e.stopPropagation()}><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/customer/orders" onClick={(e) => e.stopPropagation()}><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
-                </DropdownMenuItem>
+          {!isAdminLoggedIn && (
+            currentUser && currentUser.isLoggedIn ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="default" 
+                    className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 flex items-center gap-2"
+                  >
+                    <UserCircle className="h-4 w-4" />
+                    <span>{currentUser.name}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/customer/dashboard" onClick={(e) => e.stopPropagation()}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/customer/profile/edit" onClick={(e) => e.stopPropagation()}><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/customer/orders" onClick={(e) => e.stopPropagation()}><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
+                  </DropdownMenuItem>
                  <DropdownMenuItem asChild>
                   <Link href="/customer/inquiries" onClick={(e) => e.stopPropagation()}><MessageCircle className="mr-2 h-4 w-4" />My Inquiries</Link>
                 </DropdownMenuItem>
@@ -198,7 +207,7 @@ export function Header() {
                 <span>Sign Up</span>
               </Link>
             </>
-          )}
+          ))}
         </div>
       </div>
     </header>
