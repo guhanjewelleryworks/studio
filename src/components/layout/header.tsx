@@ -19,8 +19,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from '@/components/ui/skeleton';
 
-const navLinkClasses = "relative text-sm font-medium text-foreground/80 transition-colors hover:text-primary after:absolute after:bottom-[-5px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full";
-
 interface CurrentUser {
   isLoggedIn: boolean;
   id?: string;
@@ -28,42 +26,48 @@ interface CurrentUser {
   email?: string;
 }
 
+const navLinkClasses = "relative text-sm font-medium text-foreground/80 transition-colors hover:text-primary after:absolute after:bottom-[-5px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full";
+
+type UserStatus = 'loading' | 'guest' | 'customer' | 'admin' | 'goldsmith';
+
 export function Header() {
+  const [userStatus, setUserStatus] = useState<UserStatus>('loading');
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [isGoldsmithLoggedIn, setIsGoldsmithLoggedIn] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    setIsMounted(true); // Component has mounted on the client
-    if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem('currentUser');
-      const storedAdminStatus = localStorage.getItem('isAdminLoggedIn');
-      const storedGoldsmithStatus = localStorage.getItem('currentGoldsmithUser');
-
-      if (storedUser) {
+    // This effect runs only on the client after hydration
+    const storedUser = localStorage.getItem('currentUser');
+    const storedAdminStatus = localStorage.getItem('isAdminLoggedIn');
+    const storedGoldsmithStatus = localStorage.getItem('currentGoldsmithUser');
+    
+    if (storedAdminStatus === 'true') {
+        setUserStatus('admin');
+    } else if (storedGoldsmithStatus) {
         try {
-          setCurrentUser(JSON.parse(storedUser));
+            const parsedGoldsmith = JSON.parse(storedGoldsmithStatus);
+            if (parsedGoldsmith.isLoggedIn) {
+                setUserStatus('goldsmith');
+            } else {
+                setUserStatus('guest');
+            }
         } catch (e) {
-          console.error("Failed to parse currentUser from localStorage", e);
-          localStorage.removeItem('currentUser'); 
+            setUserStatus('guest');
         }
-      }
-      
-      setIsAdminLoggedIn(storedAdminStatus === 'true');
-
-      if (storedGoldsmithStatus) {
+    } else if (storedUser) {
         try {
-          const parsedGoldsmith = JSON.parse(storedGoldsmithStatus);
-          if (parsedGoldsmith.isLoggedIn) {
-            setIsGoldsmithLoggedIn(true);
-          }
+            const parsedUser = JSON.parse(storedUser);
+            if (parsedUser.isLoggedIn) {
+                setCurrentUser(parsedUser);
+                setUserStatus('customer');
+            } else {
+                setUserStatus('guest');
+            }
         } catch (e) {
-          console.error("Failed to parse currentGoldsmithUser from localStorage", e);
-          localStorage.removeItem('currentGoldsmithUser');
+            setUserStatus('guest');
         }
-      }
+    } else {
+        setUserStatus('guest');
     }
   }, []);
 
@@ -72,111 +76,122 @@ export function Header() {
       localStorage.removeItem('currentUser');
     }
     setCurrentUser(null);
+    setUserStatus('guest'); // Reset status on logout
     router.push('/');
     window.location.reload(); // Force reload to ensure all state is cleared
   };
 
   const renderDesktopUserActions = () => {
-    if (!isMounted) {
-      return <Skeleton className="h-10 w-40 rounded-full" />; // Placeholder to prevent layout shift
+    switch (userStatus) {
+        case 'loading':
+            return <Skeleton className="h-10 w-40 rounded-full" />;
+        
+        case 'admin':
+        case 'goldsmith':
+            return null; // Intentionally show nothing for these roles in main header
+
+        case 'customer':
+            return (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="default" 
+                      className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 flex items-center gap-2"
+                    >
+                      <UserCircle className="h-4 w-4" />
+                      <span>{currentUser?.name}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/customer/dashboard" onClick={(e) => e.stopPropagation()}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/customer/profile/edit" onClick={(e) => e.stopPropagation()}><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/customer/orders" onClick={(e) => e.stopPropagation()}><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
+                    </DropdownMenuItem>
+                   <DropdownMenuItem asChild>
+                    <Link href="/customer/inquiries" onClick={(e) => e.stopPropagation()}><MessageCircle className="mr-2 h-4 w-4" />My Inquiries</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" /> Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            );
+        
+        case 'guest':
+        default:
+            return (
+              <>
+                <Link
+                  href="/login"
+                  className={cn(
+                    buttonVariants({ variant: 'outline', size: 'default' }),
+                    'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2'
+                  )}
+                >
+                  <span>Login</span>
+                </Link>
+                <Link
+                  href="/signup"
+                  className={cn(
+                    buttonVariants({ size: 'default', variant: 'default' }),
+                    'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2'
+                  )}
+                >
+                  <span>Sign Up</span>
+                </Link>
+              </>
+            );
     }
-    if (isAdminLoggedIn || isGoldsmithLoggedIn) {
-      return null; // An admin or goldsmith is logged in, show nothing here
-    }
-    if (currentUser && currentUser.isLoggedIn) {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="default" 
-              className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 flex items-center gap-2"
-            >
-              <UserCircle className="h-4 w-4" />
-              <span>{currentUser.name}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/customer/dashboard" onClick={(e) => e.stopPropagation()}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/customer/profile/edit" onClick={(e) => e.stopPropagation()}><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/customer/orders" onClick={(e) => e.stopPropagation()}><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
-            </DropdownMenuItem>
-           <DropdownMenuItem asChild>
-            <Link href="/customer/inquiries" onClick={(e) => e.stopPropagation()}><MessageCircle className="mr-2 h-4 w-4" />My Inquiries</Link>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-            <LogOut className="mr-2 h-4 w-4" /> Logout
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      );
-    }
-    return (
-      <>
-        <Link
-          href="/login"
-          className={cn(
-            buttonVariants({ variant: 'outline', size: 'default' }),
-            'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2'
-          )}
-        >
-          <span>Login</span>
-        </Link>
-        <Link
-          href="/signup"
-          className={cn(
-            buttonVariants({ size: 'default', variant: 'default' }),
-            'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2'
-          )}
-        >
-          <span>Sign Up</span>
-        </Link>
-      </>
-    );
   };
   
   const renderMobileUserActions = () => {
-    if (!isMounted) {
-      return (
-        <div className="flex flex-col gap-3">
-          <Skeleton className="h-12 w-full rounded-full" />
-          <Skeleton className="h-12 w-full rounded-full" />
-        </div>
-      );
+    switch (userStatus) {
+        case 'loading':
+            return (
+                <div className="flex flex-col gap-3">
+                  <Skeleton className="h-12 w-full rounded-full" />
+                  <Skeleton className="h-12 w-full rounded-full" />
+                </div>
+            );
+
+        case 'admin':
+        case 'goldsmith':
+            return null; // Intentionally show nothing
+
+        case 'customer':
+            return (
+                <>
+                   <Link href="/customer/dashboard" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" /> My Dashboard
+                  </Link>
+                  <Button onClick={handleLogout} variant="destructive" size="lg" className="w-full rounded-full text-base">
+                    <LogOut className="mr-2 h-4 w-4" /> Logout
+                  </Button>
+                </>
+            );
+
+        case 'guest':
+        default:
+            return (
+              <>
+                <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
+                  <LogIn className="mr-2 h-4 w-4" /> Login
+                </Link>
+                <Link href="/signup" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+                  <UserPlus className="mr-2 h-4 w-4" /> Sign Up
+                </Link>
+              </>
+            );
     }
-     if (isAdminLoggedIn || isGoldsmithLoggedIn) {
-      return null;
-    }
-    if (currentUser && currentUser.isLoggedIn) {
-      return (
-        <>
-           <Link href="/customer/dashboard" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
-            <LayoutDashboard className="mr-2 h-4 w-4" /> My Dashboard
-          </Link>
-          <Button onClick={handleLogout} variant="destructive" size="lg" className="w-full rounded-full text-base">
-            <LogOut className="mr-2 h-4 w-4" /> Logout
-          </Button>
-        </>
-      );
-    }
-    return (
-      <>
-        <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
-          <LogIn className="mr-2 h-4 w-4" /> Login
-        </Link>
-        <Link href="/signup" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
-          <UserPlus className="mr-2 h-4 w-4" /> Sign Up
-        </Link>
-      </>
-    );
   };
 
   return (
@@ -212,7 +227,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="pr-0 bg-background w-[280px] sm:w-[320px] border-r border-border/20 shadow-xl p-0">
               <div className="flex flex-col h-full">
-                <SheetHeader className="p-0">
+                <SheetHeader>
                   <SheetTitle asChild>
                     <Link
                       href="/"
