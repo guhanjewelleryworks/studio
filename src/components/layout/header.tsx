@@ -55,7 +55,7 @@ export function Header() {
     }
     setCurrentUser(null);
     router.push('/');
-    router.refresh(); 
+    window.location.reload(); // Force reload to ensure all state is cleared
   };
 
   return (
@@ -113,7 +113,7 @@ export function Header() {
                   <Link href="/admin" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Admin Portal</Link>
                 </nav>
                 <div className="px-6 pb-8 mt-auto flex flex-col gap-3 border-t border-border/20 pt-6">
-                  {currentUser && currentUser.isLoggedIn ? (
+                  {isAdminLoggedIn ? null : currentUser && currentUser.isLoggedIn ? (
                     <>
                        <Link href="/customer/dashboard" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
                         <LayoutDashboard className="mr-2 h-4 w-4" /> My Dashboard
@@ -152,40 +152,39 @@ export function Header() {
 
         {/* Login/Signup or User Info/Logout Buttons (Desktop) */}
         <div className="hidden md:flex flex-1 items-center justify-end space-x-3">
-          {!isAdminLoggedIn && (
-            currentUser && currentUser.isLoggedIn ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="default" 
-                    className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 flex items-center gap-2"
-                  >
-                    <UserCircle className="h-4 w-4" />
-                    <span>{currentUser.name}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/customer/dashboard" onClick={(e) => e.stopPropagation()}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/customer/profile/edit" onClick={(e) => e.stopPropagation()}><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/customer/orders" onClick={(e) => e.stopPropagation()}><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
-                  </DropdownMenuItem>
-                 <DropdownMenuItem asChild>
-                  <Link href="/customer/inquiries" onClick={(e) => e.stopPropagation()}><MessageCircle className="mr-2 h-4 w-4" />My Inquiries</Link>
-                </DropdownMenuItem>
+          {isAdminLoggedIn ? null : currentUser && currentUser.isLoggedIn ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="default" 
+                  className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 flex items-center gap-2"
+                >
+                  <UserCircle className="h-4 w-4" />
+                  <span>{currentUser.name}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" /> Logout
+                <DropdownMenuItem asChild>
+                  <Link href="/customer/dashboard" onClick={(e) => e.stopPropagation()}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
                 </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <DropdownMenuItem asChild>
+                  <Link href="/customer/profile/edit" onClick={(e) => e.stopPropagation()}><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/customer/orders" onClick={(e) => e.stopPropagation()}><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
+                </DropdownMenuItem>
+               <DropdownMenuItem asChild>
+                <Link href="/customer/inquiries" onClick={(e) => e.stopPropagation()}><MessageCircle className="mr-2 h-4 w-4" />My Inquiries</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                <LogOut className="mr-2 h-4 w-4" /> Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           ) : (
             <>
               <Link
@@ -207,7 +206,7 @@ export function Header() {
                 <span>Sign Up</span>
               </Link>
             </>
-          ))}
+          )}
         </div>
       </div>
     </header>
