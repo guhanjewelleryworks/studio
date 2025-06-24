@@ -31,7 +31,8 @@ interface CurrentUser {
 export function Header() {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [isMounted, setIsMounted] = useState(false); // State to check if component has mounted
+  const [isGoldsmithLoggedIn, setIsGoldsmithLoggedIn] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export function Header() {
     if (typeof window !== "undefined") {
       const storedUser = localStorage.getItem('currentUser');
       const storedAdminStatus = localStorage.getItem('isAdminLoggedIn');
+      const storedGoldsmithStatus = localStorage.getItem('currentGoldsmithUser');
 
       if (storedUser) {
         try {
@@ -48,7 +50,20 @@ export function Header() {
           localStorage.removeItem('currentUser'); 
         }
       }
+      
       setIsAdminLoggedIn(storedAdminStatus === 'true');
+
+      if (storedGoldsmithStatus) {
+        try {
+          const parsedGoldsmith = JSON.parse(storedGoldsmithStatus);
+          if (parsedGoldsmith.isLoggedIn) {
+            setIsGoldsmithLoggedIn(true);
+          }
+        } catch (e) {
+          console.error("Failed to parse currentGoldsmithUser from localStorage", e);
+          localStorage.removeItem('currentGoldsmithUser');
+        }
+      }
     }
   }, []);
 
@@ -65,8 +80,8 @@ export function Header() {
     if (!isMounted) {
       return <Skeleton className="h-10 w-40 rounded-full" />; // Placeholder to prevent layout shift
     }
-    if (isAdminLoggedIn) {
-      return null; // Admin is logged in, show nothing here
+    if (isAdminLoggedIn || isGoldsmithLoggedIn) {
+      return null; // An admin or goldsmith is logged in, show nothing here
     }
     if (currentUser && currentUser.isLoggedIn) {
       return (
@@ -137,7 +152,7 @@ export function Header() {
         </div>
       );
     }
-     if (isAdminLoggedIn) {
+     if (isAdminLoggedIn || isGoldsmithLoggedIn) {
       return null;
     }
     if (currentUser && currentUser.isLoggedIn) {
