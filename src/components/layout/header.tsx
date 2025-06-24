@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from '@/components/ui/skeleton';
 
 const navLinkClasses = "relative text-sm font-medium text-foreground/80 transition-colors hover:text-primary after:absolute after:bottom-[-5px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full";
 
@@ -30,9 +31,11 @@ interface CurrentUser {
 export function Header() {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [isMounted, setIsMounted] = useState(false); // State to check if component has mounted
   const router = useRouter();
 
   useEffect(() => {
+    setIsMounted(true); // Component has mounted on the client
     if (typeof window !== "undefined") {
       const storedUser = localStorage.getItem('currentUser');
       const storedAdminStatus = localStorage.getItem('isAdminLoggedIn');
@@ -56,6 +59,109 @@ export function Header() {
     setCurrentUser(null);
     router.push('/');
     window.location.reload(); // Force reload to ensure all state is cleared
+  };
+
+  const renderDesktopUserActions = () => {
+    if (!isMounted) {
+      return <Skeleton className="h-10 w-40 rounded-full" />; // Placeholder to prevent layout shift
+    }
+    if (isAdminLoggedIn) {
+      return null; // Admin is logged in, show nothing here
+    }
+    if (currentUser && currentUser.isLoggedIn) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="default" 
+              className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 flex items-center gap-2"
+            >
+              <UserCircle className="h-4 w-4" />
+              <span>{currentUser.name}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/customer/dashboard" onClick={(e) => e.stopPropagation()}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/customer/profile/edit" onClick={(e) => e.stopPropagation()}><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/customer/orders" onClick={(e) => e.stopPropagation()}><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
+            </DropdownMenuItem>
+           <DropdownMenuItem asChild>
+            <Link href="/customer/inquiries" onClick={(e) => e.stopPropagation()}><MessageCircle className="mr-2 h-4 w-4" />My Inquiries</Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+            <LogOut className="mr-2 h-4 w-4" /> Logout
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      );
+    }
+    return (
+      <>
+        <Link
+          href="/login"
+          className={cn(
+            buttonVariants({ variant: 'outline', size: 'default' }),
+            'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2'
+          )}
+        >
+          <span>Login</span>
+        </Link>
+        <Link
+          href="/signup"
+          className={cn(
+            buttonVariants({ size: 'default', variant: 'default' }),
+            'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2'
+          )}
+        >
+          <span>Sign Up</span>
+        </Link>
+      </>
+    );
+  };
+  
+  const renderMobileUserActions = () => {
+    if (!isMounted) {
+      return (
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-12 w-full rounded-full" />
+          <Skeleton className="h-12 w-full rounded-full" />
+        </div>
+      );
+    }
+     if (isAdminLoggedIn) {
+      return null;
+    }
+    if (currentUser && currentUser.isLoggedIn) {
+      return (
+        <>
+           <Link href="/customer/dashboard" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+            <LayoutDashboard className="mr-2 h-4 w-4" /> My Dashboard
+          </Link>
+          <Button onClick={handleLogout} variant="destructive" size="lg" className="w-full rounded-full text-base">
+            <LogOut className="mr-2 h-4 w-4" /> Logout
+          </Button>
+        </>
+      );
+    }
+    return (
+      <>
+        <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
+          <LogIn className="mr-2 h-4 w-4" /> Login
+        </Link>
+        <Link href="/signup" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+          <UserPlus className="mr-2 h-4 w-4" /> Sign Up
+        </Link>
+      </>
+    );
   };
 
   return (
@@ -113,25 +219,7 @@ export function Header() {
                   <Link href="/admin" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Admin Portal</Link>
                 </nav>
                 <div className="px-6 pb-8 mt-auto flex flex-col gap-3 border-t border-border/20 pt-6">
-                  {isAdminLoggedIn ? null : currentUser && currentUser.isLoggedIn ? (
-                    <>
-                       <Link href="/customer/dashboard" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
-                        <LayoutDashboard className="mr-2 h-4 w-4" /> My Dashboard
-                      </Link>
-                      <Button onClick={handleLogout} variant="destructive" size="lg" className="w-full rounded-full text-base">
-                        <LogOut className="mr-2 h-4 w-4" /> Logout
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
-                        <LogIn className="mr-2 h-4 w-4" /> Login
-                      </Link>
-                      <Link href="/signup" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
-                        <UserPlus className="mr-2 h-4 w-4" /> Sign Up
-                      </Link>
-                    </>
-                  )}
+                   {renderMobileUserActions()}
                 </div>
               </div>
             </SheetContent>
@@ -152,61 +240,7 @@ export function Header() {
 
         {/* Login/Signup or User Info/Logout Buttons (Desktop) */}
         <div className="hidden md:flex flex-1 items-center justify-end space-x-3">
-          {isAdminLoggedIn ? null : currentUser && currentUser.isLoggedIn ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="default" 
-                  className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 flex items-center gap-2"
-                >
-                  <UserCircle className="h-4 w-4" />
-                  <span>{currentUser.name}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/customer/dashboard" onClick={(e) => e.stopPropagation()}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/customer/profile/edit" onClick={(e) => e.stopPropagation()}><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/customer/orders" onClick={(e) => e.stopPropagation()}><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
-                </DropdownMenuItem>
-               <DropdownMenuItem asChild>
-                <Link href="/customer/inquiries" onClick={(e) => e.stopPropagation()}><MessageCircle className="mr-2 h-4 w-4" />My Inquiries</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                <LogOut className="mr-2 h-4 w-4" /> Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className={cn(
-                  buttonVariants({ variant: 'outline', size: 'default' }),
-                  'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2'
-                )}
-              >
-                <span>Login</span>
-              </Link>
-              <Link
-                href="/signup"
-                className={cn(
-                  buttonVariants({ size: 'default', variant: 'default' }),
-                  'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2'
-                )}
-              >
-                <span>Sign Up</span>
-              </Link>
-            </>
-          )}
+          {renderDesktopUserActions()}
         </div>
       </div>
     </header>
