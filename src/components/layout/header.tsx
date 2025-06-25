@@ -29,7 +29,8 @@ interface CurrentUser {
 
 const navLinkClasses = "relative text-sm font-medium text-foreground/80 transition-colors hover:text-primary after:absolute after:bottom-[-5px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full";
 
-type UserStatus = 'loading' | 'guest' | 'customer' | 'admin' | 'goldsmith';
+// The main header only cares about customer or guest status. Admin/Goldsmith portals have their own context.
+type UserStatus = 'loading' | 'guest' | 'customer';
 
 export function Header() {
   const [userStatus, setUserStatus] = useState<UserStatus>('loading');
@@ -37,26 +38,12 @@ export function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    // This effect runs only on the client, after initial hydration
-    // It checks localStorage to determine the true user status
-    
-    const storedAdminStatus = localStorage.getItem('isAdminLoggedIn');
-    if (storedAdminStatus === 'true') {
-        setUserStatus('admin');
-        return;
-    }
-
-    const storedGoldsmithStatus = localStorage.getItem('currentGoldsmithUser');
-    if (storedGoldsmithStatus) {
-        try {
-            const parsedGoldsmith = JSON.parse(storedGoldsmithStatus);
-            if (parsedGoldsmith.isLoggedIn) {
-                setUserStatus('goldsmith');
-                return;
-            }
-        } catch (e) {
-            // Malformed JSON, fall through to check for customer
-        }
+    // This effect runs only on the client, after initial hydration.
+    // It checks localStorage to determine the CUSTOMER login status.
+    // Goldsmith and Admin sessions should not affect the main site header.
+    if (typeof window === "undefined") {
+      setUserStatus('loading');
+      return;
     }
     
     const storedUser = localStorage.getItem('currentUser');
@@ -70,19 +57,19 @@ export function Header() {
             }
         } catch (e) {
             // Malformed JSON, fall through to guest
+             console.error("Error parsing customer data from localStorage", e);
         }
     }
     
-    // If no authenticated user is found, set status to guest
+    // If no authenticated CUSTOMER is found, set status to guest.
     setUserStatus('guest');
 
   }, []);
 
   const handleLogout = () => {
+    // This logout is specific to customers. Goldsmith/Admin should log out from their respective portals.
     if (typeof window !== "undefined") {
       localStorage.removeItem('currentUser');
-      localStorage.removeItem('isAdminLoggedIn');
-      localStorage.removeItem('currentGoldsmithUser');
     }
     setCurrentUser(null);
     setUserStatus('guest'); // Reset status on logout
@@ -94,10 +81,6 @@ export function Header() {
     switch (userStatus) {
         case 'loading':
             return <Skeleton className="h-10 w-40 rounded-full" />;
-        
-        case 'admin':
-        case 'goldsmith':
-            return null; // Intentionally show nothing for these roles in main header
 
         case 'customer':
             return (
@@ -171,10 +154,6 @@ export function Header() {
                   <Skeleton className="h-12 w-full rounded-full" />
                 </div>
             );
-
-        case 'admin':
-        case 'goldsmith':
-            return null; // Intentionally show nothing
 
         case 'customer':
             return (
