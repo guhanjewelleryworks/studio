@@ -1,4 +1,3 @@
-// src/app/discover/page.tsx
 'use client';
 
 import type { Location } from '@/services/geolocation';
@@ -41,8 +40,8 @@ export default function DiscoverPage() {
         const loc: Location = { lat: latitude, lng: longitude };
         setCurrentLocation(loc);
       },
-      (err) => {
-        console.error("Error getting location:", err);
+      (err: GeolocationPositionError) => {
+        console.error("Error getting location:", err.message);
         setError("Could not access your location. Please enable location services or search manually.");
       }
     );
