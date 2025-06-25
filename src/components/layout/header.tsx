@@ -1,3 +1,4 @@
+
 // src/components/layout/header.tsx
 'use client';
 
@@ -36,44 +37,52 @@ export function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    // This effect runs only on the client after hydration
-    const storedUser = localStorage.getItem('currentUser');
-    const storedAdminStatus = localStorage.getItem('isAdminLoggedIn');
-    const storedGoldsmithStatus = localStorage.getItem('currentGoldsmithUser');
+    // This effect runs only on the client, after initial hydration
+    // It checks localStorage to determine the true user status
     
+    const storedAdminStatus = localStorage.getItem('isAdminLoggedIn');
     if (storedAdminStatus === 'true') {
         setUserStatus('admin');
-    } else if (storedGoldsmithStatus) {
+        return;
+    }
+
+    const storedGoldsmithStatus = localStorage.getItem('currentGoldsmithUser');
+    if (storedGoldsmithStatus) {
         try {
             const parsedGoldsmith = JSON.parse(storedGoldsmithStatus);
             if (parsedGoldsmith.isLoggedIn) {
                 setUserStatus('goldsmith');
-            } else {
-                setUserStatus('guest');
+                return;
             }
         } catch (e) {
-            setUserStatus('guest');
+            // Malformed JSON, fall through to check for customer
         }
-    } else if (storedUser) {
+    }
+    
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
         try {
             const parsedUser = JSON.parse(storedUser);
             if (parsedUser.isLoggedIn) {
                 setCurrentUser(parsedUser);
                 setUserStatus('customer');
-            } else {
-                setUserStatus('guest');
+                return;
             }
         } catch (e) {
-            setUserStatus('guest');
+            // Malformed JSON, fall through to guest
         }
-    } else {
-        setUserStatus('guest');
     }
+    
+    // If no authenticated user is found, set status to guest
+    setUserStatus('guest');
+
   }, []);
 
   const handleLogout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem('currentUser');
+      localStorage.removeItem('isAdminLoggedIn');
+      localStorage.removeItem('currentGoldsmithUser');
     }
     setCurrentUser(null);
     setUserStatus('guest'); // Reset status on logout
