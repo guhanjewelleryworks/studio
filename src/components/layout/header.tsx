@@ -9,7 +9,7 @@ import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, MessageCircle, 
 import { cn } from '@/lib/utils';
 import Image from 'next/image'; 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +36,7 @@ export function Header() {
   const [userStatus, setUserStatus] = useState<UserStatus>('loading');
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const router = useRouter();
+  const pathname = usePathname(); // Get the current path
 
   useEffect(() => {
     // This effect runs only on the client, after initial hydration.
@@ -46,6 +47,7 @@ export function Header() {
       return;
     }
     
+    // This effect should only check for the *customer* login status
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
         try {
@@ -53,10 +55,9 @@ export function Header() {
             if (parsedUser.isLoggedIn) {
                 setCurrentUser(parsedUser);
                 setUserStatus('customer');
-                return;
+                return; // Found a customer, stop here.
             }
         } catch (e) {
-            // Malformed JSON, fall through to guest
              console.error("Error parsing customer data from localStorage", e);
         }
     }
@@ -120,6 +121,10 @@ export function Header() {
         
         case 'guest':
         default:
+            // Only show buttons on the homepage
+            if (pathname !== '/') {
+              return null;
+            }
             return (
               <>
                 <Link
@@ -169,6 +174,10 @@ export function Header() {
 
         case 'guest':
         default:
+            // Only show buttons on the homepage
+            if (pathname !== '/') {
+              return null;
+            }
             return (
               <>
                 <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
