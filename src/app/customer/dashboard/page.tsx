@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, User, ShoppingBag, MessageCircle, Edit, LogOut, Loader2 } from 'lucide-react';
+import { LayoutDashboard, User, ShoppingBag, Edit, LogOut, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { fetchCustomerOrders, fetchCustomerInquiries } from '@/actions/customer-actions';
-import type { OrderRequest, Inquiry } from '@/types/goldsmith';
+import { fetchCustomerOrders } from '@/actions/customer-actions';
+import type { OrderRequest } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 
 interface CurrentUser {
@@ -20,14 +20,13 @@ interface CurrentUser {
 
 interface DashboardStats {
   orderCount: number;
-  inquiryCount: number;
 }
 
 export default function CustomerDashboardPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const [stats, setStats] = useState<DashboardStats>({ orderCount: 0, inquiryCount: 0 });
+  const [stats, setStats] = useState<DashboardStats>({ orderCount: 0 });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -49,13 +48,9 @@ export default function CustomerDashboardPage() {
       const loadStats = async () => {
         setIsLoading(true);
         try {
-          const [orders, inquiries] = await Promise.all([
-            fetchCustomerOrders(currentUser.id as string),
-            fetchCustomerInquiries(currentUser.id as string)
-          ]);
+          const orders = await fetchCustomerOrders(currentUser.id as string);
           setStats({
             orderCount: orders.length,
-            inquiryCount: inquiries.length,
           });
         } catch (error) {
           console.error("Failed to load dashboard stats:", error);
@@ -96,7 +91,7 @@ export default function CustomerDashboardPage() {
       </header>
 
       {/* Overview Stats */}
-      <section className="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <section className="mb-8 grid grid-cols-1 max-w-sm">
         <Card className="shadow-lg bg-card border-primary/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-accent">My Orders</CardTitle>
@@ -107,20 +102,10 @@ export default function CustomerDashboardPage() {
             <p className="text-xs text-muted-foreground">Total orders placed</p>
           </CardContent>
         </Card>
-        <Card className="shadow-lg bg-card border-primary/10">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-accent">My Inquiries</CardTitle>
-            <MessageCircle className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold text-foreground">{stats.inquiryCount}</div>}
-            <p className="text-xs text-muted-foreground">Total inquiries sent</p>
-          </CardContent>
-        </Card>
       </section>
 
       {/* Quick Links */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <DashboardActionCard
           title="Edit Profile"
           description="Update your personal information."
@@ -134,13 +119,6 @@ export default function CustomerDashboardPage() {
           icon={ShoppingBag}
           linkHref="/customer/orders"
           linkText="See Order History"
-        />
-        <DashboardActionCard
-          title="View Inquiries"
-          description="Check the status of your inquiries."
-          icon={MessageCircle}
-          linkHref="/customer/inquiries"
-          linkText="See Inquiry History"
         />
       </section>
     </div>

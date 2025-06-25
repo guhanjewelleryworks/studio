@@ -277,20 +277,3 @@ export async function fetchOrderRequestById(orderId: string): Promise<OrderReque
     return null;
   }
 }
-
-export async function fetchCustomerInquiries(customerId: string): Promise<Inquiry[]> {
-  console.log(`[Action: fetchCustomerInquiries] Fetching inquiries for customerId: ${customerId}`);
-  try {
-    const collection = await getInquiriesCollection();
-    // Fetch inquiries where customerId matches
-    const inquiriesCursor = collection.find({ customerId: customerId } as Filter<Inquiry>);
-    const inquiriesArray = await inquiriesCursor.sort({ requestedAt: -1 }).toArray();
-    console.log(`[Action: fetchCustomerInquiries] Found ${inquiriesArray.length} inquiries for customerId ${customerId}.`);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return inquiriesArray.map(({ _id, ...inquiry }) => inquiry as Inquiry);
-  } catch (error) {
-    console.error(`[Action: fetchCustomerInquiries] Error fetching inquiries for customerId ${customerId}:`, error);
-    return [];
-  }
-}
-
