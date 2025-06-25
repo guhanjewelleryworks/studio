@@ -86,7 +86,8 @@ export default function GoldsmithLoginPage() {
         title: 'Login Successful',
         description: 'Redirecting to your dashboard...',
       });
-      router.push('/goldsmith-portal/dashboard');
+      // Use window.location.href for a full page reload to ensure header state is updated
+      window.location.href = '/goldsmith-portal/dashboard';
 
     } catch (error) {
       console.error("Login error:", error);
