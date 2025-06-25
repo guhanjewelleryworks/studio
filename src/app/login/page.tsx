@@ -47,6 +47,9 @@ export default function LoginPage() {
             });
             
             if (typeof window !== "undefined") {
+              // Clear any existing goldsmith session to prevent conflicts
+              localStorage.removeItem('currentGoldsmithUser');
+
               // Store customer ID along with other details
               localStorage.setItem('currentUser', JSON.stringify({ 
                 isLoggedIn: true, 
