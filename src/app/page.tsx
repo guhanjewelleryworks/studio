@@ -70,7 +70,7 @@ export default function Home() {
         {/* Hero Section */}
         <section className="relative w-full py-10 md:py-12 lg:py-14 bg-gradient-to-br from-secondary/10 via-background to-background overflow-hidden"> {/* Reduced py */}
           <HeroPattern />
-          <div className="container px-4 md:px-6 relative z-10">
+          <div className="container max-w-screen-xl px-4 md:px-6 relative z-10">
             <div className="grid gap-4 lg:grid-cols-[1fr_500px] lg:gap-6 xl:grid-cols-[1fr_550px] items-start"> {/* Changed items-center to items-start */}
               <div className="flex flex-col justify-start space-y-4"> {/* Adjusted space-y from 3 to 4 */}
                 <div className="self-start lg:self-auto">
@@ -119,7 +119,7 @@ export default function Home() {
 
         {/* How It Works Section */}
         <section id="how-it-works" className="w-full py-10 md:py-12 lg:py-14 bg-background"> {/* Reduced py */}
-          <div className="container px-4 md:px-6">
+          <div className="container max-w-screen-xl px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-2 text-center mb-6 md:mb-8"> {/* Reduced mb */}
               <div className="space-y-1"> {/* Reduced space-y */}
                 <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-xs font-medium text-secondary-foreground shadow-sm font-poppins">How It Works</div>
@@ -147,7 +147,7 @@ export default function Home() {
 
         {/* Featured Goldsmiths Section */}
         <section className="w-full py-10 md:py-12 lg:py-14 bg-gradient-to-b from-secondary/20 to-background">
-          <div className="container grid items-center justify-center gap-3 px-4 text-center md:px-6">
+          <div className="container max-w-screen-xl grid items-center justify-center gap-3 px-4 text-center md:px-6">
             <div className="space-y-1.5 mb-4 md:mb-6">
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Meet Our Talented Artisans</h2>
               <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins">
@@ -216,7 +216,7 @@ export default function Home() {
 
         {/* Call to Action Section */}
         <section className="w-full py-10 md:py-12 lg:py-14 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background"> {/* Reduced py and border */}
-          <div className="container grid items-center justify-center gap-2 px-4 text-center md:px-6"> {/* Reduced gap */}
+          <div className="container max-w-screen-xl grid items-center justify-center gap-2 px-4 text-center md:px-6"> {/* Reduced gap */}
             <div className="space-y-1 mb-2 md:mb-3"> {/* Reduced space-y and mb */}
                <Handshake className="h-7 w-7 mx-auto text-primary mb-0.5" /> {/* Reduced size and mb */}
               <h2 className="font-heading text-accent text-2xl sm:text-3xl"> {/* Use text-accent */}
