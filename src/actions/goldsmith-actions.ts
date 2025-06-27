@@ -14,9 +14,9 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     const collection: Collection<Goldsmith> = await getGoldsmithsCollection();
 
     // Basic validation
-    if (!data.name || !data.email || !data.password || !data.state || !data.district) {
-        console.error('[Action: saveGoldsmith] Validation failed: Workshop name, email, password, state, and district are required.');
-        return { success: false, error: 'Workshop name, email, password, state, and district are required.' };
+    if (!data.name || !data.email || !data.password || !data.state || !data.district || !data.contactPerson || !data.phone || !data.specialty || (Array.isArray(data.specialty) && data.specialty.length === 0)) {
+        console.error('[Action: saveGoldsmith] Validation failed: All required fields must be filled.');
+        return { success: false, error: 'Please fill out all required fields: Workshop Name, Contact Person, Email, Phone, Location, and Specialties.' };
     }
     // Password length validation
     if (data.password.trim().length < 8) {
@@ -26,6 +26,12 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
 
     const normalizedEmail = data.email.toLowerCase().trim();
     const normalizedPhone = data.phone ? data.phone.trim() : undefined; 
+
+    if (normalizedPhone && normalizedPhone.length !== 10) {
+        console.error(`[Action: saveGoldsmith] Validation failed: Phone number ${normalizedPhone} is not 10 digits.`);
+        return { success: false, error: 'Phone number must be exactly 10 digits.' };
+    }
+
 
     const existingGoldsmithByEmail = await collection.findOne({ email: normalizedEmail });
     if (existingGoldsmithByEmail) {

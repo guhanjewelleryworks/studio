@@ -75,27 +75,17 @@ export default function GoldsmithRegisterPage() {
     const trimmedResponseTime = responseTime.trim();
 
     // Client-side validation
-    if (!trimmedWorkshopName || !trimmedEmail || !trimmedPassword || !selectedState || !selectedDistrict) {
+    if (!trimmedWorkshopName || !trimmedEmail || !trimmedPassword || !selectedState || !selectedDistrict || !trimmedContactPerson || !trimmedPhone || trimmedSpecialtiesArray.length === 0) {
       toast({
         title: 'Registration Error',
-        description: 'Workshop name, email, password, state, and district are required.',
-        variant: 'destructive',
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (trimmedPassword.length < 8) {
-      toast({
-        title: 'Registration Error',
-        description: 'Password must be at least 8 characters long.',
+        description: 'Please fill out all required fields: Workshop Name, Contact Person, Email, Phone, Location, and Specialties.',
         variant: 'destructive',
       });
       setIsSubmitting(false);
       return;
     }
     
-    if (trimmedPhone && trimmedPhone.length !== 10) {
+    if (trimmedPhone.length !== 10) {
       toast({
         title: 'Registration Error',
         description: 'Phone number must be exactly 10 digits.',
@@ -108,6 +98,16 @@ export default function GoldsmithRegisterPage() {
 
     if (trimmedPassword !== trimmedConfirmPassword) {
       toast({ title: 'Registration Error', description: 'Passwords do not match.', variant: 'destructive' });
+      setIsSubmitting(false);
+      return;
+    }
+
+     if (trimmedPassword.length < 8) {
+      toast({
+        title: 'Registration Error',
+        description: 'Password must be at least 8 characters long.',
+        variant: 'destructive',
+      });
       setIsSubmitting(false);
       return;
     }
@@ -220,7 +220,8 @@ export default function GoldsmithRegisterPage() {
                   <Input 
                     id="phone" 
                     type="tel" 
-                    placeholder="e.g., 9876543210" 
+                    placeholder="e.g., 9876543210"
+                    required 
                     className="text-foreground" 
                     value={phone} 
                     onChange={handlePhoneChange} 
@@ -280,7 +281,7 @@ export default function GoldsmithRegisterPage() {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="portfolioLink" className="text-foreground">Portfolio Link (Website, Instagram, etc.)</Label>
+              <Label htmlFor="portfolioLink" className="text-foreground">Portfolio Link (Optional)</Label>
               <Input id="portfolioLink" type="url" placeholder="https://yourportfolio.com" className="text-foreground" value={portfolioLink} onChange={(e) => setPortfolioLink(e.target.value)} disabled={isFormDisabled}/>
             </div>
 
