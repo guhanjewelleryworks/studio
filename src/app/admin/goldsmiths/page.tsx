@@ -131,7 +131,7 @@ export default function AdminGoldsmithsPage() {
                   <CardContent className="text-xs text-muted-foreground px-4 py-2">
                     <p>Contact: {goldsmith.contactPerson || 'N/A'}</p>
                     <p>Phone: {goldsmith.phone || 'N/A'}</p>
-                    <p>Address: {goldsmith.address || 'N/A'}</p>
+                    <p>Location: {goldsmith.district || 'N/A'}, {goldsmith.state || 'N/A'}</p>
                     <p>Specialty: {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : (typeof goldsmith.specialty === 'string' ? goldsmith.specialty : 'N/A')}</p>
                   </CardContent>
                   <CardFooter className="px-4 pb-4 pt-2 flex justify-end gap-2">

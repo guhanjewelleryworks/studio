@@ -14,9 +14,9 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     const collection: Collection<Goldsmith> = await getGoldsmithsCollection();
 
     // Basic validation
-    if (!data.name || !data.email || !data.password) {
-        console.error('[Action: saveGoldsmith] Validation failed: Workshop name, email, and password are required.');
-        return { success: false, error: 'Workshop name, email, and password are required.' };
+    if (!data.name || !data.email || !data.password || !data.state || !data.district) {
+        console.error('[Action: saveGoldsmith] Validation failed: Workshop name, email, password, state, and district are required.');
+        return { success: false, error: 'Workshop name, email, password, state, and district are required.' };
     }
     // Password length validation
     if (data.password.trim().length < 8) {
@@ -56,7 +56,8 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       contactPerson: data.contactPerson?.trim() || '',
       email: normalizedEmail,
       phone: normalizedPhone || '', 
-      address: data.address?.trim() || '',
+      state: data.state,
+      district: data.district,
       specialty: Array.isArray(data.specialty) ? data.specialty.map(s => s.trim()).filter(s => s) : (data.specialty?.toString().trim() || ''),
       portfolioLink: data.portfolioLink?.trim() || '',
       password: data.password.trim(), 
@@ -65,7 +66,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       imageUrl: `https://picsum.photos/seed/${safeNameSeed}/400/300`,
       profileImageUrl: `https://picsum.photos/seed/${safeNameSeed}-profile/120/120`,
       location: defaultLocation,
-      shortBio: `Specializing in ${specialtyText}.`,
+      shortBio: `Specializing in ${specialtyText}. Based in ${data.district}, ${data.state}.`,
       tagline: `Bespoke creations by ${workshopNameOrDefault}`,
       bio: `Discover the craftsmanship of ${workshopNameOrDefault}. This artisan brings years of dedication and a passion for unique jewelry to every piece, ensuring meticulous attention to detail and a personal touch. From initial design to final polish, experience the art of bespoke jewelry.`,
       yearsExperience: data.yearsExperience || 0,
@@ -456,7 +457,7 @@ export async function updateOrderStatus(
 
 export async function updateGoldsmithProfile(
   id: string, 
-  data: Partial<Pick<Goldsmith, 'name' | 'contactPerson' | 'phone' | 'address' | 'specialty' | 'portfolioLink' | 'bio' | 'tagline' | 'yearsExperience' | 'responseTime'>>
+  data: Partial<Pick<Goldsmith, 'name' | 'contactPerson' | 'phone' | 'state' | 'district' | 'specialty' | 'portfolioLink' | 'bio' | 'tagline' | 'yearsExperience' | 'responseTime'>>
 ): Promise<{ success: boolean; data?: Goldsmith; error?: string }> {
   console.log(`[Action: updateGoldsmithProfile] Updating profile for goldsmith ID ${id} with data:`, data);
   try {
@@ -469,7 +470,8 @@ export async function updateGoldsmithProfile(
     if (data.name && data.name.trim()) updateData.name = data.name.trim();
     if (data.contactPerson && data.contactPerson.trim()) updateData.contactPerson = data.contactPerson.trim();
     if (data.phone && data.phone.trim()) updateData.phone = data.phone.trim();
-    if (data.address && data.address.trim()) updateData.address = data.address.trim();
+    if (data.state && data.state.trim()) updateData.state = data.state.trim();
+    if (data.district && data.district.trim()) updateData.district = data.district.trim();
     if (data.specialty) { // specialty can be string or string[]
         if (Array.isArray(data.specialty)) {
             updateData.specialty = data.specialty.map(s => s.trim()).filter(s => s);

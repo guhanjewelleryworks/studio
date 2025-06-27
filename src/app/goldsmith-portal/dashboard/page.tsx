@@ -41,7 +41,7 @@ const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
   const totalFields = 7; 
 
   if (goldsmith.name && goldsmith.name.trim() !== '') completedFields++;
-  if (goldsmith.address && goldsmith.address.trim() !== '') completedFields++;
+  if (goldsmith.state && goldsmith.state.trim() !== '' && goldsmith.district && goldsmith.district.trim() !== '') completedFields++;
   if (goldsmith.specialty && (Array.isArray(goldsmith.specialty) ? goldsmith.specialty.length > 0 : (typeof goldsmith.specialty === 'string' && goldsmith.specialty.trim() !== ''))) completedFields++;
   if (goldsmith.bio && goldsmith.bio.trim() !== '') completedFields++;
   if (goldsmith.portfolioLink && goldsmith.portfolioLink.trim() !== '') completedFields++;

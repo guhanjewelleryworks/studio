@@ -34,7 +34,8 @@ const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id
   return {
     id: profile.id || id,
     name: profile.name || "Goldsmith Name Not Available",
-    address: profile.address || "Address Not Available",
+    state: profile.state || "State Not Available",
+    district: profile.district || "District Not Available",
     specialty: profile.specialty || ["Fine Jewelry"],
     rating: profile.rating || 0,
     imageUrl: profile.imageUrl || `https://placehold.co/400x300.png`,
@@ -243,7 +244,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                  <span className="text-[0.65rem] text-muted-foreground ml-1">(Based on X reviews)</span>
               </div>
               <CardDescription className="flex items-center justify-center text-muted-foreground text-xs pt-1">
-                <MapPin className="h-3 w-3 mr-0.5" /> {profile.address}
+                <MapPin className="h-3 w-3 mr-0.5" /> {profile.district}, {profile.state}
               </CardDescription>
                <div className="pt-2 flex flex-wrap justify-center gap-1.5">
                     {Array.isArray(profile.specialty) ? profile.specialty.map(spec => (

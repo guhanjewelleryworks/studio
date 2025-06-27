@@ -6,7 +6,8 @@ export interface Goldsmith {
   _id?: ObjectId | string; // MongoDB ID
   id: string; // Your application-specific ID
   name: string;
-  address: string;
+  state: string; // Replaced address with state
+  district: string; // Replaced address with district
   specialty: string | string[];
   rating: number;
   imageUrl?: string;

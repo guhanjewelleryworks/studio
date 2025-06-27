@@ -14,6 +14,16 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent, type ChangeEvent } from 'react';
 import { saveGoldsmith } from '@/actions/goldsmith-actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const indianStates: { [key: string]: string[] } = {
+  "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur"],
+  "Karnataka": ["Bengaluru", "Mysuru", "Hubballi-Dharwad"],
+  "Maharashtra": ["Mumbai", "Pune", "Nagpur"],
+  "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
+  "Telangana": ["Hyderabad", "Warangal", "Nizamabad"],
+};
+const stateNames = Object.keys(indianStates).sort();
 
 export default function GoldsmithRegisterPage() {
   const { toast } = useToast();
@@ -25,7 +35,8 @@ export default function GoldsmithRegisterPage() {
   const [contactPerson, setContactPerson] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
   const [specialties, setSpecialties] = useState('');
   const [portfolioLink, setPortfolioLink] = useState('');
   const [password, setPassword] = useState('');
@@ -36,13 +47,17 @@ export default function GoldsmithRegisterPage() {
 
   const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
-    // Remove non-digit characters
     const numericValue = value.replace(/[^0-9]/g, '');
-    // Restrict to 10 digits
     if (numericValue.length <= 10) {
       setPhone(numericValue);
     }
   };
+  
+  const handleStateChange = (value: string) => {
+    setSelectedState(value);
+    setSelectedDistrict(''); // Reset district when state changes
+  };
+
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -54,16 +69,15 @@ export default function GoldsmithRegisterPage() {
     const trimmedConfirmPassword = confirmPassword.trim();
     const trimmedContactPerson = contactPerson.trim();
     const trimmedPhone = phone.trim();
-    const trimmedAddress = address.trim();
     const trimmedSpecialtiesArray = specialties.split(',').map(s => s.trim()).filter(s => s);
     const trimmedPortfolioLink = portfolioLink.trim();
     const trimmedResponseTime = responseTime.trim();
 
     // Client-side validation
-    if (!trimmedWorkshopName || !trimmedEmail || !trimmedPassword) {
+    if (!trimmedWorkshopName || !trimmedEmail || !trimmedPassword || !selectedState || !selectedDistrict) {
       toast({
         title: 'Registration Error',
-        description: 'Workshop name, email, and password are required.',
+        description: 'Workshop name, email, password, state, and district are required.',
         variant: 'destructive',
       });
       setIsSubmitting(false);
@@ -103,7 +117,8 @@ export default function GoldsmithRegisterPage() {
         contactPerson: trimmedContactPerson,
         email: trimmedEmail,
         phone: trimmedPhone,
-        address: trimmedAddress,
+        state: selectedState,
+        district: selectedDistrict,
         specialty: trimmedSpecialtiesArray,
         portfolioLink: trimmedPortfolioLink,
         password: trimmedPassword,
@@ -124,7 +139,8 @@ export default function GoldsmithRegisterPage() {
         setContactPerson('');
         setEmail('');
         setPhone('');
-        setAddress('');
+        setSelectedState('');
+        setSelectedDistrict('');
         setSpecialties('');
         setPortfolioLink('');
         setPassword('');
@@ -194,19 +210,43 @@ export default function GoldsmithRegisterPage() {
                     className="text-foreground" 
                     value={phone} 
                     onChange={handlePhoneChange} 
-                    maxLength={10} // HTML5 attribute for max length
-                    pattern="[0-9]{10}" // Suggests numeric input and 10 digits
+                    maxLength={10} 
+                    pattern="[0-9]{10}" 
                     title="Please enter a 10-digit phone number"
                     disabled={isFormDisabled}
                   />
               </div>
             </div>
+            
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
+                <div className="space-y-1">
+                  <Label htmlFor="state" className="text-foreground">State</Label>
+                  <Select onValueChange={handleStateChange} value={selectedState} required disabled={isFormDisabled}>
+                    <SelectTrigger id="state" className="text-foreground">
+                      <SelectValue placeholder="Select your state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {stateNames.map(state => (
+                        <SelectItem key={state} value={state}>{state}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="district" className="text-foreground">District / City</Label>
+                  <Select onValueChange={setSelectedDistrict} value={selectedDistrict} required disabled={isFormDisabled || !selectedState}>
+                    <SelectTrigger id="district" className="text-foreground">
+                      <SelectValue placeholder="Select your district/city" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedState && indianStates[selectedState].map(district => (
+                        <SelectItem key={district} value={district}>{district}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-
-            <div className="space-y-1">
-              <Label htmlFor="address" className="text-foreground">Workshop Address</Label>
-              <Textarea id="address" placeholder="Full address of your workshop or studio" required rows={2} className="text-foreground" value={address} onChange={(e) => setAddress(e.target.value)} disabled={isFormDisabled}/>
-            </div>
 
              <div className="space-y-1">
               <Label htmlFor="specialties" className="text-foreground">Specialties & Techniques</Label>

@@ -13,12 +13,22 @@ import { useToast } from '@/hooks/use-toast';
 import { fetchGoldsmithById, updateGoldsmithProfile } from '@/actions/goldsmith-actions';
 import type { Goldsmith } from '@/types/goldsmith';
 import Link from 'next/link';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface CurrentGoldsmithUser {
   isLoggedIn: boolean;
   id: string;
   name: string;
 }
+
+const indianStates: { [key: string]: string[] } = {
+  "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur"],
+  "Karnataka": ["Bengaluru", "Mysuru", "Hubballi-Dharwad"],
+  "Maharashtra": ["Mumbai", "Pune", "Nagpur"],
+  "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
+  "Telangana": ["Hyderabad", "Warangal", "Nizamabad"],
+};
+const stateNames = Object.keys(indianStates).sort();
 
 export default function EditGoldsmithProfilePage() {
   const router = useRouter();
@@ -34,7 +44,8 @@ export default function EditGoldsmithProfilePage() {
     name: '',
     contactPerson: '',
     phone: '',
-    address: '',
+    state: '',
+    district: '',
     specialty: '',
     portfolioLink: '',
     bio: '',
@@ -68,7 +79,8 @@ export default function EditGoldsmithProfilePage() {
             name: data.name || '',
             contactPerson: data.contactPerson || '',
             phone: data.phone || '',
-            address: data.address || '',
+            state: data.state || '',
+            district: data.district || '',
             specialty: Array.isArray(data.specialty) ? data.specialty.join(', ') : data.specialty || '',
             portfolioLink: data.portfolioLink || '',
             bio: data.bio || '',
@@ -91,6 +103,16 @@ export default function EditGoldsmithProfilePage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const handleSelectChange = (name: 'state' | 'district', value: string) => {
+    setFormData(prev => {
+        const newState = { ...prev, [name]: value };
+        if (name === 'state') {
+            newState.district = ''; // Reset district when state changes
+        }
+        return newState;
+    });
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -166,10 +188,36 @@ export default function EditGoldsmithProfilePage() {
                 <Label htmlFor="tagline">Tagline / Short Slogan</Label>
                 <Input id="tagline" name="tagline" placeholder="e.g., Bespoke Creations for Timeless Moments" value={formData.tagline} onChange={handleInputChange} disabled={isSaving} />
             </div>
-            <div className="space-y-1.5">
-                <Label htmlFor="address">Workshop Address</Label>
-                <Input id="address" name="address" value={formData.address} onChange={handleInputChange} disabled={isSaving} />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="state">State</Label>
+                <Select onValueChange={(value) => handleSelectChange('state', value)} value={formData.state} required disabled={isSaving}>
+                  <SelectTrigger id="state" className="text-foreground">
+                    <SelectValue placeholder="Select your state" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stateNames.map(state => (
+                      <SelectItem key={state} value={state}>{state}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="district">District / City</Label>
+                <Select onValueChange={(value) => handleSelectChange('district', value)} value={formData.district} required disabled={isSaving || !formData.state}>
+                  <SelectTrigger id="district" className="text-foreground">
+                    <SelectValue placeholder="Select your district/city" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {formData.state && indianStates[formData.state]?.map(district => (
+                      <SelectItem key={district} value={district}>{district}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+            
             <div className="space-y-1.5">
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleInputChange} disabled={isSaving} />

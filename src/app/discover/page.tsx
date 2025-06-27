@@ -62,7 +62,7 @@ export default function DiscoverPage() {
         const loc: Location = { lat: latitude, lng: longitude };
         setCurrentLocation(loc);
       },
-      (err: GeolocationPositionError) => {
+      (err) => {
         console.error("Error getting location:", err.message);
         setError("Could not access your location. Please enable location services or search manually.");
       }
@@ -111,8 +111,8 @@ export default function DiscoverPage() {
                 : typeof g.specialty === 'string' 
                     ? g.specialty.toLowerCase().includes(searchTermLower) 
                     : false;
-            const addressMatch = g.address.toLowerCase().includes(searchTermLower);
-            return nameMatch || specialtyMatch || addressMatch;
+            const locationMatch = `${g.district}, ${g.state}`.toLowerCase().includes(searchTermLower);
+            return nameMatch || specialtyMatch || locationMatch;
         });
     }
 
@@ -279,7 +279,7 @@ export default function DiscoverPage() {
                   <div>
                     <CardTitle className="font-heading text-md text-accent mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
                     <CardDescription className="text-xs text-muted-foreground mb-0.5 line-clamp-1">
-                      <MapPin className="inline-block h-3 w-3 mr-0.5" /> {goldsmith.address}
+                      <MapPin className="inline-block h-3 w-3 mr-0.5" /> {goldsmith.district}, {goldsmith.state}
                     </CardDescription>
                     <p className="text-xs text-muted-foreground mb-1 font-medium flex items-center capitalize">
                       <Palette className="inline-block h-3 w-3 mr-0.5 text-primary"/>Specialty: {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty}
