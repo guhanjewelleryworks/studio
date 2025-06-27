@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle, Briefcase, Loader2, ShieldCheck } from 'lucide-react';
+import { CheckCircle, Briefcase, Loader2, ShieldCheck, MailCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -29,6 +29,7 @@ export default function GoldsmithRegisterPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmittedSuccessfully, setIsSubmittedSuccessfully] = useState(false);
 
   // Form state
   const [workshopName, setWorkshopName] = useState('');
@@ -130,25 +131,12 @@ export default function GoldsmithRegisterPage() {
 
       if (result.success && result.data) {
         toast({
-          title: 'Registration Submitted Successfully!',
-          description: "Awaiting for the approval, once approved you'll be part of the Goldsmith Connect Community.",
+          title: 'Registration Submitted!',
+          description: "Your profile is now under admin review.",
           duration: 7000, 
         });
-        // Clear form fields
-        setWorkshopName('');
-        setContactPerson('');
-        setEmail('');
-        setPhone('');
-        setSelectedState('');
-        setSelectedDistrict('');
-        setSpecialties('');
-        setPortfolioLink('');
-        setPassword('');
-        setConfirmPassword('');
-        setYearsExperience(undefined);
-        setResponseTime('');
         
-        router.push('/'); // Redirect to homepage
+        setIsSubmittedSuccessfully(true);
       } else {
         console.error("Failed to save goldsmith profile to MongoDB:", result.error);
         toast({
@@ -174,6 +162,32 @@ export default function GoldsmithRegisterPage() {
   };
 
   const isFormDisabled = isSubmitting;
+
+  if (isSubmittedSuccessfully) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/20 to-background">
+        <Card className="w-full max-w-lg text-center shadow-xl border-green-500/20 rounded-xl bg-card">
+          <CardHeader className="pt-8 pb-4">
+            <MailCheck className="h-16 w-16 mx-auto text-green-500 mb-4" />
+            <CardTitle className="text-3xl text-accent">Registration Submitted!</CardTitle>
+            <CardDescription className="text-muted-foreground mt-2 text-base">
+              Thank you for joining our network.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-6 pb-8">
+            <p className="text-foreground/80 mb-6">
+              Your profile has been sent to our administrators for review. You will receive an email notification once your account has been approved. This process usually takes 1-2 business days.
+            </p>
+            <Button asChild size="lg" className="w-full shadow-md rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Link href="/">
+                Return to Homepage
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/20 to-background">
