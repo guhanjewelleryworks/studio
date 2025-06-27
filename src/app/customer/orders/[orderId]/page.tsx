@@ -101,7 +101,7 @@ export default function CustomerOrderDetailPage({ params: paramsPromise }: { par
 
   if (error) {
     return (
-      <div className="container py-8 px-4 md:px-6 text-center">
+      <div className="container max-w-screen-xl py-8 px-4 md:px-6 text-center">
         <p className="text-destructive text-lg">{error}</p>
         <Button asChild variant="link" className="mt-4">
           <Link href="/customer/orders">Back to My Orders</Link>
@@ -112,7 +112,7 @@ export default function CustomerOrderDetailPage({ params: paramsPromise }: { par
 
   if (!order) {
     return (
-      <div className="container py-8 px-4 md:px-6 text-center">
+      <div className="container max-w-screen-xl py-8 px-4 md:px-6 text-center">
         <p className="text-muted-foreground text-lg">Order details could not be loaded.</p>
          <Button asChild variant="link" className="mt-4">
           <Link href="/customer/orders">Back to My Orders</Link>
@@ -122,7 +122,7 @@ export default function CustomerOrderDetailPage({ params: paramsPromise }: { par
   }
 
   return (
-    <div className="container py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/5 to-background">
+    <div className="container max-w-screen-xl py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/5 to-background">
       <header className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <ShoppingBag className="h-8 w-8 text-primary" />

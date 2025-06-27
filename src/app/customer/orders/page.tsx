@@ -87,7 +87,7 @@ export default function CustomerOrdersPage() {
 
 
   return (
-    <div className="container py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background">
+    <div className="container max-w-screen-xl py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background">
       <header className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <ShoppingBag className="h-8 w-8 text-primary" />
@@ -177,4 +177,3 @@ export default function CustomerOrdersPage() {
     </div>
   );
 }
-

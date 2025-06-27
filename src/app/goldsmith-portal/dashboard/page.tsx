@@ -186,7 +186,7 @@ export default function GoldsmithDashboardPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8 px-4 md:px-6">
+    <div className="container max-w-screen-xl mx-auto min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8 px-4 md:px-6">
       <header className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-heading text-accent">
