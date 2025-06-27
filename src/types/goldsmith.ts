@@ -44,6 +44,7 @@ export type NewGoldsmithInput = Omit<
   | 'bio'
   | 'portfolioImages' 
   | 'certifications'
+  | 'ordersCompleted'
   | 'status'
   | 'registeredAt' // Exclude from input, will be set by server
 >;

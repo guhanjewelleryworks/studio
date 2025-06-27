@@ -71,7 +71,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       bio: `Discover the craftsmanship of ${workshopNameOrDefault}. This artisan brings years of dedication and a passion for unique jewelry to every piece, ensuring meticulous attention to detail and a personal touch. From initial design to final polish, experience the art of bespoke jewelry.`,
       yearsExperience: data.yearsExperience || 0,
       responseTime: data.responseTime || "Varies",
-      ordersCompleted: data.ordersCompleted || 0,
+      ordersCompleted: 0,
       status: 'pending_verification', 
       registeredAt: new Date(), // Set registration date
     };
