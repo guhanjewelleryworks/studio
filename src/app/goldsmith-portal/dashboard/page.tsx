@@ -248,11 +248,9 @@ export default function GoldsmithDashboardPage() {
           title="Order Management"
           description="View new, active, and completed custom order requests."
           icon={Package}
-          linkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=pending_goldsmith_review`} 
-          linkText="View New Orders"
+          linkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=all`}
+          linkText="Manage All Orders"
           variant="default"
-          secondaryLinkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=in_progress`}
-          secondaryLinkText="Manage Active Orders"
         />
         <DashboardActionCard
           title="Communication Hub"

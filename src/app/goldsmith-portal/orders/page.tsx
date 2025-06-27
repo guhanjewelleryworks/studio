@@ -113,6 +113,22 @@ function GoldsmithOrdersContent() {
           </div>
         </CardHeader>
         <CardContent>
+          <div className="flex flex-wrap items-center gap-2 mb-6 border-b border-border/30 pb-4">
+            <h4 className="text-sm font-medium text-muted-foreground mr-2">Filter by status:</h4>
+            <Button asChild variant={statusFilter === 'pending_goldsmith_review' ? 'default' : 'outline'} size="sm" className="rounded-full text-xs">
+              <Link href={`/goldsmith-portal/orders?goldsmithId=${goldsmithId}&status=pending_goldsmith_review`}>New for Review</Link>
+            </Button>
+            <Button asChild variant={statusFilter === 'in_progress' ? 'default' : 'outline'} size="sm" className="rounded-full text-xs">
+              <Link href={`/goldsmith-portal/orders?goldsmithId=${goldsmithId}&status=in_progress`}>In Progress</Link>
+            </Button>
+            <Button asChild variant={statusFilter === 'completed' ? 'default' : 'outline'} size="sm" className="rounded-full text-xs">
+              <Link href={`/goldsmith-portal/orders?goldsmithId=${goldsmithId}&status=completed`}>Completed</Link>
+            </Button>
+            <Button asChild variant={statusFilter === 'all' ? 'default' : 'outline'} size="sm" className="rounded-full text-xs">
+              <Link href={`/goldsmith-portal/orders?goldsmithId=${goldsmithId}&status=all`}>All Orders</Link>
+            </Button>
+          </div>
+
           {isLoading ? (
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-lg" />)}
