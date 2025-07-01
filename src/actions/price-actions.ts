@@ -3,6 +3,7 @@
 
 import { getMetalPricesCollection } from '@/lib/mongodb';
 import type { StoredMetalPrice } from '@/types/goldsmith';
+import type { Collection } from 'mongodb';
 
 /**
  * Fetches live metal prices from GoldAPI.io and stores them in the database.
@@ -116,4 +117,36 @@ export async function fetchAndStoreLiveMetalPrices() {
         console.error("[PriceAction V6.0] A critical error occurred during the fetch process:", error);
         return { success: false, error: (error as Error).message };
     }
+}
+
+/**
+ * Fetches the most recently stored metal prices from the database for the widget.
+ * This is called by the public /api/metal-prices route.
+ */
+export async function getLatestStoredPrices(): Promise<StoredMetalPrice[]> {
+  try {
+    const collection: Collection<StoredMetalPrice> = await getMetalPricesCollection();
+    
+    // Use an aggregation pipeline to get the latest document for each unique metal symbol.
+    // This is robust against some metals failing to update while others succeed.
+    const latestPrices = await collection.aggregate<StoredMetalPrice>([
+      { $sort: { updatedAt: -1 } }, // Sort all documents by date descending
+      { 
+        $group: { 
+          _id: "$symbol", // Group by the metal symbol (e.g., 'XAU', 'XAG')
+          latestDoc: { $first: "$$ROOT" } // For each group, get the first document (which is the most recent)
+        } 
+      },
+      { $replaceRoot: { newRoot: "$latestDoc" } } // Promote the document to the top level
+    ]).toArray();
+
+    console.log(`[PriceAction] Fetched ${latestPrices.length} unique latest prices for the widget.`);
+
+    // Convert ObjectId to string for frontend serialization.
+    return latestPrices.map(p => ({ ...p, _id: p._id?.toString() as string }));
+  } catch (error) {
+    console.error("[PriceAction] Error fetching latest stored prices with aggregation:", error);
+    // Return an empty array to prevent the frontend from breaking in case of a DB error.
+    return [];
+  }
 }
