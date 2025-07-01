@@ -631,3 +631,33 @@ export async function fetchOrdersForGoldsmith(goldsmithId: string, status?: Orde
     return [];
   }
 }
+
+export async function updateGoldsmithProfileImage(
+  goldsmithId: string,
+  profileImageDataUri: string
+): Promise<{ success: boolean; error?: string; data?: Goldsmith }> {
+  console.log(`[Action: updateGoldsmithProfileImage] Updating profile image for goldsmith ID ${goldsmithId}`);
+  try {
+    if (!goldsmithId || !profileImageDataUri) {
+      return { success: false, error: 'Goldsmith ID and image data are required.' };
+    }
+
+    const collection = await getGoldsmithsCollection();
+    const result = await collection.findOneAndUpdate(
+      { id: goldsmithId },
+      { $set: { profileImageUrl: profileImageDataUri } },
+      { returnDocument: 'after', projection: { password: 0 } }
+    );
+
+    if (result) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, ...goldsmithData } = result;
+      return { success: true, data: goldsmithData as Goldsmith };
+    } else {
+      return { success: false, error: 'Goldsmith not found or profile image not updated.' };
+    }
+  } catch (error) {
+    console.error(`[Action: updateGoldsmithProfileImage] Error updating image for ${goldsmithId}:`, error);
+    return { success: false, error: 'Failed to update profile image due to a server error.' };
+  }
+}

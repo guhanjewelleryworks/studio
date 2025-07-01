@@ -1,19 +1,21 @@
 // src/app/goldsmith-portal/profile/edit/page.tsx
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { UserCog, Loader2, ArrowLeft } from 'lucide-react';
+import { UserCog, Loader2, ArrowLeft, UploadCloud } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { fetchGoldsmithById, updateGoldsmithProfile } from '@/actions/goldsmith-actions';
+import { fetchGoldsmithById, updateGoldsmithProfile, updateGoldsmithProfileImage } from '@/actions/goldsmith-actions';
 import type { Goldsmith } from '@/types/goldsmith';
 import Link from 'next/link';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import NextImage from 'next/image';
 
 interface CurrentGoldsmithUser {
   isLoggedIn: boolean;
@@ -38,6 +40,11 @@ export default function EditGoldsmithProfilePage() {
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Image upload state
+  const [isUploading, setIsUploading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Form fields state
   const [formData, setFormData] = useState({
@@ -115,6 +122,48 @@ export default function EditGoldsmithProfilePage() {
     });
   };
 
+  const handleImageFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 4 * 1024 * 1024) { // 4MB limit
+          toast({ title: "Image too large", description: "Please upload an image smaller than 4MB.", variant: "destructive" });
+          return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageUpload = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!imageFile || !imagePreview || !currentGoldsmithUser?.id) {
+      toast({ title: "No file selected", description: "Please select an image to upload.", variant: "destructive" });
+      return;
+    }
+    setIsUploading(true);
+    try {
+      const result = await updateGoldsmithProfileImage(currentGoldsmithUser.id, imagePreview);
+      if (result.success && result.data) {
+        setGoldsmithData(result.data);
+        toast({ title: "Profile Picture Updated!", description: "Your new picture is now live." });
+        setImageFile(null);
+        setImagePreview(null);
+        const fileInput = document.getElementById('profile-image-upload') as HTMLInputElement;
+        if(fileInput) fileInput.value = "";
+      } else {
+        toast({ title: "Upload Failed", description: result.error || "Could not upload image.", variant: "destructive" });
+      }
+    } catch (error) {
+       toast({ title: "Upload Error", description: "An unexpected error occurred during upload.", variant: "destructive" });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!currentGoldsmithUser?.id) return;
@@ -165,6 +214,46 @@ export default function EditGoldsmithProfilePage() {
           </Link>
         </Button>
       </header>
+      
+      {/* New Profile Picture Card */}
+      <Card className="max-w-3xl mx-auto shadow-xl bg-card border-primary/10 mb-8">
+        <CardHeader>
+          <CardTitle className="text-xl text-accent">Profile Picture</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            A great profile picture helps build trust with customers. Recommended size: 400x400 pixels.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <form onSubmit={handleImageUpload} className="flex flex-col sm:flex-row items-start gap-6">
+                <Avatar className="h-28 w-28 border-2 border-primary/20 shadow-md">
+                    <AvatarImage src={goldsmithData.profileImageUrl} alt={goldsmithData.name} />
+                    <AvatarFallback>{goldsmithData.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-grow space-y-3">
+                    <Label htmlFor="profile-image-upload">New Profile Picture</Label>
+                    <Input 
+                        id="profile-image-upload" 
+                        type="file" 
+                        accept="image/png, image/jpeg, image/webp"
+                        onChange={handleImageFileChange}
+                        disabled={isUploading}
+                        className="text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                    />
+                    {imagePreview && (
+                        <div className="flex items-center gap-4">
+                            <NextImage src={imagePreview} alt="New profile preview" width={80} height={80} className="rounded-md object-cover border border-muted" />
+                             <Button type="submit" disabled={isUploading}>
+                                {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
+                                {isUploading ? "Uploading..." : "Upload New Picture"}
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            </form>
+        </CardContent>
+      </Card>
+
+
       <Card className="max-w-3xl mx-auto shadow-xl bg-card border-primary/10">
         <CardHeader>
           <CardTitle className="text-2xl text-accent">Workshop Information</CardTitle>
