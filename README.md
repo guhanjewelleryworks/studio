@@ -62,7 +62,7 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
 
 5.  **Set the `MONGODB_URI` Environment Variable:**
     *   In your project's `.env` file, add the **exact** connection string copied from Atlas, replacing `<password>` with your actual database user password. See the "Environment Variables" section above for an example.
-    *   **CRITICAL:** The most common error `querySrv ENOTFOUND _mongodb._tcp.<hostname>` (e.g., `_mongodb._tcp.121`) happens because the `<hostname>` part of your `MONGODB_URI` is incorrect in your `.env` file. Ensure the part after `@` and before `/` is the correct Atlas cluster address (e.g., `goldsmithconnect.01ffnmh.mongodb.net`) and NOT just a number or an incomplete address like `121`.
+    *   **CRITICAL:** The most common error `querySrv ENOTFOUND _mongodb._tcp.<hostname>` (e.g., `_mongodb._tcp.121`) happens because the `<hostname>` part of your `MONGODB_URI` is incorrect in your `.env` file. Ensure the part after `@` and before `/` is the correct Atlas cluster address (e.g., `goldsmithconnect.01ffnmh.mongodb.net`) and NOT just a number or an incomplete address like `121`. The `_mongodb._tcp.121` in the error strongly suggests your hostname is being misinterpreted as `121`.
     *   Check your `src/lib/mongodb.ts` file logs (when the server starts) for the `Full MONGODB_URI being used:` message to see exactly what URI your application is using.
 
 6.  **Restart Your Application:**
@@ -123,15 +123,18 @@ The application is now built to fetch metal prices from GoldAPI.io on a schedule
     *   SSH into your EC2 instance.
     *   Open the cron table for editing by running the command: `crontab -e`.
         *   If it's your first time, it might ask you to choose a text editor. `nano` is usually the easiest choice (press Enter to select it).
-    *   **CRITICAL:** Carefully copy the **entire block** of text below. Each job is a single line. Paste it at the bottom of the file that opens.
+    *   **CRITICAL INSTRUCTIONS:**
+        *   Go to the very bottom of the file that opens.
+        *   You are going to add **three new lines** to this file.
+        *   **DO NOT** copy the text `'''crontab` or `'''` from anywhere. Those are for documentation formatting only.
+        *   Copy the lines below, paste them into the file, and then **replace `YOUR_CRON_SECRET`** with the actual secret string you created in your `.env` file. Be very careful not to add or delete any other characters or spaces.
 
-        ```crontab
+        ```
 # Fetch metal prices at 10 AM, 3 PM, and 8 PM (server time)
 0 10 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
 0 15 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
 0 20 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
 ```
-    *   **CRITICAL:** In the lines you just pasted, **replace `YOUR_CRON_SECRET`** with the actual secret string you created in your `.env` file. Be very careful not to add or delete any other characters or spaces.
     *   Save and exit the editor.
         *   In `nano`, press `Ctrl+X`.
         *   It will ask if you want to save. Press `Y`.
