@@ -47,12 +47,12 @@ export default function GoldsmithPortalPage() {
             </div>
             <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-xl shadow-2xl group border-2 border-primary/20">
               <Image
-                src="https://images.unsplash.com/photo-1596548405158-809386f68048?q=80&w=800&auto=format&fit=crop"
+                src="https://images.unsplash.com/photo-1611652022417-a55445a43320?q=80&w=800&auto=format&fit=crop"
                 alt="Goldsmith crafting jewelry"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, 600px"
-                data-ai-hint="goldsmith crafting jewelry"
+                data-ai-hint="goldsmith working"
               />
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-transparent via-black/5 to-black/20 pointer-events-none group-hover:bg-black/5 transition-colors"></div>
             </div>

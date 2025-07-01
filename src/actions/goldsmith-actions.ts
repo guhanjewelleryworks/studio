@@ -154,9 +154,9 @@ export async function fetchLatestGoldsmiths(limit: number = 5): Promise<Goldsmit
   try {
     const collection = await getGoldsmithsCollection();
     const goldsmithsCursor = collection.find({}).sort({ registeredAt: -1 }).limit(limit);
-    const customersArray: WithId<Goldsmith>[] = await customersCursor.toArray();
-    console.log(`[Action: fetchLatestGoldsmiths] Found ${customersArray.length} goldsmiths.`);
-    return customersArray.map(g => {
+    const goldsmithsArray: WithId<Goldsmith>[] = await goldsmithsCursor.toArray();
+    console.log(`[Action: fetchLatestGoldsmiths] Found ${goldsmithsArray.length} goldsmiths.`);
+    return goldsmithsArray.map(g => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, password, ...rest } = g;
       return rest as Goldsmith;
@@ -631,3 +631,4 @@ export async function fetchOrdersForGoldsmith(goldsmithId: string, status?: Orde
     return [];
   }
 }
+
