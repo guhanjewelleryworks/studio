@@ -31,7 +31,6 @@ export async function fetchAndStoreLiveMetalPrices() {
             return fetch(apiUrl, { headers: { 'x-access-token': apiKey }, next: { revalidate: 0 } })
                 .then(response => {
                     if (!response.ok) {
-                        // Try to parse error json, but don't fail if it's not json
                         return response.json().then(err => {
                            console.error(`[PriceAction V5] GoldAPI error for ${metal.symbol}:`, response.status, err);
                            return Promise.reject({ metal: metal.symbol, status: response.status, body: err });
@@ -42,12 +41,13 @@ export async function fetchAndStoreLiveMetalPrices() {
                     }
                     return response.json();
                 })
-                .then(data => ({ ...data, metalConfig: metal })); // Pass metal config along
+                .then(data => ({ ...data, metalConfig: metal }));
         });
 
         const results = await Promise.allSettled(pricePromises);
         
         const operations = [];
+        const errors: string[] = [];
         const now = new Date();
 
         results.forEach(result => {
@@ -60,7 +60,7 @@ export async function fetchAndStoreLiveMetalPrices() {
                     const priceDoc: Omit<StoredMetalPrice, '_id'> = {
                         symbol: metalConfig.symbol,
                         name: metalConfig.name,
-                        price: pricePerGram * 10, // Convert to price per 10g
+                        price: pricePerGram * 10,
                         currency: currency,
                         changePercent: data[metalConfig.changeKey] ?? 0,
                         updatedAt: now,
@@ -74,22 +74,32 @@ export async function fetchAndStoreLiveMetalPrices() {
                     });
                     console.log(`[PriceAction V5] Successfully processed price for ${metalConfig.symbol}: ${pricePerGram}`);
                 } else {
-                    console.warn(`[PriceAction V5] Price key '${metalConfig.priceKey}' not found in response for ${metalConfig.symbol}. Response keys:`, Object.keys(data));
+                    const errorMsg = `Price key '${metalConfig.priceKey}' not found in API response for ${metalConfig.symbol}.`;
+                    console.warn(`[PriceAction V5] ${errorMsg} Response keys:`, Object.keys(data));
+                    errors.push(errorMsg);
                 }
             } else {
-                // Log rejected promises from Promise.allSettled
-                console.error(`[PriceAction V5] Failed to fetch data for metal. Reason:`, result.reason);
+                const errorMsg = `Failed to fetch data for metal. Reason: ${JSON.stringify(result.reason)}`;
+                console.error(`[PriceAction V5] ${errorMsg}`);
+                errors.push(errorMsg);
             }
         });
         
         if (operations.length > 0) {
             const collection = await getMetalPricesCollection();
             await collection.bulkWrite(operations);
-            console.log(`[PriceAction V5] Successfully stored ${operations.length} metal prices.`);
-            return { success: true, message: `Updated ${operations.length} prices.` };
+            const successMessage = `Updated ${operations.length} prices.`;
+            console.log(`[PriceAction V5] ${successMessage}`);
+
+            if (errors.length > 0) {
+                return { success: true, message: successMessage, warning: `However, failed to process ${errors.length} metals. Errors: ${errors.join('; ')}` };
+            }
+            
+            return { success: true, message: successMessage };
         } else {
-            console.warn("[PriceAction V5] No valid price data was processed from any API call.");
-            return { success: false, error: "No valid price data received from API." };
+            const finalError = `No valid price data was processed from any API call. Errors: ${errors.join('; ')}`;
+            console.warn("[PriceAction V5] " + finalError);
+            return { success: false, error: finalError };
         }
 
     } catch (error) {

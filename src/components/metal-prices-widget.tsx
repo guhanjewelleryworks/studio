@@ -76,29 +76,30 @@ export const MetalPricesWidget: React.FC = () => {
     };
     
     const calculateNextUpdate = () => {
-        // Corrected schedule: 10:30, 15:30, 20:30 IST correspond to 5:00, 10:00, 15:00 UTC
-        const scheduleUTC = [5, 10, 15]; 
+        // Schedule in UTC: [hour, minute]. 5:00 UTC -> 10:30 IST, etc.
+        const scheduleUTC: [number, number][] = [[5, 0], [10, 0], [15, 0]]; 
         const now = new Date();
-        const currentUTCHour = now.getUTCHours() + now.getUTCMinutes() / 60;
-    
-        let nextUpdateUTCHour = scheduleUTC.find(time => time > currentUTCHour);
-        
+        const currentUTCHour = now.getUTCHours();
+        const currentUTCMinute = now.getUTCMinutes();
+
+        let nextUpdate = scheduleUTC.find(([hour, minute]) => {
+            if (hour > currentUTCHour) return true;
+            if (hour === currentUTCHour && minute > currentUTCMinute) return true;
+            return false;
+        });
+
         const nextUpdateDate = new Date();
         nextUpdateDate.setSeconds(0, 0);
-    
-        if (nextUpdateUTCHour !== undefined) {
-          // Next update is today
-          const hours = Math.floor(nextUpdateUTCHour);
-          const minutes = Math.round((nextUpdateUTCHour - hours) * 60);
-          nextUpdateDate.setUTCHours(hours, minutes);
+        
+        if (nextUpdate) {
+            // Next update is today
+            nextUpdateDate.setUTCHours(nextUpdate[0], nextUpdate[1]);
         } else {
-          // Next update is tomorrow, first slot
-          nextUpdateDate.setUTCDate(now.getUTCDate() + 1);
-          const hours = Math.floor(scheduleUTC[0]);
-          const minutes = Math.round((scheduleUTC[0] - hours) * 60);
-          nextUpdateDate.setUTCHours(hours, minutes);
+            // Next update is tomorrow, first slot
+            nextUpdateDate.setUTCDate(now.getUTCDate() + 1);
+            nextUpdateDate.setUTCHours(scheduleUTC[0][0], scheduleUTC[0][1]);
         }
-    
+        
         const nextUpdateIST = nextUpdateDate.toLocaleTimeString('en-IN', {
             hour: 'numeric',
             minute: '2-digit',
