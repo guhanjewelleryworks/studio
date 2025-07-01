@@ -52,10 +52,15 @@ export const MetalPricesWidget: React.FC = () => {
 
             // Set the last updated time from the first record (they should all be the same)
             const date = new Date(storedPrices[0].updatedAt);
-            const timeOptions: Intl.DateTimeFormatOptions = {
-              hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata',
+            const dateTimeOptions: Intl.DateTimeFormatOptions = {
+              day: 'numeric',
+              month: 'short',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true,
+              timeZone: 'Asia/Kolkata',
             };
-            setLastUpdated(`Prices as of ${date.toLocaleTimeString('en-IN', timeOptions)} IST`);
+            setLastUpdated(`As of ${date.toLocaleString('en-IN', dateTimeOptions)} IST`);
         } else {
           // If no prices are in the DB, show a message
           setLastUpdated("Price data not yet available.");
