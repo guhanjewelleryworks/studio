@@ -42,7 +42,7 @@ export const MetalPricesWidget: React.FC = () => {
             const formatted = storedPrices.map(p => {
               const changeValue = p.changePercent;
               return {
-                name: p.name,
+                name: p.name.replace('24K', '22K'),
                 price: `₹${p.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/10g`,
                 change: `${changeValue >= 0 ? '+' : ''}${changeValue.toFixed(2)}%`,
                 changeType: changeValue > 0.05 ? 'up' : changeValue < -0.05 ? 'down' : 'neutral',
@@ -76,8 +76,8 @@ export const MetalPricesWidget: React.FC = () => {
     };
     
     const calculateNextUpdate = () => {
-        // Schedule in UTC: [hour, minute]. 5:00 UTC -> 10:30 IST, etc.
-        const scheduleUTC: [number, number][] = [[5, 0], [10, 0], [15, 0]]; 
+        // Schedule in UTC: [hour, minute]. 5:30 UTC -> 11:00 AM IST, etc.
+        const scheduleUTC: [number, number][] = [[5, 30], [10, 30], [15, 30]]; 
         const now = new Date();
         const currentUTCHour = now.getUTCHours();
         const currentUTCMinute = now.getUTCMinutes();
