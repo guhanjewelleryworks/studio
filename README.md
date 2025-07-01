@@ -118,9 +118,9 @@ The application fetches metal prices from GoldAPI.io on a schedule. This require
 
     ```
 # Fetch prices at 10:30AM, 3:30PM, 8:30PM IST (server is in UTC)
-30 5 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
-30 10 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
-30 15 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
+0 5 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
+0 10 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
+0 15 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
 ```
 4.  **Save and Exit:**
     *   In `nano`, press `Ctrl+X`, then `Y`, then `Enter`.

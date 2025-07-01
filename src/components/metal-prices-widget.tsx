@@ -76,8 +76,8 @@ export const MetalPricesWidget: React.FC = () => {
     };
     
     const calculateNextUpdate = () => {
-        // Schedule in UTC: [hour, minute]. 5:30 UTC -> 11:00 AM IST, etc.
-        const scheduleUTC: [number, number][] = [[5, 30], [10, 30], [15, 30]]; 
+        // Schedule in UTC: 10:30 AM IST -> 05:00 UTC, 3:30 PM IST -> 10:00 UTC, 8:30 PM IST -> 15:00 UTC
+        const scheduleUTC: [number, number][] = [[5, 0], [10, 0], [15, 0]]; 
         const now = new Date();
         const currentUTCHour = now.getUTCHours();
         const currentUTCMinute = now.getUTCMinutes();
