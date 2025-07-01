@@ -243,6 +243,21 @@ export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Gold
 export async function saveOrderRequest(data: NewOrderRequestInput): Promise<{ success: boolean; error?: string; data?: OrderRequest }> {
   console.log('[Action: saveOrderRequest] Received data:', JSON.stringify(data));
   try {
+    // --- SERVER-SIDE VALIDATION ---
+    if (!data.customerId || !data.customerName || !data.customerEmail) {
+        console.error('[Action: saveOrderRequest] Validation failed: Customer ID, name, and email are required.');
+        return { success: false, error: 'A logged-in customer is required to place an order.' };
+    }
+    if (!data.goldsmithId) {
+        console.error('[Action: saveOrderRequest] Validation failed: Goldsmith ID is required.');
+        return { success: false, error: 'A goldsmith must be specified for the order.' };
+    }
+    if (!data.details || !data.referenceImage) {
+        console.error('[Action: saveOrderRequest] Validation failed: Details and a reference image are required.');
+        return { success: false, error: 'Order details and a reference image are required.' };
+    }
+    // --- END VALIDATION ---
+
     const collection = await getOrderRequestsCollection();
     const newOrderRequest: OrderRequest = {
       ...data,
