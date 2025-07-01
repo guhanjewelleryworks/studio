@@ -47,7 +47,7 @@ export default function GoldsmithPortalPage() {
             </div>
             <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-xl shadow-2xl group border-2 border-primary/20">
               <Image
-                src="/images/my-hero-image.png"
+                src="/images/goldsmith_crafting.png"
                 alt="Goldsmith crafting jewelry"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
