@@ -15,10 +15,12 @@ export async function fetchAndStoreLiveMetalPrices() {
         return { success: false, error: "API key not configured on server." };
     }
 
-    const metals = 'XAU-XAG-XPT'; // Gold, Silver, Platinum
+    const metals = 'XAU-XAG-XPT'; // Corrected with hyphens
     const currency = 'INR';
     const apiUrl = `https://www.goldapi.io/api/${metals}/${currency}`;
-    console.log(`[PriceAction] Fetching live prices from GoldAPI for symbols: ${metals}`); // Updated log message
+    
+    // This new log is the most important one for debugging.
+    console.log(`[PriceAction] Attempting to fetch URL: ${apiUrl}`); 
 
     try {
         const response = await fetch(apiUrl, {
@@ -26,14 +28,13 @@ export async function fetchAndStoreLiveMetalPrices() {
             next: { revalidate: 0 } // Ensure fresh data is fetched every time
         });
 
-        if (!response.ok) {
-            const errorBody = await response.json().catch(() => ({ error: 'Failed to parse error response from GoldAPI' }));
-            console.error('[PriceAction] GoldAPI responded with an error:', response.status, errorBody);
-            throw new Error(`GoldAPI error: ${errorBody.error || response.statusText}`);
-        }
-
         const data = await response.json();
         console.log('[PriceAction] Received data from GoldAPI:', JSON.stringify(data, null, 2));
+
+        if (!response.ok) {
+            console.error('[PriceAction] GoldAPI responded with an error:', response.status, data);
+            throw new Error(`GoldAPI error: ${data.error || response.statusText}`);
+        }
         
         const collection = await getMetalPricesCollection();
         const now = new Date();
