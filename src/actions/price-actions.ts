@@ -19,8 +19,8 @@ export async function fetchAndStoreLiveMetalPrices() {
     const currency = 'INR';
     const apiUrl = `https://www.goldapi.io/api/${metals}/${currency}`;
     
-    // This new log is the most important one for debugging.
-    console.log(`[PriceAction] Attempting to fetch URL: ${apiUrl}`); 
+    // **NEW DEBUG LOG V3**
+    console.log(`[PriceAction V3] Attempting to fetch URL with hyphens: ${apiUrl}`); 
 
     try {
         const response = await fetch(apiUrl, {
