@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { MapPin, List, Search, Star, Loader2, SlidersHorizontal, Palette } from 'lucide-react';
+import { MapPin, List, Search, Star, Loader2, SlidersHorizontal, Palette, ShieldCheck } from 'lucide-react';
 import { Link as LinkIcon } from 'lucide-react';
 import Image from 'next/image';
 import NextLink from 'next/link';
@@ -277,7 +277,12 @@ export default function DiscoverPage() {
                 </CardHeader>
                 <CardContent className="p-3 flex-grow flex flex-col justify-between">
                   <div>
-                    <CardTitle className="font-heading text-md text-accent mb-0.5 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
+                    <CardTitle className="font-heading text-md text-accent mb-0.5 group-hover:text-primary transition-colors flex items-center gap-1.5">
+                      {goldsmith.name}
+                      {goldsmith.status === 'verified' && (
+                        <ShieldCheck className="h-4 w-4 text-green-500" title="Verified Goldsmith" />
+                      )}
+                    </CardTitle>
                     <CardDescription className="text-xs text-muted-foreground mb-0.5 line-clamp-1">
                       <MapPin className="inline-block h-3 w-3 mr-0.5" /> {goldsmith.district}, {goldsmith.state}
                     </CardDescription>

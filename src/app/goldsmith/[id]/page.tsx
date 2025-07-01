@@ -237,7 +237,15 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                 <AvatarImage src={profile.profileImageUrl} alt={profile.name} data-ai-hint="artisan portrait" />
                 <AvatarFallback className="text-3xl bg-primary/20 text-primary-foreground font-poppins">{profile.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              <CardTitle className="text-xl font-heading text-accent">{profile.name}</CardTitle>
+              <div className="flex items-center justify-center gap-2">
+                <CardTitle className="text-xl font-heading text-accent">{profile.name}</CardTitle>
+                {profile.status === 'verified' && (
+                  <Badge variant="default" className="bg-green-100 text-green-800 border border-green-200 hover:bg-green-200 text-xs px-2 py-0.5 font-medium">
+                    <ShieldCheck className="h-3 w-3 mr-1" />
+                    Verified
+                  </Badge>
+                )}
+              </div>
               {profile.tagline && <p className="text-xs text-primary font-medium font-poppins mt-0.5">{profile.tagline}</p>}
               <div className="flex items-center text-amber-500 mt-1">
                 <Star className="h-3.5 w-3.5 mr-1 fill-current text-yellow-400" /> <span className="text-xs text-foreground font-poppins">{profile.rating > 0 ? profile.rating.toFixed(1) : 'New'}</span>
