@@ -18,7 +18,7 @@ export async function fetchAndStoreLiveMetalPrices() {
 
     // CORRECTED: The change key is 'chp' for all single-metal API responses.
     const metalsToFetch = [
-        { symbol: 'XAU' as const, name: 'Gold (24K)', priceKey: 'price_gram_24k', changeKey: 'chp' },
+        { symbol: 'XAU' as const, name: 'Gold (22K)', priceKey: 'price_gram_22k', changeKey: 'chp' },
         { symbol: 'XAG' as const, name: 'Silver', priceKey: 'price_gram_silver', changeKey: 'chp' },
         { symbol: 'XPT' as const, name: 'Platinum', priceKey: 'price_gram_platinum', changeKey: 'chp' },
     ];
