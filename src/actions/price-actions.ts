@@ -15,7 +15,7 @@ export async function fetchAndStoreLiveMetalPrices() {
         return { success: false, error: "API key not configured on server." };
     }
 
-    const metals = 'XAU,XAG,XPT'; // Gold, Silver, Platinum
+    const metals = 'XAU-XAG-XPT'; // Gold, Silver, Platinum (Corrected separator to hyphen)
     const currency = 'INR';
     const apiUrl = `https://www.goldapi.io/api/${metals}/${currency}`;
     console.log(`[PriceAction] Fetching live prices from GoldAPI for ${metals}`);
