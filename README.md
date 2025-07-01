@@ -113,25 +113,59 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
 The application is now built to fetch metal prices from GoldAPI.io on a schedule to conserve API requests.
 
 1.  **Get a GoldAPI.io Key:** Sign up for an account at [GoldAPI.io](https://goldapi.io/) and get your API key.
-2.  **Set Environment Variables:** Add your API key and a secret string to your `.env` file. The `CRON_SECRET` protects your update endpoint from being called by unauthorized users.
+2.  **Set Environment Variables:** Add your API key and a secret string to your `.env` file. The `CRON_SECRET` protects your update endpoint from being called by unauthorized users. You invent this secret yourself—it should be a long, random string.
     ```env
     METALS_API_KEY="your_goldapi_io_key_here"
     CRON_SECRET="generate_a_very_long_and_random_secret_string"
     ```
-3.  **Set up a Cron Job:** You need to set up a scheduled task on your server (e.g., your EC2 instance) to call the protected API endpoint at your desired times. This will trigger the price update.
+3.  **Set up a Cron Job:** You need to set up a scheduled task (a "cron job") on your server to call the protected API endpoint. This will trigger the price update.
+
     *   SSH into your EC2 instance.
-    *   Open the cron table for editing: `crontab -e`
-    *   Add lines to schedule the price updates. For example, to run at 10 AM, 3 PM, and 8 PM every day:
+    *   Open the cron table for editing: `crontab -e`. If it's your first time, it might ask you to choose a text editor (like `nano`).
+    *   Add lines to the file to schedule the price updates. For example, to run at 10 AM, 3 PM, and 8 PM every day:
         ```crontab
-        # Fetch metal prices at 10 AM, 3 PM, and 8 PM IST (adjust for your server's timezone)
+        # Fetch metal prices at 10 AM, 3 PM, and 8 PM (server time)
         0 10 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
         0 15 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
         0 20 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
         ```
-    *   **IMPORTANT:**
-        *   Replace `YOUR_CRON_SECRET` with the actual secret string you put in your `.env` file.
-        *   Ensure your Next.js application is running on port 3000 (as handled by Nginx).
-        *   Cron jobs run based on the server's system time. You may need to adjust the hours based on your server's timezone (e.g., if it's set to UTC). Use the `date` command on your EC2 instance to check its current time and timezone.
+    *   Save and exit the editor (in `nano`, press `Ctrl+X`, then `Y`, then `Enter`).
+
+### Understanding the Cron Job Command
+
+Each line you added is a separate job. Let's break down one of them:
+
+`0 10 * * * curl ...`
+
+**The Schedule Part: `0 10 * * *`**
+
+This part tells the server *when* to run the command. It's read from left to right:
+
+*   `0`: **Minute** (0-59). This runs at the 0th minute.
+*   `10`: **Hour** (0-23). This runs at the 10th hour (10 AM in 24-hour format).
+*   `*`: **Day of the Month** (1-31). The `*` means "every day".
+*   `*`: **Month** (1-12). The `*` means "every month".
+*   `*`: **Day of the Week** (0-6, where 0 is Sunday). The `*` means "every day of the week".
+
+So, `0 10 * * *` means "run this command at 10:00 AM, every single day."
+
+**The Command Part: `curl ...`**
+
+This is *what* the server does when the schedule matches.
+
+*   `curl`: A simple command-line tool for making web requests. Think of it as a web browser in your terminal.
+*   `-X GET`: Tells `curl` to make a GET request.
+*   `-H "Authorization: Bearer YOUR_CRON_SECRET"`: This is a crucial security step. It sends a "Header" along with the request. Our API endpoint will check for this header and the secret key to make sure the request is authorized.
+    *   **IMPORTANT:** You must replace `YOUR_CRON_SECRET` with the exact same secret string you created in your `.env` file.
+*   `http://localhost:3000/api/update-prices`: This is the URL it visits. Because the cron job is running on the *same server* as your Next.js app (which is running on port 3000), it can use `localhost` to talk to it.
+
+### Verifying Server Timezone
+
+Cron jobs use the server's system clock. Your EC2 instance might be set to a different timezone (like UTC) than your local time.
+
+*   SSH into your EC2 instance.
+*   Run the command `date`. It will show you the current time and timezone (e.g., `UTC`, `IST`).
+*   Adjust the hours in your `crontab -e` file accordingly. For example, if your server is in UTC and you want to run the job at 10 AM IST (which is UTC+5:30), you would set the hour to `4` (for 4:30 AM UTC, which is close enough).
 
 ## Building for Production
 
