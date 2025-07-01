@@ -15,10 +15,10 @@ export async function fetchAndStoreLiveMetalPrices() {
         return { success: false, error: "API key not configured on server." };
     }
 
-    const metals = 'XAU-XAG-XPT'; // Gold, Silver, Platinum (Corrected separator to hyphen)
+    const metals = 'XAU-XAG-XPT'; // Gold, Silver, Platinum
     const currency = 'INR';
     const apiUrl = `https://www.goldapi.io/api/${metals}/${currency}`;
-    console.log(`[PriceAction] Fetching live prices from GoldAPI for ${metals}`);
+    console.log(`[PriceAction] Fetching live prices from GoldAPI for symbols: ${metals}`); // Updated log message
 
     try {
         const response = await fetch(apiUrl, {
@@ -33,14 +33,11 @@ export async function fetchAndStoreLiveMetalPrices() {
         }
 
         const data = await response.json();
-        // --- DEBUG LOGGING ADDED ---
         console.log('[PriceAction] Received data from GoldAPI:', JSON.stringify(data, null, 2));
-        // --- END DEBUG LOGGING ---
         
         const collection = await getMetalPricesCollection();
         const now = new Date();
 
-        // Use a bulk write operation for efficiency
         const operations = [];
 
         if (data.price_gram_24k) {
@@ -101,17 +98,15 @@ export async function getLatestStoredPrices(): Promise<StoredMetalPrice[]> {
   try {
     const collection = await getMetalPricesCollection();
     
-    // Using an aggregation pipeline to get the latest document for each symbol
     const prices = await collection.aggregate([
-      { $sort: { updatedAt: -1 } }, // Sort by date descending
+      { $sort: { updatedAt: -1 } }, 
       { $group: { 
-          _id: "$symbol", // Group by metal symbol
-          latest: { $first: "$$ROOT" } // Get the first document in each group (which is the latest)
+          _id: "$symbol", 
+          latest: { $first: "$$ROOT" }
       }},
-      { $replaceRoot: { newRoot: "$latest" } } // Promote the latest document to the root
+      { $replaceRoot: { newRoot: "$latest" } }
     ]).toArray();
 
-    // Map to ensure the correct type is returned and sort consistently
     const typedPrices = prices as StoredMetalPrice[];
     const symbolOrder = ['XAU', 'XAG', 'XPT'];
     return typedPrices.sort((a, b) => symbolOrder.indexOf(a.symbol) - symbolOrder.indexOf(b.symbol));
