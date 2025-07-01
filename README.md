@@ -69,7 +69,9 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
     *   If your application is running, restart it to pick up the new environment variable.
     *   If using PM2 on EC2, use `pm2 restart <your_app_name> --update-env`.
 
-## Troubleshooting MongoDB Connection Errors
+## Troubleshooting
+
+### MongoDB Connection Errors
 
 *   **`querySrv ENOTFOUND _mongodb._tcp.<hostname>` (e.g., `_mongodb._tcp.121`) or `failed to connect to server ... on first connect`**:
     1.  **VERIFY `MONGODB_URI` in `.env` (Most Common Cause):**
@@ -93,6 +95,18 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
     2.  **MongoDB Atlas TLS Settings:** In Atlas, under Security > TLS/SSL Configuration, ensure TLS 1.2 or higher is enabled.
     3.  **Network Security:** Confirm firewalls or proxies aren't interfering with TLS/SSL traffic.
     4.  **System Time:** Ensure your server's system time is accurate, as large discrepancies can cause SSL handshake failures.
+
+### Production UI/Styling Issues
+*   **Problem: The application appears unstyled or broken (missing CSS, icons, etc.) after deploying.**
+    *   **Cause:** This is almost always caused by running the application in **development mode** (`npm run dev`) instead of **production mode** (`npm run build` and `npm start`). The Next.js development server is not optimized for production, is not stable for long periods, and can fail to serve critical CSS and JavaScript files, leading to a broken UI.
+    *   **Solution:**
+        1.  SSH into your EC2 instance.
+        2.  Navigate to your project directory (e.g., `cd /home/ubuntu/goldsmith-connect`).
+        3.  Stop any running development server process: `pm2 stop all && pm2 delete all`.
+        4.  Ensure you have a fresh production build: `npm run build`.
+        5.  Start the application using the correct production command: `pm2 start npm --name "goldsmith-connect" -- start`.
+        6.  Save the process list so it restarts on reboot: `pm2 save`.
+        7.  Verify the status with `pm2 list` to ensure the "goldsmith-connect" process is `online` and the script path points to `npm start`.
 
 ## Configuring Real-Time Metal Prices
 
