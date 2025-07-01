@@ -54,6 +54,9 @@ export async function fetchAndStoreLiveMetalPrices() {
             if (result.status === 'fulfilled') {
                 const data = result.value;
                 const metalConfig = data.metalConfig;
+                // NEW: Log the entire successful response body for debugging
+                console.log(`[PriceAction V5] Successful response for ${metalConfig.symbol}:`, JSON.stringify(data));
+                
                 const pricePerGram = data[metalConfig.priceKey];
                 
                 if (pricePerGram !== undefined && pricePerGram !== null) {
