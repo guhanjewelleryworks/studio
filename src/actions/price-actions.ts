@@ -11,7 +11,7 @@ import type { StoredMetalPrice } from '@/types/goldsmith';
 export async function fetchAndStoreLiveMetalPrices() {
     const apiKey = process.env.METALS_API_KEY;
     if (!apiKey) {
-        console.error("[PriceAction V5] CRITICAL: METALS_API_KEY is not set. Cannot fetch live prices.");
+        console.error("[PriceAction V5.1] CRITICAL: METALS_API_KEY is not set. Cannot fetch live prices.");
         return { success: false, error: "API key not configured on server." };
     }
 
@@ -22,20 +22,20 @@ export async function fetchAndStoreLiveMetalPrices() {
     ];
     const currency = 'INR';
 
-    console.log("[PriceAction V5] Starting to fetch prices for multiple metals individually.");
+    console.log("[PriceAction V5.1] Starting to fetch prices for multiple metals individually.");
 
     try {
         const pricePromises = metalsToFetch.map(metal => {
             const apiUrl = `https://www.goldapi.io/api/${metal.symbol}/${currency}`;
-            console.log(`[PriceAction V5] Preparing to fetch URL: ${apiUrl}`);
+            console.log(`[PriceAction V5.1] Preparing to fetch URL: ${apiUrl}`);
             return fetch(apiUrl, { headers: { 'x-access-token': apiKey }, next: { revalidate: 0 } })
                 .then(response => {
                     if (!response.ok) {
                         return response.json().then(err => {
-                           console.error(`[PriceAction V5] GoldAPI error for ${metal.symbol}:`, response.status, err);
+                           console.error(`[PriceAction V5.1] GoldAPI error for ${metal.symbol}:`, response.status, err);
                            return Promise.reject({ metal: metal.symbol, status: response.status, body: err });
                         }).catch(() => {
-                           console.error(`[PriceAction V5] GoldAPI non-JSON error for ${metal.symbol}:`, response.status, response.statusText);
+                           console.error(`[PriceAction V5.1] GoldAPI non-JSON error for ${metal.symbol}:`, response.status, response.statusText);
                            return Promise.reject({ metal: metal.symbol, status: response.status, body: { error: response.statusText } });
                         });
                     }
@@ -55,7 +55,7 @@ export async function fetchAndStoreLiveMetalPrices() {
                 const data = result.value;
                 const metalConfig = data.metalConfig;
                 // NEW: Log the entire successful response body for debugging
-                console.log(`[PriceAction V5] Successful response for ${metalConfig.symbol}:`, JSON.stringify(data));
+                console.log(`[PriceAction V5.1] Successful response for ${metalConfig.symbol}:`, JSON.stringify(data));
                 
                 const pricePerGram = data[metalConfig.priceKey];
                 
@@ -75,15 +75,15 @@ export async function fetchAndStoreLiveMetalPrices() {
                             upsert: true
                         }
                     });
-                    console.log(`[PriceAction V5] Successfully processed price for ${metalConfig.symbol}: ${pricePerGram}`);
+                    console.log(`[PriceAction V5.1] Successfully processed price for ${metalConfig.symbol}: ${pricePerGram}`);
                 } else {
                     const errorMsg = `Price key '${metalConfig.priceKey}' not found in API response for ${metalConfig.symbol}.`;
-                    console.warn(`[PriceAction V5] ${errorMsg} Response keys:`, Object.keys(data));
+                    console.warn(`[PriceAction V5.1] ${errorMsg} Response keys:`, Object.keys(data));
                     errors.push(errorMsg);
                 }
             } else {
                 const errorMsg = `Failed to fetch data for metal. Reason: ${JSON.stringify(result.reason)}`;
-                console.error(`[PriceAction V5] ${errorMsg}`);
+                console.error(`[PriceAction V5.1] ${errorMsg}`);
                 errors.push(errorMsg);
             }
         });
@@ -92,7 +92,7 @@ export async function fetchAndStoreLiveMetalPrices() {
             const collection = await getMetalPricesCollection();
             await collection.bulkWrite(operations);
             const successMessage = `Updated ${operations.length} prices.`;
-            console.log(`[PriceAction V5] ${successMessage}`);
+            console.log(`[PriceAction V5.1] ${successMessage}`);
 
             if (errors.length > 0) {
                 return { success: true, message: successMessage, warning: `However, failed to process ${errors.length} metals. Errors: ${errors.join('; ')}` };
@@ -101,12 +101,12 @@ export async function fetchAndStoreLiveMetalPrices() {
             return { success: true, message: successMessage };
         } else {
             const finalError = `No valid price data was processed from any API call. Errors: ${errors.join('; ')}`;
-            console.warn("[PriceAction V5] " + finalError);
+            console.warn("[PriceAction V5.1] " + finalError);
             return { success: false, error: finalError };
         }
 
     } catch (error) {
-        console.error("[PriceAction V5] A critical error occurred during the fetch process:", error);
+        console.error("[PriceAction V5.1] A critical error occurred during the fetch process:", error);
         return { success: false, error: (error as Error).message };
     }
 }
