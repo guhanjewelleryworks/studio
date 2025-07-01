@@ -115,3 +115,14 @@ export interface Customer {
 }
 
 export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'registeredAt' | 'lastLoginAt'>;
+
+// --- New Type for Stored Metal Prices ---
+export interface StoredMetalPrice {
+  _id?: ObjectId | string;
+  symbol: 'XAU' | 'XAG' | 'XPT'; // Gold, Silver, Platinum
+  name: string;
+  price: number; // Stored as number for calculations (e.g., price per 10g)
+  currency: string; // e.g., 'INR'
+  changePercent: number; // The percentage change
+  updatedAt: Date;
+}

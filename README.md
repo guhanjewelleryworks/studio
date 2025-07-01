@@ -22,18 +22,17 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
 
         **Example for `.env` file:**
         ```env
+        # Required for Database connection
         MONGODB_URI="mongodb+srv://guhanjewelleryworks:YOUR_MONGODB_PASSWORD_HERE@goldsmithconnect.01ffnmh.mongodb.net/goldsmithconnect?retryWrites=true&w=majority&appName=goldsmithconnect"
-        ```
-        **Ensure there are no typos, extra characters, or missing parts in this string.** An incorrect URI is the most common cause of connection errors.
 
-    *   If using Genkit features, add your Google Generative AI API key:
-        ```env
+        # Required for real-time metal prices via scheduled job
+        METALS_API_KEY="YOUR_GOLDAPI_IO_KEY_HERE"
+        CRON_SECRET="GENERATE_A_VERY_LONG_AND_RANDOM_SECRET_STRING_HERE"
+        
+        # Optional: Required if using Genkit AI features
         GOOGLE_GENAI_API_KEY=YOUR_API_KEY_HERE
         ```
-    *   For real-time metal prices, add your chosen API provider's key:
-        ```env
-        NEXT_PUBLIC_METALS_API_KEY=YOUR_METALS_API_KEY_HERE
-        ```
+        **Ensure there are no typos, extra characters, or missing parts in the `MONGODB_URI` string.** An incorrect URI is the most common cause of connection errors.
 
 3.  **Run Development Server:**
     ```bash
@@ -64,6 +63,7 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
 5.  **Set the `MONGODB_URI` Environment Variable:**
     *   In your project's `.env` file, add the **exact** connection string copied from Atlas, replacing `<password>` with your actual database user password. See the "Environment Variables" section above for an example.
     *   **CRITICAL:** The most common error `querySrv ENOTFOUND _mongodb._tcp.<hostname>` (e.g., `_mongodb._tcp.121`) happens because the `<hostname>` part of your `MONGODB_URI` is incorrect in your `.env` file. Ensure the part after `@` and before `/` is the correct Atlas cluster address (e.g., `goldsmithconnect.01ffnmh.mongodb.net`) and NOT just a number or an incomplete address like `121`.
+    *   Check your `src/lib/mongodb.ts` file logs (when the server starts) for the `Full MONGODB_URI being used:` message to see exactly what URI your application is using.
 
 6.  **Restart Your Application:**
     *   If your application is running, restart it to pick up the new environment variable.
@@ -108,20 +108,30 @@ To connect your application to a live MongoDB database (e.g., MongoDB Atlas):
         6.  Save the process list so it restarts on reboot: `pm2 save`.
         7.  Verify the status with `pm2 list` to ensure the "goldsmith-connect" process is `online` and the script path points to `npm start`.
 
-## Configuring Real-Time Metal Prices
+## Configuring Real-Time Metal Prices (Scheduled Fetch)
 
-The metal prices widget (`src/components/metal-prices-widget.tsx`) is set up to use simulated data by default. To display live, accurate prices:
+The application is now built to fetch metal prices from GoldAPI.io on a schedule to conserve API requests.
 
-1.  **Choose an API Provider:** Select a precious metals API provider that offers data for Gold, Silver, and Platinum in INR, preferably with data for the Bangalore market. Examples include MetalDev API, GoldAPI.io, or other financial data providers.
-2.  **Obtain an API Key:** Sign up for the chosen service and get your API key.
-3.  **Set Environment Variable:** Add your API key to the `.env` file in your project root:
+1.  **Get a GoldAPI.io Key:** Sign up for an account at [GoldAPI.io](https://goldapi.io/) and get your API key.
+2.  **Set Environment Variables:** Add your API key and a secret string to your `.env` file. The `CRON_SECRET` protects your update endpoint from being called by unauthorized users.
     ```env
-    NEXT_PUBLIC_METALS_API_KEY=YOUR_ACTUAL_API_KEY_HERE
+    METALS_API_KEY="your_goldapi_io_key_here"
+    CRON_SECRET="generate_a_very_long_and_random_secret_string"
     ```
-4.  **Update the Widget:** Modify the `fetchMetalsData` function in `src/components/metal-prices-widget.tsx`.
-    *   Uncomment the example `fetch` call.
-    *   Replace the placeholder API endpoint with your chosen API's endpoint.
-    *   Adjust the data parsing logic to match the JSON response structure of your API. The current code includes comments and placeholders to guide you.
+3.  **Set up a Cron Job:** You need to set up a scheduled task on your server (e.g., your EC2 instance) to call the protected API endpoint at your desired times. This will trigger the price update.
+    *   SSH into your EC2 instance.
+    *   Open the cron table for editing: `crontab -e`
+    *   Add lines to schedule the price updates. For example, to run at 10 AM, 3 PM, and 8 PM every day:
+        ```crontab
+        # Fetch metal prices at 10 AM, 3 PM, and 8 PM IST (adjust for your server's timezone)
+        0 10 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
+        0 15 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
+        0 20 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
+        ```
+    *   **IMPORTANT:**
+        *   Replace `YOUR_CRON_SECRET` with the actual secret string you put in your `.env` file.
+        *   Ensure your Next.js application is running on port 3000 (as handled by Nginx).
+        *   Cron jobs run based on the server's system time. You may need to adjust the hours based on your server's timezone (e.g., if it's set to UTC). Use the `date` command on your EC2 instance to check its current time and timezone.
 
 ## Building for Production
 
@@ -150,7 +160,7 @@ Follow the steps provided in the AWS EC2 deployment guide. Key steps involve:
 2.  Connecting via SSH.
 3.  Installing Node.js, npm, and PM2.
 4.  Transferring the application code to the EC2 instance (e.g., via `git clone`).
-5.  Setting up environment variables on the EC2 instance (e.g., in a `.env.production` file or through PM2 ecosystem file), including `MONGODB_URI`.
+5.  Setting up environment variables on the EC2 instance (e.g., in a `.env.production` file or through PM2 ecosystem file), including `MONGODB_URI`, `METALS_API_KEY`, and `CRON_SECRET`.
 6.  Running `npm install` and `npm run build`.
 7.  Starting the app with PM2: `pm2 start npm --name "goldsmith-connect" -- start`.
 8.  Configuring a reverse proxy like Nginx.

@@ -1,7 +1,7 @@
 // src/lib/mongodb.ts
 import type { Collection, Db } from 'mongodb';
 import { MongoClient } from 'mongodb';
-import type { Goldsmith, OrderRequest, Inquiry, Customer } from '@/types/goldsmith'; // Ensure Goldsmith type is correctly imported
+import type { Goldsmith, OrderRequest, Inquiry, Customer, StoredMetalPrice } from '@/types/goldsmith'; // Ensure Goldsmith type is correctly imported
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -121,6 +121,11 @@ export async function getInquiriesCollection(): Promise<Collection<Inquiry>> {
 export async function getCustomersCollection(): Promise<Collection<Customer>> {
   const db = await getDb();
   return db.collection<Customer>('customers');
+}
+
+export async function getMetalPricesCollection(): Promise<Collection<StoredMetalPrice>> {
+  const db = await getDb();
+  return db.collection<StoredMetalPrice>('metalPrices');
 }
 
 // Optional: Export the client promise for specific use cases, though getDb is preferred
