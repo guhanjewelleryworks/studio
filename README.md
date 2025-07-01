@@ -132,34 +132,34 @@ The application is now built to fetch metal prices from GoldAPI.io on a schedule
 
         ```
 # Fetch prices at ~10:30AM, 3:30PM, 8:30PM IST (server is in UTC)
-0 5 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
-0 10 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
-0 15 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
+30 5 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
+30 10 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
+30 15 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
 ```
     *   Save and exit the editor.
         *   In `nano`, press `Ctrl+X`.
         *   It will ask if you want to save. Press `Y`.
         *   It will ask for the file name to write. Press `Enter` to confirm.
         *   If it's successful, you'll see a message like `crontab: installing new crontab`. 
-        *   If you see an error like **"bad minute"**, it means there is a typo or an extra line break. The most common mistake is having a line break between the schedule (`0 10 * * *`) and the command (`curl...`). **Each job must be on a single, continuous line.** Re-open with `crontab -e` and carefully check your work.
+        *   If you see an error like **"bad minute"**, it means there is a typo or an extra line break. The most common mistake is having a line break between the schedule (`30 5 * * *`) and the command (`curl...`). **Each job must be on a single, continuous line.** Re-open with `crontab -e` and carefully check your work.
 
 ### Understanding the Cron Job Command
 
 Each line you added is a separate job. Let's break down one of them:
 
-`0 5 * * * curl ...`
+`30 5 * * * curl ...`
 
-**The Schedule Part: `0 5 * * *`**
+**The Schedule Part: `30 5 * * *`**
 
 This part tells the server *when* to run the command. It's read from left to right:
 
-*   `0`: **Minute** (0-59). This runs at the 0th minute.
+*   `30`: **Minute** (0-59). This runs at the 30th minute.
 *   `5`: **Hour** (0-23). This runs at the 5th hour (5:00 AM in 24-hour format).
 *   `*`: **Day of the Month** (1-31). The `*` means "every day".
 *   `*`: **Month** (1-12). The `*` means "every month".
 *   `*`: **Day of the Week** (0-6, where 0 is Sunday). The `*` means "every day of the week".
 
-So, `0 5 * * *` means "run this command at 5:00 AM, every single day."
+So, `30 5 * * *` means "run this command at 5:30 AM, every single day."
 
 **The Command Part: `curl ...`**
 
@@ -177,7 +177,7 @@ Cron jobs use the server's system clock. Your EC2 instance might be set to a dif
 
 *   SSH into your EC2 instance.
 *   Run the command `date`. It will show you the current time and timezone (e.g., `UTC`).
-*   The instructions above have been pre-adjusted for a server in **UTC** time to run at approximately 10:30 AM, 3:30 PM, and 8:30 PM **IST**. (e.g., 5:00 UTC is 10:30 IST). You should not need to make further adjustments if your server is in UTC and your goal is to run on an IST schedule.
+*   The instructions above have been pre-adjusted for a server in **UTC** time to run at approximately 10:30 AM, 3:30 PM, and 8:30 PM **IST**. (e.g., 5:30 UTC is 11:00 IST). You should not need to make further adjustments if your server is in UTC and your goal is to run on an IST schedule.
 
 ## Building for Production
 
