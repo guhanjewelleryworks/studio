@@ -124,16 +124,17 @@ The application is now built to fetch metal prices from GoldAPI.io on a schedule
     *   Open the cron table for editing by running the command: `crontab -e`.
         *   If it's your first time, it might ask you to choose a text editor. `nano` is usually the easiest choice (press Enter to select it).
     *   **CRITICAL INSTRUCTIONS:**
+        *   First, **delete any old lines** you may have added from previous attempts to avoid conflicts.
         *   Go to the very bottom of the file that opens.
-        *   You are going to add **three new lines** to this file.
-        *   **DO NOT** copy the text `'''crontab` or `'''` from anywhere. Those are for documentation formatting only.
-        *   Copy the lines below, paste them into the file, and then **replace `YOUR_CRON_SECRET`** with the actual secret string you created in your `.env` file. Be very careful not to add or delete any other characters or spaces.
+        *   You are going to add **three new lines** to this file. Copy the lines below exactly as they are.
+        *   **DO NOT** copy the text `'''` or anything outside of the box below.
+        *   After pasting, you must **replace `YOUR_CRON_SECRET`** with the actual secret string you created in your `.env` file. Be very careful not to add or delete any other characters or spaces. Each job must be on its own single line.
 
         ```
-# Fetch metal prices at 10 AM, 3 PM, and 8 PM (server time)
+# Fetch prices at ~10:30AM, 3:30PM, 8:30PM IST (server is in UTC)
+0 5 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
 0 10 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
 0 15 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
-0 20 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
 ```
     *   Save and exit the editor.
         *   In `nano`, press `Ctrl+X`.
@@ -146,19 +147,19 @@ The application is now built to fetch metal prices from GoldAPI.io on a schedule
 
 Each line you added is a separate job. Let's break down one of them:
 
-`0 10 * * * curl ...`
+`0 5 * * * curl ...`
 
-**The Schedule Part: `0 10 * * *`**
+**The Schedule Part: `0 5 * * *`**
 
 This part tells the server *when* to run the command. It's read from left to right:
 
 *   `0`: **Minute** (0-59). This runs at the 0th minute.
-*   `10`: **Hour** (0-23). This runs at the 10th hour (10 AM in 24-hour format).
+*   `5`: **Hour** (0-23). This runs at the 5th hour (5:00 AM in 24-hour format).
 *   `*`: **Day of the Month** (1-31). The `*` means "every day".
 *   `*`: **Month** (1-12). The `*` means "every month".
 *   `*`: **Day of the Week** (0-6, where 0 is Sunday). The `*` means "every day of the week".
 
-So, `0 10 * * *` means "run this command at 10:00 AM, every single day."
+So, `0 5 * * *` means "run this command at 5:00 AM, every single day."
 
 **The Command Part: `curl ...`**
 
@@ -175,8 +176,8 @@ This is *what* the server does when the schedule matches.
 Cron jobs use the server's system clock. Your EC2 instance might be set to a different timezone (like UTC) than your local time.
 
 *   SSH into your EC2 instance.
-*   Run the command `date`. It will show you the current time and timezone (e.g., `UTC`, `IST`).
-*   Adjust the hours in your `crontab -e` file accordingly. For example, if your server is in UTC and you want to run the job at 10 AM IST (which is UTC+5:30), you would set the hour to `4` (for 4:30 AM UTC, which is close enough).
+*   Run the command `date`. It will show you the current time and timezone (e.g., `UTC`).
+*   The instructions above have been pre-adjusted for a server in **UTC** time to run at approximately 10:30 AM, 3:30 PM, and 8:30 PM **IST**. (e.g., 5:00 UTC is 10:30 IST). You should not need to make further adjustments if your server is in UTC and your goal is to run on an IST schedule.
 
 ## Building for Production
 
