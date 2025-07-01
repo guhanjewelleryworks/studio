@@ -2,8 +2,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Gem, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Gem, TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
 import type { StoredMetalPrice } from '@/types/goldsmith'; // Import the new type
 
 interface FormattedMetalPrice {
@@ -29,8 +29,9 @@ async function fetchPricesFromApi(): Promise<StoredMetalPrice[]> {
 
 export const MetalPricesWidget: React.FC = () => {
   const [metalPrices, setMetalPrices] = useState<FormattedMetalPrice[]>([]);
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] =useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [nextUpdateTimeMessage, setNextUpdateTimeMessage] = useState<string>('');
 
   useEffect(() => {
     const loadAndFormatPrices = async () => {
@@ -74,10 +75,46 @@ export const MetalPricesWidget: React.FC = () => {
       }
     };
     
+    const calculateNextUpdate = () => {
+        const scheduleUTC = [5.5, 10.5, 15.5]; // 5:30, 10:30, 15:30 UTC
+        const now = new Date();
+        const currentUTCHour = now.getUTCHours() + now.getUTCMinutes() / 60;
+    
+        let nextUpdateUTCHour = scheduleUTC.find(time => time > currentUTCHour);
+        
+        const nextUpdateDate = new Date();
+        nextUpdateDate.setSeconds(0, 0);
+    
+        if (nextUpdateUTCHour !== undefined) {
+          // Next update is today
+          const hours = Math.floor(nextUpdateUTCHour);
+          const minutes = Math.round((nextUpdateUTCHour - hours) * 60);
+          nextUpdateDate.setUTCHours(hours, minutes);
+        } else {
+          // Next update is tomorrow, first slot
+          nextUpdateDate.setUTCDate(now.getUTCDate() + 1);
+          const hours = Math.floor(scheduleUTC[0]);
+          const minutes = Math.round((scheduleUTC[0] - hours) * 60);
+          nextUpdateDate.setUTCHours(hours, minutes);
+        }
+    
+        const nextUpdateIST = nextUpdateDate.toLocaleTimeString('en-IN', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: 'Asia/Kolkata'
+        });
+        setNextUpdateTimeMessage(`Next update around ${nextUpdateIST}.`);
+    };
+
     loadAndFormatPrices();
+    calculateNextUpdate();
 
     // Optional: Refresh client-side every few minutes in case the cron job ran
-    const intervalId = setInterval(loadAndFormatPrices, 5 * 60 * 1000); // Refresh every 5 minutes
+    const intervalId = setInterval(() => {
+        loadAndFormatPrices();
+        calculateNextUpdate();
+    }, 5 * 60 * 1000); // Refresh every 5 minutes
 
     return () => clearInterval(intervalId);
   }, []);
@@ -89,7 +126,7 @@ export const MetalPricesWidget: React.FC = () => {
           {isLoading ? 'Loading prices...' : lastUpdated}
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-3 pt-1 space-y-1.5">
+      <CardContent className="px-4 pb-2 pt-1 space-y-1.5">
         {isLoading && metalPrices.length === 0 ? (
           Array.from({ length: 3 }).map((_, index) => (
             <div key={index} className="flex justify-between items-center text-xs animate-pulse">
@@ -129,6 +166,12 @@ export const MetalPricesWidget: React.FC = () => {
           !isLoading && <p className="text-xs text-muted-foreground text-center">Price data currently unavailable.</p>
         )}
       </CardContent>
+       <CardFooter className="pt-0 pb-2 px-4">
+        <p className="text-[0.65rem] text-muted-foreground text-center w-full flex items-center justify-center">
+            <Info className="h-3 w-3 mr-1" />
+            {nextUpdateTimeMessage}
+        </p>
+      </CardFooter>
     </Card>
   );
 };
