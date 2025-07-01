@@ -127,14 +127,14 @@ The application is now built to fetch metal prices from GoldAPI.io on a schedule
         *   First, **delete any old lines** you may have added from previous attempts to avoid conflicts.
         *   Go to the very bottom of the file that opens.
         *   You are going to add **three new lines** to this file. Copy the lines below exactly as they are.
-        *   **DO NOT** copy the text `'''` or anything outside of the box below.
-        *   After pasting, you must **replace `YOUR_CRON_SECRET`** with the actual secret string you created in your `.env` file. Be very careful not to add or delete any other characters or spaces. Each job must be on its own single line.
+        *   **DO NOT** copy any markdown formatting like ` ``` `.
+        *   After pasting, you must **replace `<YOUR_SECRET_STRING_HERE>`** with the actual secret string you created in your `.env` file. Do not include the `<` or `>` symbols. Be very careful not to add or delete any other characters or spaces. Each job must be on its own single line.
 
         ```
 # Fetch prices at ~10:30AM, 3:30PM, 8:30PM IST (server is in UTC)
-0 5 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
-0 10 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
-0 15 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
+0 5 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
+0 10 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
+0 15 * * * curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhost:3000/api/update-prices
 ```
     *   Save and exit the editor.
         *   In `nano`, press `Ctrl+X`.
@@ -167,8 +167,8 @@ This is *what* the server does when the schedule matches.
 
 *   `curl`: A simple command-line tool for making web requests. Think of it as a web browser in your terminal.
 *   `-X GET`: Tells `curl` to make a GET request.
-*   `-H "Authorization: Bearer YOUR_CRON_SECRET"`: This is a crucial security step. It sends a "Header" along with the request. Our API endpoint will check for this header and the secret key to make sure the request is authorized.
-    *   **IMPORTANT:** You must replace `YOUR_CRON_SECRET` with the exact same secret string you created in your `.env` file.
+*   `-H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>"`: This is a crucial security step. It sends a "Header" along with the request. Our API endpoint will check for this header and the secret key to make sure the request is authorized.
+    *   **IMPORTANT:** You must replace `<YOUR_SECRET_STRING_HERE>` with the exact same secret string you created in your `.env` file. Do not include the `<` or `>` symbols.
 *   `http://localhost:3000/api/update-prices`: This is the URL it visits. Because the cron job is running on the *same server* as your Next.js app (which is running on port 3000), it can use `localhost` to talk to it.
 
 ### Verifying Server Timezone
