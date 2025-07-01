@@ -33,6 +33,10 @@ export async function fetchAndStoreLiveMetalPrices() {
         }
 
         const data = await response.json();
+        // --- DEBUG LOGGING ADDED ---
+        console.log('[PriceAction] Received data from GoldAPI:', JSON.stringify(data, null, 2));
+        // --- END DEBUG LOGGING ---
+        
         const collection = await getMetalPricesCollection();
         const now = new Date();
 
