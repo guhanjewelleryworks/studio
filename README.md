@@ -123,20 +123,21 @@ The application is now built to fetch metal prices from GoldAPI.io on a schedule
     *   SSH into your EC2 instance.
     *   Open the cron table for editing by running the command: `crontab -e`.
         *   If it's your first time, it might ask you to choose a text editor. `nano` is usually the easiest choice (press Enter to select it).
-    *   **COPY and PASTE** the following lines exactly as they are into the bottom of the file.
+    *   **CRITICAL:** Carefully copy the **entire block** of text below. Each job is a single line. Paste it at the bottom of the file that opens.
 
         ```crontab
-        # Fetch metal prices at 10 AM, 3 PM, and 8 PM (server time)
-        0 10 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
-        0 15 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
-        0 20 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
-        ```
+# Fetch metal prices at 10 AM, 3 PM, and 8 PM (server time)
+0 10 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
+0 15 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
+0 20 * * * curl -X GET -H "Authorization: Bearer YOUR_CRON_SECRET" http://localhost:3000/api/update-prices
+```
     *   **CRITICAL:** In the lines you just pasted, **replace `YOUR_CRON_SECRET`** with the actual secret string you created in your `.env` file. Be very careful not to add or delete any other characters or spaces.
     *   Save and exit the editor.
         *   In `nano`, press `Ctrl+X`.
         *   It will ask if you want to save. Press `Y`.
         *   It will ask for the file name to write. Press `Enter` to confirm.
-        *   If it's successful, you'll see a message like `crontab: installing new crontab`. If you see an error like "bad minute", it means there is a typo. Re-open with `crontab -e` and carefully check your work.
+        *   If it's successful, you'll see a message like `crontab: installing new crontab`. 
+        *   If you see an error like **"bad minute"**, it means there is a typo or an extra line break. The most common mistake is having a line break between the schedule (`0 10 * * *`) and the command (`curl...`). **Each job must be on a single, continuous line.** Re-open with `crontab -e` and carefully check your work.
 
 ### Understanding the Cron Job Command
 
