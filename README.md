@@ -1,4 +1,4 @@
-# Goldsmith Connect..
+# Goldsmith Connect.
 
 This is a Next.js application built with Firebase Studio for Goldsmith Connect.
 
