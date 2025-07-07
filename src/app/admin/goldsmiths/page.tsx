@@ -4,15 +4,18 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, ArrowLeft, CheckCircle, XCircle, Hourglass, RefreshCw, Loader2 } from 'lucide-react';
+import { Briefcase, ArrowLeft, CheckCircle, XCircle, Hourglass, RefreshCw, Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAdminGoldsmiths, updateGoldsmithStatus } from '@/actions/goldsmith-actions';
 import type { Goldsmith } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
 export default function AdminGoldsmithsPage() {
   const [goldsmiths, setGoldsmiths] = useState<Goldsmith[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredGoldsmiths, setFilteredGoldsmiths] = useState<Goldsmith[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
@@ -23,7 +26,8 @@ export default function AdminGoldsmithsPage() {
     try {
       const data = await fetchAdminGoldsmiths();
       console.log('[AdminGoldsmithsPage] Fetched data for admin:', data);
-      setGoldsmiths(data || []); // Ensure data is an array, default to empty if null/undefined
+      setGoldsmiths(data || []);
+      setFilteredGoldsmiths(data || []);
     } catch (error) {
       console.error("[AdminGoldsmithsPage] Failed to fetch goldsmiths:", error);
       toast({
@@ -31,7 +35,8 @@ export default function AdminGoldsmithsPage() {
         description: "Could not fetch goldsmiths data. Please try refreshing the page or check server logs.",
         variant: "destructive",
       });
-      setGoldsmiths([]); // Set to empty array on error
+      setGoldsmiths([]);
+      setFilteredGoldsmiths([]);
     } finally {
       setIsLoading(false);
       console.log('[AdminGoldsmithsPage] loadGoldsmiths finished');
@@ -41,6 +46,22 @@ export default function AdminGoldsmithsPage() {
   useEffect(() => {
     loadGoldsmiths();
   }, []);
+
+  useEffect(() => {
+    const lowercasedFilter = searchTerm.toLowerCase();
+    const filteredData = goldsmiths.filter(goldsmith => {
+        if (!goldsmith) return false;
+        const specialtyString = Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(' ') : (goldsmith.specialty || '');
+        return (
+            (goldsmith.name?.toLowerCase() || '').includes(lowercasedFilter) ||
+            (goldsmith.email?.toLowerCase() || '').includes(lowercasedFilter) ||
+            (goldsmith.state?.toLowerCase() || '').includes(lowercasedFilter) ||
+            (goldsmith.district?.toLowerCase() || '').includes(lowercasedFilter) ||
+            specialtyString.toLowerCase().includes(lowercasedFilter)
+        );
+    });
+    setFilteredGoldsmiths(filteredData);
+  }, [searchTerm, goldsmiths]);
 
   const handleUpdateStatus = async (id: string, newStatus: Goldsmith['status']) => {
     console.log(`[AdminGoldsmithsPage] handleUpdateStatus called for ID: ${id}, New Status: ${newStatus}`);
@@ -75,7 +96,6 @@ export default function AdminGoldsmithsPage() {
     }
   };
 
-
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">
       <header className="mb-6 flex items-center justify-between">
@@ -105,14 +125,26 @@ export default function AdminGoldsmithsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 flex items-center gap-2">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search by name, email, location, specialty..."
+                className="w-full pl-10 text-foreground"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
           {isLoading && goldsmiths.length === 0 ? (
             <div className="flex justify-center items-center py-10">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
               <p className="ml-2 text-muted-foreground">Loading goldsmiths...</p>
             </div>
-          ) : goldsmiths.length > 0 ? (
+          ) : filteredGoldsmiths.length > 0 ? (
             <div className="space-y-4">
-              {goldsmiths.filter(g => g && typeof g === 'object').map((goldsmith) => ( // Ensure goldsmith is an object
+              {filteredGoldsmiths.filter(g => g && typeof g === 'object').map((goldsmith) => (
                 <Card key={goldsmith.id} className="bg-card/80 border-border/50 shadow-sm rounded-lg">
                   <CardHeader className="pb-3 pt-4 px-4">
                     <div className="flex justify-between items-start">
@@ -187,7 +219,7 @@ export default function AdminGoldsmithsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-muted-foreground text-center py-10">No goldsmiths found. This could mean no goldsmiths are registered yet, or there was an issue loading them.</p>
+            <p className="text-muted-foreground text-center py-10">{searchTerm ? 'No goldsmiths match your search.' : 'No goldsmiths found.'}</p>
           )}
         </CardContent>
       </Card>

@@ -77,7 +77,7 @@ export async function fetchAdminCustomers(): Promise<Omit<Customer, 'password' |
   console.log('[Action: fetchAdminCustomers] Attempting to fetch customers for admin panel.');
   try {
     const collection = await getCustomersCollection();
-    const customersCursor = collection.find({});
+    const customersCursor = collection.find({}).sort({ registeredAt: -1 });
     const customersArray: WithId<Customer>[] = await customersCursor.toArray();
     console.log(`[Action: fetchAdminCustomers] Found ${customersArray.length} customers.`);
     

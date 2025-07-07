@@ -6,16 +6,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, ArrowLeft, RefreshCw, Loader2, AlertTriangle } from 'lucide-react';
+import { MessageSquare, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Search } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAllPlatformInquiries } from '@/actions/goldsmith-actions';
 import type { Inquiry, InquiryStatus } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
 
 export default function AdminCommunicationsPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredInquiries, setFilteredInquiries] = useState<Inquiry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -26,6 +29,7 @@ export default function AdminCommunicationsPage() {
     try {
       const data = await fetchAllPlatformInquiries();
       setInquiries(data || []);
+      setFilteredInquiries(data || []);
     } catch (err) {
       console.error("Failed to fetch inquiries:", err);
       setError("Could not load inquiry data. Please try again.");
@@ -42,6 +46,17 @@ export default function AdminCommunicationsPage() {
   useEffect(() => {
     loadInquiries();
   }, []);
+
+  useEffect(() => {
+    const lowercasedFilter = searchTerm.toLowerCase();
+    const filteredData = inquiries.filter(inquiry =>
+      (inquiry.id?.toLowerCase() || '').includes(lowercasedFilter) ||
+      (inquiry.customerName?.toLowerCase() || '').includes(lowercasedFilter) ||
+      (inquiry.goldsmithId?.toLowerCase() || '').includes(lowercasedFilter) ||
+      (inquiry.message?.toLowerCase() || '').includes(lowercasedFilter)
+    );
+    setFilteredInquiries(filteredData);
+  }, [searchTerm, inquiries]);
 
   const getStatusBadgeVariant = (status: InquiryStatus) => {
     switch (status) {
@@ -83,6 +98,18 @@ export default function AdminCommunicationsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 flex items-center gap-2">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search by ID, customer, goldsmith, or message..."
+                className="w-full pl-10 text-foreground"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
           {isLoading ? (
             <div className="flex justify-center items-center py-10">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -96,7 +123,7 @@ export default function AdminCommunicationsPage() {
                   {error} Please try refreshing the page or check server logs.
                 </AlertDescription>
             </Alert>
-          ) : inquiries.length > 0 ? (
+          ) : filteredInquiries.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -111,7 +138,7 @@ export default function AdminCommunicationsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {inquiries.map((inquiry) => (
+                  {filteredInquiries.map((inquiry) => (
                     <TableRow key={inquiry.id}>
                       <TableCell className="font-mono text-xs text-muted-foreground">{inquiry.id.substring(0,8)}...</TableCell>
                       <TableCell className="font-medium text-foreground">{inquiry.customerName}</TableCell>
@@ -139,8 +166,8 @@ export default function AdminCommunicationsPage() {
           ) : (
             <div className="text-center py-10">
                 <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
-                <p className="text-muted-foreground">No inquiries found on the platform.</p>
-                <p className="text-xs text-muted-foreground/80 mt-1">New inquiries from customers will appear here.</p>
+                <p className="text-muted-foreground">{searchTerm ? 'No inquiries match your search.' : 'No inquiries found on the platform.'}</p>
+                <p className="text-xs text-muted-foreground/80 mt-1">{searchTerm ? 'Try adjusting your search terms.' : 'New inquiries from customers will appear here.'}</p>
             </div>
           )}
         </CardContent>

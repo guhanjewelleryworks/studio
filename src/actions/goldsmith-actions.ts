@@ -135,7 +135,7 @@ export async function fetchAdminGoldsmiths(): Promise<Goldsmith[]> {
   console.log('[AdminActions] Fetching all goldsmiths for admin panel.');
   try {
     const collection = await getGoldsmithsCollection();
-    const goldsmithsCursor = collection.find({}); 
+    const goldsmithsCursor = collection.find({}).sort({ registeredAt: -1 });
     const goldsmithsArray = await goldsmithsCursor.toArray();
     console.log(`[AdminActions] Found ${goldsmithsArray.length} total goldsmiths for admin panel.`);
     return goldsmithsArray.map(g => {

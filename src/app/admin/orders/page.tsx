@@ -6,17 +6,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Send, Eye } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Send, Eye, Search } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAllPlatformOrderRequests, updateOrderStatus, fetchAdminGoldsmiths } from '@/actions/goldsmith-actions';
 import type { OrderRequest, OrderRequestStatus, Goldsmith } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<OrderRequest[]>([]);
   const [goldsmiths, setGoldsmiths] = useState<Goldsmith[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredOrders, setFilteredOrders] = useState<OrderRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<Record<string, boolean>>({});
@@ -32,6 +35,7 @@ export default function AdminOrdersPage() {
       ]);
       setOrders(orderData || []);
       setGoldsmiths(goldsmithData || []);
+      setFilteredOrders(orderData || []);
     } catch (err) {
       console.error("Failed to fetch orders or goldsmiths:", err);
       setError("Could not load data. Please try again.");
@@ -45,9 +49,29 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const getGoldsmithName = (goldsmithId: string) => {
+    const goldsmith = goldsmiths.find(g => g.id === goldsmithId);
+    return goldsmith ? goldsmith.name : 'N/A';
+  };
+  
   useEffect(() => {
     loadData();
   }, []);
+  
+  useEffect(() => {
+    const lowercasedFilter = searchTerm.toLowerCase();
+    const filteredData = orders.filter(order => {
+        const goldsmithName = getGoldsmithName(order.goldsmithId).toLowerCase();
+        return (
+            (order.id?.toLowerCase() || '').includes(lowercasedFilter) ||
+            (order.customerName?.toLowerCase() || '').includes(lowercasedFilter) ||
+            goldsmithName.includes(lowercasedFilter) ||
+            (order.itemDescription?.toLowerCase() || '').includes(lowercasedFilter)
+        );
+    });
+    setFilteredOrders(filteredData);
+  }, [searchTerm, orders, goldsmiths]);
+
 
   const handleUpdateStatus = async (orderId: string, newStatus: OrderRequestStatus) => {
     setIsUpdatingStatus(prev => ({ ...prev, [orderId]: true }));
@@ -57,9 +81,8 @@ export default function AdminOrdersPage() {
         title: "Order Status Updated",
         description: `Order ${orderId.substring(0,8)}... status changed to ${newStatus.replace(/_/g, ' ')}.`,
       });
-      setOrders(prevOrders => 
-        prevOrders.map(o => o.id === orderId ? { ...o, status: newStatus, updatedAt: new Date() } : o)
-      );
+      // Refresh data to get the latest state
+      loadData();
     } else {
       toast({
         title: "Update Failed",
@@ -82,11 +105,6 @@ export default function AdminOrdersPage() {
       case 'cancelled': return 'destructive';
       default: return 'outline';
     }
-  };
-
-  const getGoldsmithName = (goldsmithId: string) => {
-    const goldsmith = goldsmiths.find(g => g.id === goldsmithId);
-    return goldsmith ? goldsmith.name : 'N/A';
   };
 
   return (
@@ -118,6 +136,18 @@ export default function AdminOrdersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+           <div className="mb-4 flex items-center gap-2">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search by ID, customer, goldsmith, item..."
+                className="w-full pl-10 text-foreground"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
           {isLoading ? (
             <div className="flex justify-center items-center py-10">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -131,7 +161,7 @@ export default function AdminOrdersPage() {
                   {error} Please try refreshing the page or check server logs.
                 </AlertDescription>
             </Alert>
-          ) : orders.length > 0 ? (
+          ) : filteredOrders.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -146,7 +176,7 @@ export default function AdminOrdersPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {orders.map((order) => (
+                  {filteredOrders.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-mono text-xs text-muted-foreground">{order.id.substring(0,8)}...</TableCell>
                       <TableCell className="font-medium text-foreground">{order.customerName}</TableCell>
@@ -188,8 +218,8 @@ export default function AdminOrdersPage() {
           ) : (
             <div className="text-center py-10">
                 <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
-                <p className="text-muted-foreground">No order requests found.</p>
-                <p className="text-xs text-muted-foreground/80 mt-1">New order requests from customers will appear here.</p>
+                <p className="text-muted-foreground">{searchTerm ? 'No orders match your search.' : 'No order requests found.'}</p>
+                <p className="text-xs text-muted-foreground/80 mt-1">{searchTerm ? 'Try adjusting your search terms.' : 'New order requests from customers will appear here.'}</p>
             </div>
           )}
         </CardContent>

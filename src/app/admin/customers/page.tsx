@@ -5,16 +5,19 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Users, ArrowLeft, RefreshCw, Loader2, AlertTriangle } from 'lucide-react';
+import { Users, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Search } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAdminCustomers } from '@/actions/customer-actions';
 import type { Customer } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
 
 export default function AdminCustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<Omit<Customer, 'password' | '_id'>[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredCustomers, setFilteredCustomers] = useState<Omit<Customer, 'password' | '_id'>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -25,6 +28,7 @@ export default function AdminCustomersPage() {
     try {
       const data = await fetchAdminCustomers();
       setCustomers(data || []);
+      setFilteredCustomers(data || []);
     } catch (err) {
       console.error("Failed to fetch customers:", err);
       setError("Could not load customer data. Please try again.");
@@ -41,6 +45,15 @@ export default function AdminCustomersPage() {
   useEffect(() => {
     loadCustomers();
   }, []);
+
+  useEffect(() => {
+    const lowercasedFilter = searchTerm.toLowerCase();
+    const filteredData = customers.filter(customer =>
+      (customer.name?.toLowerCase() || '').includes(lowercasedFilter) ||
+      (customer.email?.toLowerCase() || '').includes(lowercasedFilter)
+    );
+    setFilteredCustomers(filteredData);
+  }, [searchTerm, customers]);
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">
@@ -71,6 +84,18 @@ export default function AdminCustomersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 flex items-center gap-2">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search by name or email..."
+                className="w-full pl-10 text-foreground"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
           {isLoading ? (
             <div className="flex justify-center items-center py-10">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -84,7 +109,7 @@ export default function AdminCustomersPage() {
                   {error} Please try refreshing the page or check server logs.
                 </AlertDescription>
             </Alert>
-          ) : customers.length > 0 ? (
+          ) : filteredCustomers.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -97,7 +122,7 @@ export default function AdminCustomersPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {customers.map((customer) => (
+                  {filteredCustomers.map((customer) => (
                     <TableRow key={customer.id}>
                       <TableCell className="font-medium text-foreground">{customer.name}</TableCell>
                       <TableCell className="text-muted-foreground">{customer.email}</TableCell>
@@ -121,8 +146,8 @@ export default function AdminCustomersPage() {
           ) : (
             <div className="text-center py-10">
                 <Users className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
-                <p className="text-muted-foreground">No customers found.</p>
-                <p className="text-xs text-muted-foreground/80 mt-1">New customers will appear here once they sign up.</p>
+                <p className="text-muted-foreground">{searchTerm ? 'No customers match your search.' : 'No customers found.'}</p>
+                <p className="text-xs text-muted-foreground/80 mt-1">{searchTerm ? 'Try adjusting your search terms.' : 'New customers will appear here once they sign up.'}</p>
             </div>
           )}
         </CardContent>
