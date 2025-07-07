@@ -16,7 +16,7 @@ import { useState, useEffect, use } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from '@/hooks/use-toast';
-import { fetchGoldsmithById, saveOrderRequest } from '@/actions/goldsmith-actions';
+import { fetchGoldsmithById, saveOrderRequest, incrementProfileView } from '@/actions/goldsmith-actions';
 import Link from 'next/link';
 
 interface PageParams {
@@ -113,6 +113,25 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
     loadProfile();
   }, [id]);
+
+  useEffect(() => {
+    // This effect runs only on the client side when the component mounts.
+    // It's a good place for "fire-and-forget" actions like view tracking.
+    const trackView = () => {
+      // Use sessionStorage to ensure the view is counted only once per browser session for this profile
+      const viewHasBeenTracked = sessionStorage.getItem(`viewed_goldsmith_${id}`);
+      if (!viewHasBeenTracked) {
+        console.log(`[GoldsmithProfilePage] Tracking view for goldsmith ID: ${id}`);
+        incrementProfileView(id);
+        sessionStorage.setItem(`viewed_goldsmith_${id}`, 'true');
+      }
+    };
+    
+    if (id) {
+      trackView();
+    }
+  }, [id]); // Dependency array ensures this runs once when the id is available.
+
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {

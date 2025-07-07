@@ -5,9 +5,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Eye, MessageCircle, ShoppingBag, Loader2, AlertTriangle } from 'lucide-react';
-import { fetchGoldsmithById } from '@/actions/goldsmith-actions';
+import { fetchGoldsmithById, fetchOrdersForGoldsmith } from '@/actions/goldsmith-actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import type { OrderRequest } from '@/types/goldsmith';
 
 interface CurrentGoldsmithUser {
   isLoggedIn: boolean;
@@ -16,7 +17,7 @@ interface CurrentGoldsmithUser {
 
 interface AnalyticsData {
   profileViews: number;
-  inquiriesReceived: number;
+  inquiriesReceived: number; // This will remain simulated for now
   ordersCompleted: number;
   conversionRate: string;
   mostViewedItem: string;
@@ -51,15 +52,35 @@ export default function GoldsmithAnalyticsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const goldsmithProfile = await fetchGoldsmithById(currentUser.id);
+        const [goldsmithProfile, completedOrders] = await Promise.all([
+          fetchGoldsmithById(currentUser.id),
+          fetchOrdersForGoldsmith(currentUser.id, 'completed')
+        ]);
 
         if (!goldsmithProfile) {
           throw new Error("Could not retrieve your goldsmith profile.");
         }
         
         const ordersCompleted = goldsmithProfile.ordersCompleted || 0;
+        const profileViews = goldsmithProfile.profileViews || 0;
         
-        // Inquiry system has been removed, so this data is now simulated for display.
+        // Find most frequent item from completed orders
+        let mostFrequentItem = "N/A";
+        if (completedOrders && completedOrders.length > 0) {
+            const descriptionCounts = completedOrders.reduce((acc, order) => {
+                const desc = order.itemDescription || "Unnamed Item";
+                acc[desc] = (acc[desc] || 0) + 1;
+                return acc;
+            }, {} as Record<string, number>);
+
+            if (Object.keys(descriptionCounts).length > 0) {
+              mostFrequentItem = Object.keys(descriptionCounts).reduce((a, b) => 
+                descriptionCounts[a] > descriptionCounts[b] ? a : b
+              );
+            }
+        }
+
+        // Inquiry system is still simulated as per original design.
         const inquiriesReceived = 72; // Mocked value
         
         let conversionRate = '0.00%';
@@ -70,9 +91,9 @@ export default function GoldsmithAnalyticsPage() {
         setAnalyticsData({
           ordersCompleted,
           inquiriesReceived,
-          conversionRate: `${conversionRate} (demo)`,
-          profileViews: 1250, // Mocked value
-          mostViewedItem: "Custom Diamond Engagement Ring", // Mocked value
+          conversionRate: `${conversionRate} (demo data)`,
+          profileViews: profileViews,
+          mostViewedItem: mostFrequentItem,
         });
 
       } catch (err) {
@@ -137,18 +158,18 @@ export default function GoldsmithAnalyticsPage() {
                     isLoading={isLoading}
                 />
                 <StatCard 
-                    title="Profile Views (Simulated)"
+                    title="Total Profile Views"
                     value={analyticsData?.profileViews ?? '...'}
                     icon={Eye}
-                    description="+20.1% from last month (demo data)"
+                    description="Total times your profile has been viewed."
                     isLoading={isLoading}
                 />
                 <Card className="bg-card/70 border-border/50 shadow-md">
                     <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-accent">Most Viewed Item (Simulated)</CardTitle>
+                    <CardTitle className="text-sm font-medium text-accent">Most Completed Item Type</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <p className="text-lg font-semibold text-foreground">{analyticsData?.mostViewedItem ?? '...'}</p>}
+                        {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <p className="text-lg font-semibold text-foreground truncate" title={analyticsData?.mostViewedItem}>{analyticsData?.mostViewedItem ?? '...'}</p>}
                     </CardContent>
                 </Card>
             </div>

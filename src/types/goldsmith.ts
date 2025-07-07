@@ -22,6 +22,7 @@ export interface Goldsmith {
   certifications?: string[];
   responseTime?: string;
   ordersCompleted?: number;
+  profileViews?: number;
   contactPerson?: string;
   email: string;
   phone?: string;
@@ -47,6 +48,7 @@ export type NewGoldsmithInput = Omit<
   | 'portfolioImages' 
   | 'certifications'
   | 'ordersCompleted'
+  | 'profileViews'
   | 'status'
   | 'registeredAt' // Exclude from input, will be set by server
   | 'lastLoginAt'
@@ -71,10 +73,10 @@ export interface OrderRequest {
   customerId?: string; // Link to Customer ID
   customerName: string; 
   customerEmail: string;
-  customerPhone?: string;
+  customerPhone: string;
   itemDescription: string;
   details: string;
-  referenceImage?: string; 
+  referenceImage: string; 
   status: OrderRequestStatus;
   requestedAt: Date;
   updatedAt: Date;

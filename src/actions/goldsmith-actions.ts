@@ -81,6 +81,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       yearsExperience: data.yearsExperience || 0,
       responseTime: data.responseTime || "Varies",
       ordersCompleted: 0,
+      profileViews: 0,
       status: 'pending_verification', 
       registeredAt: new Date(), // Set registration date
     };
@@ -646,5 +647,18 @@ export async function updateGoldsmithProfileImage(
   } catch (error) {
     console.error(`[Action: updateGoldsmithProfileImage] Error updating image for ${goldsmithId}:`, error);
     return { success: false, error: 'Failed to update profile image due to a server error.' };
+  }
+}
+
+export async function incrementProfileView(goldsmithId: string): Promise<void> {
+  console.log(`[Action: incrementProfileView] Attempting to increment view for goldsmith ${goldsmithId}`);
+  try {
+    // This is a fire-and-forget operation from the client, so no return value is needed.
+    const collection = await getGoldsmithsCollection();
+    await collection.updateOne({ id: goldsmithId }, { $inc: { profileViews: 1 } });
+  } catch (error) {
+    // We log the error but don't re-throw it, as failing to track a view
+    // shouldn't crash the profile page view for the user.
+    console.error(`[Action: incrementProfileView] Failed to increment view count for ${goldsmithId}:`, error);
   }
 }
