@@ -13,10 +13,22 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
+
+const actorTypes: AuditLog['actor']['type'][] = ['admin', 'customer', 'goldsmith', 'system'];
 
 export default function AdminAuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [actorTypeFilters, setActorTypeFilters] = useState<string[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<AuditLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,12 +60,19 @@ export default function AdminAuditLogsPage() {
 
   useEffect(() => {
     const lowercasedFilter = searchTerm.toLowerCase();
-    const filteredData = logs.filter(log =>
-      (log.action.toLowerCase() || '').includes(lowercasedFilter) ||
-      (log.actor.id.toLowerCase() || '').includes(lowercasedFilter)
-    );
+    const filteredData = logs.filter(log => {
+      const searchMatch =
+        (log.action.toLowerCase() || '').includes(lowercasedFilter) ||
+        (log.actor.id.toLowerCase() || '').includes(lowercasedFilter);
+      
+      const actorTypeMatch =
+        actorTypeFilters.length === 0 || actorTypeFilters.includes(log.actor.type);
+
+      return searchMatch && actorTypeMatch;
+    });
     setFilteredLogs(filteredData);
-  }, [searchTerm, logs]);
+  }, [searchTerm, logs, actorTypeFilters]);
+
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">
@@ -95,9 +114,36 @@ export default function AdminAuditLogsPage() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-                <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-                    <Filter className="mr-2 h-4 w-4" /> Filters (Simulated)
-                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
+                            <Filter className="mr-2 h-4 w-4" /> Filters {actorTypeFilters.length > 0 && `(${actorTypeFilters.length})`}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Filter by Actor Type</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {actorTypes.map((type) => (
+                        <DropdownMenuCheckboxItem
+                            key={type}
+                            checked={actorTypeFilters.includes(type)}
+                            onCheckedChange={(checked) => {
+                            const newFilters = checked
+                                ? [...actorTypeFilters, type]
+                                : actorTypeFilters.filter((t) => t !== type);
+                            setActorTypeFilters(newFilters);
+                            }}
+                            className="capitalize"
+                        >
+                            {type}
+                        </DropdownMenuCheckboxItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => setActorTypeFilters([])} disabled={actorTypeFilters.length === 0}>
+                            Clear Filters
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             {isLoading ? (
@@ -139,7 +185,7 @@ export default function AdminAuditLogsPage() {
             ) : (
                 <div className="text-center py-10">
                     <ClipboardList className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
-                    <p className="text-muted-foreground">{searchTerm ? 'No logs match your search.' : 'No audit logs found.'}</p>
+                    <p className="text-muted-foreground">{searchTerm || actorTypeFilters.length > 0 ? 'No logs match your search or filters.' : 'No audit logs found.'}</p>
                 </div>
             )}
         </CardContent>
