@@ -3,6 +3,7 @@
 import { getSettingsCollection } from '@/lib/mongodb';
 import type { PlatformSettings } from '@/types/goldsmith';
 import { revalidatePath } from 'next/cache';
+import { logAuditEvent } from './audit-log-actions';
 
 const defaultSettings: PlatformSettings = {
     key: 'platform_main',
@@ -45,6 +46,11 @@ export async function updatePlatformSettings(data: Partial<Omit<PlatformSettings
     );
     
     if (result) {
+        logAuditEvent(
+          'Updated platform settings',
+          { type: 'admin', id: 'admin_user' }, // Placeholder admin ID
+          { changes: data }
+        );
         // Revalidate the homepage path to show the new announcement immediately
         revalidatePath('/');
         return { success: true, data: result as Omit<PlatformSettings, '_id'> };

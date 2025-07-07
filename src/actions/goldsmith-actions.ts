@@ -5,6 +5,7 @@ import { getGoldsmithsCollection, getOrderRequestsCollection } from '@/lib/mongo
 import type { Goldsmith, NewGoldsmithInput, OrderRequest, NewOrderRequestInput, OrderRequestStatus } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 import type { Collection, Filter, WithId, FindOneAndUpdateOptions } from 'mongodb';
+import { logAuditEvent } from './audit-log-actions';
 
 const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Example: Los Angeles
 
@@ -186,6 +187,11 @@ export async function updateGoldsmithStatus(id: string, newStatus: Goldsmith['st
     );
 
     if (result.modifiedCount === 1) {
+      logAuditEvent(
+        `Updated goldsmith status to "${newStatus}"`,
+        { type: 'admin', id: 'admin_user' }, // Assuming admin action for now
+        { goldsmithId: id, newStatus }
+      );
       return { success: true };
     } else if (result.matchedCount === 1 && result.modifiedCount === 0) {
       return { success: true, error: 'Goldsmith status is already set to the new status.' };
@@ -376,6 +382,11 @@ export async function updateOrderStatus(
 
     if (result) {
       console.log(`[Action: updateOrderStatus] Successfully updated order ${orderId} to ${newStatus}. Updated doc:`, JSON.stringify(result));
+      logAuditEvent(
+        `Updated order status to "${newStatus}"`,
+        { type: 'admin', id: 'admin_user' }, // Placeholder for actual admin ID
+        { orderId, newStatus }
+      );
       return { success: true, data: result as OrderRequest };
     } else {
       console.log(`[Action: updateOrderStatus] Order ${orderId} not found or not updated.`);

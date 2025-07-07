@@ -114,3 +114,16 @@ export interface PlatformSettings {
   announcementText: string;
   isAnnouncementVisible: boolean;
 }
+
+// --- New Type for Audit Logs ---
+export interface AuditLog {
+  id?: string;
+  _id?: ObjectId | string;
+  timestamp: Date;
+  actor: {
+    type: 'admin' | 'customer' | 'goldsmith' | 'system';
+    id: string; // Could be 'SYSTEM' or a user/goldsmith UUID
+  };
+  action: string; // e.g., "Updated goldsmith status", "Generated user activity report"
+  details?: Record<string, any>; // e.g., { goldsmithId: '...', newStatus: 'verified' }
+}

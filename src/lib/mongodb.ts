@@ -1,7 +1,7 @@
 // src/lib/mongodb.ts
 import type { Collection, Db } from 'mongodb';
 import { MongoClient } from 'mongodb';
-import type { Goldsmith, OrderRequest, Customer, StoredMetalPrice, PlatformSettings } from '@/types/goldsmith'; // Ensure Goldsmith type is correctly imported
+import type { Goldsmith, OrderRequest, Customer, StoredMetalPrice, PlatformSettings, AuditLog } from '@/types/goldsmith'; // Ensure Goldsmith type is correctly imported
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -126,6 +126,11 @@ export async function getMetalPricesCollection(): Promise<Collection<StoredMetal
 export async function getSettingsCollection(): Promise<Collection<PlatformSettings>> {
   const db = await getDb();
   return db.collection<PlatformSettings>('settings');
+}
+
+export async function getAuditLogsCollection(): Promise<Collection<AuditLog>> {
+  const db = await getDb();
+  return db.collection<AuditLog>('auditLogs');
 }
 
 
