@@ -74,7 +74,27 @@ export async function generateReport(reportType: string): Promise<{ success: boo
       }
       
       case 'sales_summary': {
-         return { success: false, error: 'Sales Summary Report is not yet implemented.' };
+        const orders = await fetchAllPlatformOrderRequests();
+        const totalOrders = orders.length;
+        const completed = orders.filter(o => o.status === 'completed').length;
+        const cancelled = orders.filter(o => o.status === 'cancelled').length;
+        const inProgress = orders.filter(o => ['in_progress', 'artwork_completed', 'customer_review_requested', 'shipped'].includes(o.status)).length;
+        const pending = orders.filter(o => ['new', 'pending_goldsmith_review'].includes(o.status)).length;
+        
+        return {
+          success: true,
+          data: {
+            title: 'Sales Summary Report',
+            headers: ["Metric", "Value"],
+            rows: [
+              ["Total Order Requests", totalOrders],
+              ["Orders Completed", completed],
+              ["Orders Cancelled", cancelled],
+              ["Orders In Progress", inProgress],
+              ["Orders Pending Review", pending],
+            ],
+          }
+        };
       }
       
        case 'platform_traffic': {

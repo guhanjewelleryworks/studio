@@ -28,6 +28,7 @@ export interface Goldsmith {
   portfolioLink?: string;
   status: 'pending_verification' | 'verified' | 'rejected';
   registeredAt: Date; // Added for tracking registration time
+  lastLoginAt?: Date; // Added for tracking login time
 }
 
 // Input type for new goldsmith registration
@@ -47,6 +48,7 @@ export type NewGoldsmithInput = Omit<
   | 'ordersCompleted'
   | 'status'
   | 'registeredAt' // Exclude from input, will be set by server
+  | 'lastLoginAt'
 >;
 
 // New Types for Orders and Inquiries

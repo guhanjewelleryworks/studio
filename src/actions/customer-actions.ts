@@ -5,6 +5,7 @@ import { getCustomersCollection, getOrderRequestsCollection } from '@/lib/mongod
 import type { Customer, NewCustomerInput, OrderRequest } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid';
 import type { Collection, WithId, Filter } from 'mongodb';
+import { logAuditEvent } from './audit-log-actions';
 
 // IMPORTANT: In a real application, passwords should be hashed before saving.
 // For this simulation, we'll store it as plain text, but this is NOT secure for production.
@@ -46,6 +47,11 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
     console.log('[Action: saveCustomer] MongoDB insert result:', JSON.stringify(result));
 
     if (result.insertedId) {
+      logAuditEvent(
+        'Customer account created',
+        { type: 'customer', id: newCustomer.id },
+        { name: newCustomer.name, email: newCustomer.email }
+      );
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
       if (insertedDoc) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -146,6 +152,12 @@ export async function loginCustomer(credentials: Pick<NewCustomerInput, 'email' 
     const collection = await getCustomersCollection();
     const newLastLoginAt = new Date();
     await collection.updateOne({ id: customer.id }, { $set: { lastLoginAt: newLastLoginAt } });
+    
+    logAuditEvent(
+      'Customer successful login',
+      { type: 'customer', id: customer.id },
+      { email: customer.email }
+    );
     
     console.log('[Action: loginCustomer] Login successful for email:', credentials.email);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

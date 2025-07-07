@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { LogIn, Loader2, MailCheck } from 'lucide-react'; // Added MailCheck
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { fetchGoldsmithByEmailForLogin } from '@/actions/goldsmith-actions';
+import { loginGoldsmith } from '@/actions/goldsmith-actions';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +21,8 @@ import {
   DialogFooter,
   DialogClose, // Added DialogClose
 } from "@/components/ui/dialog";
+import type { NewGoldsmithInput } from '@/types/goldsmith';
+
 
 export default function GoldsmithLoginPage() {
   const router = useRouter();
@@ -49,28 +51,20 @@ export default function GoldsmithLoginPage() {
     }
 
     try {
-      const goldsmith = await fetchGoldsmithByEmailForLogin(email);
+      const result = await loginGoldsmith({ email, password });
 
-      if (!goldsmith) {
+      if (!result.success || !result.data) {
         toast({
           title: 'Login Failed',
-          description: 'Email not registered. Please check your email or register.',
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      if (goldsmith.password !== password.trim()) { 
-        toast({
-          title: 'Login Failed',
-          description: 'Incorrect password. Please try again.',
+          description: result.error || 'Please check your credentials and try again.',
           variant: 'destructive',
         });
         setIsLoading(false);
         return;
       }
       
+      const goldsmith = result.data;
+
       if (typeof window !== "undefined") {
         // Clear any existing customer session to prevent conflicts
         localStorage.removeItem('currentUser'); 

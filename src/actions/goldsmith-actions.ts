@@ -88,6 +88,11 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     console.log('[Action: saveGoldsmith] MongoDB insert result:', JSON.stringify(result));
 
     if (result.insertedId) {
+      logAuditEvent(
+        'Goldsmith account created',
+        { type: 'goldsmith', id: newGoldsmith.id },
+        { name: newGoldsmith.name, email: newGoldsmith.email }
+      );
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
       if (insertedDoc) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -241,6 +246,46 @@ export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Gold
   } catch (error) {
     console.error(`[Action: fetchGoldsmithByEmailForLogin] Error fetching goldsmith by email ${normalizedEmail} for login:`, error);
     return null;
+  }
+}
+
+export async function loginGoldsmith(credentials: Pick<NewGoldsmithInput, 'email' | 'password'>): Promise<{ success: boolean; data?: Omit<Goldsmith, 'password' | '_id'>; error?: string }> {
+  console.log('[Action: loginGoldsmith] Attempting login for email:', credentials.email);
+  try {
+    const goldsmith = await fetchGoldsmithByEmailForLogin(credentials.email);
+
+    if (!goldsmith) {
+      console.log('[Action: loginGoldsmith] Goldsmith not found for email:', credentials.email);
+      return { success: false, error: 'Invalid email or password.' };
+    }
+
+    if (goldsmith.password !== credentials.password.trim()) {
+      console.log('[Action: loginGoldsmith] Password mismatch for email:', credentials.email);
+      return { success: false, error: 'Invalid email or password.' };
+    }
+
+    const collection = await getGoldsmithsCollection();
+    const newLastLoginAt = new Date();
+    await collection.updateOne({ id: goldsmith.id }, { $set: { lastLoginAt: newLastLoginAt } });
+    
+    logAuditEvent(
+      'Goldsmith successful login',
+      { type: 'goldsmith', id: goldsmith.id },
+      { email: goldsmith.email }
+    );
+    
+    console.log('[Action: loginGoldsmith] Login successful for email:', credentials.email);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...goldsmithDataToReturn } = goldsmith;
+    return { success: true, data: { ...goldsmithDataToReturn, lastLoginAt: newLastLoginAt } as Omit<Goldsmith, 'password' | '_id'> };
+
+  } catch (error) {
+    console.error('[Action: loginGoldsmith] Error during login:', error);
+    let errorMessage = 'An unknown error occurred during login.';
+    if (error instanceof Error) {
+        errorMessage = error.message;
+    }
+    return { success: false, error: `Login failed: ${errorMessage}` };
   }
 }
 

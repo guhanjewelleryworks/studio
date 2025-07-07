@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 const reportTypes = [
     { value: "user_activity", label: "User Activity Report" },
     { value: "goldsmith_performance", label: "Goldsmith Performance Report" },
-    { value: "sales_summary", label: "Sales Summary Report (Coming Soon)" },
+    { value: "sales_summary", label: "Sales Summary Report" },
     { value: "platform_traffic", label: "Platform Traffic Analysis (Coming Soon)" },
 ];
 
@@ -108,7 +108,7 @@ export function ReportForm() {
               </DynamicSelectTrigger>
               <DynamicSelectContent>
                   {reportTypes.map(report => (
-                      <DynamicSelectItem key={report.value} value={report.value}>{report.label}</DynamicSelectItem>
+                      <DynamicSelectItem key={report.value} value={report.value} disabled={report.label.includes('(Coming Soon)')}>{report.label}</DynamicSelectItem>
                   ))}
               </DynamicSelectContent>
           </DynamicSelect>
