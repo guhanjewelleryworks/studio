@@ -72,7 +72,8 @@ export default function GoldsmithLoginPage() {
         localStorage.setItem('currentGoldsmithUser', JSON.stringify({
           isLoggedIn: true,
           id: goldsmith.id,
-          name: goldsmith.name
+          name: goldsmith.name,
+          email: goldsmith.email
         }));
       }
 
