@@ -38,6 +38,20 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+// Define StatCard outside of the main component to prevent hydration errors
+const StatCard = ({ title, value, icon: Icon, description, isLoading }: { title: string, value: string | number, icon: React.ElementType, description: string, isLoading: boolean }) => (
+     <Card className="bg-card/70 border-border/50 shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-accent">{title}</CardTitle>
+            <Icon className="h-4 w-4 text-primary" />
+        </CardHeader>
+        <CardContent>
+            {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold text-foreground">{value}</div>}
+            <p className="text-xs text-muted-foreground">{description}</p>
+        </CardContent>
+    </Card>
+ );
+
 export default function GoldsmithAnalyticsPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -129,19 +143,6 @@ export default function GoldsmithAnalyticsPage() {
 
     loadAnalyticsData();
   }, [currentUser, toast]);
-
-  const StatCard = ({ title, value, icon: Icon, description, isLoading }: { title: string, value: string | number, icon: React.ElementType, description: string, isLoading: boolean }) => (
-     <Card className="bg-card/70 border-border/50 shadow-md">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-accent">{title}</CardTitle>
-            <Icon className="h-4 w-4 text-primary" />
-        </CardHeader>
-        <CardContent>
-            {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold text-foreground">{value}</div>}
-            <p className="text-xs text-muted-foreground">{description}</p>
-        </CardContent>
-    </Card>
-  );
 
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8 px-4 md:px-6">
