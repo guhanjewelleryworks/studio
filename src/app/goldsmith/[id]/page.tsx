@@ -1,3 +1,4 @@
+
 // src/app/goldsmith/[id]/page.tsx
 'use client';
 
@@ -178,8 +179,8 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
      const customerPhone = (form.elements.namedItem('contact-phone') as HTMLInputElement)?.value;
      const message = (form.elements.namedItem('contact-message') as HTMLTextAreaElement)?.value;
 
-    if (!message) {
-      toast({ title: "Missing Information", description: "Please provide details for your custom order.", variant: "destructive" });
+    if (!message || !customerPhone) {
+      toast({ title: "Missing Information", description: "Please provide your phone number and order details.", variant: "destructive" });
       setIsSubmittingForm(false);
       return;
     }
@@ -356,8 +357,8 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                 <form className="space-y-3.5" onSubmit={handleContactFormSubmit}>
                     <p className="text-sm text-muted-foreground">You are placing this request as: <strong>{currentUser.name}</strong> ({currentUser.email})</p>
                     <div className="space-y-1">
-                      <Label htmlFor="contact-phone" className="text-foreground text-xs font-medium">Your Phone (Optional)</Label>
-                      <Input id="contact-phone" name="contact-phone" type="tel" placeholder="e.g., 9876543210" className="text-foreground text-sm py-2"/>
+                      <Label htmlFor="contact-phone" className="text-foreground text-xs font-medium">Your Phone</Label>
+                      <Input id="contact-phone" name="contact-phone" type="tel" placeholder="e.g., 9876543210" required className="text-foreground text-sm py-2"/>
                     </div>
                     <div className="space-y-1">
                       <Label htmlFor="contact-message" className="text-foreground text-xs font-medium">Your Custom Order Details</Label>

@@ -313,9 +313,9 @@ export async function saveOrderRequest(data: NewOrderRequestInput): Promise<{ su
         console.error('[Action: saveOrderRequest] Validation failed: Goldsmith ID is required.');
         return { success: false, error: 'A goldsmith must be specified for the order.' };
     }
-    if (!data.details || !data.referenceImage) {
-        console.error('[Action: saveOrderRequest] Validation failed: Details and a reference image are required.');
-        return { success: false, error: 'Order details and a reference image are required.' };
+    if (!data.details || !data.referenceImage || !data.customerPhone) {
+        console.error('[Action: saveOrderRequest] Validation failed: Details, reference image, and phone number are required.');
+        return { success: false, error: 'Order details, a reference image, and a phone number are required.' };
     }
     // --- END VALIDATION ---
 
