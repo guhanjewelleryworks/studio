@@ -1,20 +1,30 @@
 // src/app/goldsmith-portal/settings/page.tsx
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings, Lock, Bell, CreditCard } from 'lucide-react';
+import { Settings, Lock, Bell, CreditCard, ArrowLeft } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function GoldsmithSettingsPage() {
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8 px-4 md:px-6">
+       <header className="max-w-3xl mx-auto mb-6 flex items-center justify-between">
+         <div className="flex items-center gap-3">
+            <Settings className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-heading text-accent">Account Settings</h1>
+        </div>
+        <Button asChild variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
+          <Link href="/goldsmith-portal/dashboard">
+            <ArrowLeft className="mr-1.5 h-4 w-4" />
+            Back to Dashboard
+          </Link>
+        </Button>
+      </header>
+
       <Card className="max-w-3xl mx-auto shadow-xl bg-card border-primary/10">
         <CardHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <Settings className="h-8 w-8 text-primary" />
-            <CardTitle className="text-2xl text-accent">Account Settings</CardTitle>
-          </div>
           <CardDescription className="text-muted-foreground">
             Manage your login credentials, notification preferences, and payment details.
           </CardDescription>

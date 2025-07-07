@@ -4,7 +4,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, Eye, ShoppingBag, Percent, Loader2, AlertTriangle, ListChecks } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BarChart3, Eye, ShoppingBag, Percent, Loader2, AlertTriangle, ListChecks, ArrowLeft } from 'lucide-react';
 import { fetchGoldsmithById, fetchOrdersForGoldsmith } from '@/actions/goldsmith-actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -16,6 +17,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Bar, BarChart as RechartsBarChart, XAxis, YAxis } from "recharts";
+import Link from 'next/link';
 
 interface CurrentGoldsmithUser {
   isLoggedIn: boolean;
@@ -38,7 +40,6 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-// Define StatCard outside of the main component to prevent hydration errors
 const StatCard = ({ title, value, icon: Icon, description, isLoading }: { title: string, value: string | number, icon: React.ElementType, description: string, isLoading: boolean }) => (
      <Card className="bg-card/70 border-border/50 shadow-md">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -146,12 +147,21 @@ export default function GoldsmithAnalyticsPage() {
 
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8 px-4 md:px-6">
+      <header className="max-w-4xl mx-auto mb-6 flex items-center justify-between">
+         <div className="flex items-center gap-3">
+            <BarChart3 className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-heading text-accent">Performance Analytics</h1>
+        </div>
+        <Button asChild variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
+          <Link href="/goldsmith-portal/dashboard">
+            <ArrowLeft className="mr-1.5 h-4 w-4" />
+            Back to Dashboard
+          </Link>
+        </Button>
+      </header>
+      
       <Card className="max-w-4xl mx-auto shadow-xl bg-card border-primary/10">
         <CardHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <BarChart3 className="h-8 w-8 text-primary" />
-            <CardTitle className="text-2xl text-accent">Performance Analytics</CardTitle>
-          </div>
           <CardDescription className="text-muted-foreground">
             Insights into your profile views, customer inquiries, and order trends.
           </CardDescription>
