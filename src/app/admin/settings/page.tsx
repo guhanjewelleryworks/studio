@@ -4,12 +4,10 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Settings, ArrowLeft, ToggleLeft, Palette, Percent, Megaphone, Loader2 } from 'lucide-react';
+import { Settings, ArrowLeft, Megaphone, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { fetchPlatformSettings, updatePlatformSettings } from '@/actions/settings-actions';
@@ -119,43 +117,6 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
             )}
-          </section>
-
-          <Separator />
-          
-          {/* ... other settings sections ... */}
-          <section>
-            <h2 className="text-lg font-semibold text-muted-foreground/70 mb-3 flex items-center">
-              <ToggleLeft className="mr-2 h-5 w-5 text-muted-foreground/50" /> General Platform Settings (Simulated)
-            </h2>
-            <div className="space-y-4 opacity-50">
-              <div>
-                <Label htmlFor="platform-name" className="text-foreground">Platform Name</Label>
-                <Input id="platform-name" defaultValue="Goldsmith Connect" className="text-foreground" disabled/>
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="maintenance-mode" className="text-foreground">Maintenance Mode</Label>
-                <Switch id="maintenance-mode" disabled/>
-              </div>
-            </div>
-          </section>
-          
-          <Separator />
-
-           {/* Commission/Fees (Placeholder) */}
-          <section>
-            <h2 className="text-lg font-semibold text-muted-foreground/70 mb-3 flex items-center">
-              <Percent className="mr-2 h-5 w-5 text-muted-foreground/50" /> Commission & Fees (Simulated)
-            </h2>
-            <div className="space-y-4 opacity-50">
-                <div>
-                    <Label htmlFor="platform-fee" className="text-foreground">Platform Fee (%)</Label>
-                    <Input id="platform-fee" type="number" defaultValue="5" className="text-foreground" disabled/>
-                </div>
-                 <p className="text-xs text-muted-foreground">
-                (Simulated: Configure rates for platform services.)
-              </p>
-            </div>
           </section>
 
           <div className="pt-4 text-right">
