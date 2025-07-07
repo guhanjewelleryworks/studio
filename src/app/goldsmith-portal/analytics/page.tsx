@@ -1,14 +1,21 @@
 // src/app/goldsmith-portal/analytics/page.tsx
-'use client'; // Make it a client component
+'use client'; 
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, Eye, ShoppingBag, Loader2, AlertTriangle } from 'lucide-react';
+import { BarChart3, Eye, ShoppingBag, Percent, Loader2, AlertTriangle, ListChecks } from 'lucide-react';
 import { fetchGoldsmithById, fetchOrdersForGoldsmith } from '@/actions/goldsmith-actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import type { OrderRequest } from '@/types/goldsmith';
+import type { OrderRequest, OrderRequestStatus } from '@/types/goldsmith';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
+import { Bar, BarChart as RechartsBarChart, XAxis, YAxis } from "recharts";
 
 interface CurrentGoldsmithUser {
   isLoggedIn: boolean;
@@ -17,9 +24,19 @@ interface CurrentGoldsmithUser {
 
 interface AnalyticsData {
   profileViews: number;
+  totalOrders: number;
   ordersCompleted: number;
-  mostViewedItem: string;
+  completionRate: number;
+  mostFrequentItem: string;
+  orderStatusBreakdown: { status: string; count: number }[];
 }
+
+const chartConfig = {
+  count: {
+    label: "Orders",
+    color: "hsl(var(--primary))",
+  },
+} satisfies ChartConfig;
 
 export default function GoldsmithAnalyticsPage() {
   const router = useRouter();
@@ -50,21 +67,23 @@ export default function GoldsmithAnalyticsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const [goldsmithProfile, completedOrders] = await Promise.all([
+        const [goldsmithProfile, allOrders] = await Promise.all([
           fetchGoldsmithById(currentUser.id),
-          fetchOrdersForGoldsmith(currentUser.id, 'completed')
+          fetchOrdersForGoldsmith(currentUser.id, 'all') // Fetch all orders
         ]);
 
         if (!goldsmithProfile) {
           throw new Error("Could not retrieve your goldsmith profile.");
         }
         
-        const ordersCompleted = goldsmithProfile.ordersCompleted || 0;
+        const totalOrders = allOrders.length;
+        const completedOrders = allOrders.filter(o => o.status === 'completed');
+        const ordersCompleted = completedOrders.length;
+        const completionRate = totalOrders > 0 ? (ordersCompleted / totalOrders) * 100 : 0;
         const profileViews = goldsmithProfile.profileViews || 0;
         
-        // Find most frequent item from completed orders
         let mostFrequentItem = "N/A";
-        if (completedOrders && completedOrders.length > 0) {
+        if (completedOrders.length > 0) {
             const descriptionCounts = completedOrders.reduce((acc, order) => {
                 const desc = order.itemDescription || "Unnamed Item";
                 acc[desc] = (acc[desc] || 0) + 1;
@@ -77,11 +96,25 @@ export default function GoldsmithAnalyticsPage() {
               );
             }
         }
+        
+        const inProgressStatuses: OrderRequestStatus[] = ['in_progress', 'artwork_completed', 'customer_review_requested', 'shipped'];
+        const statusCounts = allOrders
+          .filter(o => inProgressStatuses.includes(o.status))
+          .reduce((acc, order) => {
+            const friendlyStatus = order.status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            acc[friendlyStatus] = (acc[friendlyStatus] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+        
+        const orderStatusBreakdown = Object.entries(statusCounts).map(([status, count]) => ({ status, count }));
 
         setAnalyticsData({
+          profileViews,
+          totalOrders,
           ordersCompleted,
-          profileViews: profileViews,
-          mostViewedItem: mostFrequentItem,
+          completionRate,
+          mostFrequentItem,
+          orderStatusBreakdown,
         });
 
       } catch (err) {
@@ -130,29 +163,91 @@ export default function GoldsmithAnalyticsPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <StatCard 
-                    title="Orders Completed"
-                    value={analyticsData?.ordersCompleted ?? '...'}
-                    icon={ShoppingBag}
-                    description="Total orders successfully completed."
-                    isLoading={isLoading}
-                />
-                <StatCard 
-                    title="Total Profile Views"
-                    value={analyticsData?.profileViews ?? '...'}
-                    icon={Eye}
-                    description="Total times your profile has been viewed."
-                    isLoading={isLoading}
-                />
-                <Card className="bg-card/70 border-border/50 shadow-md md:col-span-2">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <StatCard 
+                      title="Total Orders"
+                      value={analyticsData?.totalOrders ?? '...'}
+                      icon={ShoppingBag}
+                      description="Total orders assigned to you."
+                      isLoading={isLoading}
+                  />
+                  <StatCard 
+                      title="Orders Completed"
+                      value={analyticsData?.ordersCompleted ?? '...'}
+                      icon={ListChecks}
+                      description="Orders successfully completed."
+                      isLoading={isLoading}
+                  />
+                  <StatCard 
+                      title="Completion Rate"
+                      value={`${analyticsData?.completionRate.toFixed(1) ?? '...'}%`}
+                      icon={Percent}
+                      description="Percentage of orders completed."
+                      isLoading={isLoading}
+                  />
+                  <StatCard 
+                      title="Profile Views"
+                      value={analyticsData?.profileViews ?? '...'}
+                      icon={Eye}
+                      description="Times your profile was viewed."
+                      isLoading={isLoading}
+                  />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="bg-card/70 border-border/50 shadow-md">
                     <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-accent">Most Completed Item Type</CardTitle>
+                    <CardTitle className="text-sm font-medium text-accent">Most Popular Item Type</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <p className="text-lg font-semibold text-foreground truncate" title={analyticsData?.mostViewedItem}>{analyticsData?.mostViewedItem ?? '...'}</p>}
+                        {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <p className="text-lg font-semibold text-foreground truncate" title={analyticsData?.mostFrequentItem}>{analyticsData?.mostFrequentItem ?? '...'}</p>}
+                        <p className="text-xs text-muted-foreground">Based on completed orders.</p>
                     </CardContent>
                 </Card>
+
+                <Card className="bg-card/70 border-border/50 shadow-md">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-accent">Live Order Status Breakdown</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {isLoading ? (
+                            <div className="flex items-center justify-center h-[150px]">
+                                <Loader2 className="h-8 w-8 animate-spin" />
+                            </div>
+                        ) : analyticsData && analyticsData.orderStatusBreakdown.length > 0 ? (
+                            <ChartContainer config={chartConfig} className="h-[150px] w-full">
+                                <RechartsBarChart
+                                    accessibilityLayer
+                                    data={analyticsData.orderStatusBreakdown}
+                                    layout="vertical"
+                                    margin={{ left: 10, right: 10, top: 10, bottom: 10 }}
+                                >
+                                    <XAxis type="number" hide />
+                                    <YAxis
+                                        dataKey="status"
+                                        type="category"
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickMargin={10}
+                                        width={110}
+                                        tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }}
+                                    />
+                                    <ChartTooltip
+                                        cursor={false}
+                                        content={<ChartTooltipContent indicator="line" />}
+                                    />
+                                    <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+                                </RechartsBarChart>
+                            </ChartContainer>
+                        ) : (
+                            <div className="flex items-center justify-center h-[150px]">
+                                <p className="text-sm text-muted-foreground">No active orders to display.</p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+              </div>
             </div>
           )}
         </CardContent>
