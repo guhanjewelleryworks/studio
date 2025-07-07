@@ -31,6 +31,8 @@ export interface Goldsmith {
   status: 'pending_verification' | 'verified' | 'rejected';
   registeredAt: Date; // Added for tracking registration time
   lastLoginAt?: Date; // Added for tracking login time
+  passwordResetToken?: string;
+  passwordResetTokenExpires?: Date;
 }
 
 // Input type for new goldsmith registration
@@ -52,6 +54,8 @@ export type NewGoldsmithInput = Omit<
   | 'status'
   | 'registeredAt' // Exclude from input, will be set by server
   | 'lastLoginAt'
+  | 'passwordResetToken'
+  | 'passwordResetTokenExpires'
 >;
 
 // New Types for Orders and Inquiries

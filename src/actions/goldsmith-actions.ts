@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 import type { Collection, Filter, WithId, FindOneAndUpdateOptions } from 'mongodb';
 import { logAuditEvent } from './audit-log-actions';
 import { createAdminNotification } from './notification-actions';
+import crypto from 'crypto';
 
 const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Example: Los Angeles
 
@@ -701,5 +702,93 @@ export async function changeGoldsmithPassword(goldsmithId: string, currentPasswo
   } catch (error) {
     console.error(`[Action: changeGoldsmithPassword] Error changing password for ${goldsmithId}:`, error);
     return { success: false, error: 'Failed to change password due to a server error.' };
+  }
+}
+
+// --- New Actions for Password Reset ---
+
+export async function requestGoldsmithPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
+  console.log(`[Action: requestGoldsmithPasswordReset] Request received for email: ${email}`);
+  const genericSuccessMessage = "If an account with this email exists, a password reset link has been (simulated) sent.";
+
+  try {
+    const collection = await getGoldsmithsCollection();
+    const goldsmith = await collection.findOne({ email: email.toLowerCase().trim() });
+
+    if (!goldsmith) {
+      console.log(`[Action: requestGoldsmithPasswordReset] No goldsmith found with email: ${email}. Sending generic success to prevent enumeration.`);
+      return { success: true, message: genericSuccessMessage };
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const passwordResetTokenExpires = new Date(Date.now() + 3600000); // 1 hour from now
+
+    await collection.updateOne(
+      { _id: goldsmith._id },
+      { $set: { passwordResetToken: resetToken, passwordResetTokenExpires } }
+    );
+
+    // IMPORTANT: Since we can't send emails, we log the link for the developer to test.
+    // In a production app, you would use a service like Nodemailer or SendGrid here.
+    const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/goldsmith-portal/reset-password?token=${resetToken}`;
+    console.log("----------------------------------------------------");
+    console.log("PASSWORD RESET REQUESTED (FOR DEVELOPER TESTING)");
+    console.log(`Goldsmith: ${goldsmith.email}`);
+    console.log(`Reset URL: ${resetUrl}`);
+    console.log("----------------------------------------------------");
+    
+    logAuditEvent('Goldsmith requested password reset', { type: 'goldsmith', id: goldsmith.id }, { email: goldsmith.email });
+
+    return { success: true, message: genericSuccessMessage };
+
+  } catch (error) {
+    console.error("[Action: requestGoldsmithPasswordReset] Error:", error);
+    // Still return a generic message on failure to prevent leaking information
+    return { success: true, message: genericSuccessMessage };
+  }
+}
+
+export async function resetGoldsmithPasswordWithToken(token: string, newPassword: string): Promise<{ success: boolean; error?: string }> {
+  console.log(`[Action: resetGoldsmithPasswordWithToken] Attempting to reset password with token: ${token.substring(0,10)}...`);
+
+  try {
+    if (!token || !newPassword) {
+      return { success: false, error: 'Token and new password are required.' };
+    }
+    if (newPassword.trim().length < 8) {
+      return { success: false, error: 'Password must be at least 8 characters long.' };
+    }
+
+    const collection = await getGoldsmithsCollection();
+    const goldsmith = await collection.findOne({
+      passwordResetToken: token,
+      passwordResetTokenExpires: { $gt: new Date() } // Check if token is not expired
+    });
+
+    if (!goldsmith) {
+      console.log(`[Action: resetGoldsmithPasswordWithToken] Invalid or expired token provided.`);
+      return { success: false, error: 'This password reset token is invalid or has expired.' };
+    }
+
+    // Update the password and clear the reset token fields
+    const result = await collection.updateOne(
+      { _id: goldsmith._id },
+      {
+        $set: { password: newPassword.trim() },
+        $unset: { passwordResetToken: "", passwordResetTokenExpires: "" }
+      }
+    );
+
+    if (result.modifiedCount === 1) {
+      console.log(`[Action: resetGoldsmithPasswordWithToken] Successfully reset password for ${goldsmith.email}.`);
+      logAuditEvent('Goldsmith password successfully reset via token', { type: 'goldsmith', id: goldsmith.id }, { email: goldsmith.email });
+      return { success: true };
+    } else {
+      return { success: false, error: 'Failed to update password. Please try again.' };
+    }
+
+  } catch (error) {
+    console.error('[Action: resetGoldsmithPasswordWithToken] Error:', error);
+    return { success: false, error: 'An unexpected server error occurred.' };
   }
 }

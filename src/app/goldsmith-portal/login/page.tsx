@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { LogIn, Loader2, MailCheck } from 'lucide-react'; // Added MailCheck
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { loginGoldsmith } from '@/actions/goldsmith-actions';
+import { loginGoldsmith, requestGoldsmithPasswordReset } from '@/actions/goldsmith-actions';
 import {
   Dialog,
   DialogContent,
@@ -32,6 +32,7 @@ export default function GoldsmithLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [isForgotPasswordLoading, setIsForgotPasswordLoading] = useState(false);
   const [isForgotPasswordDialogOpen, setIsForgotPasswordDialogOpen] = useState(false);
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState('');
 
@@ -95,16 +96,25 @@ export default function GoldsmithLoginPage() {
     }
   };
 
-  const handleForgotPasswordSubmit = (e: FormEvent) => {
+  const handleForgotPasswordSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!forgotPasswordEmail.trim()) {
       setForgotPasswordMessage("Please enter your email address.");
       return;
     }
-    // Simulate sending email
-    setForgotPasswordMessage(`If an account exists for ${forgotPasswordEmail}, a (simulated) password reset link has been sent. Please check your inbox.`);
-    // In a real app, you'd call a server action here.
-    // setForgotPasswordEmail(''); // Optionally clear after submission
+    setIsForgotPasswordLoading(true);
+    setForgotPasswordMessage('');
+
+    const result = await requestGoldsmithPasswordReset(forgotPasswordEmail);
+
+    if (result.success) {
+      setForgotPasswordMessage(result.message);
+    } else {
+      // Although the action returns a generic message, handle potential future errors
+      setForgotPasswordMessage("An unexpected error occurred. Please try again.");
+    }
+    
+    setIsForgotPasswordLoading(false);
   };
 
   return (
@@ -165,7 +175,7 @@ export default function GoldsmithLoginPage() {
                     <DialogHeader>
                       <DialogTitle className="text-accent">Forgot Your Password?</DialogTitle>
                       <DialogDescription className="text-muted-foreground">
-                        Enter your registered email address. We&apos;ll simulate sending a password reset link.
+                        Enter your registered email address. Since we can't send emails, a reset link will be logged to your server console for developer testing.
                       </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
@@ -181,10 +191,11 @@ export default function GoldsmithLoginPage() {
                           onChange={(e) => setForgotPasswordEmail(e.target.value)}
                           required
                           className="text-foreground"
+                          disabled={isForgotPasswordLoading}
                         />
                       </div>
                       {forgotPasswordMessage && (
-                        <div className={`p-3 rounded-md text-sm ${forgotPasswordMessage.startsWith("If an account exists") ? 'bg-green-100 border border-green-300 text-green-700' : 'bg-yellow-100 border border-yellow-300 text-yellow-700'}`}>
+                        <div className={`p-3 rounded-md text-sm bg-green-100 border border-green-300 text-green-800`}>
                            <div className="flex items-center">
                             <MailCheck className="h-5 w-5 mr-2"/>
                             <p>{forgotPasswordMessage}</p>
@@ -192,11 +203,12 @@ export default function GoldsmithLoginPage() {
                         </div>
                       )}
                       <DialogFooter className="sm:justify-start gap-2">
-                        <Button type="submit" variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                          Send Reset Link (Simulated)
+                        <Button type="submit" variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isForgotPasswordLoading}>
+                          {isForgotPasswordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Request Reset Link
                         </Button>
                         <DialogClose asChild>
-                          <Button type="button" variant="outline">
+                          <Button type="button" variant="outline" disabled={isForgotPasswordLoading}>
                             Close
                           </Button>
                         </DialogClose>
