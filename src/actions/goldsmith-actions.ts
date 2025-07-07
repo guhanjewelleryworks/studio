@@ -662,3 +662,44 @@ export async function incrementProfileView(goldsmithId: string): Promise<void> {
     console.error(`[Action: incrementProfileView] Failed to increment view count for ${goldsmithId}:`, error);
   }
 }
+
+export async function changeGoldsmithPassword(goldsmithId: string, currentPasswordInput: string, newPasswordInput: string): Promise<{ success: boolean; error?: string }> {
+  console.log(`[Action: changeGoldsmithPassword] Attempting to change password for goldsmith ID ${goldsmithId}.`);
+  try {
+    if (!goldsmithId || !currentPasswordInput || !newPasswordInput) {
+      return { success: false, error: 'Goldsmith ID, current password, and new password are required.' };
+    }
+    if (newPasswordInput.trim().length < 8) {
+      return { success: false, error: 'New password must be at least 8 characters long.' };
+    }
+
+    const collection = await getGoldsmithsCollection();
+    // Fetch the full goldsmith document, including the password
+    const goldsmith = await collection.findOne({ id: goldsmithId });
+
+    if (!goldsmith) {
+      return { success: false, error: 'Goldsmith not found.' };
+    }
+
+    // IMPORTANT: Plain text password comparison. NOT FOR PRODUCTION.
+    if (goldsmith.password !== currentPasswordInput.trim()) {
+      return { success: false, error: 'Incorrect current password.' };
+    }
+
+    // Update the password (still plain text)
+    const result = await collection.updateOne(
+      { id: goldsmithId },
+      { $set: { password: newPasswordInput.trim() } }
+    );
+
+    if (result.modifiedCount === 1) {
+      logAuditEvent('Goldsmith changed password', { type: 'goldsmith', id: goldsmithId }, { email: goldsmith.email });
+      return { success: true };
+    } else {
+      return { success: false, error: 'Password not updated. Please try again.' };
+    }
+  } catch (error) {
+    console.error(`[Action: changeGoldsmithPassword] Error changing password for ${goldsmithId}:`, error);
+    return { success: false, error: 'Failed to change password due to a server error.' };
+  }
+}
