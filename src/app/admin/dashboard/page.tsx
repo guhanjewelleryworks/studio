@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
-import { fetchLatestCustomers } from '@/actions/customer-actions';
+import { fetchLatestCustomers, fetchAdminCustomers } from '@/actions/customer-actions';
 import { 
   fetchAdminGoldsmiths, 
   getPlatformPendingOrderCount, 
