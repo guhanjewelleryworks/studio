@@ -106,3 +106,11 @@ export interface StoredMetalPrice {
   changePercent: number; // The percentage change
   updatedAt: Date;
 }
+
+// --- New Type for Platform Settings ---
+export interface PlatformSettings {
+  _id?: ObjectId | string;
+  key: 'platform_main'; // A fixed key to ensure only one settings document
+  announcementText: string;
+  isAnnouncementVisible: boolean;
+}
