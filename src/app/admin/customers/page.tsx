@@ -118,7 +118,6 @@ export default function AdminCustomersPage() {
                     <TableHead className="text-foreground">Email</TableHead>
                     <TableHead className="text-foreground">Registered At</TableHead>
                     <TableHead className="text-foreground">Last Login</TableHead>
-                    <TableHead className="text-right text-foreground">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -131,12 +130,6 @@ export default function AdminCustomersPage() {
                       </TableCell>
                        <TableCell className="text-muted-foreground">
                         {customer.lastLoginAt ? format(new Date(customer.lastLoginAt), 'PPpp') : 'N/A'}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">
-                          View
-                        </Button>
-                        {/* Add more actions like Edit, Suspend if needed */}
                       </TableCell>
                     </TableRow>
                   ))}
