@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, Eye, MessageCircle, ShoppingBag, Loader2, AlertTriangle } from 'lucide-react';
+import { BarChart3, Eye, ShoppingBag, Loader2, AlertTriangle } from 'lucide-react';
 import { fetchGoldsmithById, fetchOrdersForGoldsmith } from '@/actions/goldsmith-actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -17,9 +17,7 @@ interface CurrentGoldsmithUser {
 
 interface AnalyticsData {
   profileViews: number;
-  inquiriesReceived: number; // This will remain simulated for now
   ordersCompleted: number;
-  conversionRate: string;
   mostViewedItem: string;
 }
 
@@ -80,18 +78,8 @@ export default function GoldsmithAnalyticsPage() {
             }
         }
 
-        // Inquiry system is still simulated as per original design.
-        const inquiriesReceived = 72; // Mocked value
-        
-        let conversionRate = '0.00%';
-        if (inquiriesReceived > 0) {
-          conversionRate = ((ordersCompleted / inquiriesReceived) * 100).toFixed(2) + '%';
-        }
-
         setAnalyticsData({
           ordersCompleted,
-          inquiriesReceived,
-          conversionRate: `${conversionRate} (demo data)`,
           profileViews: profileViews,
           mostViewedItem: mostFrequentItem,
         });
@@ -144,17 +132,10 @@ export default function GoldsmithAnalyticsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <StatCard 
-                    title="Inquiries Received (Simulated)"
-                    value={analyticsData?.inquiriesReceived ?? '...'}
-                    icon={MessageCircle}
-                    description="Total customer inquiries (demo data)."
-                    isLoading={isLoading}
-                />
-                <StatCard 
                     title="Orders Completed"
                     value={analyticsData?.ordersCompleted ?? '...'}
                     icon={ShoppingBag}
-                    description={`Conversion Rate: ${analyticsData?.conversionRate ?? '...'}`}
+                    description="Total orders successfully completed."
                     isLoading={isLoading}
                 />
                 <StatCard 
@@ -164,7 +145,7 @@ export default function GoldsmithAnalyticsPage() {
                     description="Total times your profile has been viewed."
                     isLoading={isLoading}
                 />
-                <Card className="bg-card/70 border-border/50 shadow-md">
+                <Card className="bg-card/70 border-border/50 shadow-md md:col-span-2">
                     <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-accent">Most Completed Item Type</CardTitle>
                     </CardHeader>
