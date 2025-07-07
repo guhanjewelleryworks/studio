@@ -54,6 +54,48 @@ export function ReportForm() {
     }
     setIsLoading(false);
   };
+  
+  const handleDownloadCsv = () => {
+    if (!reportData) {
+      toast({
+        title: "No Data Available",
+        description: "Please generate a report before attempting to download.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const { headers, rows, title } = reportData;
+
+    // Create CSV content
+    const csvHeader = headers.map(h => `"${h}"`).join(',');
+    const csvRows = rows.map(row => 
+        row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+    const csvContent = `${csvHeader}\n${csvRows}`;
+
+    // Create a Blob and trigger the download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+
+    // Create a dynamic, safe filename
+    const safeTitle = title.toLowerCase().replace(/[^a-z0-9_]+/g, '_');
+    const fileName = `${safeTitle}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.setAttribute("download", fileName);
+    
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast({
+        title: "Download Started",
+        description: `${fileName} is being downloaded.`
+    })
+  };
 
   return (
     <div className="space-y-6">
@@ -76,8 +118,13 @@ export function ReportForm() {
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
               {isLoading ? 'Generating...' : 'Generate Report'}
           </Button>
-          <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-              <Download className="mr-2 h-4 w-4" /> CSV (Simulated)
+          <Button 
+            variant="outline" 
+            className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground"
+            onClick={handleDownloadCsv}
+            disabled={!reportData || isLoading}
+          >
+              <Download className="mr-2 h-4 w-4" /> Download CSV
           </Button>
         </div>
       </div>
