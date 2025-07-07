@@ -1,3 +1,4 @@
+
 // src/types/goldsmith.ts
 import type { Location } from '@/services/geolocation';
 import type { ObjectId } from 'mongodb';
@@ -128,4 +129,15 @@ export interface AuditLog {
   };
   action: string; // e.g., "Updated goldsmith status", "Generated user activity report"
   details?: Record<string, any>; // e.g., { goldsmithId: '...', newStatus: 'verified' }
+}
+
+// --- New Type for Admin Notifications ---
+export interface AdminNotification {
+  _id?: ObjectId | string;
+  id: string; // UUID
+  type: 'new_goldsmith_registration' | 'new_order_request';
+  message: string;
+  link: string; // e.g., /admin/goldsmiths
+  isRead: boolean;
+  createdAt: Date;
 }

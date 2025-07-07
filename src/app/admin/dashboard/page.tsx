@@ -1,9 +1,19 @@
+
 // src/app/admin/dashboard/page.tsx
 'use client'; 
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import {
   Users,
@@ -17,22 +27,22 @@ import {
   LogOut,
   ShieldCheck,
   Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
-import { 
-  fetchAdminCustomers,
-  fetchLatestCustomers 
-} from '@/actions/customer-actions';
+import { fetchLatestCustomers } from '@/actions/customer-actions';
 import { 
   fetchAdminGoldsmiths, 
   getPlatformPendingOrderCount, 
   fetchLatestGoldsmiths,
   fetchLatestPlatformOrderRequests,
 } from '@/actions/goldsmith-actions';
-import type { Customer, Goldsmith, OrderRequest } from '@/types/goldsmith';
+import { fetchUnreadAdminNotifications, markAllAdminNotificationsAsRead } from '@/actions/notification-actions';
+import type { Customer, Goldsmith, OrderRequest, AdminNotification } from '@/types/goldsmith';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const DashboardCard = ({ title, description, icon: Icon, linkHref, linkText }: { title: string, description: string, icon: React.ElementType, linkHref?: string, linkText?: string }) => (
   <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10 rounded-xl">
@@ -91,31 +101,29 @@ export default function AdminDashboardPage() {
   const [recentActivities, setRecentActivities] = useState<ActivityItem[]>([]);
   const [isActivityLoading, setIsActivityLoading] = useState(true);
 
-  useEffect(() => {
-    const adminLoggedIn = typeof window !== "undefined" ? localStorage.getItem('isAdminLoggedIn') : null;
-    if (adminLoggedIn !== 'true') {
-      router.replace('/admin/login?redirect=/admin/dashboard');
-    } else {
-      setIsCheckingAuth(false); // Authenticated, stop checking
-      fetchDashboardData(); // Fetch data only if authenticated
-    }
-  }, [router]);
-  
+  // Notifications State
+  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
   const fetchDashboardData = async () => {
-    setOverviewStats(prev => prev.map(s => ({ ...s, isLoading: true })));
+    // This function now fetches both stats and notifications
     setIsActivityLoading(true);
+    setOverviewStats(prev => prev.map(s => ({ ...s, isLoading: true })));
 
     try {
       const [
         customersData,
         goldsmithsData,
         pendingOrdersCountData,
+        notificationsData,
       ] = await Promise.all([
         fetchAdminCustomers(),
         fetchAdminGoldsmiths(),
         getPlatformPendingOrderCount(),
+        fetchUnreadAdminNotifications(),
       ]);
 
+      // Handle stats
       const totalUsers = (customersData || []).length;
       const activeGoldsmiths = (goldsmithsData || []).filter(g => g && g.status === 'verified').length;
       const pendingGoldsmiths = (goldsmithsData || []).filter(g => g && g.status === 'pending_verification').length;
@@ -126,9 +134,16 @@ export default function AdminDashboardPage() {
         { title: "Pending Orders", value: pendingOrdersCountData ?? 0, icon: ShoppingCart, isLoading: false, description: `${pendingOrdersCountData ?? 0} require action` },
         { title: "Pending Goldsmiths", value: pendingGoldsmiths, icon: Hourglass, isLoading: false, description: `${pendingGoldsmiths} awaiting verification` },
       ]);
+      
+      // Handle notifications
+      setNotifications(notificationsData || []);
+      setUnreadCount((notificationsData || []).length);
+      
     } catch (error) {
       console.error("Failed to load admin dashboard overview stats:", error);
       setOverviewStats(prevStats => prevStats.map(s => ({ ...s, value: 'Error', isLoading: false, description: 'Data unavailable' })));
+      setNotifications([]);
+      setUnreadCount(0);
     }
 
     try {
@@ -217,6 +232,17 @@ export default function AdminDashboardPage() {
     }
   };
 
+
+  useEffect(() => {
+    const adminLoggedIn = typeof window !== "undefined" ? localStorage.getItem('isAdminLoggedIn') : null;
+    if (adminLoggedIn !== 'true') {
+      router.replace('/admin/login?redirect=/admin/dashboard');
+    } else {
+      setIsCheckingAuth(false);
+      fetchDashboardData();
+    }
+  }, [router]);
+  
   const handleAdminLogout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem('isAdminLoggedIn');
@@ -224,6 +250,21 @@ export default function AdminDashboardPage() {
     toast({ title: "Logged Out", description: "You have been logged out from the admin panel." });
     router.push('/admin/login');
   };
+
+  const handleMarkNotificationsRead = async (isOpen: boolean) => {
+    if (isOpen && unreadCount > 0) {
+      // Optimistically update the UI
+      setUnreadCount(0);
+      // Call the server action to update the database
+      const result = await markAllAdminNotificationsAsRead();
+      if (!result.success) {
+        // If it fails, maybe show a toast and refetch to get the real count
+        toast({ title: "Error", description: "Could not mark notifications as read.", variant: "destructive" });
+        fetchDashboardData();
+      }
+    }
+  };
+
 
   if (isCheckingAuth) {
     return <AdminAuthLoader />;
@@ -237,10 +278,45 @@ export default function AdminDashboardPage() {
           <p className="text-muted-foreground text-md">Welcome, Admin! Oversee and manage platform operations.</p>
         </div>
         <div className="flex items-center gap-3">
-            <Button variant="outline" size="icon" className="rounded-full border-border hover:bg-secondary/30">
-                <Bell className="h-5 w-5 text-muted-foreground"/>
-                <span className="sr-only">Notifications</span>
-            </Button>
+            <DropdownMenu onOpenChange={handleMarkNotificationsRead}>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="relative rounded-full border-border hover:bg-secondary/30">
+                    <Bell className="h-5 w-5 text-muted-foreground"/>
+                    {unreadCount > 0 && (
+                        <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center rounded-full text-xs">
+                           {unreadCount}
+                        </Badge>
+                    )}
+                    <span className="sr-only">Notifications</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80">
+                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {notifications.length > 0 ? (
+                  notifications.map(notif => (
+                    <DropdownMenuItem key={notif.id} asChild>
+                      <Link href={notif.link} className="flex flex-col items-start gap-1 p-2">
+                        <p className="text-xs text-foreground whitespace-normal">{notif.message}</p>
+                        <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true })}</p>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-sm text-muted-foreground">
+                    You're all caught up!
+                  </div>
+                )}
+                 {notifications.length > 0 && (
+                    <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/audit-logs" className="justify-center text-xs text-primary">View All Activity</Link>
+                    </DropdownMenuItem>
+                    </>
+                 )}
+              </DropdownMenuContent>
+            </DropdownMenu>
              <Button variant="destructive" size="sm" onClick={handleAdminLogout} className="rounded-full text-xs">
                 <LogOut className="mr-1.5 h-3.5 w-3.5" /> Logout
             </Button>

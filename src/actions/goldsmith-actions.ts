@@ -1,3 +1,4 @@
+
 // src/actions/goldsmith-actions.ts
 'use server';
 
@@ -6,6 +7,7 @@ import type { Goldsmith, NewGoldsmithInput, OrderRequest, NewOrderRequestInput, 
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 import type { Collection, Filter, WithId, FindOneAndUpdateOptions } from 'mongodb';
 import { logAuditEvent } from './audit-log-actions';
+import { createAdminNotification } from './notification-actions';
 
 const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Example: Los Angeles
 
@@ -93,6 +95,14 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
         { type: 'goldsmith', id: newGoldsmith.id },
         { name: newGoldsmith.name, email: newGoldsmith.email }
       );
+
+      // Create an admin notification for the new registration
+      await createAdminNotification({
+        type: 'new_goldsmith_registration',
+        message: `New goldsmith '${newGoldsmith.name}' has registered and is awaiting verification.`,
+        link: '/admin/goldsmiths',
+      });
+      
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
       if (insertedDoc) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -319,6 +329,13 @@ export async function saveOrderRequest(data: NewOrderRequestInput): Promise<{ su
     };
     const result = await collection.insertOne(newOrderRequest);
     if (result.insertedId) {
+      // Create an admin notification for the new order request
+      await createAdminNotification({
+        type: 'new_order_request',
+        message: `New order from '${newOrderRequest.customerName}' for '${newOrderRequest.itemDescription.substring(0, 25)}...'`,
+        link: `/admin/orders/${newOrderRequest.id}`,
+      });
+
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, ...orderRequestWithoutMongoId } = insertedDoc!;
