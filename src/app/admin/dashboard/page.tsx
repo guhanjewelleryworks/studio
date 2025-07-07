@@ -17,7 +17,6 @@ import {
   LogOut,
   ShieldCheck,
   Loader2,
-  MessageSquare,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
@@ -292,13 +291,6 @@ export default function AdminDashboardPage() {
           icon={ShoppingCart}
           linkText="View Orders"
           linkHref="/admin/orders"
-        />
-        <DashboardCard
-          title="Communications (Removed)"
-          description="This feature has been consolidated into Order Management for a streamlined workflow."
-          icon={MessageSquare}
-          linkText="View Deprecated Page"
-          linkHref="/admin/communications"
         />
         <DashboardCard
           title="Database Records"
