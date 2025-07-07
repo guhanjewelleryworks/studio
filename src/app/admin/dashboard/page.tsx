@@ -364,8 +364,7 @@ export default function AdminDashboardPage() {
             <CardTitle className="text-md text-accent font-heading flex items-center"><ShieldCheck className="h-4 w-4 mr-2 text-primary"/>Admin Notes & Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-1 text-xs text-muted-foreground">
-            <p>This is a simulated admin dashboard. In a real application, ensure all actions are logged and proper authorization checks are in place.</p>
-            <p className="mt-1.5">Quick links: <Link href="/admin/audit-logs" className="text-primary hover:underline">View Audit Logs</Link> | <Link href="/admin/reports" className="text-primary hover:underline">Generate Reports</Link></p>
+            <p>Quick links: <Link href="/admin/audit-logs" className="text-primary hover:underline">View Audit Logs</Link> | <Link href="/admin/reports" className="text-primary hover:underline">Generate Reports</Link></p>
           </CardContent>
         </Card>
       </section>
