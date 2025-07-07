@@ -80,26 +80,6 @@ export interface OrderRequest {
 export type NewOrderRequestInput = Omit<OrderRequest, '_id' | 'id' | 'status' | 'requestedAt' | 'updatedAt'>;
 
 
-export type InquiryStatus = 'new' | 'admin_review' | 'forwarded_to_goldsmith' | 'goldsmith_replied' | 'closed';
-
-export interface Inquiry {
-  _id?: ObjectId | string;
-  id: string; // UUID
-  goldsmithId: string;
-  customerId?: string; // Link to Customer ID
-  customerName: string;
-  customerEmail: string;
-  customerPhone?: string;
-  message: string;
-  referenceImage?: string; 
-  status: InquiryStatus;
-  requestedAt: Date;
-  updatedAt: Date;
-}
-
-export type NewInquiryInput = Omit<Inquiry, '_id' | 'id' | 'status' | 'requestedAt' | 'updatedAt'>;
-
-
 // --- Customer Types ---
 export interface Customer {
   _id?: ObjectId | string; // MongoDB ID

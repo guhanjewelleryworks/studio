@@ -1,8 +1,8 @@
 // src/actions/goldsmith-actions.ts
 'use server';
 
-import { getGoldsmithsCollection, getOrderRequestsCollection, getInquiriesCollection } from '@/lib/mongodb';
-import type { Goldsmith, NewGoldsmithInput, OrderRequest, NewOrderRequestInput, Inquiry, NewInquiryInput, OrderRequestStatus, InquiryStatus } from '@/types/goldsmith';
+import { getGoldsmithsCollection, getOrderRequestsCollection } from '@/lib/mongodb';
+import type { Goldsmith, NewGoldsmithInput, OrderRequest, NewOrderRequestInput, OrderRequestStatus } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 import type { Collection, Filter, WithId, FindOneAndUpdateOptions } from 'mongodb';
 
@@ -238,7 +238,7 @@ export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Gold
   }
 }
 
-// --- New Actions for Orders and Inquiries ---
+// --- New Actions for Orders ---
 
 export async function saveOrderRequest(data: NewOrderRequestInput): Promise<{ success: boolean; error?: string; data?: OrderRequest }> {
   console.log('[Action: saveOrderRequest] Received data:', JSON.stringify(data));
@@ -280,31 +280,6 @@ export async function saveOrderRequest(data: NewOrderRequestInput): Promise<{ su
   }
 }
 
-export async function saveInquiry(data: NewInquiryInput): Promise<{ success: boolean; error?: string; data?: Inquiry }> {
-  console.log('[Action: saveInquiry] Received data:', JSON.stringify(data));
-  try {
-    const collection = await getInquiriesCollection();
-    const newInquiry: Inquiry = {
-      ...data,
-      id: uuidv4(),
-      status: 'new',
-      requestedAt: new Date(),
-      updatedAt: new Date(),
-    };
-    const result = await collection.insertOne(newInquiry);
-     if (result.insertedId) {
-      const insertedDoc = await collection.findOne({ _id: result.insertedId });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { _id, ...inquiryWithoutMongoId } = insertedDoc!;
-      return { success: true, data: inquiryWithoutMongoId as Inquiry };
-    }
-    return { success: false, error: 'Failed to save inquiry.' };
-  } catch (error) {
-    console.error('[Action: saveInquiry] Error:', error);
-    return { success: false, error: 'Server error while saving inquiry.' };
-  }
-}
-
 export async function getNewOrderCountForGoldsmith(goldsmithId: string): Promise<number> {
   console.log(`[Action: getNewOrderCountForGoldsmith] Fetching for goldsmithId: ${goldsmithId}`);
   try {
@@ -314,20 +289,6 @@ export async function getNewOrderCountForGoldsmith(goldsmithId: string): Promise
     return count;
   } catch (error) {
     console.error(`[Action: getNewOrderCountForGoldsmith] Error fetching new order count for ${goldsmithId}:`, error);
-    return 0;
-  }
-}
-
-
-export async function getPendingInquiriesCountForGoldsmith(goldsmithId: string): Promise<number> {
-  console.log(`[Action: getPendingInquiriesCountForGoldsmith] Fetching for goldsmithId: ${goldsmithId}`);
-  try {
-    const collection = await getInquiriesCollection();
-    const count = await collection.countDocuments({ goldsmithId, status: 'new' });
-    console.log(`[Action: getPendingInquiriesCountForGoldsmith] Found ${count} new inquiries.`);
-    return count;
-  } catch (error) {
-    console.error(`[Action: getPendingInquiriesCountForGoldsmith] Error fetching new inquiry count for ${goldsmithId}:`, error);
     return 0;
   }
 }
@@ -343,20 +304,6 @@ export async function getPlatformPendingOrderCount(): Promise<number> {
     return count;
   } catch (error) {
     console.error(`[Action: getPlatformPendingOrderCount] Error fetching pending order count:`, error);
-    return 0;
-  }
-}
-
-export async function getPlatformPendingInquiriesCount(): Promise<number> {
-  console.log('[Action: getPlatformPendingInquiriesCount] Fetching count of pending inquiries for admin dashboard.');
-  try {
-    const collection = await getInquiriesCollection();
-    const pendingStatuses: InquiryStatus[] = ['new', 'admin_review']; 
-    const count = await collection.countDocuments({ status: { $in: pendingStatuses } });
-    console.log(`[Action: getPlatformPendingInquiriesCount] Found ${count} pending inquiries.`);
-    return count;
-  } catch (error) {
-    console.error(`[Action: getPlatformPendingInquiriesCount] Error fetching pending inquiry count:`, error);
     return 0;
   }
 }
@@ -388,37 +335,6 @@ export async function fetchAllPlatformOrderRequests(): Promise<OrderRequest[]> {
     return ordersArray.map(({ _id, ...order }) => order as OrderRequest);
   } catch (error) {
     console.error(`[Action: fetchAllPlatformOrderRequests] Error fetching all orders:`, error);
-    return [];
-  }
-}
-
-
-export async function fetchLatestPlatformInquiries(limit: number = 3): Promise<Inquiry[]> {
-  console.log(`[Action: fetchLatestPlatformInquiries] Fetching latest ${limit} platform inquiries.`);
-  try {
-    const collection = await getInquiriesCollection();
-    const inquiriesCursor = collection.find({}).sort({ requestedAt: -1 }).limit(limit);
-    const inquiriesArray: WithId<Inquiry>[] = await inquiriesCursor.toArray();
-    console.log(`[Action: fetchLatestPlatformInquiries] Found ${inquiriesArray.length} inquiries.`);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return inquiriesArray.map(({ _id, ...inquiry }) => inquiry as Inquiry);
-  } catch (error) {
-    console.error(`[Action: fetchLatestPlatformInquiries] Error fetching latest inquiries:`, error);
-    return [];
-  }
-}
-
-export async function fetchAllPlatformInquiries(): Promise<Inquiry[]> {
-  console.log(`[Action: fetchAllPlatformInquiries] Fetching all platform inquiries for admin.`);
-  try {
-    const collection = await getInquiriesCollection();
-    const inquiriesCursor = collection.find({}).sort({ requestedAt: -1 }); // Sort by most recent
-    const inquiriesArray: WithId<Inquiry>[] = await inquiriesCursor.toArray();
-    console.log(`[Action: fetchAllPlatformInquiries] Found ${inquiriesArray.length} total inquiries.`);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return inquiriesArray.map(({ _id, ...inquiry }) => inquiry as Inquiry);
-  } catch (error) {
-    console.error(`[Action: fetchAllPlatformInquiries] Error fetching all inquiries:`, error);
     return [];
   }
 }
@@ -590,23 +506,6 @@ export async function deleteGoldsmithPortfolioImage(
   } catch (error) {
     console.error(`[Action: deleteGoldsmithPortfolioImage] Error deleting image for ${goldsmithId}:`, error);
     return { success: false, error: 'Failed to delete image due to a server error.' };
-  }
-}
-
-
-export async function fetchInquiriesForGoldsmith(goldsmithId: string): Promise<Inquiry[]> {
-  console.log(`[Action: fetchInquiriesForGoldsmith] Fetching inquiries for goldsmithId: ${goldsmithId}`);
-  try {
-    const collection = await getInquiriesCollection();
-    // Fetch inquiries where goldsmithId matches
-    const inquiriesCursor = collection.find({ goldsmithId: goldsmithId } as Filter<Inquiry>);
-    const inquiriesArray = await inquiriesCursor.sort({ requestedAt: -1 }).toArray();
-    console.log(`[Action: fetchInquiriesForGoldsmith] Found ${inquiriesArray.length} inquiries for goldsmithId ${goldsmithId}.`);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return inquiriesArray.map(({ _id, ...inquiry }) => inquiry as Inquiry);
-  } catch (error) {
-    console.error(`[Action: fetchInquiriesForGoldsmith] Error fetching inquiries for goldsmithId ${goldsmithId}:`, error);
-    return [];
   }
 }
 

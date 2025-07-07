@@ -9,14 +9,15 @@ import {
   Users,
   Briefcase,
   ShoppingCart,
-  MessageSquare,
+  Hourglass,
   Database,
   Settings,
   BarChart3,
   Bell,
   LogOut,
   ShieldCheck,
-  Loader2 
+  Loader2,
+  MessageSquare,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
@@ -27,12 +28,10 @@ import {
 import { 
   fetchAdminGoldsmiths, 
   getPlatformPendingOrderCount, 
-  getPlatformPendingInquiriesCount,
   fetchLatestGoldsmiths,
   fetchLatestPlatformOrderRequests,
-  fetchLatestPlatformInquiries
 } from '@/actions/goldsmith-actions';
-import type { Customer, Goldsmith, OrderRequest, Inquiry } from '@/types/goldsmith';
+import type { Customer, Goldsmith, OrderRequest } from '@/types/goldsmith';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
@@ -65,7 +64,7 @@ interface OverviewStatDisplay {
 
 interface ActivityItem {
   id: string;
-  type: 'newUser' | 'newGoldsmith' | 'newOrder' | 'newInquiry';
+  type: 'newUser' | 'newGoldsmith' | 'newOrder';
   message: string;
   time: string; // Formatted time (e.g., "2 hours ago")
   timestamp: Date; // Actual timestamp for sorting
@@ -88,7 +87,7 @@ export default function AdminDashboardPage() {
     { title: "Total Users", value: "0", icon: Users, description: "registered users", isLoading: true },
     { title: "Active Goldsmiths", value: "0", icon: Briefcase, description: "verified partners", isLoading: true },
     { title: "Pending Orders", value: "0", icon: ShoppingCart, description: "require action", isLoading: true },
-    { title: "Unread Messages", value: "0", icon: MessageSquare, description: "to review", isLoading: true },
+    { title: "Pending Goldsmiths", value: "0", icon: Hourglass, description: "awaiting verification", isLoading: true },
   ]);
   const [recentActivities, setRecentActivities] = useState<ActivityItem[]>([]);
   const [isActivityLoading, setIsActivityLoading] = useState(true);
@@ -112,22 +111,21 @@ export default function AdminDashboardPage() {
         customersData,
         goldsmithsData,
         pendingOrdersCountData,
-        pendingInquiriesCountData,
       ] = await Promise.all([
         fetchAdminCustomers(),
         fetchAdminGoldsmiths(),
         getPlatformPendingOrderCount(),
-        getPlatformPendingInquiriesCount(),
       ]);
 
       const totalUsers = (customersData || []).length;
       const activeGoldsmiths = (goldsmithsData || []).filter(g => g && g.status === 'verified').length;
+      const pendingGoldsmiths = (goldsmithsData || []).filter(g => g && g.status === 'pending_verification').length;
 
       setOverviewStats([
         { title: "Total Users", value: totalUsers, icon: Users, isLoading: false, description: `${totalUsers} registered` },
         { title: "Active Goldsmiths", value: activeGoldsmiths, icon: Briefcase, isLoading: false, description: `${activeGoldsmiths} verified` },
         { title: "Pending Orders", value: pendingOrdersCountData ?? 0, icon: ShoppingCart, isLoading: false, description: `${pendingOrdersCountData ?? 0} require action` },
-        { title: "Unread Messages", value: pendingInquiriesCountData ?? 0, icon: MessageSquare, isLoading: false, description: `${pendingInquiriesCountData ?? 0} to review` },
+        { title: "Pending Goldsmiths", value: pendingGoldsmiths, icon: Hourglass, isLoading: false, description: `${pendingGoldsmiths} awaiting verification` },
       ]);
     } catch (error) {
       console.error("Failed to load admin dashboard overview stats:", error);
@@ -139,12 +137,10 @@ export default function AdminDashboardPage() {
         latestCustomersData,
         latestGoldsmithsData,
         latestOrdersData,
-        latestInquiriesData,
       ] = await Promise.all([
         fetchLatestCustomers(3), 
         fetchLatestGoldsmiths(3), 
         fetchLatestPlatformOrderRequests(3), 
-        fetchLatestPlatformInquiries(3), 
       ]);
 
       const activities: ActivityItem[] = [];
@@ -200,24 +196,6 @@ export default function AdminDashboardPage() {
           });
         } else {
           console.warn(`[AdminDashboard] Order ${order.id || 'Unknown ID'} has invalid or missing requestedAt: ${order.requestedAt}`);
-        }
-      });
-
-      (latestInquiriesData || []).forEach(inquiry => {
-        if (!inquiry) return;
-        const reqDate = inquiry.requestedAt ? new Date(inquiry.requestedAt) : null;
-        if (reqDate && !isNaN(reqDate.getTime())) {
-          activities.push({
-            id: `inquiry-${inquiry.id}`,
-            type: 'newInquiry',
-            message: `New inquiry from '${inquiry.customerName || 'N/A'}' for goldsmith ID ${(inquiry.goldsmithId || 'N/A').substring(0,8)}...`,
-            timestamp: reqDate,
-            time: formatDistanceToNow(reqDate, { addSuffix: true }),
-            icon: MessageSquare,
-            link: `/admin/communications`,
-          });
-        } else {
-          console.warn(`[AdminDashboard] Inquiry ${inquiry.id || 'Unknown ID'} has invalid or missing requestedAt: ${inquiry.requestedAt}`);
         }
       });
       
@@ -316,10 +294,10 @@ export default function AdminDashboardPage() {
           linkHref="/admin/orders"
         />
         <DashboardCard
-          title="Communications"
-          description="Facilitate and monitor introductions and communications between users and goldsmiths."
+          title="Communications (Removed)"
+          description="This feature has been consolidated into Order Management for a streamlined workflow."
           icon={MessageSquare}
-          linkText="Access Messages"
+          linkText="View Deprecated Page"
           linkHref="/admin/communications"
         />
         <DashboardCard

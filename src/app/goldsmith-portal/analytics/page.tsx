@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Eye, MessageCircle, ShoppingBag, Loader2, AlertTriangle } from 'lucide-react';
-import { fetchGoldsmithById, fetchInquiriesForGoldsmith } from '@/actions/goldsmith-actions';
+import { fetchGoldsmithById } from '@/actions/goldsmith-actions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -15,11 +15,11 @@ interface CurrentGoldsmithUser {
 }
 
 interface AnalyticsData {
-  profileViews: number; // Will remain mocked
+  profileViews: number;
   inquiriesReceived: number;
   ordersCompleted: number;
   conversionRate: string;
-  mostViewedItem: string; // Will remain mocked
+  mostViewedItem: string;
 }
 
 export default function GoldsmithAnalyticsPage() {
@@ -51,17 +51,16 @@ export default function GoldsmithAnalyticsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const [goldsmithProfile, allInquiries] = await Promise.all([
-          fetchGoldsmithById(currentUser.id),
-          fetchInquiriesForGoldsmith(currentUser.id)
-        ]);
+        const goldsmithProfile = await fetchGoldsmithById(currentUser.id);
 
         if (!goldsmithProfile) {
           throw new Error("Could not retrieve your goldsmith profile.");
         }
         
         const ordersCompleted = goldsmithProfile.ordersCompleted || 0;
-        const inquiriesReceived = allInquiries.length;
+        
+        // Inquiry system has been removed, so this data is now simulated for display.
+        const inquiriesReceived = 72; // Mocked value
         
         let conversionRate = '0.00%';
         if (inquiriesReceived > 0) {
@@ -71,9 +70,9 @@ export default function GoldsmithAnalyticsPage() {
         setAnalyticsData({
           ordersCompleted,
           inquiriesReceived,
-          conversionRate,
-          profileViews: 1250, // Keep mocked
-          mostViewedItem: "Custom Diamond Engagement Ring", // Keep mocked
+          conversionRate: `${conversionRate} (demo)`,
+          profileViews: 1250, // Mocked value
+          mostViewedItem: "Custom Diamond Engagement Ring", // Mocked value
         });
 
       } catch (err) {
@@ -124,10 +123,10 @@ export default function GoldsmithAnalyticsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <StatCard 
-                    title="Inquiries Received"
+                    title="Inquiries Received (Simulated)"
                     value={analyticsData?.inquiriesReceived ?? '...'}
                     icon={MessageCircle}
-                    description="Total customer inquiries sent to you."
+                    description="Total customer inquiries (demo data)."
                     isLoading={isLoading}
                 />
                 <StatCard 

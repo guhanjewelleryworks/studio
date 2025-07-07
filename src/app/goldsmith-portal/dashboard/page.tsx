@@ -9,7 +9,6 @@ import { Separator } from '@/components/ui/separator';
 import { 
   UserCog, 
   Package, 
-  MessageSquare, 
   GalleryHorizontal, 
   Settings,
   Bell,
@@ -19,13 +18,13 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import type { Goldsmith } from '@/types/goldsmith';
-import { fetchGoldsmithById, getNewOrderCountForGoldsmith, getPendingInquiriesCountForGoldsmith } from '@/actions/goldsmith-actions';
+import { fetchGoldsmithById, getNewOrderCountForGoldsmith } from '@/actions/goldsmith-actions';
 import { useToast } from '@/hooks/use-toast';
 
 interface DashboardStats {
   goldsmithName: string;
   newOrdersCount: number;
-  pendingInquiriesCount: number;
+  portfolioImageCount: number;
   profileCompletion: number;
 }
 
@@ -56,7 +55,7 @@ export default function GoldsmithDashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({
     goldsmithName: "Loading...",
     newOrdersCount: 0, 
-    pendingInquiriesCount: 0,
+    portfolioImageCount: 0,
     profileCompletion: 0,
   });
   const [currentGoldsmith, setCurrentGoldsmith] = useState<Goldsmith | null>(null);
@@ -95,7 +94,7 @@ export default function GoldsmithDashboardPage() {
         // Only set loading to false if we definitely aren't going to fetch.
         if (!localStorage.getItem('currentGoldsmithUser')) {
              setIsLoading(false);
-             setStats({ goldsmithName: "Guest", newOrdersCount: 0, pendingInquiriesCount: 0, profileCompletion: 0 });
+             setStats({ goldsmithName: "Guest", newOrdersCount: 0, portfolioImageCount: 0, profileCompletion: 0 });
         }
         return;
       }
@@ -116,16 +115,13 @@ export default function GoldsmithDashboardPage() {
             });
           }
 
-          const [ordersCount, inquiriesCount] = await Promise.all([
-            getNewOrderCountForGoldsmith(activeGoldsmith.id), 
-            getPendingInquiriesCountForGoldsmith(activeGoldsmith.id)
-          ]);
+          const ordersCount = await getNewOrderCountForGoldsmith(activeGoldsmith.id); 
 
           setStats({
             goldsmithName: activeGoldsmith.name,
             profileCompletion: calculateProfileCompletion(activeGoldsmith),
             newOrdersCount: ordersCount, 
-            pendingInquiriesCount: inquiriesCount,
+            portfolioImageCount: activeGoldsmith.portfolioImages?.length || 0,
           });
         } else {
            toast({
@@ -137,7 +133,7 @@ export default function GoldsmithDashboardPage() {
             goldsmithName: "Profile Error",
             profileCompletion: 0,
             newOrdersCount: 0,
-            pendingInquiriesCount: 0,
+            portfolioImageCount: 0,
           });
            // Potentially log out or redirect if profile is crucial and not found
            localStorage.removeItem('currentGoldsmithUser');
@@ -154,7 +150,7 @@ export default function GoldsmithDashboardPage() {
             goldsmithName: "Error Loading",
             profileCompletion: 0,
             newOrdersCount: 0,
-            pendingInquiriesCount: 0,
+            portfolioImageCount: 0,
           });
       } finally {
         setIsLoading(false);
@@ -213,12 +209,12 @@ export default function GoldsmithDashboardPage() {
         </Card>
         <Card className="shadow-lg bg-card border-primary/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-accent">Pending Inquiries</CardTitle>
-            <MessageSquare className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-accent">Portfolio Images</CardTitle>
+            <GalleryHorizontal className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">{isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.pendingInquiriesCount}</div>
-            <p className="text-xs text-muted-foreground">Require your response</p>
+            <div className="text-2xl font-bold text-foreground">{isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.portfolioImageCount}</div>
+            <p className="text-xs text-muted-foreground">Showcasing your work</p>
           </CardContent>
         </Card>
         <Card className="shadow-lg bg-card border-primary/10">
@@ -253,19 +249,19 @@ export default function GoldsmithDashboardPage() {
           variant="default"
         />
         <DashboardActionCard
-          title="Communication Hub"
-          description="Respond to customer inquiries and manage conversations."
-          icon={MessageSquare}
-          linkHref={`/goldsmith-portal/messages?goldsmithId=${currentGoldsmith?.id || ''}`}
-          linkText="Access Messages"
-          variant="default"
-        />
-        <DashboardActionCard
           title="Portfolio Showcase"
           description="Manage images of your work to attract customers."
           icon={GalleryHorizontal}
           linkHref={`/goldsmith-portal/portfolio/manage?goldsmithId=${currentGoldsmith?.id || ''}`}
           linkText="Update Portfolio"
+          variant="default"
+        />
+        <DashboardActionCard
+          title="Performance Analytics"
+          description="View insights on profile views and orders."
+          icon={BarChart3}
+          linkHref="/goldsmith-portal/analytics"
+          linkText="View Analytics"
           variant="outline"
         />
         <DashboardActionCard

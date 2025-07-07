@@ -1,8 +1,8 @@
 // src/actions/customer-actions.ts
 'use server';
 
-import { getCustomersCollection, getOrderRequestsCollection, getInquiriesCollection } from '@/lib/mongodb';
-import type { Customer, NewCustomerInput, OrderRequest, Inquiry } from '@/types/goldsmith';
+import { getCustomersCollection, getOrderRequestsCollection } from '@/lib/mongodb';
+import type { Customer, NewCustomerInput, OrderRequest } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid';
 import type { Collection, WithId, Filter } from 'mongodb';
 
