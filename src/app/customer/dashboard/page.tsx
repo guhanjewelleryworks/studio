@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { fetchCustomerOrders } from '@/actions/customer-actions';
 import type { OrderRequest } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 interface CurrentUser {
   isLoggedIn: boolean;
@@ -20,13 +21,47 @@ interface CurrentUser {
 
 interface DashboardStats {
   orderCount: number;
+  notificationCount: number;
 }
+
+interface DashboardActionCardProps {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  linkHref: string;
+  linkText: string;
+  notificationCount?: number;
+}
+
+const DashboardActionCard: React.FC<DashboardActionCardProps> = ({ title, description, icon: Icon, linkHref, linkText, notificationCount }) => (
+  <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10 rounded-xl">
+    <CardHeader>
+      <div className="flex items-center justify-between gap-3 mb-2">
+        <div className="flex items-center gap-3">
+            <Icon className="h-7 w-7 text-primary" />
+            <CardTitle className="text-xl text-accent font-heading">{title}</CardTitle>
+        </div>
+        {notificationCount && notificationCount > 0 && (
+            <Badge variant="destructive" className="h-6 w-6 p-0 flex items-center justify-center rounded-full text-xs animate-pulse">
+                {notificationCount}
+            </Badge>
+        )}
+      </div>
+      <CardDescription className="text-muted-foreground text-sm">{description}</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <Button asChild variant="default" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full">
+        <Link href={linkHref}>{linkText}</Link>
+      </Button>
+    </CardContent>
+  </Card>
+);
 
 export default function CustomerDashboardPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const [stats, setStats] = useState<DashboardStats>({ orderCount: 0 });
+  const [stats, setStats] = useState<DashboardStats>({ orderCount: 0, notificationCount: 0 });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -49,8 +84,12 @@ export default function CustomerDashboardPage() {
         setIsLoading(true);
         try {
           const orders = await fetchCustomerOrders(currentUser.id as string);
+          const notificationCount = orders.filter(
+            o => o.status === 'customer_review_requested' || o.status === 'shipped'
+          ).length;
           setStats({
             orderCount: orders.length,
+            notificationCount,
           });
         } catch (error) {
           console.error("Failed to load dashboard stats:", error);
@@ -119,33 +158,9 @@ export default function CustomerDashboardPage() {
           icon={ShoppingBag}
           linkHref="/customer/orders"
           linkText="See Order History"
+          notificationCount={stats.notificationCount}
         />
       </section>
     </div>
   );
 }
-
-interface DashboardActionCardProps {
-  title: string;
-  description: string;
-  icon: React.ElementType;
-  linkHref: string;
-  linkText: string;
-}
-
-const DashboardActionCard: React.FC<DashboardActionCardProps> = ({ title, description, icon: Icon, linkHref, linkText }) => (
-  <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10 rounded-xl">
-    <CardHeader>
-      <div className="flex items-center gap-3 mb-2">
-        <Icon className="h-7 w-7 text-primary" />
-        <CardTitle className="text-xl text-accent font-heading">{title}</CardTitle>
-      </div>
-      <CardDescription className="text-muted-foreground text-sm">{description}</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <Button asChild variant="default" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-full">
-        <Link href={linkHref}>{linkText}</Link>
-      </Button>
-    </CardContent>
-  </Card>
-);

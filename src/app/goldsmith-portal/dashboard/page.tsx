@@ -20,10 +20,11 @@ import Link from 'next/link';
 import type { Goldsmith } from '@/types/goldsmith';
 import { fetchGoldsmithById, getNewOrderCountForGoldsmith } from '@/actions/goldsmith-actions';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 interface DashboardStats {
   goldsmithName: string;
-  newOrdersCount: number;
+  newOrdersCount: number; 
   portfolioImageCount: number;
   profileCompletion: number;
 }
@@ -49,6 +50,49 @@ const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
   
   return Math.round((completedFields / totalFields) * 100);
 };
+
+interface DashboardActionCardProps {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  linkHref: string;
+  linkText: string;
+  variant?: "default" | "outline";
+  secondaryLinkHref?: string;
+  secondaryLinkText?: string;
+  notificationCount?: number;
+}
+
+const DashboardActionCard: React.FC<DashboardActionCardProps> = ({ title, description, icon: Icon, linkHref, linkText, variant = "default", secondaryLinkHref, secondaryLinkText, notificationCount }) => (
+  <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
+    <CardHeader>
+      <div className="flex items-center justify-between gap-3 mb-2">
+        <div className="flex items-center gap-3">
+            <Icon className="h-8 w-8 text-primary" />
+            <CardTitle className="text-xl text-accent font-heading">{title}</CardTitle>
+        </div>
+        {notificationCount && notificationCount > 0 && (
+            <Badge variant="destructive" className="h-6 w-6 p-0 flex items-center justify-center rounded-full text-xs animate-pulse">
+                {notificationCount}
+            </Badge>
+        )}
+      </div>
+      <CardDescription className="text-muted-foreground text-sm">
+        {description}
+      </CardDescription>
+    </CardHeader>
+    <CardContent className="space-y-2">
+      <Button asChild className={`w-full ${variant === "default" ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground"}`} variant={variant}>
+        <Link href={linkHref}>{linkText}</Link>
+      </Button>
+      {secondaryLinkHref && secondaryLinkText && (
+        <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
+          <Link href={secondaryLinkHref}>{secondaryLinkText}</Link>
+        </Button>
+      )}
+    </CardContent>
+  </Card>
+);
 
 export default function GoldsmithDashboardPage() {
   const router = useRouter();
@@ -247,6 +291,7 @@ export default function GoldsmithDashboardPage() {
           linkHref={`/goldsmith-portal/orders?goldsmithId=${currentGoldsmith?.id || ''}&status=all`}
           linkText="Manage All Orders"
           variant="default"
+          notificationCount={stats.newOrdersCount}
         />
         <DashboardActionCard
           title="Portfolio Showcase"
@@ -276,38 +321,3 @@ export default function GoldsmithDashboardPage() {
     </div>
   );
 }
-
-interface DashboardActionCardProps {
-  title: string;
-  description: string;
-  icon: React.ElementType;
-  linkHref: string;
-  linkText: string;
-  variant?: "default" | "outline";
-  secondaryLinkHref?: string;
-  secondaryLinkText?: string;
-}
-
-const DashboardActionCard: React.FC<DashboardActionCardProps> = ({ title, description, icon: Icon, linkHref, linkText, variant = "default", secondaryLinkHref, secondaryLinkText }) => (
-  <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10">
-    <CardHeader>
-      <div className="flex items-center gap-3 mb-2">
-        <Icon className="h-8 w-8 text-primary" />
-        <CardTitle className="text-xl text-accent font-heading">{title}</CardTitle>
-      </div>
-      <CardDescription className="text-muted-foreground text-sm">
-        {description}
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-2">
-      <Button asChild className={`w-full ${variant === "default" ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground"}`} variant={variant}>
-        <Link href={linkHref}>{linkText}</Link>
-      </Button>
-      {secondaryLinkHref && secondaryLinkText && (
-        <Button asChild variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-          <Link href={secondaryLinkHref}>{secondaryLinkText}</Link>
-        </Button>
-      )}
-    </CardContent>
-  </Card>
-);
