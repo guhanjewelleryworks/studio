@@ -141,9 +141,23 @@ export interface AuditLog {
 export interface AdminNotification {
   _id?: ObjectId | string;
   id: string; // UUID
-  type: 'new_goldsmith_registration' | 'new_order_request';
+  type: 'new_goldsmith_registration' | 'new_order_request' | 'new_contact_message';
   message: string;
   link: string; // e.g., /admin/goldsmiths
   isRead: boolean;
   createdAt: Date;
 }
+
+// --- New Type for Contact Form Submissions ---
+export interface ContactSubmission {
+    _id?: ObjectId | string;
+    id: string;
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+    submittedAt: Date;
+    isArchived: boolean;
+}
+
+export type NewContactSubmission = Omit<ContactSubmission, '_id' | 'id' | 'submittedAt' | 'isArchived'>;

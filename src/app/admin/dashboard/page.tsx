@@ -28,6 +28,7 @@ import {
   ShieldCheck,
   Loader2,
   AlertTriangle,
+  MessageSquare,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
@@ -367,6 +368,13 @@ export default function AdminDashboardPage() {
           icon={ShoppingCart}
           linkText="View Orders"
           linkHref="/admin/orders"
+        />
+        <DashboardCard
+          title="Communications"
+          description="View and manage messages submitted through the public contact form."
+          icon={MessageSquare}
+          linkText="View Messages"
+          linkHref="/admin/communications"
         />
         <DashboardCard
           title="Database Records"
