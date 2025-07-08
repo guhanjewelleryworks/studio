@@ -11,6 +11,7 @@ import type { ContactSubmission } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 export default function AdminCommunicationsPage() {
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
