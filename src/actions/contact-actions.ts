@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createAdminNotification } from './notification-actions';
 import { logAuditEvent } from './audit-log-actions';
 import { type WithId } from 'mongodb';
+import { revalidatePath } from 'next/cache';
 
 export async function saveContactSubmission(data: NewContactSubmission): Promise<{ success: boolean; error?: string }> {
   console.log('[Action: saveContactSubmission] Received data:', JSON.stringify(data));
@@ -38,6 +39,7 @@ export async function saveContactSubmission(data: NewContactSubmission): Promise
       });
       // Log audit event
       logAuditEvent('Contact form submitted', { type: 'system', id: 'public_form' }, { email: newSubmission.email, phone: newSubmission.phone, subject: newSubmission.subject });
+      revalidatePath('/admin/dashboard'); // Revalidate dashboard to update count
       return { success: true };
     }
 
@@ -81,6 +83,7 @@ export async function archiveContactSubmission(id: string): Promise<{ success: b
 
         if (result.modifiedCount === 1) {
             logAuditEvent('Archived contact submission', { type: 'admin', id: 'admin_user' }, { submissionId: id });
+            revalidatePath('/admin/dashboard'); // Revalidate dashboard to update count
             return { success: true };
         }
         
@@ -90,4 +93,17 @@ export async function archiveContactSubmission(id: string): Promise<{ success: b
         console.error(`[Action: archiveContactSubmission] Error archiving submission ${id}:`, error);
         return { success: false, error: 'Failed to archive due to a server error.' };
     }
+}
+
+export async function getUnarchivedContactSubmissionsCount(): Promise<number> {
+  console.log('[Action: getUnarchivedContactSubmissionsCount] Fetching count of unarchived submissions.');
+  try {
+    const collection = await getContactSubmissionsCollection();
+    const count = await collection.countDocuments({ isArchived: false });
+    console.log(`[Action: getUnarchivedContactSubmissionsCount] Found ${count} unarchived submissions.`);
+    return count;
+  } catch (error) {
+    console.error(`[Action: getUnarchivedContactSubmissionsCount] Error fetching count:`, error);
+    return 0;
+  }
 }

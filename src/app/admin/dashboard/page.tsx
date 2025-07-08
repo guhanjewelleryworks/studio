@@ -33,6 +33,7 @@ import {
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { fetchLatestCustomers, fetchAdminCustomers } from '@/actions/customer-actions';
+import { getUnarchivedContactSubmissionsCount } from '@/actions/contact-actions'; // New import
 import { 
   fetchAdminGoldsmiths, 
   getPlatformPendingOrderCount, 
@@ -45,12 +46,19 @@ import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-const DashboardCard = ({ title, description, icon: Icon, linkHref, linkText }: { title: string, description: string, icon: React.ElementType, linkHref?: string, linkText?: string }) => (
+const DashboardCard = ({ title, description, icon: Icon, linkHref, linkText, notificationCount }: { title: string, description: string, icon: React.ElementType, linkHref?: string, linkText?: string, notificationCount?: number }) => (
   <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10 rounded-xl">
-    <CardHeader className="pb-3 pt-4 px-4">
-      <div className="flex items-center gap-3 mb-1.5">
-        <Icon className="h-7 w-7 text-primary" />
-        <CardTitle className="text-xl text-accent font-heading">{title}</CardTitle>
+    <CardHeader className="pb-3 pt-4 px-4 relative">
+      <div className="flex items-start justify-between gap-3 mb-1.5">
+        <div className="flex items-center gap-3">
+            <Icon className="h-7 w-7 text-primary" />
+            <CardTitle className="text-xl text-accent font-heading">{title}</CardTitle>
+        </div>
+         {notificationCount && notificationCount > 0 && (
+            <Badge variant="destructive" className="h-6 w-6 p-0 flex items-center justify-center rounded-full text-xs animate-pulse">
+                {notificationCount}
+            </Badge>
+        )}
       </div>
       <CardDescription className="text-muted-foreground text-xs leading-relaxed">{description}</CardDescription>
     </CardHeader>
@@ -102,6 +110,9 @@ export default function AdminDashboardPage() {
   const [recentActivities, setRecentActivities] = useState<ActivityItem[]>([]);
   const [isActivityLoading, setIsActivityLoading] = useState(true);
 
+  // Card Notification Counts State
+  const [unreadContactCount, setUnreadContactCount] = useState(0);
+
   // Notifications State
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -117,11 +128,13 @@ export default function AdminDashboardPage() {
         goldsmithsData,
         pendingOrdersCountData,
         notificationsData,
+        unreadContactsCountData, // Fetch new count
       ] = await Promise.all([
         fetchAdminCustomers(),
         fetchAdminGoldsmiths(),
         getPlatformPendingOrderCount(),
         fetchUnreadAdminNotifications(),
+        getUnarchivedContactSubmissionsCount(), // New action call
       ]);
 
       // Handle stats
@@ -139,12 +152,14 @@ export default function AdminDashboardPage() {
       // Handle notifications
       setNotifications(notificationsData || []);
       setUnreadCount((notificationsData || []).length);
+      setUnreadContactCount(unreadContactsCountData || 0); // Set new count
       
     } catch (error) {
       console.error("Failed to load admin dashboard overview stats:", error);
       setOverviewStats(prevStats => prevStats.map(s => ({ ...s, value: 'Error', isLoading: false, description: 'Data unavailable' })));
       setNotifications([]);
       setUnreadCount(0);
+      setUnreadContactCount(0);
     }
 
     try {
@@ -375,6 +390,7 @@ export default function AdminDashboardPage() {
           icon={MessageSquare}
           linkText="View Messages"
           linkHref="/admin/communications"
+          notificationCount={unreadContactCount}
         />
         <DashboardCard
           title="Database Records"
