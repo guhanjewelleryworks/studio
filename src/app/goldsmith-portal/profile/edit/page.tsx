@@ -112,6 +112,14 @@ export default function EditGoldsmithProfilePage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
   
+  const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    const numericValue = value.replace(/[^0-9]/g, '');
+    if (numericValue.length <= 10) {
+      setFormData(prev => ({ ...prev, phone: numericValue }));
+    }
+  };
+
   const handleSelectChange = (name: 'state' | 'district', value: string) => {
     setFormData(prev => {
         const newState = { ...prev, [name]: value };
@@ -167,6 +175,16 @@ export default function EditGoldsmithProfilePage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!currentGoldsmithUser?.id) return;
+    
+    if (!formData.phone || formData.phone.trim().length !== 10) {
+        toast({
+            title: 'Invalid Phone Number',
+            description: 'Phone number is required and must be exactly 10 digits.',
+            variant: 'destructive',
+        });
+        return;
+    }
+
     setIsSaving(true);
     try {
       const result = await updateGoldsmithProfile(currentGoldsmithUser.id, {
@@ -308,8 +326,19 @@ export default function EditGoldsmithProfilePage() {
             </div>
             
             <div className="space-y-1.5">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleInputChange} disabled={isSaving} />
+                <Label htmlFor="phone">Phone Number (Required, 10 digits)</Label>
+                <Input 
+                  id="phone" 
+                  name="phone" 
+                  type="tel" 
+                  value={formData.phone} 
+                  onChange={handlePhoneChange} 
+                  disabled={isSaving} 
+                  required
+                  maxLength={10}
+                  pattern="[0-9]{10}"
+                  title="Phone number must be 10 digits."
+                />
             </div>
             <div className="space-y-1.5">
                 <Label htmlFor="specialty">Specialties (comma-separated)</Label>

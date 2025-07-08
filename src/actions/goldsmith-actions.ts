@@ -477,11 +477,12 @@ export async function updateGoldsmithProfile(
       return { success: false, error: 'Goldsmith ID is required.' };
     }
 
+    const collection = await getGoldsmithsCollection();
+
     // Sanitize and prepare the update object
     const updateData: { [key: string]: any } = {};
     if (data.name && data.name.trim()) updateData.name = data.name.trim();
     if (data.contactPerson && data.contactPerson.trim()) updateData.contactPerson = data.contactPerson.trim();
-    if (data.phone && data.phone.trim()) updateData.phone = data.phone.trim();
     if (data.state && data.state.trim()) updateData.state = data.state.trim();
     if (data.district && data.district.trim()) updateData.district = data.district.trim();
     if (data.specialty) { // specialty can be string or string[]
@@ -497,12 +498,28 @@ export async function updateGoldsmithProfile(
     if (data.yearsExperience !== undefined) updateData.yearsExperience = data.yearsExperience;
     if (data.responseTime) updateData.responseTime = data.responseTime.trim();
     
+    // Server-side validation for phone number
+    if (data.phone !== undefined) {
+      const trimmedPhone = data.phone.trim();
+      if (!trimmedPhone) {
+        return { success: false, error: "Phone number is required and cannot be empty." };
+      }
+      if (trimmedPhone.length !== 10) {
+        return { success: false, error: "Phone number must be exactly 10 digits." };
+      }
+      // Check for uniqueness, excluding the current user
+      const existingGoldsmith = await collection.findOne({ phone: trimmedPhone, id: { $ne: id } });
+      if (existingGoldsmith) {
+        return { success: false, error: "This phone number is already in use by another account." };
+      }
+      updateData.phone = trimmedPhone;
+    }
+
     if (Object.keys(updateData).length === 0) {
         return { success: false, error: "No valid data provided to update." };
     }
 
 
-    const collection = await getGoldsmithsCollection();
     const result = await collection.findOneAndUpdate(
       { id: id },
       { $set: updateData },
