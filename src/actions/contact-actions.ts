@@ -11,8 +11,12 @@ import { type WithId } from 'mongodb';
 export async function saveContactSubmission(data: NewContactSubmission): Promise<{ success: boolean; error?: string }> {
   console.log('[Action: saveContactSubmission] Received data:', JSON.stringify(data));
   try {
-    if (!data.name || !data.email || !data.subject || !data.message) {
+    if (!data.name || !data.email || !data.phone || !data.subject || !data.message) {
       return { success: false, error: 'All fields are required.' };
+    }
+    
+    if (data.phone.trim().length !== 10 || !/^[0-9]+$/.test(data.phone.trim())) {
+      return { success: false, error: 'Phone number must be exactly 10 digits.' };
     }
 
     const collection = await getContactSubmissionsCollection();
@@ -33,7 +37,7 @@ export async function saveContactSubmission(data: NewContactSubmission): Promise
         link: '/admin/communications',
       });
       // Log audit event
-      logAuditEvent('Contact form submitted', { type: 'system', id: 'public_form' }, { email: newSubmission.email, subject: newSubmission.subject });
+      logAuditEvent('Contact form submitted', { type: 'system', id: 'public_form' }, { email: newSubmission.email, phone: newSubmission.phone, subject: newSubmission.subject });
       return { success: true };
     }
 

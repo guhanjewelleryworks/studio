@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Archive } from 'lucide-react';
+import { MessageSquare, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Archive, Phone } from 'lucide-react';
 import Link from 'next/link';
 import { fetchContactSubmissions, archiveContactSubmission } from '@/actions/contact-actions';
 import type { ContactSubmission } from '@/types/goldsmith';
@@ -98,6 +98,10 @@ export default function AdminCommunicationsPage() {
                     </div>
                     <CardDescription className="text-xs text-muted-foreground pt-1">
                         From: {sub.name} ({sub.email})
+                        <span className="flex items-center mt-1">
+                          <Phone className="h-3 w-3 mr-1.5" />
+                          {sub.phone}
+                        </span>
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="px-4 py-3">

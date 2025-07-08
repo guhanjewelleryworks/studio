@@ -1,4 +1,3 @@
-
 // src/types/goldsmith.ts
 import type { Location } from '@/services/geolocation';
 import type { ObjectId } from 'mongodb';
@@ -154,6 +153,7 @@ export interface ContactSubmission {
     id: string;
     name: string;
     email: string;
+    phone: string;
     subject: string;
     message: string;
     submittedAt: Date;

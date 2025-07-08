@@ -16,6 +16,9 @@ import { saveContactSubmission } from '@/actions/contact-actions';
 const contactFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
+  phone: z.string()
+    .length(10, { message: "Phone number must be exactly 10 digits." })
+    .regex(/^[0-9]+$/, { message: "Phone number must contain only digits." }),
   subject: z.string().min(3, { message: "Subject must be at least 3 characters." }),
   message: z.string().min(10, { message: "Message must be at least 10 characters." }),
 });
@@ -70,6 +73,12 @@ export default function ContactPage() {
               <Label htmlFor="email" className="text-xs font-medium text-foreground">Your Email Address</Label>
               <Input id="email" type="email" placeholder="jane.doe@example.com" {...register('email')} className="text-sm py-2 text-foreground" />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="phone" className="text-xs font-medium text-foreground">Your Phone Number</Label>
+              <Input id="phone" type="tel" placeholder="10-digit mobile number" {...register('phone')} className="text-sm py-2 text-foreground" maxLength={10} />
+              {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
             </div>
 
             <div className="space-y-1">
