@@ -8,66 +8,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { LogIn, Loader2, Eye, EyeOff, AlertTriangle, LogOut as LogOutIcon } from 'lucide-react';
+import { LogIn, Loader2, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
 import { useState, type FormEvent } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { signIn, signOut } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { resendVerificationEmail } from '@/actions/customer-actions';
 
-function LoginErrorDisplay() {
-  const searchParams = useSearchParams();
-  const error = searchParams.get('error');
-  const router = useRouter();
-  const [isSigningOut, setIsSigningOut] = React.useState(false);
 
-  const errorMessages: Record<string, string> = {
-    Configuration: 'There is a problem with the server configuration. This can happen if an account was deleted and you tried to sign in again with the same social provider.',
-    AccessDenied: 'You do not have permission to sign in. Please contact support if you believe this is an error.',
-    Verification: 'The sign-in link is no longer valid. It may have been used already or expired.',
-    CredentialsSignin: 'Login failed. Please check your email and password and try again.',
-  };
-
-  const getErrorMessage = () => {
-    return error ? (errorMessages[error] || 'An unexpected error occurred. Please try again.') : 'An unknown error occurred.';
-  }
-
-  const handleSignOutAndRetry = async () => {
-    setIsSigningOut(true);
-    await signOut({ redirect: false });
-    router.push('/login');
-    setIsSigningOut(false);
-  };
-
-  return (
-    <Card className="w-full max-w-md shadow-xl border-destructive/30 rounded-xl bg-card">
-      <CardHeader className="text-center pt-8 pb-4">
-        <AlertTriangle className="h-14 w-14 mx-auto text-destructive mb-3" />
-        <CardTitle className="text-3xl text-accent">Login Error</CardTitle>
-        <CardDescription className="text-muted-foreground mt-2 text-base min-h-[40px]">
-          {getErrorMessage()}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="px-8 pb-8 pt-4 space-y-4">
-        <p className="text-sm text-center text-muted-foreground">
-          To resolve this, you can try signing out completely and then attempting to log in again.
-        </p>
-        <Button onClick={handleSignOutAndRetry} size="lg" className="w-full" variant="destructive" disabled={isSigningOut}>
-          {isSigningOut ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOutIcon className="mr-2 h-4 w-4" />}
-          {isSigningOut ? 'Signing Out...' : 'Sign Out & Try Again'}
-        </Button>
-        <Button asChild variant="link" className="w-full">
-          <Link href="/">Return to Homepage</Link>
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-
-function LoginForm() {
+export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
@@ -76,6 +27,26 @@ function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showResend, setShowResend] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
+
+
+  React.useEffect(() => {
+    if (error === 'CredentialsSignin') {
+        toast({
+            title: 'Login Failed',
+            description: 'Invalid email or password. Please try again.',
+            variant: 'destructive',
+        });
+    } else if (error) {
+         toast({
+            title: 'Login Error',
+            description: 'An unexpected error occurred during login. Please try again.',
+            variant: 'destructive',
+        });
+    }
+  }, [error, toast]);
+
 
   const handleResend = async () => {
     setIsResending(true);
@@ -110,8 +81,6 @@ function LoginForm() {
           setShowResend(true);
           toast({ title: "Email Not Verified", description: "Please check your inbox for a verification link.", variant: "destructive" });
         } else {
-          // All other errors are now handled by redirecting to this page with an error param
-          // This will trigger the LoginErrorDisplay component
           router.push(`/login?error=${result.error}`);
         }
         setIsLoading(false);
@@ -128,83 +97,63 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md shadow-xl border-primary/10 rounded-xl bg-card">
-      <CardHeader className="text-center pt-6 pb-3">
-        <LogIn className="h-10 w-10 mx-auto text-primary mb-2.5" />
-        <CardTitle className="text-3xl text-accent">Welcome Back!</CardTitle>
-        <CardDescription className="text-muted-foreground mt-1">Log in to continue your Goldsmith Connect journey.</CardDescription>
-      </CardHeader>
-      <CardContent className="px-6 pb-6 pt-3">
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-foreground">Email Address</Label>
-            <Input id="email" type="email" placeholder="you@example.com" required className="text-base text-foreground py-2" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
-          </div>
-
-          <div className="space-y-1.5 relative">
-            <Label htmlFor="password" className="text-foreground">Password</Label>
-            <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" required className="text-base text-foreground py-2 pr-10" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
-            <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1} >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-between pt-0.5">
-            <div className="flex items-center space-x-1.5">
-              <Checkbox id="remember-me" />
-              <label htmlFor="remember-me" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-muted-foreground">Remember me</label>
+    <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
+      <Card className="w-full max-w-md shadow-xl border-primary/10 rounded-xl bg-card">
+        <CardHeader className="text-center pt-6 pb-3">
+          <LogIn className="h-10 w-10 mx-auto text-primary mb-2.5" />
+          <CardTitle className="text-3xl text-accent">Welcome Back!</CardTitle>
+          <CardDescription className="text-muted-foreground mt-1">Log in to continue your Goldsmith Connect journey.</CardDescription>
+        </CardHeader>
+        <CardContent className="px-6 pb-6 pt-3">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-foreground">Email Address</Label>
+              <Input id="email" type="email" placeholder="you@example.com" required className="text-base text-foreground py-2" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
             </div>
-            <Link href="#" className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors">Forgot password?</Link>
-          </div>
 
-          <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
-            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
-          </Button>
-
-          {showResend && (
-            <div className="text-center">
-              <Button type="button" variant="link" className="text-primary" onClick={handleResend} disabled={isResending}>
-                {isResending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Resend verification email
+            <div className="space-y-1.5 relative">
+              <Label htmlFor="password" className="text-foreground">Password</Label>
+              <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" required className="text-base text-foreground py-2 pr-10" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
+              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1} >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
               </Button>
             </div>
-          )}
 
-          <Separator className="my-5" />
-          <SocialAuthButtons mode="login" />
-          <p className="text-center text-sm text-muted-foreground pt-3.5">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">Sign up here</Link>
-          </p>
-          <p className="text-center text-sm text-muted-foreground">
-            Are you a Goldsmith?{' '}
-            <Link href="/goldsmith-portal/login" className="font-semibold text-accent hover:text-accent/80 underline underline-offset-2 transition-colors">Login to Goldsmith Portal</Link>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
-  );
-}
+            <div className="flex items-center justify-between pt-0.5">
+              <div className="flex items-center space-x-1.5">
+                <Checkbox id="remember-me" />
+                <label htmlFor="remember-me" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-muted-foreground">Remember me</label>
+              </div>
+              <Link href="#" className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors">Forgot password?</Link>
+            </div>
 
+            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
+            </Button>
 
-function LoginContent() {
-  const searchParams = useSearchParams();
-  const error = searchParams.get('error');
+            {showResend && (
+              <div className="text-center">
+                <Button type="button" variant="link" className="text-primary" onClick={handleResend} disabled={isResending}>
+                  {isResending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Resend verification email
+                </Button>
+              </div>
+            )}
 
-  if (error) {
-    return <LoginErrorDisplay />;
-  }
-
-  return <LoginForm />;
-}
-
-export default function LoginPage() {
-  return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
-      <React.Suspense fallback={<Loader2 className="h-12 w-12 animate-spin text-primary" />}>
-        <LoginContent />
-      </React.Suspense>
+            <Separator className="my-5" />
+            <SocialAuthButtons mode="login" />
+            <p className="text-center text-sm text-muted-foreground pt-3.5">
+              Don&apos;t have an account?{' '}
+              <Link href="/signup" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">Sign up here</Link>
+            </p>
+            <p className="text-center text-sm text-muted-foreground">
+              Are you a Goldsmith?{' '}
+              <Link href="/goldsmith-portal/login" className="font-semibold text-accent hover:text-accent/80 underline underline-offset-2 transition-colors">Login to Goldsmith Portal</Link>
+            </p>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
