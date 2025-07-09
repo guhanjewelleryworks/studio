@@ -3,6 +3,7 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -15,82 +16,66 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
-import NextImage from 'next/image'; // Using NextImage for optimized images
+import NextImage from 'next/image';
 
 interface PageParams {
   orderId: string;
 }
 
-interface CurrentUser {
-  isLoggedIn: boolean;
-  id?: string;
-}
-
 export default function CustomerOrderDetailPage({ params: paramsPromise }: { params: Promise<PageParams> }) {
-  const params = use(paramsPromise); // Resolve the promise for params
+  const params = use(paramsPromise);
   const { orderId } = params;
   
   const router = useRouter();
   const { toast } = useToast();
+  const { data: session, status } = useSession();
 
   const [order, setOrder] = useState<OrderRequest | null>(null);
   const [goldsmith, setGoldsmith] = useState<Goldsmith | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
   useEffect(() => {
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-      const parsedUser: CurrentUser = JSON.parse(user);
-      if (!parsedUser.isLoggedIn) {
-        router.push(`/login?redirect=/customer/orders/${orderId}`);
-      } else {
-        setCurrentUser(parsedUser);
-      }
-    } else {
+    if (status === 'unauthenticated') {
       router.push(`/login?redirect=/customer/orders/${orderId}`);
     }
-  }, [router, orderId]);
 
-  useEffect(() => {
-    if (!orderId || !currentUser) return; // Don't fetch if no orderId or user not resolved yet
-
-    const loadOrderDetails = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const fetchedOrder = await fetchOrderRequestById(orderId);
-        if (fetchedOrder) {
-          // Ensure the order belongs to the current customer
-          if (fetchedOrder.customerId && fetchedOrder.customerId !== currentUser.id) {
-             setError("You are not authorized to view this order.");
-             setOrder(null);
-             setGoldsmith(null);
-             setIsLoading(false);
-             return;
+    if (status === 'authenticated' && session.user.id && orderId) {
+      const loadOrderDetails = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const fetchedOrder = await fetchOrderRequestById(orderId);
+          if (fetchedOrder) {
+            // Ensure the order belongs to the current customer
+            if (fetchedOrder.customerId && fetchedOrder.customerId !== session.user.id) {
+               setError("You are not authorized to view this order.");
+               setOrder(null);
+               setGoldsmith(null);
+               return;
+            }
+            setOrder(fetchedOrder);
+            if (fetchedOrder.goldsmithId) {
+              const fetchedGoldsmith = await fetchGoldsmithById(fetchedOrder.goldsmithId);
+              setGoldsmith(fetchedGoldsmith);
+            }
+          } else {
+            setError("Order not found.");
           }
-          setOrder(fetchedOrder);
-          if (fetchedOrder.goldsmithId) {
-            const fetchedGoldsmith = await fetchGoldsmithById(fetchedOrder.goldsmithId);
-            setGoldsmith(fetchedGoldsmith);
-          }
-        } else {
-          setError("Order not found.");
+        } catch (err) {
+          console.error("Failed to load order details:", err);
+          setError("Could not load order details. Please try again.");
+          toast({ title: "Error", description: "Failed to fetch order details.", variant: "destructive" });
+        } finally {
+          setIsLoading(false);
         }
-      } catch (err) {
-        console.error("Failed to load order details:", err);
-        setError("Could not load order details. Please try again.");
-        toast({ title: "Error", description: "Failed to fetch order details.", variant: "destructive" });
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      };
 
-    loadOrderDetails();
-  }, [orderId, currentUser, toast]);
+      loadOrderDetails();
+    }
+  }, [orderId, session, status, router, toast]);
 
-  if (isLoading) {
+  if (status === 'loading' || isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />

@@ -1,13 +1,13 @@
-
 // src/app/customer/orders/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingBag, Loader2, ArrowLeft, AlertTriangle, Eye } from 'lucide-react'; // Added Eye icon
+import { ShoppingBag, Loader2, ArrowLeft, AlertTriangle, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { fetchCustomerOrders } from '@/actions/customer-actions';
 import type { OrderRequest, OrderRequestStatus } from '@/types/goldsmith';
@@ -17,51 +17,38 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { OrderStatusProgress } from '@/components/orders/OrderStatusProgress'; 
 import { Separator } from '@/components/ui/separator';
 
-interface CurrentUser {
-  isLoggedIn: boolean;
-  id?: string;
-  name?: string;
-  email?: string;
-}
-
 export default function CustomerOrdersPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const { data: session, status } = useSession();
   const [orders, setOrders] = useState<OrderRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-      const parsedUser: CurrentUser = JSON.parse(user);
-      if (parsedUser.isLoggedIn && parsedUser.id) {
-        setCurrentUser(parsedUser);
-        loadOrders(parsedUser.id);
-      } else {
-        router.push('/login?redirect=/customer/orders');
-      }
-    } else {
+    if (status === 'unauthenticated') {
       router.push('/login?redirect=/customer/orders');
     }
-  }, [router]);
 
-  const loadOrders = async (customerId: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const fetchedOrders = await fetchCustomerOrders(customerId);
-      setOrders(fetchedOrders);
-    } catch (err) {
-      console.error("Failed to fetch orders:", err);
-      setError("Could not load your orders. Please try again.");
-      toast({ title: "Error", description: "Failed to fetch order history.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
+    if (status === 'authenticated' && session?.user?.id) {
+      const loadOrders = async (customerId: string) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const fetchedOrders = await fetchCustomerOrders(customerId);
+          setOrders(fetchedOrders);
+        } catch (err) {
+          console.error("Failed to fetch orders:", err);
+          setError("Could not load your orders. Please try again.");
+          toast({ title: "Error", description: "Failed to fetch order history.", variant: "destructive" });
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadOrders(session.user.id);
     }
-  };
-  
+  }, [status, session, router, toast]);
+
   const getStatusBadgeVariant = (status: OrderRequestStatus) => {
     switch (status) {
       case 'new': return 'default'; 
@@ -74,17 +61,13 @@ export default function CustomerOrdersPage() {
     }
   };
 
-  if (!currentUser && isLoading) { 
+  if (status === 'loading') { 
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
-  if (!currentUser && !isLoading) { 
-    return null; 
-  }
-
 
   return (
     <div className="container max-w-screen-xl py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background">

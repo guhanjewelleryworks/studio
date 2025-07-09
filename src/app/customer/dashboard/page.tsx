@@ -3,21 +3,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LayoutDashboard, User, ShoppingBag, Edit, LogOut, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { fetchCustomerOrders } from '@/actions/customer-actions';
-import type { OrderRequest } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-
-interface CurrentUser {
-  isLoggedIn: boolean;
-  id?: string;
-  name?: string;
-  email?: string;
-}
 
 interface DashboardStats {
   orderCount: number;
@@ -60,30 +53,22 @@ const DashboardActionCard: React.FC<DashboardActionCardProps> = ({ title, descri
 export default function CustomerDashboardPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const { data: session, status } = useSession();
   const [stats, setStats] = useState<DashboardStats>({ orderCount: 0, notificationCount: 0 });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
 
   useEffect(() => {
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-      const parsedUser = JSON.parse(user);
-      if (parsedUser.isLoggedIn && parsedUser.id) {
-        setCurrentUser(parsedUser);
-      } else {
-        router.push('/login?redirect=/customer/dashboard');
-      }
-    } else {
+    if (status === 'unauthenticated') {
       router.push('/login?redirect=/customer/dashboard');
     }
-  }, [router]);
+  }, [status, router]);
 
   useEffect(() => {
-    if (currentUser?.id) {
+    if (status === 'authenticated' && session?.user?.id) {
       const loadStats = async () => {
-        setIsLoading(true);
+        setIsLoadingStats(true);
         try {
-          const orders = await fetchCustomerOrders(currentUser.id as string);
+          const orders = await fetchCustomerOrders(session.user.id as string);
           const notificationCount = orders.filter(
             o => o.status === 'customer_review_requested' || o.status === 'shipped'
           ).length;
@@ -95,21 +80,20 @@ export default function CustomerDashboardPage() {
           console.error("Failed to load dashboard stats:", error);
           toast({ title: "Error", description: "Could not load dashboard data.", variant: "destructive" });
         } finally {
-          setIsLoading(false);
+          setIsLoadingStats(false);
         }
       };
       loadStats();
     }
-  }, [currentUser, toast]);
+  }, [status, session, toast]);
   
   const handleLogout = () => {
-    localStorage.removeItem('currentUser');
+    // This will be handled by the header's signOut call.
+    // If we need a button here, it should also call signOut.
     router.push('/');
-    // Force re-render of header, etc.
-    window.location.reload(); 
   };
 
-  if (!currentUser) {
+  if (status === 'loading') {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -117,16 +101,20 @@ export default function CustomerDashboardPage() {
     );
   }
 
+  if (status !== 'authenticated') {
+    // This can be a fallback or null, as the useEffect will redirect.
+    return null;
+  }
+
+
   return (
     <div className="container max-w-screen-xl py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background">
       <header className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-heading text-accent">Welcome, {currentUser.name}!</h1>
+          <h1 className="text-3xl font-heading text-accent">Welcome, {session.user?.name}!</h1>
           <p className="text-muted-foreground text-lg">Manage your profile, orders, and inquiries.</p>
         </div>
-        <Button variant="outline" onClick={handleLogout} className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive-foreground rounded-full">
-          <LogOut className="mr-2 h-4 w-4" /> Logout
-        </Button>
+        {/* Logout button is now in the header dropdown */}
       </header>
 
       {/* Overview Stats */}
@@ -137,7 +125,7 @@ export default function CustomerDashboardPage() {
             <ShoppingBag className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold text-foreground">{stats.orderCount}</div>}
+            {isLoadingStats ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold text-foreground">{stats.orderCount}</div>}
             <p className="text-xs text-muted-foreground">Total orders placed</p>
           </CardContent>
         </Card>

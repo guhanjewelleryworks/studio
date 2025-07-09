@@ -3,6 +3,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,21 +15,14 @@ import type { Customer } from '@/types/goldsmith';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 
-interface CurrentUser {
-  isLoggedIn: boolean;
-  id?: string;
-  name?: string;
-  email?: string;
-}
-
 export default function EditCustomerProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const { data: session, status, update: updateSession } = useSession();
   const [customerData, setCustomerData] = useState<Omit<Customer, 'password' | '_id'> | null>(null);
   
   const [name, setName] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingData, setIsLoadingData] = useState(true);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // State for password change
@@ -38,54 +32,47 @@ export default function EditCustomerProfilePage() {
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-      const parsedUser: CurrentUser = JSON.parse(user);
-      if (parsedUser.isLoggedIn && parsedUser.id) {
-        setCurrentUser(parsedUser);
-        fetchCustomerData(parsedUser.id);
-      } else {
-        router.push('/login?redirect=/customer/profile/edit');
-      }
-    } else {
+    if (status === 'unauthenticated') {
       router.push('/login?redirect=/customer/profile/edit');
     }
-  }, [router]);
-
-  const fetchCustomerData = async (id: string) => {
-    setIsLoading(true);
-    try {
-      const data = await fetchCustomerById(id);
-      if (data) {
-        setCustomerData(data);
-        setName(data.name);
-      } else {
-        toast({ title: "Error", description: "Could not fetch profile data.", variant: "destructive" });
-        router.push('/customer/dashboard');
-      }
-    } catch (error) {
-      console.error("Failed to fetch customer data:", error);
-      toast({ title: "Error", description: "Failed to load profile.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
+    
+    if (status === 'authenticated' && session.user.id) {
+      const fetchCustomerData = async (id: string) => {
+        setIsLoadingData(true);
+        try {
+          const data = await fetchCustomerById(id);
+          if (data) {
+            setCustomerData(data);
+            setName(data.name);
+          } else {
+            toast({ title: "Error", description: "Could not fetch profile data.", variant: "destructive" });
+            router.push('/customer/dashboard');
+          }
+        } catch (error) {
+          console.error("Failed to fetch customer data:", error);
+          toast({ title: "Error", description: "Failed to load profile.", variant: "destructive" });
+        } finally {
+          setIsLoadingData(false);
+        }
+      };
+      fetchCustomerData(session.user.id);
     }
-  };
+  }, [status, session, router, toast]);
 
   const handleProfileSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!currentUser?.id || !name.trim()) {
+    if (!session?.user?.id || !name.trim()) {
       toast({ title: "Validation Error", description: "Name cannot be empty.", variant: "destructive" });
       return;
     }
     setIsSavingProfile(true);
     try {
-      const result = await updateCustomerProfile(currentUser.id, { name: name.trim() });
+      const result = await updateCustomerProfile(session.user.id, { name: name.trim() });
       if (result.success && result.data) {
         toast({ title: "Profile Updated", description: "Your profile has been successfully updated." });
-        if (currentUser.name !== result.data.name) {
-            localStorage.setItem('currentUser', JSON.stringify({ ...currentUser, name: result.data.name }));
-        }
         setCustomerData(result.data);
+        // Update the session to reflect the new name in the header immediately
+        await updateSession({ name: result.data.name });
         router.refresh(); 
       } else {
         toast({ title: "Update Failed", description: result.error || "Could not update profile.", variant: "destructive" });
@@ -100,7 +87,7 @@ export default function EditCustomerProfilePage() {
 
   const handlePasswordChangeSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!currentUser?.id) return;
+    if (!session?.user?.id) return;
 
     if (!currentPassword || !newPassword || !confirmNewPassword) {
       toast({ title: "Validation Error", description: "All password fields are required.", variant: "destructive" });
@@ -117,7 +104,7 @@ export default function EditCustomerProfilePage() {
 
     setIsSavingPassword(true);
     try {
-      const result = await changeCustomerPassword(currentUser.id, currentPassword, newPassword);
+      const result = await changeCustomerPassword(session.user.id, currentPassword, newPassword);
       if (result.success) {
         toast({ title: "Password Changed", description: "Your password has been successfully updated." });
         setCurrentPassword('');
@@ -134,7 +121,7 @@ export default function EditCustomerProfilePage() {
     }
   };
   
-  if (isLoading || !customerData) {
+  if (status === 'loading' || isLoadingData || !customerData) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
