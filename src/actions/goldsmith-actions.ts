@@ -9,7 +9,9 @@ import type { Collection, Filter, WithId, FindOneAndUpdateOptions } from 'mongod
 import { logAuditEvent } from './audit-log-actions';
 import { createAdminNotification } from './notification-actions';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 
+const SALT_ROUNDS = 10;
 const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Example: Los Angeles
 
 export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success: boolean; data?: Goldsmith; error?: string }> {
@@ -60,6 +62,8 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     const specialtyText = (Array.isArray(data.specialty) && data.specialty.length > 0)
         ? data.specialty.join(', ')
         : 'fine jewelry';
+    
+    const hashedPassword = bcrypt.hashSync(data.password.trim(), SALT_ROUNDS);
 
     const newGoldsmith: Goldsmith = {
       name: data.name.trim(),
@@ -70,7 +74,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       district: data.district,
       specialty: Array.isArray(data.specialty) ? data.specialty.map(s => s.trim()).filter(s => s) : (data.specialty?.toString().trim() || ''),
       portfolioLink: data.portfolioLink?.trim() || '',
-      password: data.password.trim(), 
+      password: hashedPassword, 
       id: uuidv4(),
       rating: 0,
       imageUrl: `https://picsum.photos/seed/${safeNameSeed}/400/300`,
@@ -87,7 +91,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       registeredAt: new Date(), // Set registration date
     };
     
-    console.log('[Action: saveGoldsmith] Attempting to insert new goldsmith:', JSON.stringify(newGoldsmith));
+    console.log('[Action: saveGoldsmith] Attempting to insert new goldsmith...');
     const result = await collection.insertOne(newGoldsmith);
     console.log('[Action: saveGoldsmith] MongoDB insert result:', JSON.stringify(result));
 
@@ -109,7 +113,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       if (insertedDoc) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { _id, ...goldsmithWithoutMongoId } = insertedDoc;
-        console.log('[Action: saveGoldsmith] Successfully inserted and retrieved doc:', JSON.stringify(goldsmithWithoutMongoId));
+        console.log('[Action: saveGoldsmith] Successfully inserted and retrieved doc.');
         return { success: true, data: goldsmithWithoutMongoId as Goldsmith };
       }
       console.warn('[Action: saveGoldsmith] InsertedId was present, but document not found immediately after insert. ID:', result.insertedId.toString());
@@ -230,7 +234,7 @@ export async function fetchGoldsmithById(id: string): Promise<Goldsmith | null> 
     if (goldsmithDoc) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, password, ...goldsmith } = goldsmithDoc; 
-      console.log(`[Action: fetchGoldsmithById] Found goldsmith:`, JSON.stringify(goldsmith));
+      console.log(`[Action: fetchGoldsmithById] Found goldsmith.`);
       return goldsmith as Goldsmith;
     }
     console.log(`[Action: fetchGoldsmithById] Goldsmith with ID ${id} not found.`);
@@ -266,12 +270,14 @@ export async function loginGoldsmith(credentials: Pick<NewGoldsmithInput, 'email
   try {
     const goldsmith = await fetchGoldsmithByEmailForLogin(credentials.email);
 
-    if (!goldsmith) {
-      console.log('[Action: loginGoldsmith] Goldsmith not found for email:', credentials.email);
+    if (!goldsmith || !goldsmith.password) {
+      console.log('[Action: loginGoldsmith] Goldsmith not found or no password set for email:', credentials.email);
       return { success: false, error: 'Invalid email or password.' };
     }
+    
+    const passwordMatch = bcrypt.compareSync(credentials.password.trim(), goldsmith.password);
 
-    if (goldsmith.password !== credentials.password.trim()) {
+    if (!passwordMatch) {
       console.log('[Action: loginGoldsmith] Password mismatch for email:', credentials.email);
       return { success: false, error: 'Invalid email or password.' };
     }
@@ -445,7 +451,7 @@ export async function updateOrderStatus(
     const result = await collection.findOneAndUpdate(filter, updateDoc, options);
 
     if (result) {
-      console.log(`[Action: updateOrderStatus] Successfully updated order ${orderId} to ${newStatus}. Updated doc:`, JSON.stringify(result));
+      console.log(`[Action: updateOrderStatus] Successfully updated order ${orderId} to ${newStatus}.`);
       logAuditEvent(
         `Updated order status to "${newStatus}"`,
         { type: 'admin', id: 'admin_user' }, // Placeholder for actual admin ID
@@ -695,19 +701,20 @@ export async function changeGoldsmithPassword(goldsmithId: string, currentPasswo
     // Fetch the full goldsmith document, including the password
     const goldsmith = await collection.findOne({ id: goldsmithId });
 
-    if (!goldsmith) {
-      return { success: false, error: 'Goldsmith not found.' };
+    if (!goldsmith || !goldsmith.password) {
+      return { success: false, error: 'Goldsmith not found or no password is set.' };
     }
-
-    // IMPORTANT: Plain text password comparison. NOT FOR PRODUCTION.
-    if (goldsmith.password !== currentPasswordInput.trim()) {
+    
+    const passwordMatch = bcrypt.compareSync(currentPasswordInput.trim(), goldsmith.password);
+    if (!passwordMatch) {
       return { success: false, error: 'Incorrect current password.' };
     }
 
-    // Update the password (still plain text)
+    // Hash the new password
+    const newHashedPassword = bcrypt.hashSync(newPasswordInput.trim(), SALT_ROUNDS);
     const result = await collection.updateOne(
       { id: goldsmithId },
-      { $set: { password: newPasswordInput.trim() } }
+      { $set: { password: newHashedPassword } }
     );
 
     if (result.modifiedCount === 1) {
@@ -788,11 +795,14 @@ export async function resetGoldsmithPasswordWithToken(token: string, newPassword
       return { success: false, error: 'This password reset token is invalid or has expired.' };
     }
 
+    // Hash the new password before storing it
+    const newHashedPassword = bcrypt.hashSync(newPassword.trim(), SALT_ROUNDS);
+    
     // Update the password and clear the reset token fields
     const result = await collection.updateOne(
       { _id: goldsmith._id },
       {
-        $set: { password: newPassword.trim() },
+        $set: { password: newHashedPassword },
         $unset: { passwordResetToken: "", passwordResetTokenExpires: "" }
       }
     );

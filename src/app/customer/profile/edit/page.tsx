@@ -7,13 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Edit, UserCircle, Loader2, ArrowLeft, Lock, ShieldAlert } from 'lucide-react';
+import { Edit, UserCircle, Loader2, ArrowLeft, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { fetchCustomerById, updateCustomerProfile, changeCustomerPassword } from '@/actions/customer-actions';
 import type { Customer } from '@/types/goldsmith';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface CurrentUser {
   isLoggedIn: boolean;
@@ -213,14 +212,6 @@ export default function EditCustomerProfilePage() {
             <CardDescription className="text-muted-foreground mt-1 text-sm">Update your account password.</CardDescription>
           </CardHeader>
           <CardContent className="px-6 pb-6 pt-4">
-             <Alert variant="destructive" className="mb-4 text-xs">
-                <ShieldAlert className="h-4 w-4" />
-                <AlertTitle>Security Warning!</AlertTitle>
-                <AlertDescription>
-                  This platform currently uses plain text passwords for demonstration purposes. 
-                  <strong>Do not use real or sensitive passwords.</strong> In a production application, passwords must be securely hashed.
-                </AlertDescription>
-            </Alert>
             <form className="space-y-5" onSubmit={handlePasswordChangeSubmit}>
               <div className="space-y-1.5">
                 <Label htmlFor="currentPassword" className="text-foreground">Current Password</Label>
