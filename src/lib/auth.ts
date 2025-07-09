@@ -39,10 +39,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        // We will add email verification logic here later
-        // if (!user.emailVerified) {
-        //   throw new Error('Email not verified');
-        // }
+        if (!user.emailVerified) {
+          // Special error case for not verified
+          throw new Error('NOT_VERIFIED');
+        }
 
         if (!user.password) {
             return null; // Can't log in with password if none is set (e.g., social account)
@@ -90,6 +90,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   pages: {
     signIn: '/login',
-    // error: '/auth/error', // Optionally, create a custom error page
+    error: '/auth/error', // A custom error page to handle sign in errors
   },
 });
