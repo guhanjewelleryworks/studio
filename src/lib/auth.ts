@@ -45,7 +45,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         if (!user.password) {
-            return null; // Can't log in with password if none is set (e.g., social account)
+            // This case handles when a user created an account with Google, then tries to log in with credentials
+            // Before an OAuthAccountNotLinked error is thrown, we can simply say invalid credentials
+            return null;
         }
 
         const passwordsMatch = await bcrypt.compare(
@@ -54,7 +56,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
 
         if (passwordsMatch) {
-            // The lastLoginAt update is now handled by the signIn callback for all login types.
+            // The lastLoginAt update is now handled by the events.signIn callback.
             
             // Return the user object expected by next-auth
             return {
@@ -72,24 +74,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
     strategy: 'jwt',
   },
-  callbacks: {
-    async signIn({ user }) {
-      if (user?.email) {
+  events: {
+    async signIn(message) {
+      // This event fires on a successful sign-in with ANY provider.
+      // This is the correct place for side-effects like updating login times.
+      if (message.user.email) {
         try {
           const customers = await getCustomersCollection();
-          // This update now runs for both Google and Credentials sign-ins
           await customers.updateOne(
-            { email: user.email },
+            { email: message.user.email },
             { $set: { lastLoginAt: new Date() } }
           );
-          console.log(`[Auth Callback: signIn] Updated lastLoginAt for ${user.email}`);
+          console.log(`[Auth Event: signIn] Updated lastLoginAt for ${message.user.email}`);
         } catch (error) {
-          console.error("[Auth Callback: signIn] Failed to update lastLoginAt:", error);
-          // We don't block the sign-in for this, so we just log the error.
+          console.error("[Auth Event: signIn] Failed to update lastLoginAt:", error);
         }
       }
-      return true; // Continue with the sign-in process
-    },
+    }
+  },
+  callbacks: {
+    // The signIn callback is removed to allow default error handling to proceed.
+    
     // This callback is used to add our custom `id` field to the session user object
     async jwt({ token, user }) {
         if (user) {
