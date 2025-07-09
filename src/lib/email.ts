@@ -8,8 +8,12 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Use the public URL from env vars, falling back to the standard dev port 9002
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
 
-export async function sendVerificationEmail(email: string, token: string) {
-  const verificationLink = `${baseUrl}/verify-email?token=${token}`;
+export async function sendVerificationEmail(email: string, linkOrToken: string) {
+  // This function is now flexible. If it receives a full URL, it uses it.
+  // If it receives just a token, it constructs the default customer verification link.
+  const verificationLink = linkOrToken.startsWith('http')
+    ? linkOrToken
+    : `${baseUrl}/verify-email?token=${linkOrToken}`;
 
   try {
     const { data, error } = await resend.emails.send({
