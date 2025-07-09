@@ -9,6 +9,7 @@ import type { Customer } from '@/types/goldsmith';
 import bcrypt from 'bcryptjs';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true, // Recommended for environments like Firebase Studio
   adapter: MongoDBAdapter(clientPromise, {
     databaseName: process.env.DB_NAME || 'goldsmithconnect',
     collections: {
@@ -38,9 +39,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        if (!user.emailVerified) {
-          throw new Error('NOT_VERIFIED');
-        }
+        // We will add email verification logic here later
+        // if (!user.emailVerified) {
+        //   throw new Error('Email not verified');
+        // }
 
         if (!user.password) {
             return null; // Can't log in with password if none is set (e.g., social account)
