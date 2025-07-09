@@ -1,10 +1,11 @@
+
 // src/app/admin/goldsmiths/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, ArrowLeft, CheckCircle, XCircle, Hourglass, RefreshCw, Loader2, Search } from 'lucide-react';
+import { Briefcase, ArrowLeft, CheckCircle, XCircle, Hourglass, RefreshCw, Loader2, Search, MailWarning } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAdminGoldsmiths, updateGoldsmithStatus } from '@/actions/goldsmith-actions';
 import type { Goldsmith } from '@/types/goldsmith';
@@ -86,7 +87,8 @@ export default function AdminGoldsmithsPage() {
   const getStatusBadgeVariant = (status?: Goldsmith['status'] | string | null) => {
     switch (status) {
       case 'verified':
-        return 'default'; 
+        return 'default';
+      case 'pending_email_verification':
       case 'pending_verification':
         return 'secondary'; 
       case 'rejected':
@@ -156,7 +158,7 @@ export default function AdminGoldsmithsPage() {
                           variant={getStatusBadgeVariant(goldsmith.status)} 
                           className="capitalize text-xs"
                         >
-                          {typeof goldsmith.status === 'string' ? goldsmith.status.replace('_', ' ') : 'unknown'}
+                          {typeof goldsmith.status === 'string' ? goldsmith.status.replace(/_/g, ' ') : 'unknown'}
                         </Badge>
                     </div>
                   </CardHeader>
@@ -167,6 +169,11 @@ export default function AdminGoldsmithsPage() {
                     <p>Specialty: {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : (typeof goldsmith.specialty === 'string' ? goldsmith.specialty : 'N/A')}</p>
                   </CardContent>
                   <CardFooter className="px-4 pb-4 pt-2 flex justify-end gap-2">
+                    {goldsmith.status === 'pending_email_verification' && (
+                        <div className="flex items-center gap-2 text-xs text-yellow-600 dark:text-yellow-400">
+                           <MailWarning className="h-4 w-4" /> Awaiting email verification from user.
+                        </div>
+                    )}
                     {goldsmith.status === 'pending_verification' && (
                       <>
                         <Button

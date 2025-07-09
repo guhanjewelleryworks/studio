@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 import type { Collection, Filter, WithId, FindOneAndUpdateOptions } from 'mongodb';
 import { logAuditEvent } from './audit-log-actions';
 import { createAdminNotification } from './notification-actions';
+import { sendVerificationEmail } from '@/lib/email';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 
@@ -64,6 +65,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
         : 'fine jewelry';
     
     const hashedPassword = await bcrypt.hash(data.password.trim(), SALT_ROUNDS);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
 
     const newGoldsmith: Goldsmith = {
       name: data.name.trim(),
@@ -87,8 +89,10 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       responseTime: data.responseTime || "Varies",
       ordersCompleted: 0,
       profileViews: 0,
-      status: 'pending_verification', 
-      registeredAt: new Date(), // Set registration date
+      status: 'pending_email_verification',
+      registeredAt: new Date(),
+      emailVerified: null,
+      verificationToken,
     };
     
     console.log('[Action: saveGoldsmith] Attempting to insert new goldsmith...');
@@ -97,17 +101,14 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
 
     if (result.insertedId) {
       logAuditEvent(
-        'Goldsmith account created',
+        'Goldsmith account created (pending email verification)',
         { type: 'goldsmith', id: newGoldsmith.id },
         { name: newGoldsmith.name, email: newGoldsmith.email }
       );
 
-      // Create an admin notification for the new registration
-      await createAdminNotification({
-        type: 'new_goldsmith_registration',
-        message: `New goldsmith '${newGoldsmith.name}' has registered and is awaiting verification.`,
-        link: '/admin/goldsmiths',
-      });
+      // Send verification email
+      const verificationUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002'}/goldsmith-portal/verify-email?token=${verificationToken}`;
+      await sendVerificationEmail(newGoldsmith.email, verificationUrl);
       
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
       if (insertedDoc) {
@@ -132,6 +133,46 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
         }
     }
     return { success: false, error: `Failed to register goldsmith: ${errorMessage}` };
+  }
+}
+
+export async function verifyGoldsmithEmail(token: string): Promise<{ success: boolean; message: string }> {
+  console.log(`[Action: verifyGoldsmithEmail] Attempting to verify with token: ${token.substring(0, 10)}...`);
+  if (!token) {
+    return { success: false, message: 'Verification token is missing.' };
+  }
+
+  try {
+    const collection = await getGoldsmithsCollection();
+    const goldsmith = await collection.findOne({ verificationToken: token });
+
+    if (!goldsmith) {
+      return { success: false, message: 'Invalid or expired verification token.' };
+    }
+
+    const result = await collection.updateOne(
+      { _id: goldsmith._id },
+      { $set: { emailVerified: new Date(), status: 'pending_verification' }, $unset: { verificationToken: "" } }
+    );
+
+    if (result.modifiedCount > 0) {
+      logAuditEvent('Goldsmith email verified', { type: 'goldsmith', id: goldsmith.id }, { email: goldsmith.email });
+
+      // Notify admin now that email is verified
+      await createAdminNotification({
+        type: 'new_goldsmith_registration',
+        message: `New goldsmith '${goldsmith.name}' has verified their email and is awaiting approval.`,
+        link: '/admin/goldsmiths',
+      });
+      
+      return { success: true, message: 'Email verified successfully! Your profile is now under review by our administrators.' };
+    }
+    
+    return { success: false, message: 'Could not verify email. It may have already been verified.' };
+
+  } catch (error) {
+    console.error('[Action: verifyGoldsmithEmail] Error during email verification:', error);
+    return { success: false, message: 'An unexpected server error occurred.' };
   }
 }
 
@@ -196,7 +237,7 @@ export async function updateGoldsmithStatus(id: string, newStatus: Goldsmith['st
     if (!id || !newStatus) {
       return { success: false, error: 'Goldsmith ID and new status are required.' };
     }
-    const validStatuses: Goldsmith['status'][] = ['pending_verification', 'verified', 'rejected'];
+    const validStatuses: Goldsmith['status'][] = ['pending_email_verification', 'pending_verification', 'verified', 'rejected'];
     if (!validStatuses.includes(newStatus)) {
       return { success: false, error: 'Invalid status provided.' };
     }
@@ -273,6 +314,20 @@ export async function loginGoldsmith(credentials: Pick<NewGoldsmithInput, 'email
     if (!goldsmith || !goldsmith.password) {
       console.log('[Action: loginGoldsmith] Goldsmith not found or no password set for email:', credentials.email);
       return { success: false, error: 'Invalid email or password.' };
+    }
+
+    if (!goldsmith.emailVerified) {
+      return { success: false, error: 'Your email address has not been verified.' };
+    }
+    
+    if (goldsmith.status !== 'verified') {
+        let statusMessage = 'Your account is not yet active.';
+        if (goldsmith.status === 'pending_verification') {
+            statusMessage = 'Your account is pending administrator approval.';
+        } else if (goldsmith.status === 'rejected') {
+            statusMessage = 'Your account application was not approved. Please contact support for more information.';
+        }
+        return { success: false, error: statusMessage };
     }
     
     const passwordMatch = await bcrypt.compare(credentials.password.trim(), goldsmith.password);

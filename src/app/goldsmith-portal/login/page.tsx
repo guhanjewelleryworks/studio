@@ -1,3 +1,4 @@
+
 // src/app/goldsmith-portal/login/page.tsx
 'use client';
 
@@ -30,6 +31,7 @@ export default function GoldsmithLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false);
 
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [isForgotPasswordLoading, setIsForgotPasswordLoading] = useState(false);
@@ -40,6 +42,7 @@ export default function GoldsmithLoginPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
+    setShowResend(false);
 
     if (!email || !password) {
       toast({
@@ -55,6 +58,9 @@ export default function GoldsmithLoginPage() {
       const result = await loginGoldsmith({ email, password });
 
       if (!result.success || !result.data) {
+        if (result.error === 'Your email address has not been verified.') {
+            setShowResend(true);
+        }
         toast({
           title: 'Login Failed',
           description: result.error || 'Please check your credentials and try again.',
@@ -94,6 +100,15 @@ export default function GoldsmithLoginPage() {
       });
       setIsLoading(false);
     }
+  };
+  
+  const handleResend = () => {
+    // Note: A resend action for goldsmiths would need to be created.
+    // For now, we'll just show a message.
+    toast({
+        title: "Resend Verification Email",
+        description: "Functionality to resend verification for goldsmiths is pending implementation. Please check your original email."
+    });
   };
 
   const handleForgotPasswordSubmit = async (e: FormEvent) => {
@@ -227,6 +242,14 @@ export default function GoldsmithLoginPage() {
                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 {isLoading ? 'Logging in...' : 'Login to Portal'}
               </Button>
+              
+               {showResend && (
+                <div className="text-center">
+                    <Button type="button" variant="link" className="text-primary" onClick={handleResend}>
+                        Resend verification email
+                    </Button>
+                </div>
+                )}
 
               <p className="text-center text-sm text-muted-foreground pt-4">
                 Don&apos;t have a partner account?{' '}

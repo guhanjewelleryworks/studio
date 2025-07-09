@@ -1,3 +1,4 @@
+
 // src/app/goldsmith-portal/register/page.tsx
 'use client';
 
@@ -6,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { CheckCircle, Briefcase, Loader2, ShieldCheck, MailCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -132,7 +132,7 @@ export default function GoldsmithRegisterPage() {
       if (result.success && result.data) {
         toast({
           title: 'Registration Submitted!',
-          description: "Your profile is now under admin review.",
+          description: "Please check your email to verify your account.",
           duration: 7000, 
         });
         
@@ -171,12 +171,12 @@ export default function GoldsmithRegisterPage() {
             <MailCheck className="h-16 w-16 mx-auto text-green-500 mb-4" />
             <CardTitle className="text-3xl text-accent">Registration Submitted!</CardTitle>
             <CardDescription className="text-muted-foreground mt-2 text-base">
-              Thank you for joining our network.
+              Please check your email to verify your account.
             </CardDescription>
           </CardHeader>
           <CardContent className="px-6 pb-8">
             <p className="text-foreground/80 mb-6">
-              Your profile has been sent to our administrators for review. You will receive an email notification once your account has been approved. This process usually takes 1-2 business days.
+              A verification link has been sent to your email address. Please click it to confirm your account. After verification, your profile will be reviewed by our administrators.
             </p>
             <Button asChild size="lg" className="w-full shadow-md rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link href="/">
@@ -298,9 +298,9 @@ export default function GoldsmithRegisterPage() {
 
             <Alert variant="default" className="mt-4 bg-primary/5 border-primary/20 text-xs">
                 <ShieldCheck className="h-4 w-4 text-primary/70" />
-                <AlertTitle className="text-primary/90 font-medium">Admin Verification Required</AlertTitle>
+                <AlertTitle className="text-primary/90 font-medium">Email &amp; Admin Verification Required</AlertTitle>
                 <AlertDescription className="text-muted-foreground">
-                    Your registration will be submitted for admin review. You will be notified upon approval.
+                    You will receive an email to verify your address. Once verified, your registration will be submitted for admin review.
                 </AlertDescription>
             </Alert>
 

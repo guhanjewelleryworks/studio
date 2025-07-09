@@ -1,3 +1,4 @@
+
 // src/types/goldsmith.ts
 import type { Location } from '@/services/geolocation';
 import type { ObjectId } from 'mongodb';
@@ -27,9 +28,11 @@ export interface Goldsmith {
   phone?: string;
   password?: string; 
   portfolioLink?: string;
-  status: 'pending_verification' | 'verified' | 'rejected';
+  status: 'pending_email_verification' | 'pending_verification' | 'verified' | 'rejected';
   registeredAt: Date; // Added for tracking registration time
   lastLoginAt?: Date; // Added for tracking login time
+  emailVerified: Date | null;
+  verificationToken: string | null;
   passwordResetToken?: string;
   passwordResetTokenExpires?: Date;
 }
@@ -53,6 +56,8 @@ export type NewGoldsmithInput = Omit<
   | 'status'
   | 'registeredAt' // Exclude from input, will be set by server
   | 'lastLoginAt'
+  | 'emailVerified'
+  | 'verificationToken'
   | 'passwordResetToken'
   | 'passwordResetTokenExpires'
 >;
