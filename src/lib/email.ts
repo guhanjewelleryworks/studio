@@ -1,6 +1,7 @@
 // src/lib/email.ts
 import { Resend } from 'resend';
 import { VerificationEmail } from '@/components/email/VerificationEmail';
+import { PasswordResetEmail } from '@/components/email/PasswordResetEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -29,6 +30,31 @@ export async function sendVerificationEmail(email: string, token: string) {
   } catch (error) {
     console.error("Error in sendVerificationEmail:", error);
     // Rethrow or handle as needed, so the calling action knows it failed
+    throw error;
+  }
+}
+
+export async function sendPasswordResetEmail(email: string, token: string) {
+  const resetLink = `${baseUrl}/customer/reset-password?token=${token}`;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Goldsmith Connect <onboarding@resend.dev>',
+      to: [email],
+      subject: 'Reset Your Goldsmith Connect Password',
+      react: PasswordResetEmail({ resetLink }),
+    });
+
+    if (error) {
+      console.error("Resend API error for password reset:", error);
+      throw new Error(`Failed to send password reset email: ${error.message}`);
+    }
+
+    console.log("Password reset email sent successfully:", data);
+    return data;
+    
+  } catch (error) {
+    console.error("Error in sendPasswordResetEmail:", error);
     throw error;
   }
 }

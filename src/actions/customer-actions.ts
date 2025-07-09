@@ -8,7 +8,7 @@ import type { Collection, WithId, Filter } from 'mongodb';
 import { ObjectId } from 'mongodb'; // Import ObjectId
 import { logAuditEvent } from './audit-log-actions';
 import crypto from 'crypto';
-import { sendVerificationEmail } from '@/lib/email';
+import { sendVerificationEmail, sendPasswordResetEmail } from '@/lib/email';
 import bcrypt from 'bcryptjs';
 
 const SALT_ROUNDS = 10;
@@ -337,7 +337,7 @@ export async function fetchOrderRequestById(orderId: string): Promise<OrderReque
 
 export async function requestCustomerPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
   console.log(`[Action: requestCustomerPasswordReset] Request received for email: ${email}`);
-  const genericSuccessMessage = "If an account with this email exists and is not a social login, a password reset link has been sent. Please check your console for the link during development.";
+  const genericSuccessMessage = "If an account with this email exists and is not a social login, a password reset link has been sent. Please check your inbox and spam folder.";
 
   try {
     const collection = await getCustomersCollection();
@@ -357,15 +357,8 @@ export async function requestCustomerPasswordReset(email: string): Promise<{ suc
       { $set: { passwordResetToken: resetToken, passwordResetTokenExpires } }
     );
     
-    // Simulate sending email by logging to console
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
-    const resetUrl = `${baseUrl}/customer/reset-password?token=${resetToken}`;
-    
-    console.log("----------------------------------------------------");
-    console.log("CUSTOMER PASSWORD RESET REQUESTED (FOR DEVELOPER TESTING)");
-    console.log(`Customer: ${customer.email}`);
-    console.log(`Reset URL: ${resetUrl}`);
-    console.log("----------------------------------------------------");
+    // Send the actual password reset email
+    await sendPasswordResetEmail(customer.email, resetToken);
     
     logAuditEvent('Customer requested password reset', { type: 'customer', id: customer.id }, { email: customer.email });
 

@@ -171,7 +171,7 @@ export default function LoginPage() {
                     <DialogHeader>
                         <DialogTitle className="text-accent">Forgot Your Password?</DialogTitle>
                         <DialogDescription className="text-muted-foreground">
-                            Enter your email to receive a password reset link. For development, the link will be printed to your server console.
+                            Enter your email to receive a password reset link. Check your inbox (and spam folder) for the email.
                         </DialogDescription>
                     </DialogHeader>
                     {resetMessage ? (
