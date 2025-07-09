@@ -59,18 +59,16 @@ export default function LoginPage() {
   useEffect(() => {
     const error = searchParams.get('error');
     if (error) {
+        if (error === 'OAuthAccountNotLinked') {
+            router.replace('/auth-error');
+            return;
+        }
+
         if (error === 'CredentialsSignin') {
             toast({
                 title: 'Login Failed',
                 description: 'Invalid email or password. Please try again.',
                 variant: 'destructive',
-            });
-        } else if (error === 'OAuthAccountNotLinked') {
-            toast({
-                title: 'Account Linking Required',
-                description: "This email is already registered. To connect your Google account, please sign in with your password first.",
-                variant: 'destructive',
-                duration: 8000,
             });
         } else {
              toast({
@@ -128,12 +126,14 @@ export default function LoginPage() {
           setShowResend(true);
           toast({ title: "Email Not Verified", description: "Please check your inbox for a verification link.", variant: "destructive" });
         } else {
-          // Redirect to login page with error, which the useEffect will catch
+          // The useEffect will catch other errors like CredentialsSignin
           router.push(`/login?error=${result.error}`);
         }
       } else if (result?.ok) {
         const redirectUrl = searchParams.get('redirect') || '/customer/dashboard';
         router.push(redirectUrl);
+      } else {
+        setIsLoading(false);
       }
 
     } catch (error) {
