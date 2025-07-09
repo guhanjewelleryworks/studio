@@ -140,7 +140,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/20 bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 shadow-sm">
+    <header className="w-full border-b border-border/20 bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 shadow-sm">
       <div className="container flex h-20 max-w-screen-xl items-center px-4 md:px-6">
         {/* Desktop Navigation */}
         <div className="mr-6 hidden md:flex items-center">

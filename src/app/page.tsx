@@ -1,19 +1,17 @@
 // src/app/page.tsx
-'use client'; // Make this a client component to fetch data
+'use client'; 
 
-import type { Goldsmith, PlatformSettings } from '@/types/goldsmith'; // Import Goldsmith type
+import type { Goldsmith } from '@/types/goldsmith'; 
 import type { SVGProps } from 'react';
 import Link from 'next/link';
-import NextLink from 'next/link'; // Ensure NextLink (aliased Link) is imported
+import NextLink from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Search, ShieldCheck, Gift, MapPin, UserCheck, Handshake, Gem, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { MetalPricesWidget } from '@/components/metal-prices-widget';
-import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions'; // Import the server action
-import { fetchPlatformSettings } from '@/actions/settings-actions'; // New import
-import { AnnouncementBanner } from '@/components/layout/AnnouncementBanner'; // New import
+import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions'; 
 import React, { useEffect, useState } from 'react';
 
 // Subtle pattern for hero section
@@ -41,8 +39,6 @@ export default function Home() {
   const [featuredGoldsmiths, setFeaturedGoldsmiths] = useState<Goldsmith[]>([]);
   const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
   const [errorFeatured, setErrorFeatured] = useState<string | null>(null);
-  const [settings, setSettings] = useState<Partial<PlatformSettings>>({}); // State for settings
-  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
 
   useEffect(() => {
     const loadFeaturedGoldsmiths = async () => {
@@ -59,15 +55,7 @@ export default function Home() {
       }
     };
 
-    const loadSettings = async () => {
-      setIsLoadingSettings(true);
-      const fetchedSettings = await fetchPlatformSettings();
-      setSettings(fetchedSettings);
-      setIsLoadingSettings(false);
-    };
-
     loadFeaturedGoldsmiths();
-    loadSettings();
   }, []);
 
 
@@ -79,9 +67,6 @@ export default function Home() {
 
   return (
     <>
-      {settings.isAnnouncementVisible && settings.announcementText && (
-        <AnnouncementBanner text={settings.announcementText} />
-      )}
       <div className="flex flex-col items-center bg-background text-foreground">
         {/* Hero Section */}
         <section className="relative w-full py-10 md:py-12 lg:py-14 bg-gradient-to-br from-secondary/10 via-background to-background overflow-hidden">

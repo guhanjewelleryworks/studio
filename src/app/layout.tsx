@@ -7,6 +7,8 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from "@/components/ui/toaster";
 import AuthProvider from '@/components/auth/AuthProvider';
+import { fetchPlatformSettings } from '@/actions/settings-actions';
+import { AnnouncementBanner } from '@/components/layout/AnnouncementBanner';
 
 const geistSans = GeistSans;
 
@@ -30,11 +32,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await fetchPlatformSettings();
+
   return (
     <html lang="en" className={cn("h-full antialiased", poppins.variable, playfairDisplay.variable, geistSans.variable)}>
       <body
@@ -44,7 +48,12 @@ export default function RootLayout({
       >
         <AuthProvider>
           <div className="relative flex min-h-dvh flex-col bg-transparent z-0">
-            <Header />
+            <div className="sticky top-0 z-50">
+              {settings.isAnnouncementVisible && settings.announcementText && (
+                <AnnouncementBanner text={settings.announcementText} />
+              )}
+              <Header />
+            </div>
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
