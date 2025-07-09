@@ -60,7 +60,7 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
                 <p className="font-medium">{session.user?.name}</p>
-                <p className="text-xs text-muted-foreground font-normal truncate">{session.user?.email}</p>
+                <p className="text-xs text-muted-foreground font-normal">{session.user?.email}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
