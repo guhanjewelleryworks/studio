@@ -6,75 +6,143 @@ import type { Customer, NewCustomerInput, OrderRequest } from '@/types/goldsmith
 import { v4 as uuidv4 } from 'uuid';
 import type { Collection, WithId, Filter } from 'mongodb';
 import { logAuditEvent } from './audit-log-actions';
+import crypto from 'crypto';
+import { sendVerificationEmail } from '@/lib/email';
 
 // IMPORTANT: In a real application, passwords should be hashed before saving.
 // For this simulation, we'll store it as plain text, but this is NOT secure for production.
 // Consider using a library like bcrypt.js for hashing.
 
-export async function saveCustomer(data: NewCustomerInput): Promise<{ success: boolean; data?: Omit<Customer, 'password' | '_id'>; error?: string }> {
+export async function saveCustomer(data: NewCustomerInput): Promise<{ success: boolean; message: string; error?: string }> {
   console.log('[Action: saveCustomer] Received data for customer registration:', JSON.stringify(data));
   try {
     const collection: Collection<Customer> = await getCustomersCollection();
 
     if (!data.name || !data.email || !data.password) {
       console.error('[Action: saveCustomer] Validation failed: Name, email, and password are required.');
-      return { success: false, error: 'Name, email, and password are required.' };
+      return { success: false, message: 'Name, email, and password are required.' };
     }
     if (data.password.trim().length < 6) { 
         console.error('[Action: saveCustomer] Validation failed: Password too short.');
-        return { success: false, error: 'Password must be at least 6 characters long.' };
+        return { success: false, message: 'Password must be at least 6 characters long.' };
     }
 
     const normalizedEmail = data.email.toLowerCase().trim();
 
     const existingCustomer = await collection.findOne({ email: normalizedEmail });
     if (existingCustomer) {
-      console.error(`[Action: saveCustomer] Validation failed: Email ${normalizedEmail} already exists.`);
-      return { success: false, error: 'An account with this email already exists. Please log in or use a different email.' };
+      if (!existingCustomer.emailVerified) {
+        // If user exists but is not verified, allow them to get a new verification email
+        await resendVerificationEmail(normalizedEmail);
+        return { success: true, message: `An unverified account with this email already exists. We've sent a new verification link to ${normalizedEmail}. Please check your inbox and spam folder.` };
+      }
+      console.error(`[Action: saveCustomer] Validation failed: Email ${normalizedEmail} already exists and is verified.`);
+      return { success: false, message: 'An account with this email already exists. Please log in or use a different email.' };
     }
 
-    const newCustomer: Customer = {
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
+    const newCustomer: Omit<Customer, '_id'> = {
       id: uuidv4(),
       name: data.name.trim(),
       email: normalizedEmail,
       password: data.password.trim(), // Store plain text password (NOT FOR PRODUCTION)
       registeredAt: new Date(),
       lastLoginAt: undefined, 
+      emailVerified: null,
+      verificationToken: verificationToken,
     };
 
-    console.log('[Action: saveCustomer] Attempting to insert new customer:', JSON.stringify(newCustomer));
+    console.log('[Action: saveCustomer] Attempting to insert new customer.');
     const result = await collection.insertOne(newCustomer);
-    console.log('[Action: saveCustomer] MongoDB insert result:', JSON.stringify(result));
+    console.log('[Action: saveCustomer] MongoDB insert result:', result.insertedId);
 
     if (result.insertedId) {
+      // Send verification email
+      await sendVerificationEmail(newCustomer.email, verificationToken);
+
       logAuditEvent(
-        'Customer account created',
+        'Customer account created (pending verification)',
         { type: 'customer', id: newCustomer.id },
         { name: newCustomer.name, email: newCustomer.email }
       );
-      const insertedDoc = await collection.findOne({ _id: result.insertedId });
-      if (insertedDoc) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { _id, password, ...customerWithoutSensitiveData } = insertedDoc; 
-        console.log('[Action: saveCustomer] Successfully inserted and retrieved customer:', JSON.stringify(customerWithoutSensitiveData));
-        return { success: true, data: customerWithoutSensitiveData as Omit<Customer, 'password' | '_id'> };
-      }
-      console.warn('[Action: saveCustomer] InsertedId was present, but document not found after insert. ID:', result.insertedId.toString());
-      return { success: true, data: {id: newCustomer.id, name: newCustomer.name, email: newCustomer.email, registeredAt: newCustomer.registeredAt } };
+      return { success: true, message: 'Account created successfully! A verification link has been sent to your email.' };
     } else {
       console.error('[Action: saveCustomer] Failed to insert customer data. MongoDB result did not contain insertedId.');
-      return { success: false, error: 'Failed to insert customer data.' };
+      return { success: false, message: 'Failed to insert customer data.' };
     }
   } catch (error) {
     console.error('[Action: saveCustomer] Error during customer registration:', error);
     let errorMessage = 'An unknown error occurred while registering customer.';
     if (error instanceof Error) {
         errorMessage = error.message;
-         if ((error as any).code === 11000) { 
-            errorMessage = 'A duplicate record error occurred. This email might already be in use.';
-        }
     }
-    return { success: false, error: `Failed to register customer: ${errorMessage}` };
+    return { success: false, message: `Failed to register customer: ${errorMessage}` };
+  }
+}
+
+export async function verifyEmail(token: string): Promise<{ success: boolean; message: string }> {
+  console.log(`[Action: verifyEmail] Attempting to verify with token: ${token.substring(0, 10)}...`);
+  if (!token) {
+    return { success: false, message: 'Verification token is missing.' };
+  }
+
+  try {
+    const collection = await getCustomersCollection();
+    const customer = await collection.findOne({ verificationToken: token });
+
+    if (!customer) {
+      return { success: false, message: 'Invalid or expired verification token.' };
+    }
+
+    const result = await collection.updateOne(
+      { _id: customer._id },
+      { $set: { emailVerified: new Date() }, $unset: { verificationToken: "" } }
+    );
+
+    if (result.modifiedCount > 0) {
+      logAuditEvent('Customer email verified', { type: 'customer', id: customer.id }, { email: customer.email });
+      return { success: true, message: 'Email verified successfully! You can now log in.' };
+    }
+    
+    return { success: false, message: 'Could not verify email. It may have already been verified.' };
+
+  } catch (error) {
+    console.error('[Action: verifyEmail] Error during email verification:', error);
+    return { success: false, message: 'An unexpected server error occurred.' };
+  }
+}
+
+export async function resendVerificationEmail(email: string): Promise<{ success: boolean; message: string }> {
+  console.log(`[Action: resendVerificationEmail] Request for email: ${email}`);
+  const genericSuccessMessage = "If an account with this email exists and is unverified, a new verification link has been sent. Please check your inbox and spam folder.";
+
+  try {
+    const collection = await getCustomersCollection();
+    const customer = await collection.findOne({ email: email.toLowerCase().trim() });
+
+    if (!customer || customer.emailVerified) {
+      // Don't reveal if user exists or is already verified
+      console.log(`[Action: resendVerificationEmail] No action needed for email: ${email}.`);
+      return { success: true, message: genericSuccessMessage };
+    }
+
+    const newVerificationToken = crypto.randomBytes(32).toString('hex');
+    await collection.updateOne(
+      { _id: customer._id },
+      { $set: { verificationToken: newVerificationToken } }
+    );
+    
+    // Send the new verification email
+    await sendVerificationEmail(customer.email, newVerificationToken);
+    
+    logAuditEvent('Resent verification email', { type: 'customer', id: customer.id }, { email: customer.email });
+    return { success: true, message: genericSuccessMessage };
+
+  } catch (error) {
+    console.error('[Action: resendVerificationEmail] Error:', error);
+    // Still return a generic message on failure to prevent leaking information
+    return { success: true, message: genericSuccessMessage };
   }
 }
 
@@ -144,6 +212,11 @@ export async function loginCustomer(credentials: Pick<NewCustomerInput, 'email' 
       return { success: false, error: 'Invalid email or password.' };
     }
 
+    if (!customer.emailVerified) {
+      console.log(`[Action: loginCustomer] Email not verified for: ${credentials.email}`);
+      return { success: false, error: 'NOT_VERIFIED' }; // Specific error code for UI
+    }
+    
     if (customer.password !== credentials.password.trim()) {
       console.log('[Action: loginCustomer] Password mismatch for email:', credentials.email);
       return { success: false, error: 'Invalid email or password.' };

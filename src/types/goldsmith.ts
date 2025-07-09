@@ -97,12 +97,14 @@ export interface Customer {
   password?: string; // For app-specific auth, hashed in DB
   registeredAt: Date;
   lastLoginAt?: Date;
+  emailVerified: Date | null;
+  verificationToken: string | null;
   // Add other customer-specific fields as needed, e.g.,
   // shippingAddress: string;
   // orderHistory: string[]; // Array of Order IDs
 }
 
-export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'registeredAt' | 'lastLoginAt'>;
+export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken'>;
 
 // --- New Type for Stored Metal Prices ---
 export interface StoredMetalPrice {

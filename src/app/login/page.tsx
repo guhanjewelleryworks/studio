@@ -13,7 +13,7 @@ import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { loginCustomer } from '@/actions/customer-actions';
+import { loginCustomer, resendVerificationEmail } from '@/actions/customer-actions';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,60 +22,50 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); 
   const [isLoading, setIsLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
+  const handleResend = async () => {
+    setIsResending(true);
+    const result = await resendVerificationEmail(email);
+    toast({
+        title: "Request Sent",
+        description: result.message
+    });
+    setIsResending(false);
+  };
+  
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setShowResend(false); // Reset on new submission
 
     if (!email.trim() || !password.trim()) {
-        toast({
-            title: "Login Error",
-            description: "Please enter both email and password.",
-            variant: "destructive",
-        });
+        toast({ title: "Login Error", description: "Please enter both email and password.", variant: "destructive" });
         setIsLoading(false);
         return;
     }
     
     try {
         const result = await loginCustomer({ email, password });
-
         if (result.success && result.data) {
-            toast({
-              title: "Login Successful!",
-              description: `Welcome back, ${result.data.name}! Redirecting...`,
-            });
-            
+            toast({ title: "Login Successful!", description: `Welcome back, ${result.data.name}! Redirecting...` });
             if (typeof window !== "undefined") {
-              // Clear any existing goldsmith session to prevent conflicts
               localStorage.removeItem('currentGoldsmithUser');
-
-              // Store customer ID along with other details
-              localStorage.setItem('currentUser', JSON.stringify({ 
-                isLoggedIn: true, 
-                id: result.data.id, // Add customer ID
-                name: result.data.name, 
-                email: result.data.email 
-              }));
+              localStorage.setItem('currentUser', JSON.stringify({ isLoggedIn: true, id: result.data.id, name: result.data.name, email: result.data.email }));
             }
-            
             window.location.href = '/';
-
         } else {
-             toast({
-              title: "Login Failed",
-              description: result.error || "Could not log you in. Please check your credentials.",
-              variant: "destructive",
-            });
+            if (result.error === 'NOT_VERIFIED') {
+                setShowResend(true);
+                toast({ title: "Email Not Verified", description: "Please check your inbox for a verification link.", variant: "destructive" });
+            } else {
+                toast({ title: "Login Failed", description: result.error || "Could not log you in. Please check your credentials.", variant: "destructive" });
+            }
             setIsLoading(false);
         }
     } catch (error) {
-        console.error("Login page submission error:", error);
-        toast({
-          title: "Login Failed",
-          description: "An unexpected error occurred. Please try again later.",
-          variant: "destructive",
-        });
+        toast({ title: "Login Failed", description: "An unexpected error occurred.", variant: "destructive" });
         setIsLoading(false);
     }
   };
@@ -92,38 +82,13 @@ export default function LoginPage() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-foreground">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                required
-                className="text-base text-foreground py-2"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-              />
+              <Input id="email" type="email" placeholder="you@example.com" required className="text-base text-foreground py-2" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading}/>
             </div>
 
             <div className="space-y-1.5 relative"> 
               <Label htmlFor="password" className="text-foreground">Password</Label>
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'} 
-                placeholder="Enter your password"
-                required
-                className="text-base text-foreground py-2 pr-10" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" 
-                onClick={() => setShowPassword(!showPassword)}
-                tabIndex={-1} 
-              >
+              <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" required className="text-base text-foreground py-2 pr-10" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
+              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1} >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
               </Button>
@@ -132,45 +97,33 @@ export default function LoginPage() {
              <div className="flex items-center justify-between pt-0.5">
                 <div className="flex items-center space-x-1.5">
                   <Checkbox id="remember-me" />
-                  <label
-                    htmlFor="remember-me"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-muted-foreground"
-                  >
-                    Remember me
-                  </label>
+                  <label htmlFor="remember-me" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-muted-foreground">Remember me</label>
                 </div>
-                <Link
-                  href="#"
-                  className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
-                >
-                  Forgot password?
-                </Link>
+                <Link href="#" className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors">Forgot password?</Link>
               </div>
 
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground"
-              disabled={isLoading}
-            >
+            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
             </Button>
+            
+            {showResend && (
+              <div className="text-center">
+                 <Button type="button" variant="link" className="text-primary" onClick={handleResend} disabled={isResending}>
+                   {isResending ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                   Resend verification email
+                 </Button>
+              </div>
+            )}
 
             <Separator className="my-5" />
             <SocialAuthButtons mode="login" />
-
-
              <p className="text-center text-sm text-muted-foreground pt-3.5">
                 Don&apos;t have an account?{' '}
-                <Link href="/signup" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
-                  Sign up here
-                </Link>
+                <Link href="/signup" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">Sign up here</Link>
               </p>
               <p className="text-center text-sm text-muted-foreground">
                 Are you a Goldsmith?{' '}
-                <Link href="/goldsmith-portal/login" className="font-semibold text-accent hover:text-accent/80 underline underline-offset-2 transition-colors">
-                  Login to Goldsmith Portal
-                </Link>
+                <Link href="/goldsmith-portal/login" className="font-semibold text-accent hover:text-accent/80 underline underline-offset-2 transition-colors">Login to Goldsmith Portal</Link>
               </p>
           </form>
         </CardContent>
