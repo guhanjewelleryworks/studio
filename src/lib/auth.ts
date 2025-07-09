@@ -54,8 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
 
         if (passwordsMatch) {
-            // Update last login time
-            await customers.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } });
+            // The lastLoginAt update is now handled by the signIn callback for all login types.
             
             // Return the user object expected by next-auth
             return {
@@ -74,6 +73,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: 'jwt',
   },
   callbacks: {
+    async signIn({ user }) {
+      if (user?.email) {
+        try {
+          const customers = await getCustomersCollection();
+          // This update now runs for both Google and Credentials sign-ins
+          await customers.updateOne(
+            { email: user.email },
+            { $set: { lastLoginAt: new Date() } }
+          );
+          console.log(`[Auth Callback: signIn] Updated lastLoginAt for ${user.email}`);
+        } catch (error) {
+          console.error("[Auth Callback: signIn] Failed to update lastLoginAt:", error);
+          // We don't block the sign-in for this, so we just log the error.
+        }
+      }
+      return true; // Continue with the sign-in process
+    },
     // This callback is used to add our custom `id` field to the session user object
     async jwt({ token, user }) {
         if (user) {
