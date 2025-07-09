@@ -79,8 +79,6 @@ export default function LoginPage() {
                 variant: 'destructive',
             });
         }
-        // Remove the error from the URL so it doesn't show again on refresh
-        router.replace('/login', {scroll: false});
     }
   }, [searchParams, toast, router]);
 
@@ -121,7 +119,7 @@ export default function LoginPage() {
       const result = await signIn('credentials', {
         redirect: false,
         email: email,
-        password: password.trim(),
+        password: password,
       });
 
       if (result?.error) {
@@ -130,12 +128,12 @@ export default function LoginPage() {
           setShowResend(true);
           toast({ title: "Email Not Verified", description: "Please check your inbox for a verification link.", variant: "destructive" });
         } else {
-          // The useEffect above will handle showing the toast for CredentialsSignin
+          // Redirect to login page with error, which the useEffect will catch
+          router.push(`/login?error=${result.error}`);
         }
       } else if (result?.ok) {
-        // A full page reload is better here to ensure all state (like header) is updated correctly.
         const redirectUrl = searchParams.get('redirect') || '/customer/dashboard';
-        window.location.href = redirectUrl;
+        router.push(redirectUrl);
       }
 
     } catch (error) {
