@@ -58,27 +58,31 @@ export default function LoginPage() {
 
   useEffect(() => {
     const error = searchParams.get('error');
-    if (error === 'CredentialsSignin') {
-        toast({
-            title: 'Login Failed',
-            description: 'Invalid email or password. Please try again.',
-            variant: 'destructive',
-        });
-    } else if (error === 'OAuthAccountNotLinked') {
-        toast({
-            title: 'Account Linking Required',
-            description: "This email is already registered. To connect your Google account, please sign in with your password first.",
-            variant: 'destructive',
-            duration: 8000,
-        });
-    } else if (error) {
-         toast({
-            title: 'Login Error',
-            description: 'An unexpected error occurred during login. Please try again.',
-            variant: 'destructive',
-        });
+    if (error) {
+        if (error === 'CredentialsSignin') {
+            toast({
+                title: 'Login Failed',
+                description: 'Invalid email or password. Please try again.',
+                variant: 'destructive',
+            });
+        } else if (error === 'OAuthAccountNotLinked') {
+            toast({
+                title: 'Account Linking Required',
+                description: "This email is already registered. To connect your Google account, please sign in with your password first.",
+                variant: 'destructive',
+                duration: 8000,
+            });
+        } else {
+             toast({
+                title: 'Login Error',
+                description: 'An unexpected error occurred during login. Please try again.',
+                variant: 'destructive',
+            });
+        }
+        // Remove the error from the URL so it doesn't show again on refresh
+        router.replace('/login', {scroll: false});
     }
-  }, [searchParams, toast]);
+  }, [searchParams, toast, router]);
 
 
   const handleResend = async () => {
@@ -126,12 +130,12 @@ export default function LoginPage() {
           setShowResend(true);
           toast({ title: "Email Not Verified", description: "Please check your inbox for a verification link.", variant: "destructive" });
         } else {
-          toast({ title: "Login Failed", description: "Invalid email or password. Please try again.", variant: "destructive" });
+          // The useEffect above will handle showing the toast for CredentialsSignin
         }
       } else if (result?.ok) {
-        toast({ title: "Login Successful!", description: `Welcome back! Redirecting...` });
+        // A full page reload is better here to ensure all state (like header) is updated correctly.
         const redirectUrl = searchParams.get('redirect') || '/customer/dashboard';
-        router.push(redirectUrl);
+        window.location.href = redirectUrl;
       }
 
     } catch (error) {
