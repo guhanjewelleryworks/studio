@@ -12,7 +12,7 @@ import { LogIn, Loader2, Eye, EyeOff, MailCheck } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { signIn, useSession } from 'next-auth/react';
 import { resendVerificationEmail } from '@/actions/customer-actions';
@@ -47,8 +47,8 @@ export default function LoginPage() {
   const [isRequestingReset, setIsRequestingReset] = useState(false);
   const [resetMessage, setResetMessage] = useState('');
 
-  // FIX: Redirect if already logged in
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (status === 'authenticated') {
       const redirectUrl = searchParams.get('redirect') || '/customer/dashboard';
       router.replace(redirectUrl);
@@ -56,13 +56,20 @@ export default function LoginPage() {
   }, [status, router, searchParams]);
 
 
-  React.useEffect(() => {
+  useEffect(() => {
     const error = searchParams.get('error');
     if (error === 'CredentialsSignin') {
         toast({
             title: 'Login Failed',
             description: 'Invalid email or password. Please try again.',
             variant: 'destructive',
+        });
+    } else if (error === 'OAuthAccountNotLinked') {
+        toast({
+            title: 'Account Linking Required',
+            description: "This email is already registered. To connect your Google account, please sign in with your password first.",
+            variant: 'destructive',
+            duration: 8000,
         });
     } else if (error) {
          toast({
@@ -124,7 +131,7 @@ export default function LoginPage() {
       } else if (result?.ok) {
         toast({ title: "Login Successful!", description: `Welcome back! Redirecting...` });
         const redirectUrl = searchParams.get('redirect') || '/customer/dashboard';
-        router.push(redirectUrl); // FIX: Use router.push for proper client-side navigation
+        router.push(redirectUrl);
       }
 
     } catch (error) {
@@ -133,7 +140,6 @@ export default function LoginPage() {
     }
   };
   
-  // FIX: Show loader while session is loading or user is being redirected
   if (status === 'loading' || status === 'authenticated') {
       return (
           <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
