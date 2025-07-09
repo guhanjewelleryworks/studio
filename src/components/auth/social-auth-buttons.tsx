@@ -36,20 +36,11 @@ interface SocialAuthButtonsProps {
 export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
   const { toast } = useToast();
 
-  const handleGoogleAuth = async () => {
-    try {
-        // Adding prompt: 'select_account' forces the Google account chooser to appear.
-        // This helps bypass issues with stale sessions or deleted user records,
-        // providing a smoother user experience.
-        await signIn('google', { callbackUrl: '/' }, { prompt: 'select_account' });
-    } catch (error) {
-        console.error("Google Sign-In Error:", error);
-        toast({
-            title: "Sign-In Error",
-            description: "Could not sign in with Google. Please try again.",
-            variant: "destructive",
-        })
-    }
+  const handleGoogleAuth = () => {
+    // No async/await here. signIn handles the browser navigation.
+    // On success, it redirects to callbackUrl.
+    // On error, it redirects to the error page (/login) with a query param.
+    signIn('google', { callbackUrl: '/customer/dashboard' });
   };
 
   const buttonTextPrefix = mode === 'login' ? 'Continue' : 'Sign up';
