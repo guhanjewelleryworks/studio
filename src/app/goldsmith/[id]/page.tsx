@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { fetchGoldsmithById, saveOrderRequest, incrementProfileView } from '@/actions/goldsmith-actions';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface PageParams {
   id: string;
@@ -53,6 +54,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   const params = use(paramsPromise);
   const { id } = params;
   
+  const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
   const [profile, setProfile] = useState<GoldsmithProfileType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -171,20 +173,18 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
      if (result.success && result.data) {
         toast({
           title: 'Custom Order Request Submitted!', 
-          description: `Your request for ${profile!.name} has been sent to admin for review.`,
-          duration: 7000,
+          description: `Your request for ${profile!.name} has been sent. Redirecting to your orders...`,
+          duration: 5000,
         });
-        form.reset();
-        setSelectedImage(null);
-        setImagePreview(null);
+        router.push('/customer/orders');
      } else {
         toast({
           title: 'Order Request Submission Failed', 
           description: result.error || "Could not send your order request. Please try again.",
           variant: 'destructive',
         });
+        setIsSubmittingForm(false);
      }
-     setIsSubmittingForm(false);
    };
   
   if (isLoading) {
