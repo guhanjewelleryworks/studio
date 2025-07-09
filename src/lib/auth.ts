@@ -3,8 +3,7 @@ import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 import Credentials from 'next-auth/providers/credentials';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
-import clientPromise from '@/lib/mongodb';
-import { getCustomersCollection } from './mongodb';
+import clientPromise, { getCustomersCollection, getDb } from '@/lib/mongodb';
 import type { Customer } from '@/types/goldsmith';
 import bcrypt from 'bcryptjs';
 
@@ -93,9 +92,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }
   },
   callbacks: {
-    // The signIn callback is removed to allow default error handling to proceed.
-    
-    // This callback is used to add our custom `id` field to the session user object
+    async signIn({ user, account }) {
+      // For OAuth providers, proactively check for the account linking issue.
+      if (account && account.provider !== 'credentials') {
+        const customers = await getCustomersCollection();
+        const existingUserByEmail = await customers.findOne({ email: user.email });
+
+        // If a user with this email exists and they have a password, it means they signed up with credentials.
+        if (existingUserByEmail && existingUserByEmail.password) {
+          // Now check if they already have this OAuth account linked.
+          const db = await getDb();
+          // The adapter stores linked accounts in the 'accounts' collection by default
+          const accountsCollection = db.collection('accounts');
+          const linkedAccount = await accountsCollection.findOne({
+            userId: existingUserByEmail._id, // The adapter links by the MongoDB '_id'
+            provider: account.provider
+          });
+
+          // If there's no linked account, we have the account linking conflict.
+          if (!linkedAccount) {
+            // Force a redirect to the login page with the specific error.
+            return `/login?error=OAuthAccountNotLinked`;
+          }
+        }
+      }
+
+      // If we passed all checks, or it's a credentials login (which is handled in `authorize`), allow the sign-in.
+      return true;
+    },
     async jwt({ token, user }) {
         if (user) {
             token.id = user.id;
