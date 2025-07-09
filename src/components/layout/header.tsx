@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, Edit, LayoutDashboard } from 'lucide-react';
+import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, Edit, LayoutDashboard, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image'; 
 import { useState, useEffect } from 'react';
@@ -62,6 +62,9 @@ export function Header() {
                 <p className="text-xs text-muted-foreground font-normal whitespace-normal break-words">{session.user?.email}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/"><Home className="mr-2 h-4 w-4" />Home</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/customer/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
             </DropdownMenuItem>
