@@ -33,9 +33,8 @@ export function Header() {
   const pathname = usePathname();
 
   const handleCustomerLogout = async () => {
-    await signOut({ redirect: false });
-    router.push('/');
-    router.refresh();
+    // This performs the sign-out and then redirects the browser, ensuring a clean state.
+    await signOut({ callbackUrl: '/' });
   };
 
   const renderDesktopUserActions = () => {

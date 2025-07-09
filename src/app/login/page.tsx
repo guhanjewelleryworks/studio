@@ -114,8 +114,9 @@ export default function LoginPage() {
         setIsLoading(false);
       } else if (result?.ok) {
         toast({ title: "Login Successful!", description: `Welcome back! Redirecting...` });
-        router.push('/');
-        router.refresh();
+        const redirectUrl = searchParams.get('redirect') || '/';
+        // Use window.location.assign for a full page reload to ensure all states are updated.
+        window.location.assign(redirectUrl);
       }
 
     } catch (error) {
