@@ -122,12 +122,20 @@ export default function SignUpPage() {
             </Button>
             <Separator className="my-5" />
             <SocialAuthButtons mode="signup" />
-             <p className="text-center text-sm text-muted-foreground pt-3.5">
+            <div className="text-center text-sm text-muted-foreground pt-3.5 space-y-2">
+              <p>
                 Already have an account?{' '}
                 <Link href="/login" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
                   Login here
                 </Link>
               </p>
+              <p>
+                Are you a Goldsmith?{' '}
+                <Link href="/goldsmith-portal/register" className="font-semibold text-accent hover:text-accent/80 underline underline-offset-2 transition-colors">
+                  Register your workshop
+                </Link>
+              </p>
+            </div>
           </form>
         </CardContent>
       </Card>
