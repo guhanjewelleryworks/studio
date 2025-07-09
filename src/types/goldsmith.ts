@@ -100,12 +100,11 @@ export interface Customer {
   lastLoginAt?: Date;
   emailVerified: Date | null;
   verificationToken: string | null;
-  // Add other customer-specific fields as needed, e.g.,
-  // shippingAddress: string;
-  // orderHistory: string[]; // Array of Order IDs
+  passwordResetToken?: string;
+  passwordResetTokenExpires?: Date;
 }
 
-export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken'>;
+export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken' | 'passwordResetToken' | 'passwordResetTokenExpires'>;
 
 // --- New Type for Stored Metal Prices ---
 export interface StoredMetalPrice {

@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { LogIn, Loader2, Eye, EyeOff } from 'lucide-react';
+import { LogIn, Loader2, Eye, EyeOff, MailCheck } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
@@ -16,6 +16,16 @@ import { useState, type FormEvent } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { signIn } from 'next-auth/react';
 import { resendVerificationEmail } from '@/actions/customer-actions';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { requestCustomerPasswordReset } from '@/actions/customer-actions';
 
 
 export default function LoginPage() {
@@ -29,6 +39,12 @@ export default function LoginPage() {
   const [isResending, setIsResending] = useState(false);
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
+
+  // State for forgot password dialog
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [isRequestingReset, setIsRequestingReset] = useState(false);
+  const [resetMessage, setResetMessage] = useState('');
 
 
   React.useEffect(() => {
@@ -57,6 +73,18 @@ export default function LoginPage() {
     });
     setIsResending(false);
   };
+  
+  const handleRequestReset = async (e: FormEvent) => {
+      e.preventDefault();
+      setIsRequestingReset(true);
+      setResetMessage('');
+
+      const result = await requestCustomerPasswordReset(forgotPasswordEmail);
+      
+      setResetMessage(result.message);
+      setIsRequestingReset(false);
+      // Don't close the dialog automatically, let the user see the message.
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -73,7 +101,7 @@ export default function LoginPage() {
       const result = await signIn('credentials', {
         redirect: false,
         email: email,
-        password: password,
+        password: password.trim(),
       });
 
       if (result?.error) {
@@ -125,7 +153,59 @@ export default function LoginPage() {
                 <Checkbox id="remember-me" />
                 <label htmlFor="remember-me" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-muted-foreground">Remember me</label>
               </div>
-              <Link href="#" className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors">Forgot password?</Link>
+              <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
+                <DialogTrigger asChild>
+                    <button
+                        type="button"
+                        className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
+                        onClick={() => {
+                            setResetMessage('');
+                            setForgotPasswordEmail('');
+                            setIsForgotPasswordOpen(true);
+                        }}
+                    >
+                        Forgot password?
+                    </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md bg-card">
+                    <DialogHeader>
+                        <DialogTitle className="text-accent">Forgot Your Password?</DialogTitle>
+                        <DialogDescription className="text-muted-foreground">
+                            Enter your email to receive a password reset link. For development, the link will be printed to your server console.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {resetMessage ? (
+                        <div className="p-3 rounded-md text-sm bg-green-100 border border-green-300 text-green-800">
+                            <div className="flex items-center">
+                                <MailCheck className="h-5 w-5 mr-2"/>
+                                <p>{resetMessage}</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleRequestReset} className="space-y-4">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="forgot-email" className="text-foreground">Your Email</Label>
+                                <Input
+                                    id="forgot-email"
+                                    type="email"
+                                    placeholder="you@example.com"
+                                    value={forgotPasswordEmail}
+                                    onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                                    required
+                                    className="text-foreground"
+                                    disabled={isRequestingReset}
+                                />
+                            </div>
+                            <DialogFooter className="sm:justify-start">
+                                <Button type="submit" variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isRequestingReset}>
+                                    {isRequestingReset && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Send Reset Link
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    )}
+                </DialogContent>
+            </Dialog>
             </div>
 
             <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>

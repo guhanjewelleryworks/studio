@@ -331,3 +331,97 @@ export async function fetchOrderRequestById(orderId: string): Promise<OrderReque
     return null;
   }
 }
+
+
+// --- New Password Reset Actions ---
+
+export async function requestCustomerPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
+  console.log(`[Action: requestCustomerPasswordReset] Request received for email: ${email}`);
+  const genericSuccessMessage = "If an account with this email exists and is not a social login, a password reset link has been sent. Please check your console for the link during development.";
+
+  try {
+    const collection = await getCustomersCollection();
+    const customer = await collection.findOne({ email: email.toLowerCase().trim() });
+
+    // Important security check: Don't allow password resets for accounts without a password (social logins)
+    if (!customer || !customer.password) {
+      console.log(`[Action: requestCustomerPasswordReset] No applicable customer found for email: ${email}. Sending generic success message to prevent enumeration.`);
+      return { success: true, message: genericSuccessMessage };
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const passwordResetTokenExpires = new Date(Date.now() + 3600000); // 1 hour from now
+
+    await collection.updateOne(
+      { _id: customer._id },
+      { $set: { passwordResetToken: resetToken, passwordResetTokenExpires } }
+    );
+    
+    // Simulate sending email by logging to console
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+    const resetUrl = `${baseUrl}/customer/reset-password?token=${resetToken}`;
+    
+    console.log("----------------------------------------------------");
+    console.log("CUSTOMER PASSWORD RESET REQUESTED (FOR DEVELOPER TESTING)");
+    console.log(`Customer: ${customer.email}`);
+    console.log(`Reset URL: ${resetUrl}`);
+    console.log("----------------------------------------------------");
+    
+    logAuditEvent('Customer requested password reset', { type: 'customer', id: customer.id }, { email: customer.email });
+
+    return { success: true, message: genericSuccessMessage };
+
+  } catch (error) {
+    console.error("[Action: requestCustomerPasswordReset] Error:", error);
+    // Still return a generic message on failure to prevent leaking information
+    return { success: true, message: genericSuccessMessage };
+  }
+}
+
+export async function resetCustomerPasswordWithToken(token: string, newPassword: string): Promise<{ success: boolean; error?: string }> {
+  console.log(`[Action: resetCustomerPasswordWithToken] Attempting to reset password with token: ${token.substring(0,10)}...`);
+
+  try {
+    if (!token || !newPassword) {
+      return { success: false, error: 'Token and new password are required.' };
+    }
+    if (newPassword.trim().length < 6) {
+      return { success: false, error: 'Password must be at least 6 characters long.' };
+    }
+
+    const collection = await getCustomersCollection();
+    const customer = await collection.findOne({
+      passwordResetToken: token,
+      passwordResetTokenExpires: { $gt: new Date() } // Check if token is not expired
+    });
+
+    if (!customer) {
+      console.log(`[Action: resetCustomerPasswordWithToken] Invalid or expired token provided.`);
+      return { success: false, error: 'This password reset token is invalid or has expired.' };
+    }
+
+    // Hash the new password before storing it
+    const newHashedPassword = await bcrypt.hash(newPassword.trim(), SALT_ROUNDS);
+    
+    // Update the password and clear the reset token fields
+    const result = await collection.updateOne(
+      { _id: customer._id },
+      {
+        $set: { password: newHashedPassword },
+        $unset: { passwordResetToken: "", passwordResetTokenExpires: "" }
+      }
+    );
+
+    if (result.modifiedCount === 1) {
+      console.log(`[Action: resetCustomerPasswordWithToken] Successfully reset password for ${customer.email}.`);
+      logAuditEvent('Customer password successfully reset via token', { type: 'customer', id: customer.id }, { email: customer.email });
+      return { success: true };
+    } else {
+      return { success: false, error: 'Failed to update password. Please try again.' };
+    }
+
+  } catch (error) {
+    console.error('[Action: resetCustomerPasswordWithToken] Error:', error);
+    return { success: false, error: 'An unexpected server error occurred.' };
+  }
+}
