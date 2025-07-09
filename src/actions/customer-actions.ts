@@ -5,6 +5,7 @@ import { getCustomersCollection, getOrderRequestsCollection } from '@/lib/mongod
 import type { Customer, NewCustomerInput, OrderRequest } from '@/types/goldsmith';
 import { v4 as uuidv4 } from 'uuid';
 import type { Collection, WithId, Filter } from 'mongodb';
+import { ObjectId } from 'mongodb'; // Import ObjectId
 import { logAuditEvent } from './audit-log-actions';
 import crypto from 'crypto';
 import { sendVerificationEmail } from '@/lib/email';
@@ -190,7 +191,18 @@ export async function fetchCustomerById(id: string): Promise<Omit<Customer, 'pas
   console.log(`[Action: fetchCustomerById] Attempting to fetch customer by ID ${id}.`);
   try {
     const collection = await getCustomersCollection();
-    const customerDoc = await collection.findOne({ id: id }); // Using the UUID 'id' field
+    
+    // This query now handles both custom UUIDs (from credential signup) 
+    // and MongoDB ObjectIDs (from OAuth providers like Google).
+    const query = {
+      $or: [
+        { id: id },
+        ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: 'invalid-object-id' }
+      ]
+    };
+    
+    const customerDoc = await collection.findOne(query);
+    
     if (customerDoc) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, password, ...customerData } = customerDoc;
@@ -210,8 +222,16 @@ export async function updateCustomerProfile(id: string, data: { name?: string })
       return { success: false, error: 'Customer ID and a valid name are required.' };
     }
     const collection = await getCustomersCollection();
+    
+    const filter = {
+      $or: [
+        { id: id },
+        ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: 'invalid-object-id' }
+      ]
+    };
+
     const result = await collection.findOneAndUpdate(
-      { id: id },
+      filter,
       { $set: { name: data.name.trim() } },
       { returnDocument: 'after', projection: { password: 0, _id: 0 } }
     );
@@ -238,8 +258,15 @@ export async function changeCustomerPassword(customerId: string, currentPassword
     }
 
     const collection = await getCustomersCollection();
-    // Fetch the full customer document, including the password
-    const customer = await collection.findOne({ id: customerId });
+    
+    const filter = {
+      $or: [
+        { id: customerId },
+        ObjectId.isValid(customerId) ? { _id: new ObjectId(customerId) } : { id: 'invalid-object-id' }
+      ]
+    };
+    
+    const customer = await collection.findOne(filter);
 
     if (!customer) {
       return { success: false, error: 'Customer not found.' };
@@ -257,7 +284,7 @@ export async function changeCustomerPassword(customerId: string, currentPassword
     // Hash the new password
     const newHashedPassword = await bcrypt.hash(newPasswordInput.trim(), SALT_ROUNDS);
     const result = await collection.updateOne(
-      { id: customerId },
+      { _id: customer._id }, // Always update using the unique _id
       { $set: { password: newHashedPassword } }
     );
 

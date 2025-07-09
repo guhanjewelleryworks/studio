@@ -36,7 +36,7 @@ export default function EditCustomerProfilePage() {
       router.push('/login?redirect=/customer/profile/edit');
     }
     
-    if (status === 'authenticated' && session.user.id) {
+    if (status === 'authenticated' && session?.user?.id) {
       const fetchCustomerData = async (id: string) => {
         setIsLoadingData(true);
         try {
@@ -129,6 +129,9 @@ export default function EditCustomerProfilePage() {
     );
   }
 
+  // Determine if the user signed up with an OAuth provider
+  const isOAuthUser = !customerData.password;
+
   return (
     <div className="container max-w-screen-xl py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background">
        <header className="max-w-3xl mx-auto mb-6 flex items-center justify-between">
@@ -190,67 +193,70 @@ export default function EditCustomerProfilePage() {
           </CardContent>
         </Card>
 
-        <Separator />
-
-        <Card className="shadow-xl bg-card border-primary/10 rounded-xl">
-          <CardHeader className="text-center pt-6 pb-4">
-            <Lock className="h-12 w-12 mx-auto text-primary mb-3" />
-            <CardTitle className="text-2xl text-accent">Change Password</CardTitle>
-            <CardDescription className="text-muted-foreground mt-1 text-sm">Update your account password.</CardDescription>
-          </CardHeader>
-          <CardContent className="px-6 pb-6 pt-4">
-            <form className="space-y-5" onSubmit={handlePasswordChangeSubmit}>
-              <div className="space-y-1.5">
-                <Label htmlFor="currentPassword" className="text-foreground">Current Password</Label>
-                <Input
-                  id="currentPassword"
-                  type="password"
-                  placeholder="Your current password"
-                  required
-                  className="text-base text-foreground py-2"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  disabled={isSavingPassword}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="newPassword" className="text-foreground">New Password (min. 6 characters)</Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  placeholder="Enter new password"
-                  required
-                  className="text-base text-foreground py-2"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  disabled={isSavingPassword}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="confirmNewPassword" className="text-foreground">Confirm New Password</Label>
-                <Input
-                  id="confirmNewPassword"
-                  type="password"
-                  placeholder="Confirm new password"
-                  required
-                  className="text-base text-foreground py-2"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  disabled={isSavingPassword}
-                />
-              </div>
-              <Button
-                type="submit"
-                size="lg"
-                variant="outline"
-                className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground mt-2"
-                disabled={isSavingPassword}
-              >
-                {isSavingPassword ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Change Password"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+        {!isOAuthUser && (
+            <>
+            <Separator />
+            <Card className="shadow-xl bg-card border-primary/10 rounded-xl">
+            <CardHeader className="text-center pt-6 pb-4">
+                <Lock className="h-12 w-12 mx-auto text-primary mb-3" />
+                <CardTitle className="text-2xl text-accent">Change Password</CardTitle>
+                <CardDescription className="text-muted-foreground mt-1 text-sm">Update your account password.</CardDescription>
+            </CardHeader>
+            <CardContent className="px-6 pb-6 pt-4">
+                <form className="space-y-5" onSubmit={handlePasswordChangeSubmit}>
+                <div className="space-y-1.5">
+                    <Label htmlFor="currentPassword" className="text-foreground">Current Password</Label>
+                    <Input
+                    id="currentPassword"
+                    type="password"
+                    placeholder="Your current password"
+                    required
+                    className="text-base text-foreground py-2"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    disabled={isSavingPassword}
+                    />
+                </div>
+                <div className="space-y-1.5">
+                    <Label htmlFor="newPassword" className="text-foreground">New Password (min. 6 characters)</Label>
+                    <Input
+                    id="newPassword"
+                    type="password"
+                    placeholder="Enter new password"
+                    required
+                    className="text-base text-foreground py-2"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    disabled={isSavingPassword}
+                    />
+                </div>
+                <div className="space-y-1.5">
+                    <Label htmlFor="confirmNewPassword" className="text-foreground">Confirm New Password</Label>
+                    <Input
+                    id="confirmNewPassword"
+                    type="password"
+                    placeholder="Confirm new password"
+                    required
+                    className="text-base text-foreground py-2"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    disabled={isSavingPassword}
+                    />
+                </div>
+                <Button
+                    type="submit"
+                    size="lg"
+                    variant="outline"
+                    className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground mt-2"
+                    disabled={isSavingPassword}
+                >
+                    {isSavingPassword ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Change Password"}
+                </Button>
+                </form>
+            </CardContent>
+            </Card>
+            </>
+        )}
       </div>
     </div>
   );
