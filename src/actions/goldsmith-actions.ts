@@ -63,7 +63,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
         ? data.specialty.join(', ')
         : 'fine jewelry';
     
-    const hashedPassword = bcrypt.hashSync(data.password.trim(), SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(data.password.trim(), SALT_ROUNDS);
 
     const newGoldsmith: Goldsmith = {
       name: data.name.trim(),
@@ -275,7 +275,7 @@ export async function loginGoldsmith(credentials: Pick<NewGoldsmithInput, 'email
       return { success: false, error: 'Invalid email or password.' };
     }
     
-    const passwordMatch = bcrypt.compareSync(credentials.password.trim(), goldsmith.password);
+    const passwordMatch = await bcrypt.compare(credentials.password.trim(), goldsmith.password);
 
     if (!passwordMatch) {
       console.log('[Action: loginGoldsmith] Password mismatch for email:', credentials.email);
@@ -705,13 +705,13 @@ export async function changeGoldsmithPassword(goldsmithId: string, currentPasswo
       return { success: false, error: 'Goldsmith not found or no password is set.' };
     }
     
-    const passwordMatch = bcrypt.compareSync(currentPasswordInput.trim(), goldsmith.password);
+    const passwordMatch = await bcrypt.compare(currentPasswordInput.trim(), goldsmith.password);
     if (!passwordMatch) {
       return { success: false, error: 'Incorrect current password.' };
     }
 
     // Hash the new password
-    const newHashedPassword = bcrypt.hashSync(newPasswordInput.trim(), SALT_ROUNDS);
+    const newHashedPassword = await bcrypt.hash(newPasswordInput.trim(), SALT_ROUNDS);
     const result = await collection.updateOne(
       { id: goldsmithId },
       { $set: { password: newHashedPassword } }
@@ -796,7 +796,7 @@ export async function resetGoldsmithPasswordWithToken(token: string, newPassword
     }
 
     // Hash the new password before storing it
-    const newHashedPassword = bcrypt.hashSync(newPassword.trim(), SALT_ROUNDS);
+    const newHashedPassword = await bcrypt.hash(newPassword.trim(), SALT_ROUNDS);
     
     // Update the password and clear the reset token fields
     const result = await collection.updateOne(
