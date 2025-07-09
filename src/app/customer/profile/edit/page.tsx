@@ -40,6 +40,7 @@ export default function EditCustomerProfilePage() {
       const fetchCustomerData = async (id: string) => {
         setIsLoadingData(true);
         try {
+          // This call fetches the full customer object, including the password field existence
           const data = await fetchCustomerById(id);
           if (data) {
             setCustomerData(data);
