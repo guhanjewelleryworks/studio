@@ -4,7 +4,8 @@ import { VerificationEmail } from '@/components/email/VerificationEmail';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+// Use the public URL from env vars, falling back to the standard dev port 9002
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
 
 export async function sendVerificationEmail(email: string, token: string) {
   const verificationLink = `${baseUrl}/verify-email?token=${token}`;

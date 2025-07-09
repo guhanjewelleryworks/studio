@@ -744,10 +744,11 @@ export async function requestGoldsmithPasswordReset(email: string): Promise<{ su
       { _id: goldsmith._id },
       { $set: { passwordResetToken: resetToken, passwordResetTokenExpires } }
     );
-
-    // IMPORTANT: Since we can't send emails, we log the link for the developer to test.
-    // In a production app, you would use a service like Nodemailer or SendGrid here.
-    const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/goldsmith-portal/reset-password?token=${resetToken}`;
+    
+    // Use the public URL from env vars, falling back to the standard dev port
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+    const resetUrl = `${baseUrl}/goldsmith-portal/reset-password?token=${resetToken}`;
+    
     console.log("----------------------------------------------------");
     console.log("PASSWORD RESET REQUESTED (FOR DEVELOPER TESTING)");
     console.log(`Goldsmith: ${goldsmith.email}`);
