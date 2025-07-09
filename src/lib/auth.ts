@@ -90,6 +90,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   pages: {
     signIn: '/login',
-    error: '/auth/error', // A custom error page to handle sign in errors
+    error: '/login', // All sign-in errors will now redirect to the login page itself
   },
 });
