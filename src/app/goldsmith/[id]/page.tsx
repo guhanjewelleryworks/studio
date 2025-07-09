@@ -1,4 +1,3 @@
-
 // src/app/goldsmith/[id]/page.tsx
 'use client';
 
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from '@/components/ui/label';
-import { MapPin, Star, MessageSquare, Send, ShieldCheck, Sparkles, Award, Eye, Edit3, LogIn, UserPlus } from "lucide-react";
+import { MapPin, Star, MessageSquare, Send, ShieldCheck, Sparkles, Award, Eye, Edit3, LogIn, UserPlus, Loader2 as Spinner } from "lucide-react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,18 +17,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from '@/hooks/use-toast';
 import { fetchGoldsmithById, saveOrderRequest, incrementProfileView } from '@/actions/goldsmith-actions';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 interface PageParams {
   id: string;
 }
-
-interface CurrentUser {
-  isLoggedIn: boolean;
-  id?: string; 
-  name?: string;
-  email?: string;
-}
-
 
 const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id: string): GoldsmithProfileType | null => {
   if (!profile) return null;
@@ -60,7 +52,8 @@ const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id
 export default function GoldsmithProfilePage({ params: paramsPromise }: { params: Promise<PageParams> }) {
   const params = use(paramsPromise);
   const { id } = params;
-
+  
+  const { data: session, status: sessionStatus } = useSession();
   const [profile, setProfile] = useState<GoldsmithProfileType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,20 +61,8 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
    useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem('currentUser');
-      if (storedUser) {
-        try {
-          setCurrentUser(JSON.parse(storedUser));
-        } catch (e) {
-          console.error("Failed to parse currentUser from localStorage", e);
-        }
-      }
-    }
-
     const loadProfile = async () => {
       if (!id) {
         setError("Goldsmith ID not found in URL.");
@@ -148,6 +129,64 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
     }
   };
 
+  const handleContactFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+     e.preventDefault();
+
+     if (sessionStatus !== 'authenticated' || !session || !session.user) {
+        toast({ title: "Not Logged In", description: "You must be logged in to place an order.", variant: "destructive" });
+        return;
+    }
+
+     setIsSubmittingForm(true);
+     const form = e.target as HTMLFormElement;
+     const customerPhone = (form.elements.namedItem('contact-phone') as HTMLInputElement)?.value;
+     const message = (form.elements.namedItem('contact-message') as HTMLTextAreaElement)?.value;
+
+    if (!message || !customerPhone) {
+      toast({ title: "Missing Information", description: "Please provide your phone number and order details.", variant: "destructive" });
+      setIsSubmittingForm(false);
+      return;
+    }
+    
+    if (!imagePreview) {
+      toast({ title: "Missing Reference Image", description: "A reference image is required for custom orders.", variant: "destructive" });
+      setIsSubmittingForm(false);
+      return;
+    }
+
+     const orderData: NewOrderRequestInput = { 
+        goldsmithId: profile!.id,
+        customerId: session.user.id,
+        customerName: session.user.name || 'N/A',
+        customerEmail: session.user.email || 'N/A',
+        customerPhone,
+        itemDescription: `Custom Order for ${profile!.name} (via profile contact)`, 
+        details: message, 
+        referenceImage: imagePreview,
+     };
+     
+     console.log("Submitting Custom Order Request via form:", orderData);
+     const result = await saveOrderRequest(orderData); 
+
+     if (result.success && result.data) {
+        toast({
+          title: 'Custom Order Request Submitted!', 
+          description: `Your request for ${profile!.name} has been sent to admin for review.`,
+          duration: 7000,
+        });
+        form.reset();
+        setSelectedImage(null);
+        setImagePreview(null);
+     } else {
+        toast({
+          title: 'Order Request Submission Failed', 
+          description: result.error || "Could not send your order request. Please try again.",
+          variant: 'destructive',
+        });
+     }
+     setIsSubmittingForm(false);
+   };
+  
   if (isLoading) {
      return (
       <div className="container max-w-screen-xl py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-background text-foreground">
@@ -184,64 +223,91 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   if (!profile) {
     return <div className="container max-w-screen-xl py-6 md:py-10 px-4 md:px-6 text-center text-muted-foreground text-lg">Profile not found.</div>;
   }
-
-  const handleContactFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-     e.preventDefault();
-
-     if (!currentUser?.isLoggedIn || !currentUser.id || !currentUser.name || !currentUser.email) {
-        toast({ title: "Not Logged In", description: "You must be logged in to place an order.", variant: "destructive" });
-        return;
+  
+  const renderContactForm = () => {
+    if (sessionStatus === 'loading') {
+      return (
+        <Card id="contact-form-section" className="shadow-xl border-primary/10 rounded-xl bg-card">
+          <CardContent className="p-5 flex justify-center items-center h-48">
+            <Spinner className="h-8 w-8 animate-spin text-primary" />
+          </CardContent>
+        </Card>
+      );
     }
 
-     setIsSubmittingForm(true);
-     const form = e.target as HTMLFormElement;
-     const customerPhone = (form.elements.namedItem('contact-phone') as HTMLInputElement)?.value;
-     const message = (form.elements.namedItem('contact-message') as HTMLTextAreaElement)?.value;
+    if (sessionStatus === 'authenticated' && session.user) {
+      return (
+        <Card id="contact-form-section" className="shadow-xl border-primary/10 rounded-xl bg-card">
+          <CardHeader className="p-5">
+            <CardTitle className="text-lg font-heading text-accent">Request Custom Order from {profile.name}</CardTitle> 
+            <CardDescription className="text-xs text-muted-foreground mt-0.5">Provide details for your custom piece. This request will be sent to an admin for review.</CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 pt-0">
+            <form className="space-y-3.5" onSubmit={handleContactFormSubmit}>
+                <p className="text-sm text-muted-foreground">You are placing this request as: <strong>{session.user.name}</strong> ({session.user.email})</p>
+                <div className="space-y-1">
+                  <Label htmlFor="contact-phone" className="text-foreground text-xs font-medium">Your Phone</Label>
+                  <Input id="contact-phone" name="contact-phone" type="tel" placeholder="e.g., 9876543210" required className="text-foreground text-sm py-2"/>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="contact-message" className="text-foreground text-xs font-medium">Your Custom Order Details</Label>
+                  <Textarea id="contact-message" name="contact-message" placeholder="Describe your desired jewelry piece, including type, materials, style, and any specific design ideas..." required rows={3} className="text-foreground text-sm py-2"/>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="ornament-image" className="text-foreground text-xs font-medium">Attach Reference Image (Required)</Label>
+                  <div className="flex items-center gap-3">
+                    <Input 
+                      id="ornament-image" 
+                      name="ornament-image"
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageChange}
+                      required
+                      className="text-foreground text-sm py-1.5 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                    />
+                  </div>
+                  {imagePreview && (
+                    <div className="mt-2 p-2 border border-muted rounded-md inline-block">
+                      <Image src={imagePreview} alt="Ornament preview" width={80} height={80} className="rounded object-contain" data-ai-hint="jewelry design sketch" />
+                    </div>
+                  )}
+                </div>
 
-    if (!message || !customerPhone) {
-      toast({ title: "Missing Information", description: "Please provide your phone number and order details.", variant: "destructive" });
-      setIsSubmittingForm(false);
-      return;
+              <Button type="submit" size="default" className="shadow-md rounded-full text-xs py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isSubmittingForm}>
+                  <Send className="mr-1.5 h-3.5 w-3.5"/> {isSubmittingForm ? "Sending Request..." : "Submit Custom Order request"}
+              </Button>
+              <p className="text-[0.65rem] text-muted-foreground pt-1.5">Your request will be reviewed by an administrator before being forwarded to the goldsmith if appropriate.</p>
+            </form>
+          </CardContent>
+        </Card>
+      );
     }
     
-    if (!imagePreview) {
-      toast({ title: "Missing Reference Image", description: "A reference image is required for custom orders.", variant: "destructive" });
-      setIsSubmittingForm(false);
-      return;
-    }
-
-     const orderData: NewOrderRequestInput = { 
-        goldsmithId: profile.id,
-        customerId: currentUser.id,
-        customerName: currentUser.name,
-        customerEmail: currentUser.email,
-        customerPhone,
-        itemDescription: `Custom Order for ${profile.name} (via profile contact)`, 
-        details: message, 
-        referenceImage: imagePreview,
-     };
-     
-     console.log("Submitting Custom Order Request via form:", orderData);
-     const result = await saveOrderRequest(orderData); 
-
-     if (result.success && result.data) {
-        toast({
-          title: 'Custom Order Request Submitted!', 
-          description: `Your request for ${profile.name} has been sent to admin for review.`,
-          duration: 7000,
-        });
-        form.reset();
-        setSelectedImage(null);
-        setImagePreview(null);
-     } else {
-        toast({
-          title: 'Order Request Submission Failed', 
-          description: result.error || "Could not send your order request. Please try again.",
-          variant: 'destructive',
-        });
-     }
-     setIsSubmittingForm(false);
-   };
+    return (
+        <Card id="contact-form-section" className="shadow-xl border-primary/10 rounded-xl bg-card">
+          <CardHeader className="p-5 text-center">
+              <CardTitle className="text-lg font-heading text-accent">Login to Request a Custom Order</CardTitle>
+              <CardDescription className="text-xs text-muted-foreground mt-1">
+                  You must have an account to connect with our artisans.
+              </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 pt-0 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button asChild className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Link href={`/login?redirect=/goldsmith/${profile.id}`}>
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Login
+                  </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full sm:w-auto border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
+                  <Link href={`/signup?redirect=/goldsmith/${profile.id}`}>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Sign Up
+                  </Link>
+              </Button>
+          </CardContent>
+        </Card>
+    );
+  };
 
 
   return (
@@ -365,75 +431,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
               )}
             </CardContent>
           </Card>
-
-          {currentUser?.isLoggedIn ? (
-            <Card id="contact-form-section" className="shadow-xl border-primary/10 rounded-xl bg-card">
-              <CardHeader className="p-5">
-                <CardTitle className="text-lg font-heading text-accent">Request Custom Order from {profile.name}</CardTitle> 
-                <CardDescription className="text-xs text-muted-foreground mt-0.5">Provide details for your custom piece. This request will be sent to an admin for review.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-5 pt-0">
-                <form className="space-y-3.5" onSubmit={handleContactFormSubmit}>
-                    <p className="text-sm text-muted-foreground">You are placing this request as: <strong>{currentUser.name}</strong> ({currentUser.email})</p>
-                    <div className="space-y-1">
-                      <Label htmlFor="contact-phone" className="text-foreground text-xs font-medium">Your Phone</Label>
-                      <Input id="contact-phone" name="contact-phone" type="tel" placeholder="e.g., 9876543210" required className="text-foreground text-sm py-2"/>
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="contact-message" className="text-foreground text-xs font-medium">Your Custom Order Details</Label>
-                      <Textarea id="contact-message" name="contact-message" placeholder="Describe your desired jewelry piece, including type, materials, style, and any specific design ideas..." required rows={3} className="text-foreground text-sm py-2"/>
-                    </div>
-                    <div className="space-y-1">
-                      <Label htmlFor="ornament-image" className="text-foreground text-xs font-medium">Attach Reference Image (Required)</Label>
-                      <div className="flex items-center gap-3">
-                        <Input 
-                          id="ornament-image" 
-                          name="ornament-image"
-                          type="file" 
-                          accept="image/*" 
-                          onChange={handleImageChange}
-                          required
-                          className="text-foreground text-sm py-1.5 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                        />
-                      </div>
-                      {imagePreview && (
-                        <div className="mt-2 p-2 border border-muted rounded-md inline-block">
-                          <Image src={imagePreview} alt="Ornament preview" width={80} height={80} className="rounded object-contain" data-ai-hint="jewelry design sketch" />
-                        </div>
-                      )}
-                    </div>
-
-                  <Button type="submit" size="default" className="shadow-md rounded-full text-xs py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isSubmittingForm}>
-                      <Send className="mr-1.5 h-3.5 w-3.5"/> {isSubmittingForm ? "Sending Request..." : "Submit Custom Order request"}
-                  </Button>
-                  <p className="text-[0.65rem] text-muted-foreground pt-1.5">Your request will be reviewed by an administrator before being forwarded to the goldsmith if appropriate.</p>
-                </form>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card id="contact-form-section" className="shadow-xl border-primary/10 rounded-xl bg-card">
-              <CardHeader className="p-5 text-center">
-                  <CardTitle className="text-lg font-heading text-accent">Login to Request a Custom Order</CardTitle>
-                  <CardDescription className="text-xs text-muted-foreground mt-1">
-                      You must have an account to connect with our artisans.
-                  </CardDescription>
-              </CardHeader>
-              <CardContent className="p-5 pt-0 flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <Button asChild className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
-                      <Link href={`/login?redirect=/goldsmith/${profile.id}`}>
-                          <LogIn className="mr-2 h-4 w-4" />
-                          Login
-                      </Link>
-                  </Button>
-                  <Button asChild variant="outline" className="w-full sm:w-auto border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-                      <Link href={`/signup?redirect=/goldsmith/${profile.id}`}>
-                          <UserPlus className="mr-2 h-4 w-4" />
-                          Sign Up
-                      </Link>
-                  </Button>
-              </CardContent>
-            </Card>
-          )}
+          {renderContactForm()}
         </div>
       </div>
     </div>
