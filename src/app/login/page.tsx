@@ -14,7 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
 import { useState, type FormEvent } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { resendVerificationEmail } from '@/actions/customer-actions';
 import {
   Dialog,
@@ -31,23 +31,33 @@ import { requestCustomerPasswordReset } from '@/actions/customer-actions';
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const { status } = useSession();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showResend, setShowResend] = useState(false);
   const [isResending, setIsResending] = useState(false);
-  const searchParams = useSearchParams();
-  const error = searchParams.get('error');
-
+  
   // State for forgot password dialog
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [isRequestingReset, setIsRequestingReset] = useState(false);
   const [resetMessage, setResetMessage] = useState('');
 
+  // FIX: Redirect if already logged in
+  React.useEffect(() => {
+    if (status === 'authenticated') {
+      const redirectUrl = searchParams.get('redirect') || '/customer/dashboard';
+      router.replace(redirectUrl);
+    }
+  }, [status, router, searchParams]);
+
 
   React.useEffect(() => {
+    const error = searchParams.get('error');
     if (error === 'CredentialsSignin') {
         toast({
             title: 'Login Failed',
@@ -61,7 +71,7 @@ export default function LoginPage() {
             variant: 'destructive',
         });
     }
-  }, [error, toast]);
+  }, [searchParams, toast]);
 
 
   const handleResend = async () => {
@@ -83,7 +93,6 @@ export default function LoginPage() {
       
       setResetMessage(result.message);
       setIsRequestingReset(false);
-      // Don't close the dialog automatically, let the user see the message.
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -105,18 +114,17 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
+        setIsLoading(false);
         if (result.error === 'NOT_VERIFIED') {
           setShowResend(true);
           toast({ title: "Email Not Verified", description: "Please check your inbox for a verification link.", variant: "destructive" });
         } else {
-          router.push(`/login?error=${result.error}`);
+          toast({ title: "Login Failed", description: "Invalid email or password. Please try again.", variant: "destructive" });
         }
-        setIsLoading(false);
       } else if (result?.ok) {
         toast({ title: "Login Successful!", description: `Welcome back! Redirecting...` });
-        const redirectUrl = searchParams.get('redirect') || '/';
-        // Use window.location.assign for a full page reload to ensure all states are updated.
-        window.location.assign(redirectUrl);
+        const redirectUrl = searchParams.get('redirect') || '/customer/dashboard';
+        router.push(redirectUrl); // FIX: Use router.push for proper client-side navigation
       }
 
     } catch (error) {
@@ -124,6 +132,15 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+  
+  // FIX: Show loader while session is loading or user is being redirected
+  if (status === 'loading' || status === 'authenticated') {
+      return (
+          <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          </div>
+      );
+  }
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
