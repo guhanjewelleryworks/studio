@@ -54,6 +54,7 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
   return (
     <div className="space-y-3">
       <Button
+        type="button"
         variant="outline"
         size="lg"
         className="w-full rounded-full text-base py-3 shadow-sm"
