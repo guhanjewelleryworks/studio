@@ -40,7 +40,7 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
     }
 
     const verificationToken = crypto.randomBytes(32).toString('hex');
-    const hashedPassword = bcrypt.hashSync(data.password.trim(), SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(data.password.trim(), SALT_ROUNDS);
 
     const newCustomer: Omit<Customer, '_id'> = {
       id: uuidv4(),
@@ -184,75 +184,6 @@ export async function fetchLatestCustomers(limit: number = 3): Promise<Omit<Cust
   }
 }
 
-async function fetchCustomerByEmailForAuth(email: string): Promise<Customer | null> {
-  const normalizedEmail = email.toLowerCase().trim();
-  console.log(`[Action: fetchCustomerByEmailForAuth] Attempting to fetch customer by email ${normalizedEmail}.`);
-  try {
-    const collection = await getCustomersCollection();
-    const customerDoc = await collection.findOne({ email: normalizedEmail });
-    if (customerDoc) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { _id, ...customer } = customerDoc; 
-      return customer as Customer;
-    }
-    return null;
-  } catch (error) {
-    console.error(`[Action: fetchCustomerByEmailForAuth] Error fetching customer by email ${normalizedEmail}:`, error);
-    return null;
-  }
-}
-
-export async function loginCustomer(credentials: Pick<NewCustomerInput, 'email' | 'password'>): Promise<{ success: boolean; data?: Omit<Customer, 'password' | '_id'>; error?: string }> {
-  console.log('[Action: loginCustomer] Attempting login for email:', credentials.email);
-  try {
-    const customer = await fetchCustomerByEmailForAuth(credentials.email);
-
-    if (!customer) {
-      console.log('[Action: loginCustomer] Customer not found for email:', credentials.email);
-      return { success: false, error: 'Invalid email or password.' };
-    }
-
-    if (!customer.emailVerified) {
-      console.log(`[Action: loginCustomer] Email not verified for: ${credentials.email}`);
-      return { success: false, error: 'NOT_VERIFIED' }; // Specific error code for UI
-    }
-    
-    if (!customer.password) {
-        console.log('[Action: loginCustomer] No password set for this account (e.g., social login).');
-        return { success: false, error: 'Invalid email or password.' };
-    }
-
-    const passwordMatch = bcrypt.compareSync(credentials.password.trim(), customer.password);
-    if (!passwordMatch) {
-      console.log('[Action: loginCustomer] Password mismatch for email:', credentials.email);
-      return { success: false, error: 'Invalid email or password.' };
-    }
-
-    const collection = await getCustomersCollection();
-    const newLastLoginAt = new Date();
-    await collection.updateOne({ id: customer.id }, { $set: { lastLoginAt: newLastLoginAt } });
-    
-    logAuditEvent(
-      'Customer successful login',
-      { type: 'customer', id: customer.id },
-      { email: customer.email }
-    );
-    
-    console.log('[Action: loginCustomer] Login successful for email:', credentials.email);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...customerDataToReturn } = customer;
-    return { success: true, data: { ...customerDataToReturn, lastLoginAt: newLastLoginAt } as Omit<Customer, 'password' | '_id'> };
-
-  } catch (error) {
-    console.error('[Action: loginCustomer] Error during login:', error);
-    let errorMessage = 'An unknown error occurred during login.';
-    if (error instanceof Error) {
-        errorMessage = error.message;
-    }
-    return { success: false, error: `Login failed: ${errorMessage}` };
-  }
-}
-
 // --- New Customer-Specific Actions ---
 
 export async function fetchCustomerById(id: string): Promise<Omit<Customer, 'password' | '_id'> | null> {
@@ -318,13 +249,13 @@ export async function changeCustomerPassword(customerId: string, currentPassword
         return { success: false, error: 'Password cannot be changed for this account (e.g., social login).' };
     }
 
-    const passwordMatch = bcrypt.compareSync(currentPasswordInput.trim(), customer.password);
+    const passwordMatch = await bcrypt.compare(currentPasswordInput.trim(), customer.password);
     if (!passwordMatch) {
       return { success: false, error: 'Incorrect current password.' };
     }
 
     // Hash the new password
-    const newHashedPassword = bcrypt.hashSync(newPasswordInput.trim(), SALT_ROUNDS);
+    const newHashedPassword = await bcrypt.hash(newPasswordInput.trim(), SALT_ROUNDS);
     const result = await collection.updateOne(
       { id: customerId },
       { $set: { password: newHashedPassword } }

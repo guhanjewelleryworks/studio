@@ -13,7 +13,8 @@ import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { loginCustomer, resendVerificationEmail } from '@/actions/customer-actions';
+import { signIn } from 'next-auth/react';
+import { resendVerificationEmail } from '@/actions/customer-actions';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setShowResend(false); // Reset on new submission
+    setShowResend(false);
 
     if (!email.trim() || !password.trim()) {
         toast({ title: "Login Error", description: "Please enter both email and password.", variant: "destructive" });
@@ -47,23 +48,28 @@ export default function LoginPage() {
     }
     
     try {
-        const result = await loginCustomer({ email, password });
-        if (result.success && result.data) {
-            toast({ title: "Login Successful!", description: `Welcome back, ${result.data.name}! Redirecting...` });
-            if (typeof window !== "undefined") {
-              localStorage.removeItem('currentGoldsmithUser');
-              localStorage.setItem('currentUser', JSON.stringify({ isLoggedIn: true, id: result.data.id, name: result.data.name, email: result.data.email }));
-            }
-            window.location.href = '/';
-        } else {
-            if (result.error === 'NOT_VERIFIED') {
-                setShowResend(true);
+        const result = await signIn('credentials', {
+            redirect: false,
+            email: email,
+            password: password,
+        });
+
+        if (result?.error) {
+            if (result.error === 'CredentialsSignin' || result.error === 'Callback') {
+                toast({ title: "Login Failed", description: "Invalid email or password.", variant: "destructive" });
+            } else if (result.error.includes('NOT_VERIFIED')) {
+                 setShowResend(true);
                 toast({ title: "Email Not Verified", description: "Please check your inbox for a verification link.", variant: "destructive" });
             } else {
-                toast({ title: "Login Failed", description: result.error || "Could not log you in. Please check your credentials.", variant: "destructive" });
+                 toast({ title: "Login Failed", description: result.error, variant: "destructive" });
             }
             setIsLoading(false);
+        } else if (result?.ok) {
+            toast({ title: "Login Successful!", description: `Welcome back! Redirecting...` });
+            router.push('/');
+            router.refresh();
         }
+
     } catch (error) {
         toast({ title: "Login Failed", description: "An unexpected error occurred.", variant: "destructive" });
         setIsLoading(false);

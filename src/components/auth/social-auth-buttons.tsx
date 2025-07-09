@@ -1,18 +1,9 @@
 // src/components/auth/social-auth-buttons.tsx
 'use client';
 
-// Removed Firebase imports:
-// import type { AuthError } from 'firebase/auth';
-// import {
-//   signInWithPopup,
-//   GoogleAuthProvider,
-//   FacebookAuthProvider,
-// } from 'firebase/auth';
-// import { auth } from '@/lib/firebase/firebase';
-
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-// import { cn } from '@/lib/utils'; // cn might not be needed if variants aren't used
+import { signIn } from 'next-auth/react';
 
 // Inline SVG for Google Icon
 const GoogleIcon = () => (
@@ -37,13 +28,6 @@ const GoogleIcon = () => (
   </svg>
 );
 
-// Inline SVG for Facebook Icon
-const FacebookIcon = () => (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2.5" fill="currentColor">
-        <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878V14.89H8.078V12.376h2.36V10.47c0-2.336 1.393-3.632 3.526-3.632.997 0 1.855.074 2.104.107v2.213H14.89c-1.142 0-1.363.542-1.363 1.333v1.885h2.473l-.32 2.513H13.526v7.008C18.343 21.128 22 16.991 22 12z"></path>
-    </svg>
-);
-
 
 interface SocialAuthButtonsProps {
   mode: 'login' | 'signup';
@@ -53,24 +37,16 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
   const { toast } = useToast();
 
   const handleGoogleAuth = async () => {
-    // Firebase Auth is removed - Simulate or do nothing
-    console.log(`Simulating Google ${mode}... (Firebase Auth Removed)`);
-    toast({
-      title: `Google ${mode} (Simulated)`,
-      description: `This would normally trigger Google Sign-In. Firebase Auth has been removed.`,
-    });
-    // In a real scenario without Firebase, you'd redirect to Google's OAuth endpoint.
-    // Example: window.location.href = '/api/auth/google'; (if you had a custom backend)
-  };
-
-  const handleFacebookAuth = async () => {
-    // Firebase Auth is removed - Simulate or do nothing
-    console.log(`Simulating Facebook ${mode}... (Firebase Auth Removed)`);
-    toast({
-      title: `Facebook ${mode} (Simulated)`,
-      description: `This would normally trigger Facebook Sign-In. Firebase Auth has been removed.`,
-      variant: "default",
-    });
+    try {
+        await signIn('google', { callbackUrl: '/' });
+    } catch (error) {
+        console.error("Google Sign-In Error:", error);
+        toast({
+            title: "Sign-In Error",
+            description: "Could not sign in with Google. Please try again.",
+            variant: "destructive",
+        })
+    }
   };
 
   const buttonTextPrefix = mode === 'login' ? 'Continue' : 'Sign up';
@@ -85,15 +61,6 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
       >
         <GoogleIcon />
         {buttonTextPrefix} with Google
-      </Button>
-      <Button
-        variant="outline"
-        size="lg"
-        className="w-full rounded-full text-base py-3 shadow-sm" // Consider different styling for Facebook if desired
-        onClick={handleFacebookAuth}
-      >
-        <FacebookIcon />
-        {buttonTextPrefix} with Facebook
       </Button>
     </div>
   );

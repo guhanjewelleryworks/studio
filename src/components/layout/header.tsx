@@ -1,15 +1,15 @@
-
 // src/components/layout/header.tsx
 'use client';
 
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, MessageCircle, Edit, LayoutDashboard } from 'lucide-react';
+import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, Edit, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image'; 
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,173 +19,122 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-interface CurrentUser {
-  isLoggedIn: boolean;
-  id?: string;
-  name?: string;
-  email?: string;
-}
 
 const navLinkClasses = "relative text-sm font-medium text-foreground/80 transition-colors hover:text-primary after:absolute after:bottom-[-5px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full";
 
-// The main header only cares about customer or guest status. Admin/Goldsmith portals have their own context.
-type UserStatus = 'loading' | 'guest' | 'customer';
-
+// This header now prioritizes the next-auth session for customers.
+// The goldsmith portal login is a separate concern and should ideally have its own layout,
+// but for now, we will handle customer auth here.
 export function Header() {
-  const [userStatus, setUserStatus] = useState<UserStatus>('loading');
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const pathname = usePathname(); // Get the current path
+  const pathname = usePathname();
 
-  useEffect(() => {
-    // This effect runs only on the client, after initial hydration.
-    // It checks localStorage to determine the CUSTOMER login status.
-    // Goldsmith and Admin sessions should not affect the main site header.
-    if (typeof window === "undefined") {
-      setUserStatus('loading');
-      return;
-    }
-    
-    // This effect should only check for the *customer* login status
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-        try {
-            const parsedUser = JSON.parse(storedUser);
-            if (parsedUser.isLoggedIn) {
-                setCurrentUser(parsedUser);
-                setUserStatus('customer');
-                return; // Found a customer, stop here.
-            }
-        } catch (e) {
-             console.error("Error parsing customer data from localStorage", e);
-        }
-    }
-    
-    // If no authenticated CUSTOMER is found, set status to guest.
-    setUserStatus('guest');
-
-  }, []);
-
-  const handleLogout = () => {
-    // This logout is specific to customers. Goldsmith/Admin should log out from their respective portals.
-    if (typeof window !== "undefined") {
-      localStorage.removeItem('currentUser');
-    }
-    setCurrentUser(null);
-    setUserStatus('guest'); // Reset status on logout
+  const handleCustomerLogout = async () => {
+    await signOut({ redirect: false });
     router.push('/');
-    window.location.reload(); // Force reload to ensure all state is cleared
+    router.refresh();
   };
 
   const renderDesktopUserActions = () => {
-    switch (userStatus) {
-        case 'loading':
-            return <Skeleton className="h-10 w-40 rounded-full" />;
-
-        case 'customer':
-            return (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      size="default" 
-                      className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 flex items-center gap-2"
-                    >
-                      <UserCircle className="h-4 w-4" />
-                      <span>{currentUser?.name}</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/customer/dashboard" onClick={(e) => e.stopPropagation()}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/customer/profile/edit" onClick={(e) => e.stopPropagation()}><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/customer/orders" onClick={(e) => e.stopPropagation()}><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
-                    </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                    <LogOut className="mr-2 h-4 w-4" /> Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            );
-        
-        case 'guest':
-        default:
-            // Only show buttons on the homepage
-            if (pathname !== '/') {
-              return null;
-            }
-            return (
-              <>
-                <Link
-                  href="/login"
-                  className={cn(
-                    buttonVariants({ variant: 'outline', size: 'default' }),
-                    'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2'
-                  )}
-                >
-                  <span>Login</span>
-                </Link>
-                <Link
-                  href="/signup"
-                  className={cn(
-                    buttonVariants({ size: 'default', variant: 'default' }),
-                    'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2'
-                  )}
-                >
-                  <span>Sign Up</span>
-                </Link>
-              </>
-            );
+    if (status === 'loading') {
+      return <Skeleton className="h-10 w-40 rounded-full" />;
     }
+
+    if (status === 'authenticated') {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="ghost" 
+              className="relative h-10 w-10 rounded-full p-0"
+            >
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={session.user?.image || ''} alt={session.user?.name || 'User'} />
+                <AvatarFallback>{session.user?.name?.charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>
+                <p className="font-medium">{session.user?.name}</p>
+                <p className="text-xs text-muted-foreground font-normal truncate">{session.user?.email}</p>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/customer/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/customer/profile/edit"><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/customer/orders"><ShoppingBag className="mr-2 h-4 w-4" />My Orders</Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleCustomerLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+              <LogOut className="mr-2 h-4 w-4" /> Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+    
+    // Guest view
+    return (
+      <>
+        <Link
+          href="/login"
+          className={cn(
+            buttonVariants({ variant: 'outline', size: 'default' }),
+            'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2'
+          )}
+        >
+          <span>Login</span>
+        </Link>
+        <Link
+          href="/signup"
+          className={cn(
+            buttonVariants({ size: 'default', variant: 'default' }),
+            'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2'
+          )}
+        >
+          <span>Sign Up</span>
+        </Link>
+      </>
+    );
   };
   
   const renderMobileUserActions = () => {
-    switch (userStatus) {
-        case 'loading':
-            return (
-                <div className="flex flex-col gap-3">
-                  <Skeleton className="h-12 w-full rounded-full" />
-                  <Skeleton className="h-12 w-full rounded-full" />
-                </div>
-            );
+     if (status === 'loading') {
+      return <Skeleton className="h-12 w-full rounded-full" />;
+     }
 
-        case 'customer':
-            return (
-                <>
-                   <Link href="/customer/dashboard" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" /> My Dashboard
-                  </Link>
-                  <Button onClick={handleLogout} variant="destructive" size="lg" className="w-full rounded-full text-base">
-                    <LogOut className="mr-2 h-4 w-4" /> Logout
-                  </Button>
-                </>
-            );
-
-        case 'guest':
-        default:
-            // Only show buttons on the homepage
-            if (pathname !== '/') {
-              return null;
-            }
-            return (
-              <>
-                <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
-                  <LogIn className="mr-2 h-4 w-4" /> Login
-                </Link>
-                <Link href="/signup" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
-                  <UserPlus className="mr-2 h-4 w-4" /> Sign Up
-                </Link>
-              </>
-            );
-    }
+     if (status === 'authenticated') {
+       return (
+        <>
+           <Link href="/customer/dashboard" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+            <LayoutDashboard className="mr-2 h-4 w-4" /> My Dashboard
+          </Link>
+          <Button onClick={handleCustomerLogout} variant="destructive" size="lg" className="w-full rounded-full text-base">
+            <LogOut className="mr-2 h-4 w-4" /> Logout
+          </Button>
+        </>
+       );
+     }
+     
+     // Guest view
+     return (
+        <>
+          <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
+            <LogIn className="mr-2 h-4 w-4" /> Login
+          </Link>
+          <Link href="/signup" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+            <UserPlus className="mr-2 h-4 w-4" /> Sign Up
+          </Link>
+        </>
+     );
   };
 
   return (

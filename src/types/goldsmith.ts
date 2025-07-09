@@ -94,6 +94,7 @@ export interface Customer {
   id: string; // Application-specific UUID
   name: string;
   email: string;
+  image?: string; // Added for next-auth compatibility
   password?: string; // For app-specific auth, hashed in DB
   registeredAt: Date;
   lastLoginAt?: Date;
@@ -104,7 +105,7 @@ export interface Customer {
   // orderHistory: string[]; // Array of Order IDs
 }
 
-export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken'>;
+export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken'>;
 
 // --- New Type for Stored Metal Prices ---
 export interface StoredMetalPrice {
