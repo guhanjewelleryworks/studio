@@ -49,10 +49,10 @@ export default async function RootLayout({
         <AuthProvider>
           <div className="relative flex min-h-dvh flex-col bg-transparent z-0">
             <div className="sticky top-0 z-50">
+              <Header />
               {settings.isAnnouncementVisible && settings.announcementText && (
                 <AnnouncementBanner text={settings.announcementText} />
               )}
-              <Header />
             </div>
             <main className="flex-1">{children}</main>
             <Footer />
