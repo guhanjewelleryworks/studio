@@ -1,3 +1,4 @@
+
 // src/app/goldsmith-portal/orders/[orderId]/page.tsx
 'use client';
 
@@ -190,8 +191,8 @@ export default function GoldsmithOrderDetailPage({ params: paramsPromise }: { pa
               <Separator />
                 <div className="space-y-1">
                     <h3 className="text-sm font-semibold text-foreground">Customer:</h3>
-                    <p className="text-sm text-foreground/80">{order.customerName} ({order.customerEmail})</p>
-                    {order.customerPhone && <p className="text-sm text-foreground/80">Phone: {order.customerPhone}</p>}
+                    <p className="text-sm text-foreground/80">{order.customerName}</p>
+                    <p className="text-xs text-muted-foreground">(Contact details are managed by the admin)</p>
                 </div>
               <Separator />
               <div>
