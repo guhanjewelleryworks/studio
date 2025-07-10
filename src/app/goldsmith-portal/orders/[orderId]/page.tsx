@@ -192,7 +192,6 @@ export default function GoldsmithOrderDetailPage({ params: paramsPromise }: { pa
                 <div className="space-y-1">
                     <h3 className="text-sm font-semibold text-foreground">Customer:</h3>
                     <p className="text-sm text-foreground/80">{order.customerName}</p>
-                    <p className="text-xs text-muted-foreground">(Contact details are managed by the admin)</p>
                 </div>
               <Separator />
               <div>
