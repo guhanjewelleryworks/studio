@@ -4,7 +4,7 @@
 import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { GalleryHorizontal, PlusCircle, Trash2, Loader2, ArrowLeft, Image as ImageIcon, AlertTriangle } from 'lucide-react';
+import { GalleryHorizontal, PlusCircle, Trash2, Loader2, ArrowLeft, Image as ImageIcon, AlertTriangle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +24,8 @@ interface CurrentGoldsmithUser {
   id: string;
 }
 
+const MAX_PORTFOLIO_IMAGES = 8;
+
 export default function ManageGoldsmithPortfolioPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -37,6 +39,8 @@ export default function ManageGoldsmithPortfolioPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const portfolioIsFull = goldsmith?.portfolioImages && goldsmith.portfolioImages.length >= MAX_PORTFOLIO_IMAGES;
 
   useEffect(() => {
     const user = localStorage.getItem('currentGoldsmithUser');
@@ -90,6 +94,10 @@ export default function ManageGoldsmithPortfolioPage() {
 
   const handleUploadSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (portfolioIsFull) {
+        toast({ title: "Portfolio Full", description: `You cannot upload more than ${MAX_PORTFOLIO_IMAGES} images.`, variant: "destructive" });
+        return;
+    }
     if (!selectedFile || !imagePreview || !currentUser?.id) {
       toast({ title: "No file selected", description: "Please select an image to upload.", variant: "destructive" });
       return;
@@ -155,46 +163,54 @@ export default function ManageGoldsmithPortfolioPage() {
         <CardHeader>
           <CardTitle className="text-xl text-accent">Add New Image</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Showcase your best work. Upload high-quality images of your creations (max 4MB per image).
+            Showcase your best work. Upload high-quality images of your creations (max 4MB per image). You can upload a maximum of {MAX_PORTFOLIO_IMAGES} images.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleUploadSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="new-image-upload" className="sr-only">Choose Image</Label>
-              <Input 
-                id="new-image-upload" 
-                type="file" 
-                accept="image/png, image/jpeg, image/webp"
-                onChange={handleFileChange}
-                disabled={isUploading}
-                className="text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-              />
-            </div>
-            {imagePreview && (
-              <div className="flex items-center gap-4">
-                <div className="w-24 h-24 relative rounded-md overflow-hidden border border-border">
-                  <NextImage src={imagePreview} alt="Preview of new portfolio item" fill className="object-cover" />
-                </div>
-                <Button type="submit" disabled={isUploading}>
-                  {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
-                  {isUploading ? "Uploading..." : "Upload Image"}
-                </Button>
+          {portfolioIsFull ? (
+            <Alert variant="default" className="bg-primary/5 border-primary/20">
+              <Info className="h-4 w-4 text-primary" />
+              <AlertTitle>Portfolio Full</AlertTitle>
+              <AlertDescription>You have reached the maximum of {MAX_PORTFOLIO_IMAGES} images. Please delete an existing image to upload a new one.</AlertDescription>
+            </Alert>
+          ) : (
+            <form onSubmit={handleUploadSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="new-image-upload" className="sr-only">Choose Image</Label>
+                <Input 
+                  id="new-image-upload" 
+                  type="file" 
+                  accept="image/png, image/jpeg, image/webp"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                  className="text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                />
               </div>
-            )}
-          </form>
+              {imagePreview && (
+                <div className="flex items-center gap-4">
+                  <div className="w-24 h-24 relative rounded-md overflow-hidden border border-border">
+                    <NextImage src={imagePreview} alt="Preview of new portfolio item" fill className="object-cover" />
+                  </div>
+                  <Button type="submit" disabled={isUploading}>
+                    {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+                    {isUploading ? "Uploading..." : "Upload Image"}
+                  </Button>
+                </div>
+              )}
+            </form>
+          )}
         </CardContent>
       </Card>
 
       {/* Existing Portfolio */}
       <Card className="max-w-4xl mx-auto shadow-xl bg-card border-primary/10">
         <CardHeader>
-          <CardTitle className="text-xl text-accent">Your Current Portfolio</CardTitle>
+          <CardTitle className="text-xl text-accent">Your Current Portfolio ({goldsmith?.portfolioImages?.length || 0}/{MAX_PORTFOLIO_IMAGES})</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {Array.from({length: 3}).map((_, i) => <div key={i} className="aspect-square bg-muted animate-pulse rounded-lg" />)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({length: 4}).map((_, i) => <div key={i} className="aspect-square bg-muted animate-pulse rounded-lg" />)}
             </div>
           ) : error ? (
             <Alert variant="destructive">
@@ -203,7 +219,7 @@ export default function ManageGoldsmithPortfolioPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : goldsmith?.portfolioImages && goldsmith.portfolioImages.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {goldsmith.portfolioImages.map((imageUrl, index) => (
                 <div key={imageUrl} className="relative aspect-square rounded-lg overflow-hidden shadow-md group">
                   <NextImage 

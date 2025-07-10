@@ -602,6 +602,8 @@ export async function updateGoldsmithProfile(
 
 // --- New Actions for Portfolio Management ---
 
+const MAX_PORTFOLIO_IMAGES = 8;
+
 export async function addGoldsmithPortfolioImage(
   goldsmithId: string, 
   imageDataUri: string
@@ -613,6 +615,17 @@ export async function addGoldsmithPortfolioImage(
     }
 
     const collection = await getGoldsmithsCollection();
+
+    // First, check the current image count to enforce the limit
+    const goldsmith = await collection.findOne({ id: goldsmithId });
+    if (!goldsmith) {
+        return { success: false, error: 'Goldsmith not found.' };
+    }
+    if (goldsmith.portfolioImages && goldsmith.portfolioImages.length >= MAX_PORTFOLIO_IMAGES) {
+        return { success: false, error: `Portfolio is full. You cannot upload more than ${MAX_PORTFOLIO_IMAGES} images.` };
+    }
+
+
     const result = await collection.findOneAndUpdate(
       { id: goldsmithId },
       { $push: { portfolioImages: imageDataUri } },
