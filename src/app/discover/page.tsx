@@ -25,6 +25,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge'; // Import Badge component
+import { differenceInDays } from 'date-fns';
 
 export default function DiscoverPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -231,49 +233,57 @@ export default function DiscoverPage() {
               <Card key={index} className="animate-pulse bg-card h-[280px] rounded-xl shadow-md border-border"></Card> 
              ))
           ) : displayedGoldsmiths.length > 0 ? (
-             displayedGoldsmiths.map((goldsmith) => (
-              <Card key={goldsmith.id} className="shadow-lg hover:shadow-2xl transition-all duration-300 bg-card border-primary/15 flex flex-col rounded-xl overflow-hidden group">
-                <CardHeader className="p-0 relative">
-                  <Image
-                    src={goldsmith.imageUrl || 'https://picsum.photos/seed/default-goldsmith/400/300'}
-                    alt={goldsmith.name}
-                    width={400}
-                    height={200}
-                    className="rounded-t-xl object-cover w-full aspect-[16/9] group-hover:scale-105 transition-transform duration-300"
-                    data-ai-hint="goldsmith workshop"
-                  />
-                  <div className="absolute top-2 right-2 bg-primary/80 backdrop-blur-sm text-primary-foreground px-2 py-0.5 rounded-full text-xs font-semibold flex items-center shadow-md">
-                     <Star className="h-3 w-3 mr-0.5 fill-current" /> {goldsmith.rating > 0 ? goldsmith.rating.toFixed(1) : 'New'}
-                  </div>
-                </CardHeader>
-                <CardContent className="p-3 flex-grow flex flex-col justify-between">
-                  <div>
-                    <CardTitle className="font-heading text-md text-accent mb-0.5 group-hover:text-primary transition-colors flex items-center gap-1.5">
-                      {goldsmith.name}
-                      {goldsmith.status === 'verified' && (
-                        <ShieldCheck className="h-4 w-4 text-green-500" title="Verified Goldsmith" />
-                      )}
-                    </CardTitle>
-                    <CardDescription className="text-xs text-muted-foreground mb-0.5 line-clamp-1">
-                      <MapPin className="inline-block h-3 w-3 mr-0.5" /> {goldsmith.district}, {goldsmith.state}
-                    </CardDescription>
-                    <p className="text-xs text-muted-foreground mb-1 font-medium flex items-center capitalize">
-                      <Palette className="inline-block h-3 w-3 mr-0.5 text-primary"/>Specialty: {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty}
-                    </p>
-                    <p className="text-xs text-muted-foreground leading-snug line-clamp-2 mb-2">{goldsmith.shortBio}</p>
-                  </div>
-                  <NextLink
-                    href={`/goldsmith/${goldsmith.id}`}
-                    className={cn(
-                       buttonVariants({ variant: "outline", size: "xs" }),
-                       'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-1.5 w-full rounded-lg text-xs py-1.5 shadow-md'
-                    )}
-                  >
-                    <LinkIcon className="mr-1 h-3 w-3"/>View Profile & Connect
-                  </NextLink>
-                </CardContent>
-              </Card>
-            ))
+             displayedGoldsmiths.map((goldsmith) => {
+                const isNew = goldsmith.registeredAt && differenceInDays(new Date(), new Date(goldsmith.registeredAt)) <= 15;
+                return (
+                  <Card key={goldsmith.id} className="shadow-lg hover:shadow-2xl transition-all duration-300 bg-card border-primary/15 flex flex-col rounded-xl overflow-hidden group">
+                    <CardHeader className="p-0 relative">
+                      <Image
+                        src={goldsmith.imageUrl || 'https://picsum.photos/seed/default-goldsmith/400/300'}
+                        alt={goldsmith.name}
+                        width={400}
+                        height={200}
+                        className="rounded-t-xl object-cover w-full aspect-[16/9] group-hover:scale-105 transition-transform duration-300"
+                        data-ai-hint="goldsmith workshop"
+                      />
+                      <div className="absolute top-2 right-2 flex items-center gap-1.5">
+                         {isNew && (
+                            <Badge variant="destructive" className="animate-pulse">New</Badge>
+                         )}
+                         <div className="bg-primary/80 backdrop-blur-sm text-primary-foreground px-2 py-0.5 rounded-full text-xs font-semibold flex items-center shadow-md">
+                           <Star className="h-3 w-3 mr-0.5 fill-current" /> {goldsmith.rating > 0 ? goldsmith.rating.toFixed(1) : 'New'}
+                         </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-3 flex-grow flex flex-col justify-between">
+                      <div>
+                        <CardTitle className="font-heading text-md text-accent mb-0.5 group-hover:text-primary transition-colors flex items-center gap-1.5">
+                          {goldsmith.name}
+                          {goldsmith.status === 'verified' && (
+                            <ShieldCheck className="h-4 w-4 text-green-500" title="Verified Goldsmith" />
+                          )}
+                        </CardTitle>
+                        <CardDescription className="text-xs text-muted-foreground mb-0.5 line-clamp-1">
+                          <MapPin className="inline-block h-3 w-3 mr-0.5" /> {goldsmith.district}, {goldsmith.state}
+                        </CardDescription>
+                        <p className="text-xs text-muted-foreground mb-1 font-medium flex items-center capitalize">
+                          <Palette className="inline-block h-3 w-3 mr-0.5 text-primary"/>Specialty: {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty}
+                        </p>
+                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2 mb-2">{goldsmith.shortBio}</p>
+                      </div>
+                      <NextLink
+                        href={`/goldsmith/${goldsmith.id}`}
+                        className={cn(
+                           buttonVariants({ variant: "outline", size: "xs" }),
+                           'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-1.5 w-full rounded-lg text-xs py-1.5 shadow-md'
+                        )}
+                      >
+                        <LinkIcon className="mr-1 h-3 w-3"/>View Profile & Connect
+                      </NextLink>
+                    </CardContent>
+                  </Card>
+                );
+             })
           ) : (
              !isLoading && !error && <p className="col-span-full text-center text-muted-foreground py-6 text-sm">No goldsmiths found based on your criteria.</p>
           )}
