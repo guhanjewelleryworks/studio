@@ -1,13 +1,13 @@
 // src/app/goldsmith-portal/login/page.tsx
 'use client';
 
-import { useState, type FormEvent, Fragment } from 'react'; // Added Fragment
+import { useState, type FormEvent, Fragment } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LogIn, Loader2, MailCheck, Eye, EyeOff } from 'lucide-react'; // Added MailCheck, Eye, EyeOff
+import { LogIn, Loader2, MailCheck, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { loginGoldsmith, requestGoldsmithPasswordReset } from '@/actions/goldsmith-actions';
@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogClose, // Added DialogClose
+  DialogClose,
 } from "@/components/ui/dialog";
 import type { NewGoldsmithInput } from '@/types/goldsmith';
 
@@ -73,7 +73,6 @@ export default function GoldsmithLoginPage() {
       const goldsmith = result.data;
 
       if (typeof window !== "undefined") {
-        // Clear any existing customer session to prevent conflicts
         localStorage.removeItem('currentUser'); 
         
         localStorage.setItem('currentGoldsmithUser', JSON.stringify({
@@ -88,7 +87,6 @@ export default function GoldsmithLoginPage() {
         title: 'Login Successful',
         description: 'Redirecting to your dashboard...',
       });
-      // Use window.location.href for a full page reload to ensure header state is updated
       window.location.href = '/goldsmith-portal/dashboard';
 
     } catch (error) {
@@ -103,8 +101,6 @@ export default function GoldsmithLoginPage() {
   };
   
   const handleResend = () => {
-    // Note: A resend action for goldsmiths would need to be created.
-    // For now, we'll just show a message.
     toast({
         title: "Resend Verification Email",
         description: "Functionality to resend verification for goldsmiths is pending implementation. Please check your original email."
@@ -123,10 +119,8 @@ export default function GoldsmithLoginPage() {
     const result = await requestGoldsmithPasswordReset(forgotPasswordEmail);
 
     if (result.success) {
-      // The message from the action is now displayed, which gives the user feedback.
       setForgotPasswordMessage(result.message);
     } else {
-      // Although the action returns a generic message, handle potential future errors
       setForgotPasswordMessage("An unexpected error occurred. Please try again.");
     }
     
@@ -176,68 +170,20 @@ export default function GoldsmithLoginPage() {
                 </Button>
               </div>
 
-              <div className="flex items-center justify-end pt-0.5">
-                <Dialog open={isForgotPasswordDialogOpen} onOpenChange={setIsForgotPasswordDialogOpen}>
+              <div className="text-right pt-0.5">
                   <DialogTrigger asChild>
                     <button
                       type="button"
                       className="text-sm text-primary hover:text-primary/80 underline underline-offset-4 transition-colors"
                       onClick={() => {
-                        setForgotPasswordMessage(''); // Clear previous message
-                        setForgotPasswordEmail(''); // Clear email field
+                        setForgotPasswordMessage('');
+                        setForgotPasswordEmail('');
                         setIsForgotPasswordDialogOpen(true);
                       }}
                     >
                       Forgot password?
                     </button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-md bg-card">
-                    <DialogHeader>
-                      <DialogTitle className="text-accent">Forgot Your Password?</DialogTitle>
-                      <DialogDescription className="text-muted-foreground">
-                        Enter your registered email address to receive a password reset link.
-                      </DialogDescription>
-                    </DialogHeader>
-                    {forgotPasswordMessage ? (
-                         <div className={`p-3 rounded-md text-sm bg-green-100 border border-green-300 text-green-800`}>
-                           <div className="flex items-start">
-                            <MailCheck className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5"/>
-                            <p className="whitespace-pre-wrap">{forgotPasswordMessage}</p>
-                           </div>
-                        </div>
-                    ) : (
-                    <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="forgot-email" className="text-foreground">
-                          Registered Email
-                        </Label>
-                        <Input
-                          id="forgot-email"
-                          type="email"
-                          placeholder="your.email@example.com"
-                          value={forgotPasswordEmail}
-                          onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                          required
-                          className="text-foreground"
-                          disabled={isForgotPasswordLoading}
-                        />
-                      </div>
-                      
-                      <DialogFooter className="sm:justify-start gap-2">
-                        <Button type="submit" variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isForgotPasswordLoading}>
-                          {isForgotPasswordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                          Send Reset Link
-                        </Button>
-                        <DialogClose asChild>
-                          <Button type="button" variant="outline" disabled={isForgotPasswordLoading}>
-                            Close
-                          </Button>
-                        </DialogClose>
-                      </DialogFooter>
-                    </form>
-                    )}
-                  </DialogContent>
-                </Dialog>
               </div>
 
               <Button
@@ -249,7 +195,8 @@ export default function GoldsmithLoginPage() {
                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 {isLoading ? 'Logging in...' : 'Login to Portal'}
               </Button>
-              
+            </form>
+             
                {showResend && (
                 <div className="text-center">
                     <Button type="button" variant="link" className="text-primary" onClick={handleResend}>
@@ -264,10 +211,58 @@ export default function GoldsmithLoginPage() {
                   Register here
                 </Link>
               </p>
-            </form>
           </CardContent>
         </Card>
       </div>
+
+       <Dialog open={isForgotPasswordDialogOpen} onOpenChange={setIsForgotPasswordDialogOpen}>
+          <DialogContent className="sm:max-w-md bg-card">
+            <DialogHeader>
+              <DialogTitle className="text-accent">Forgot Your Password?</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                Enter your registered email address to receive a password reset link.
+              </DialogDescription>
+            </DialogHeader>
+            {forgotPasswordMessage ? (
+                 <div className={`p-3 rounded-md text-sm bg-green-100 border border-green-300 text-green-800`}>
+                   <div className="flex items-start">
+                    <MailCheck className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5"/>
+                    <p className="whitespace-pre-wrap">{forgotPasswordMessage}</p>
+                   </div>
+                </div>
+            ) : (
+            <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="forgot-email" className="text-foreground">
+                  Registered Email
+                </Label>
+                <Input
+                  id="forgot-email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={forgotPasswordEmail}
+                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                  required
+                  className="text-foreground"
+                  disabled={isForgotPasswordLoading}
+                />
+              </div>
+              
+              <DialogFooter className="sm:justify-start gap-2">
+                <Button type="submit" variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isForgotPasswordLoading}>
+                  {isForgotPasswordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Send Reset Link
+                </Button>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline" disabled={isForgotPasswordLoading}>
+                    Close
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </form>
+            )}
+          </DialogContent>
+        </Dialog>
     </Fragment>
   )
 }
