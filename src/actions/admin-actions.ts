@@ -103,9 +103,15 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
       console.log(`[Admin Actions] Admin login successful for ${credentials.email}.`);
       await logAuditEvent('Admin successful login', { type: 'admin', id: adminUser.id }, { email: adminUser.email });
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...adminDataToReturn } = adminUser;
-      return { success: true, message: 'Login successful!', admin: adminDataToReturn };
+      // FIX: Manually create a plain object to avoid serialization errors
+      const adminDataToReturn = {
+        id: adminUser.id,
+        email: adminUser.email,
+        role: adminUser.role,
+        createdAt: adminUser.createdAt.toISOString(), // Convert Date to string
+      };
+
+      return { success: true, message: 'Login successful!', admin: adminDataToReturn as any };
     } else {
       console.warn(`[Admin Actions] Login failed: Password mismatch for ${credentials.email}.`);
       return { success: false, message: 'Invalid email or password.' };
