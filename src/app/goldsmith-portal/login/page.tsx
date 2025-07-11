@@ -1,4 +1,3 @@
-
 // src/app/goldsmith-portal/login/page.tsx
 'use client';
 
@@ -124,6 +123,8 @@ export default function GoldsmithLoginPage() {
     const result = await requestGoldsmithPasswordReset(forgotPasswordEmail);
 
     if (result.success) {
+      // The message from the action is now displayed, which gives the user feedback.
+      // Since emails are not sent, we rely on this message and the console log on the server.
       setForgotPasswordMessage(result.message);
     } else {
       // Although the action returns a generic message, handle potential future errors
@@ -198,6 +199,14 @@ export default function GoldsmithLoginPage() {
                         Enter your registered email address. Since we can't send emails, a reset link will be logged to your server console for developer testing.
                       </DialogDescription>
                     </DialogHeader>
+                    {forgotPasswordMessage ? (
+                         <div className={`p-3 rounded-md text-sm bg-green-100 border border-green-300 text-green-800`}>
+                           <div className="flex items-start">
+                            <MailCheck className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5"/>
+                            <p className="whitespace-pre-wrap">{forgotPasswordMessage}</p>
+                           </div>
+                        </div>
+                    ) : (
                     <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
                       <div className="space-y-1.5">
                         <Label htmlFor="forgot-email" className="text-foreground">
@@ -214,14 +223,7 @@ export default function GoldsmithLoginPage() {
                           disabled={isForgotPasswordLoading}
                         />
                       </div>
-                      {forgotPasswordMessage && (
-                        <div className={`p-3 rounded-md text-sm bg-green-100 border border-green-300 text-green-800`}>
-                           <div className="flex items-center">
-                            <MailCheck className="h-5 w-5 mr-2"/>
-                            <p>{forgotPasswordMessage}</p>
-                           </div>
-                        </div>
-                      )}
+                      
                       <DialogFooter className="sm:justify-start gap-2">
                         <Button type="submit" variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isForgotPasswordLoading}>
                           {isForgotPasswordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -234,6 +236,7 @@ export default function GoldsmithLoginPage() {
                         </DialogClose>
                       </DialogFooter>
                     </form>
+                    )}
                   </DialogContent>
                 </Dialog>
               </div>

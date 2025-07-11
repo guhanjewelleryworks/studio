@@ -1,4 +1,3 @@
-
 // src/actions/goldsmith-actions.ts
 'use server';
 
@@ -8,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid'; // For generating unique IDs
 import type { Collection, Filter, WithId, FindOneAndUpdateOptions } from 'mongodb';
 import { logAuditEvent } from './audit-log-actions';
 import { createAdminNotification } from './notification-actions';
-import { sendVerificationEmail } from '@/lib/email';
+import { sendGoldsmithPasswordResetEmail, sendVerificationEmail } from '@/lib/email';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 
@@ -107,8 +106,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       );
 
       // Send verification email
-      const verificationUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002'}/goldsmith-portal/verify-email?token=${verificationToken}`;
-      await sendVerificationEmail(newGoldsmith.email, verificationUrl);
+      await sendVerificationEmail(newGoldsmith.email, newGoldsmith.verificationToken, 'goldsmith');
       
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
       if (insertedDoc) {
@@ -810,7 +808,7 @@ export async function changeGoldsmithPassword(goldsmithId: string, currentPasswo
 
 export async function requestGoldsmithPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
   console.log(`[Action: requestGoldsmithPasswordReset] Request received for email: ${email}`);
-  const genericSuccessMessage = "If an account with this email exists, a password reset link has been (simulated) sent.";
+  const genericSuccessMessage = "If an account with this email exists, a password reset link has been generated and logged to the server console for testing. In a real environment, an email would be sent.";
 
   try {
     const collection = await getGoldsmithsCollection();
@@ -829,15 +827,8 @@ export async function requestGoldsmithPasswordReset(email: string): Promise<{ su
       { $set: { passwordResetToken: resetToken, passwordResetTokenExpires } }
     );
     
-    // Use the public URL from env vars, falling back to the standard dev port
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
-    const resetUrl = `${baseUrl}/goldsmith-portal/reset-password?token=${resetToken}`;
-    
-    console.log("----------------------------------------------------");
-    console.log("PASSWORD RESET REQUESTED (FOR DEVELOPER TESTING)");
-    console.log(`Goldsmith: ${goldsmith.email}`);
-    console.log(`Reset URL: ${resetUrl}`);
-    console.log("----------------------------------------------------");
+    // Simulate sending an email by logging it for the developer
+    await sendGoldsmithPasswordResetEmail(goldsmith.email, resetToken);
     
     logAuditEvent('Goldsmith requested password reset', { type: 'goldsmith', id: goldsmith.id }, { email: goldsmith.email });
 

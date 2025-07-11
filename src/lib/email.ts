@@ -8,12 +8,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Use the public URL from env vars, falling back to the standard dev port 9002
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
 
-export async function sendVerificationEmail(email: string, linkOrToken: string) {
-  // This function is now flexible. If it receives a full URL, it uses it.
-  // If it receives just a token, it constructs the default customer verification link.
-  const verificationLink = linkOrToken.startsWith('http')
-    ? linkOrToken
-    : `${baseUrl}/verify-email?token=${linkOrToken}`;
+export async function sendVerificationEmail(email: string, token: string, userType: 'customer' | 'goldsmith') {
+  // Construct the correct link based on user type
+  const verificationLink = userType === 'goldsmith'
+    ? `${baseUrl}/goldsmith-portal/verify-email?token=${token}`
+    : `${baseUrl}/verify-email?token=${token}`;
 
   try {
     const { data, error } = await resend.emails.send({
@@ -38,7 +37,7 @@ export async function sendVerificationEmail(email: string, linkOrToken: string) 
   }
 }
 
-export async function sendPasswordResetEmail(email: string, token: string) {
+export async function sendCustomerPasswordResetEmail(email: string, token: string) {
   const resetLink = `${baseUrl}/customer/reset-password?token=${token}`;
 
   try {
@@ -58,7 +57,46 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     return data;
     
   } catch (error) {
-    console.error("Error in sendPasswordResetEmail:", error);
+    console.error("Error in sendCustomerPasswordResetEmail:", error);
     throw error;
   }
+}
+
+export async function sendGoldsmithPasswordResetEmail(email: string, token: string) {
+  const resetLink = `${baseUrl}/goldsmith-portal/reset-password?token=${token}`;
+
+  // This function simulates sending an email by logging to the console.
+  // This is for development/testing as per project requirements.
+  console.log("----------------------------------------------------");
+  console.log("PASSWORD RESET REQUESTED (FOR DEVELOPER TESTING)");
+  console.log(`Goldsmith: ${email}`);
+  console.log(`Reset URL: ${resetLink}`);
+  console.log("----------------------------------------------------");
+
+  // In a real production scenario with an email provider, you would use:
+  /*
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Goldsmith Connect <onboarding@resend.dev>',
+      to: [email],
+      subject: 'Reset Your Goldsmith Portal Password',
+      react: PasswordResetEmail({ resetLink }),
+    });
+
+    if (error) {
+      console.error("Resend API error for goldsmith password reset:", error);
+      throw new Error(`Failed to send password reset email: ${error.message}`);
+    }
+
+    console.log("Goldsmith password reset email sent successfully:", data);
+    return data;
+    
+  } catch (error) {
+    console.error("Error in sendGoldsmithPasswordResetEmail:", error);
+    throw error;
+  }
+  */
+
+  // Since we are not sending a real email, we'll just resolve successfully.
+  return Promise.resolve();
 }
