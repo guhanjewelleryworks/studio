@@ -20,14 +20,12 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Redirect to dashboard if already logged in
+    // CRITICAL FIX: Always clear the session flag when visiting the login page
+    // This prevents a stale flag from causing an automatic redirect.
     if (typeof window !== "undefined") {
-      const adminLoggedIn = localStorage.getItem('isAdminLoggedIn');
-      if (adminLoggedIn === 'true') {
-        router.replace('/admin/dashboard');
-      }
+      localStorage.removeItem('isAdminLoggedIn');
     }
-  }, [router]);
+  }, []);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
