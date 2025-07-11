@@ -1,7 +1,8 @@
+
 // src/app/goldsmith-portal/login/page.tsx
 'use client';
 
-import { useState, type FormEvent, Fragment } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,8 +22,6 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import type { NewGoldsmithInput } from '@/types/goldsmith';
-
 
 export default function GoldsmithLoginPage() {
   const router = useRouter();
@@ -37,7 +36,6 @@ export default function GoldsmithLoginPage() {
   const [isForgotPasswordLoading, setIsForgotPasswordLoading] = useState(false);
   const [isForgotPasswordDialogOpen, setIsForgotPasswordDialogOpen] = useState(false);
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState('');
-
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -128,7 +126,7 @@ export default function GoldsmithLoginPage() {
   };
 
   return (
-    <Fragment>
+    <Dialog open={isForgotPasswordDialogOpen} onOpenChange={setIsForgotPasswordDialogOpen}>
       <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/20 to-background">
         <Card className="w-full max-w-lg shadow-xl border-primary/15 rounded-xl bg-card">
           <CardHeader className="text-center pt-6 pb-4">
@@ -178,7 +176,6 @@ export default function GoldsmithLoginPage() {
                       onClick={() => {
                         setForgotPasswordMessage('');
                         setForgotPasswordEmail('');
-                        setIsForgotPasswordDialogOpen(true);
                       }}
                     >
                       Forgot password?
@@ -215,7 +212,7 @@ export default function GoldsmithLoginPage() {
         </Card>
       </div>
 
-       <Dialog open={isForgotPasswordDialogOpen} onOpenChange={setIsForgotPasswordDialogOpen}>
+       
           <DialogContent className="sm:max-w-md bg-card">
             <DialogHeader>
               <DialogTitle className="text-accent">Forgot Your Password?</DialogTitle>
@@ -262,7 +259,6 @@ export default function GoldsmithLoginPage() {
             </form>
             )}
           </DialogContent>
-        </Dialog>
-    </Fragment>
+    </Dialog>
   )
 }
