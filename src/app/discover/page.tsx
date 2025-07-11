@@ -23,7 +23,6 @@ import {
   SheetClose,
 } from '@/components/ui/sheet';
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 
@@ -50,7 +49,7 @@ export default function DiscoverPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [filters, setFilters] = useState({
     specialties: [] as string[],
-    rating: 0, // 0 for any
+    states: [] as string[],
   });
 
   // Initial data fetch
@@ -83,18 +82,25 @@ export default function DiscoverPage() {
     loadGoldsmiths();
   }, []);
 
-  // Memoize unique specialties to avoid recalculating on every render
-  const uniqueSpecialties = useMemo(() => {
-    if (!allGoldsmiths) return [];
+  // Memoize unique values to avoid recalculating on every render
+  const { uniqueSpecialties, uniqueStates } = useMemo(() => {
+    if (!allGoldsmiths) return { uniqueSpecialties: [], uniqueStates: [] };
     const specialtiesSet = new Set<string>();
+    const statesSet = new Set<string>();
     allGoldsmiths.forEach(g => {
         if (Array.isArray(g.specialty)) {
             g.specialty.forEach(s => s && specialtiesSet.add(s));
         } else if (typeof g.specialty === 'string' && g.specialty) {
             specialtiesSet.add(g.specialty);
         }
+        if (g.state) {
+            statesSet.add(g.state);
+        }
     });
-    return Array.from(specialtiesSet).sort();
+    return { 
+        uniqueSpecialties: Array.from(specialtiesSet).sort(),
+        uniqueStates: Array.from(statesSet).sort(),
+    };
   }, [allGoldsmiths]);
 
   // Combined filtering logic
@@ -124,14 +130,14 @@ export default function DiscoverPage() {
         });
     }
 
-    // 3. Filter by rating
-    if (filters.rating > 0) {
-        filtered = filtered.filter(g => g.rating >= filters.rating);
+    // 3. Filter by selected states
+    if (filters.states.length > 0) {
+        filtered = filtered.filter(g => filters.states.includes(g.state));
     }
     
     setDisplayedGoldsmiths(filtered);
     
-    if (filtered.length === 0 && (searchTerm.trim() || filters.specialties.length > 0 || filters.rating > 0)) {
+    if (filtered.length === 0 && (searchTerm.trim() || filters.specialties.length > 0 || filters.states.length > 0)) {
         setError(`No goldsmiths found matching your criteria. Try adjusting your search or filters.`);
     } else {
         setError(null);
@@ -143,7 +149,7 @@ export default function DiscoverPage() {
   const handleClearFilters = () => {
     setFilters({
         specialties: [],
-        rating: 0,
+        states: [],
     });
   };
 
@@ -191,35 +197,37 @@ export default function DiscoverPage() {
                 </SheetHeader>
                 <Separator className="my-3"/>
                 <div className="flex-grow overflow-y-auto pr-4 space-y-6">
-                    {/* Rating Filter */}
-                    <div>
-                        <Label className="text-base font-semibold text-foreground">Rating</Label>
-                        <RadioGroup
-                            value={String(filters.rating)}
-                            onValueChange={(value) => setFilters(prev => ({...prev, rating: Number(value)}))}
-                            className="mt-2 space-y-1"
-                        >
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="0" id="r-any" />
-                                <Label htmlFor="r-any" className="font-normal">Any Rating</Label>
+                    
+                    {/* State Filter */}
+                    {uniqueStates.length > 0 && (
+                        <div>
+                            <Label className="text-base font-semibold text-foreground">Filter by State</Label>
+                            <div className="mt-2 space-y-2">
+                                {uniqueStates.map(state => (
+                                    <div key={state} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`state-${state}`}
+                                            checked={filters.states.includes(state)}
+                                            onCheckedChange={(checked) => {
+                                                const newStates = checked
+                                                    ? [...filters.states, state]
+                                                    : filters.states.filter(s => s !== state);
+                                                setFilters(prev => ({...prev, states: newStates}));
+                                            }}
+                                        />
+                                        <Label htmlFor={`state-${state}`} className="font-normal capitalize">{state}</Label>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="4" id="r-4" />
-                                <Label htmlFor="r-4" className="font-normal">4 stars & up</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="3" id="r-3" />
-                                <Label htmlFor="r-3" className="font-normal">3 stars & up</Label>
-                            </div>
-                        </RadioGroup>
-                    </div>
+                        </div>
+                    )}
                     
                     <Separator />
 
                     {/* Specialty Filter */}
                     {uniqueSpecialties.length > 0 && (
                         <div>
-                            <Label className="text-base font-semibold text-foreground">Specialties</Label>
+                            <Label className="text-base font-semibold text-foreground">Filter by Specialties</Label>
                             <div className="mt-2 space-y-2">
                                 {uniqueSpecialties.map(spec => (
                                     <div key={spec} className="flex items-center space-x-2">
