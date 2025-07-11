@@ -48,7 +48,7 @@ export default function Home() {
       setErrorFeatured(null);
       try {
         const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
-        setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 3));
+        setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 4));
       } catch (err) {
         console.error("Error fetching featured goldsmiths:", err);
         setErrorFeatured("Could not load featured artisans. Please try again later.");
@@ -156,15 +156,15 @@ export default function Home() {
               </p>
             </div>
             {isLoadingFeatured ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 pt-4 md:pt-5">
-                {Array.from({ length: 3 }).map((_, index) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 pt-4 md:pt-5">
+                {Array.from({ length: 4 }).map((_, index) => (
                    <Card key={index} className="animate-pulse bg-card/80 rounded-xl shadow-lg border-border h-[420px]"></Card>
                 ))}
               </div>
             ) : errorFeatured ? (
               <p className="text-destructive text-center">{errorFeatured}</p>
             ) : featuredGoldsmiths.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 pt-4 md:pt-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6 pt-4 md:pt-5">
                 {featuredGoldsmiths.map((goldsmith) => {
                   const isNew = goldsmith.registeredAt && differenceInDays(new Date(), new Date(goldsmith.registeredAt)) <= 15;
                   return (
