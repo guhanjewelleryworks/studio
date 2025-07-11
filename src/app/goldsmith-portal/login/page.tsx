@@ -124,7 +124,6 @@ export default function GoldsmithLoginPage() {
 
     if (result.success) {
       // The message from the action is now displayed, which gives the user feedback.
-      // Since emails are not sent, we rely on this message and the console log on the server.
       setForgotPasswordMessage(result.message);
     } else {
       // Although the action returns a generic message, handle potential future errors
@@ -196,7 +195,7 @@ export default function GoldsmithLoginPage() {
                     <DialogHeader>
                       <DialogTitle className="text-accent">Forgot Your Password?</DialogTitle>
                       <DialogDescription className="text-muted-foreground">
-                        Enter your registered email address. Since we can't send emails, a reset link will be logged to your server console for developer testing.
+                        Enter your registered email address to receive a password reset link.
                       </DialogDescription>
                     </DialogHeader>
                     {forgotPasswordMessage ? (
@@ -227,7 +226,7 @@ export default function GoldsmithLoginPage() {
                       <DialogFooter className="sm:justify-start gap-2">
                         <Button type="submit" variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isForgotPasswordLoading}>
                           {isForgotPasswordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                          Request Reset Link
+                          Send Reset Link
                         </Button>
                         <DialogClose asChild>
                           <Button type="button" variant="outline" disabled={isForgotPasswordLoading}>

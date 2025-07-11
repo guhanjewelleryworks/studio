@@ -65,16 +65,6 @@ export async function sendCustomerPasswordResetEmail(email: string, token: strin
 export async function sendGoldsmithPasswordResetEmail(email: string, token: string) {
   const resetLink = `${baseUrl}/goldsmith-portal/reset-password?token=${token}`;
 
-  // This function simulates sending an email by logging to the console.
-  // This is for development/testing as per project requirements.
-  console.log("----------------------------------------------------");
-  console.log("PASSWORD RESET REQUESTED (FOR DEVELOPER TESTING)");
-  console.log(`Goldsmith: ${email}`);
-  console.log(`Reset URL: ${resetLink}`);
-  console.log("----------------------------------------------------");
-
-  // In a real production scenario with an email provider, you would use:
-  /*
   try {
     const { data, error } = await resend.emails.send({
       from: 'Goldsmith Connect <onboarding@resend.dev>',
@@ -95,8 +85,4 @@ export async function sendGoldsmithPasswordResetEmail(email: string, token: stri
     console.error("Error in sendGoldsmithPasswordResetEmail:", error);
     throw error;
   }
-  */
-
-  // Since we are not sending a real email, we'll just resolve successfully.
-  return Promise.resolve();
 }

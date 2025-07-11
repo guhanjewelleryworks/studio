@@ -808,7 +808,7 @@ export async function changeGoldsmithPassword(goldsmithId: string, currentPasswo
 
 export async function requestGoldsmithPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
   console.log(`[Action: requestGoldsmithPasswordReset] Request received for email: ${email}`);
-  const genericSuccessMessage = "If an account with this email exists, a password reset link has been generated and logged to the server console for testing. In a real environment, an email would be sent.";
+  const genericSuccessMessage = "If an account with this email exists, a password reset link has been sent. Please check your inbox and spam folder.";
 
   try {
     const collection = await getGoldsmithsCollection();
@@ -827,7 +827,6 @@ export async function requestGoldsmithPasswordReset(email: string): Promise<{ su
       { $set: { passwordResetToken: resetToken, passwordResetTokenExpires } }
     );
     
-    // Simulate sending an email by logging it for the developer
     await sendGoldsmithPasswordResetEmail(goldsmith.email, resetToken);
     
     logAuditEvent('Goldsmith requested password reset', { type: 'goldsmith', id: goldsmith.id }, { email: goldsmith.email });
