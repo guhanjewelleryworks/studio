@@ -7,12 +7,14 @@ import Link from 'next/link';
 import NextLink from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Search, ShieldCheck, Gift, MapPin, UserCheck, Handshake, Gem, Loader2 } from 'lucide-react';
+import { Search, ShieldCheck, Gift, MapPin, UserCheck, Handshake, Gem, Loader2, Star } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { MetalPricesWidget } from '@/components/metal-prices-widget';
 import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions'; 
 import React, { useEffect, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { differenceInDays } from 'date-fns';
 
 // Subtle pattern for hero section
 const HeroPattern = () => (
@@ -146,8 +148,8 @@ export default function Home() {
 
         {/* Featured Goldsmiths Section */}
         <section className="w-full py-10 md:py-12 lg:py-14 bg-gradient-to-b from-secondary/20 to-background">
-          <div className="container max-w-screen-xl grid items-center justify-center gap-3 px-4 text-center md:px-6">
-            <div className="space-y-1.5 mb-4 md:mb-6">
+          <div className="container max-w-screen-xl px-4 md:px-6">
+            <div className="space-y-1.5 mb-4 md:mb-6 text-center">
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Meet Our Talented Artisans</h2>
               <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins">
                 Discover skilled goldsmiths ready to craft your next masterpiece.
@@ -160,49 +162,62 @@ export default function Home() {
                 ))}
               </div>
             ) : errorFeatured ? (
-              <p className="text-destructive">{errorFeatured}</p>
+              <p className="text-destructive text-center">{errorFeatured}</p>
             ) : featuredGoldsmiths.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 pt-4 md:pt-5">
-                {featuredGoldsmiths.map((goldsmith) => (
-                  <Card key={goldsmith.id} className="shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1.5 bg-card border-primary/20 overflow-hidden group rounded-xl flex flex-col">
-                    <CardHeader className="p-0 relative">
-                      <Image
-                        src={goldsmith.imageUrl || `https://placehold.co/400x300.png`} // fallback to placeholder
-                        alt={goldsmith.name || 'Featured Goldsmith'} // fallback alt
-                        width={400}
-                        height={300} // Adjusted for 4:3 ratio
-                        className="object-cover w-full aspect-[4/3] group-hover:scale-105 transition-transform duration-300"
-                        data-ai-hint="goldsmith artisan jewelry" // More generic hint
-                      />
-                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                        <h3 className="text-xl font-heading text-primary-foreground drop-shadow-md">{goldsmith.name}</h3>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-4 text-left space-y-1.5 flex-grow flex flex-col justify-between">
-                      <div>
-                        <CardTitle className="text-lg font-heading text-accent mb-1 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
-                        <p className="flex items-center text-foreground/90 text-xs font-poppins mb-1.5">
-                           <Gem className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
-                           {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty}
-                        </p>
-                        <p className="text-xs text-foreground/80 leading-relaxed line-clamp-3 font-poppins mb-2.5">
-                          {goldsmith.shortBio || `A master of timeless designs and intricate details, located in ${goldsmith.address || 'their workshop'}.`}
-                        </p>
-                      </div>
-                      <NextLink
-                        href={`/goldsmith/${goldsmith.id}`}
-                        className={cn(buttonVariants({ variant: "default", size: "sm" }), "bg-primary text-primary-foreground hover:bg-primary/90 mt-auto w-full rounded-full text-sm py-2 shadow-md hover:shadow-lg")}
-                      >
-                        <span>View Profile & Connect</span>
-                      </NextLink>
-                    </CardContent>
-                  </Card>
-                ))}
+                {featuredGoldsmiths.map((goldsmith) => {
+                  const isNew = goldsmith.registeredAt && differenceInDays(new Date(), new Date(goldsmith.registeredAt)) <= 15;
+                  return (
+                    <Card key={goldsmith.id} className="shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1.5 bg-card border-primary/20 overflow-hidden group rounded-xl flex flex-col">
+                      <CardHeader className="p-0 relative">
+                        <Image
+                          src={goldsmith.imageUrl || `https://placehold.co/400x300.png`}
+                          alt={goldsmith.name || 'Featured Goldsmith'}
+                          width={400}
+                          height={300}
+                          className="object-cover w-full aspect-[4/3] group-hover:scale-105 transition-transform duration-300"
+                          data-ai-hint="goldsmith artisan jewelry"
+                        />
+                         <div className="absolute top-2 right-2 flex items-center gap-1.5">
+                           {isNew && (
+                              <Badge variant="default" className="animate-pulse flex items-center gap-1 bg-primary text-primary-foreground">
+                                <Star className="h-3 w-3 fill-current" />
+                                New
+                              </Badge>
+                           )}
+                           {goldsmith.rating > 0 && (
+                              <div className="bg-background/80 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-full text-xs font-semibold flex items-center shadow-md">
+                                <Star className="h-3 w-3 mr-0.5 fill-current text-yellow-400" /> {goldsmith.rating.toFixed(1)}
+                              </div>
+                           )}
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-4 text-left space-y-1.5 flex-grow flex flex-col justify-between">
+                        <div>
+                          <CardTitle className="text-lg font-heading text-accent mb-1 group-hover:text-primary transition-colors">{goldsmith.name}</CardTitle>
+                          <p className="flex items-center text-foreground/90 text-xs font-poppins mb-1.5">
+                            <Gem className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
+                            {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty}
+                          </p>
+                          <p className="text-xs text-foreground/80 leading-relaxed line-clamp-3 font-poppins mb-2.5">
+                            {goldsmith.shortBio || `A master of timeless designs and intricate details, located in ${goldsmith.state || 'their workshop'}.`}
+                          </p>
+                        </div>
+                        <NextLink
+                          href={`/goldsmith/${goldsmith.id}`}
+                          className={cn(buttonVariants({ variant: "default", size: "sm" }), "bg-primary text-primary-foreground hover:bg-primary/90 mt-auto w-full rounded-full text-sm py-2 shadow-md hover:shadow-lg")}
+                        >
+                          <span>View Profile & Connect</span>
+                        </NextLink>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             ) : (
-               <p className="text-muted-foreground font-poppins py-8">No featured artisans available at the moment. Please check back soon!</p>
+               <p className="text-muted-foreground font-poppins py-8 text-center">No featured artisans available at the moment. Please check back soon!</p>
             )}
-            <div className="mt-8 md:mt-10">
+            <div className="mt-8 md:mt-10 text-center">
               <Link
                 href="/discover"
                 className={cn(buttonVariants({ size: 'lg', variant: 'outline' }), "border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground shadow-lg hover:shadow-xl transition-shadow rounded-full px-8 py-3 text-base")}
