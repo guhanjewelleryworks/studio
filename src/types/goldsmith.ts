@@ -111,6 +111,20 @@ export interface Customer {
 
 export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken' | 'passwordResetToken' | 'passwordResetTokenExpires'>;
 
+
+// --- Admin Type ---
+export interface Admin {
+  _id?: ObjectId;
+  id: string;
+  email: string;
+  password?: string;
+  role: 'superadmin' | 'admin';
+  createdAt: Date;
+}
+
+export type NewAdminInput = Omit<Admin, '_id' | 'id' | 'createdAt'>;
+
+
 // --- New Type for Stored Metal Prices ---
 export interface StoredMetalPrice {
   _id?: ObjectId | string;

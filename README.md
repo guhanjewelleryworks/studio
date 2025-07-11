@@ -20,6 +20,10 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
         METALS_API_KEY="YOUR_GOLDAPI_IO_KEY_HERE"
         CRON_SECRET="GENERATE_A_VERY_LONG_AND_RANDOM_SECRET_STRING_HERE"
         
+        # Required for Admin Portal Login
+        ADMIN_EMAIL="admin@example.com"
+        ADMIN_PASSWORD="a_very_strong_and_long_password"
+        
         # Optional: Required if using Genkit AI features
         GOOGLE_GENAI_API_KEY="YOUR_API_KEY_HERE"
         ```

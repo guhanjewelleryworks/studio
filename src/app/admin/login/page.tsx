@@ -10,11 +10,12 @@ import { Label } from '@/components/ui/label';
 import { ShieldAlert, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { loginAdmin } from '@/actions/admin-actions';
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,25 +33,32 @@ export default function AdminLoginPage() {
     event.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Simulate admin credentials check
-    if (username === 'admin' && password === 'password') { 
-      if (typeof window !== "undefined") {
-        localStorage.setItem('isAdminLoggedIn', 'true');
+    try {
+      const result = await loginAdmin({ email, password });
+      
+      if (result.success) { 
+        if (typeof window !== "undefined") {
+          localStorage.setItem('isAdminLoggedIn', 'true');
+        }
+        toast({
+          title: 'Login Successful',
+          description: 'Redirecting to the admin dashboard...',
+        });
+        router.push('/admin/dashboard');
+      } else {
+        toast({
+          title: 'Login Failed',
+          description: result.message,
+          variant: 'destructive',
+        });
+        setIsLoading(false);
       }
-      toast({
-        title: 'Login Successful (Simulated)',
-        description: 'Redirecting to the admin dashboard...',
-      });
-      router.push('/admin/dashboard');
-    } else {
-      toast({
-        title: 'Login Failed (Simulated)',
-        description: 'Invalid username or password. Please try "admin" and "password".',
-        variant: 'destructive',
-      });
+    } catch (error) {
+       toast({
+          title: 'Login Failed',
+          description: 'An unexpected server error occurred.',
+          variant: 'destructive',
+        });
       setIsLoading(false);
     }
   };
@@ -66,15 +74,15 @@ export default function AdminLoginPage() {
         <CardContent className="px-8 pb-6 pt-4"> 
           <form className="space-y-4" onSubmit={handleSubmit}> 
             <div className="space-y-1.5">
-              <Label htmlFor="username" className="text-foreground">Username or Email</Label>
+              <Label htmlFor="email" className="text-foreground">Admin Email</Label>
               <Input 
-                id="username" 
-                type="text" 
-                placeholder="admin" 
+                id="email" 
+                type="email" 
+                placeholder="Enter admin email" 
                 required 
                 className="text-base py-2 text-foreground"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading} 
               /> 
             </div>
@@ -84,7 +92,7 @@ export default function AdminLoginPage() {
               <Input 
                 id="password" 
                 type="password" 
-                placeholder="password"
+                placeholder="Enter admin password"
                 required 
                 className="text-base py-2 text-foreground"
                 value={password}
