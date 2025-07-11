@@ -1,12 +1,12 @@
+
 'use client';
 
-import type { Location } from '@/services/geolocation';
 import type { Goldsmith } from '@/types/goldsmith';
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { MapPin, List, Search, Star, Loader2, SlidersHorizontal, Palette, ShieldCheck } from 'lucide-react';
+import { Search, Star, Loader2, SlidersHorizontal, Palette, ShieldCheck, MapPin } from 'lucide-react';
 import { Link as LinkIcon } from 'lucide-react';
 import Image from 'next/image';
 import NextLink from 'next/link';
@@ -26,24 +26,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 
-
-// Placeholder for Map Component
-const MapPlaceholder = ({ locations }: { locations: Location[] }) => (
-  <div className="w-full h-[300px] md:h-full bg-card/70 rounded-xl flex flex-col items-center justify-center text-muted-foreground border border-border shadow-inner">
-    <MapPin className="h-16 w-16 text-primary/70 mb-4" />
-    <p className="text-xl font-semibold text-foreground">Interactive Map View</p>
-    <p className="text-base mt-1 text-muted-foreground">(Displaying {locations.length} locations)</p>
-  </div>
-);
-
-
 export default function DiscoverPage() {
-  const [viewMode, setViewMode] = useState<'map' | 'list'>('list');
   const [searchTerm, setSearchTerm] = useState('');
-  const [allGoldsmiths, setAllGoldsmiths] = useState<Goldsmith[]>([]); 
-  const [displayedGoldsmiths, setDisplayedGoldsmiths] = useState<Goldsmith[]>([]); 
+  const [allGoldsmiths, setAllGoldsmiths] = useState<Goldsmith[]>([]);
+  const [displayedGoldsmiths, setDisplayedGoldsmiths] = useState<Goldsmith[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -55,18 +42,6 @@ export default function DiscoverPage() {
   // Initial data fetch
   useEffect(() => {
     setIsLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        const loc: Location = { lat: latitude, lng: longitude };
-        setCurrentLocation(loc);
-      },
-      (err) => {
-        console.error("Error getting location:", err.message);
-        setError("Could not access your location. Please enable location services or search manually.");
-      }
-    );
-
     const loadGoldsmiths = async () => {
       try {
         const fetchedGoldsmiths = await fetchAllGoldsmiths();
@@ -153,21 +128,10 @@ export default function DiscoverPage() {
     });
   };
 
-  const goldsmithLocations = displayedGoldsmiths.map(g => g.location).filter(loc => loc !== undefined) as Location[];
-
-
   return (
     <div className="container max-w-screen-xl py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)]">
       <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-6">
         <h1 className="text-3xl font-heading text-accent tracking-tight">Find a Goldsmith</h1>
-        <div className="flex gap-2">
-          <Button variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} aria-label="List View" className="rounded-lg px-4 py-2 text-sm shadow-md">
-            <List className="mr-1.5 h-4 w-4" /> List
-          </Button>
-          <Button variant={viewMode === 'map' ? 'default' : 'outline'} onClick={() => setViewMode('map')} aria-label="Map View" className="rounded-lg px-4 py-2 text-sm shadow-md">
-            <MapPin className="mr-1.5 h-4 w-4" /> Map
-          </Button>
-        </div>
       </div>
 
       <div className="mb-6 flex flex-col sm:flex-row gap-2.5 items-center">
@@ -261,10 +225,9 @@ export default function DiscoverPage() {
 
        {error && <p className="text-destructive text-center mb-3 text-sm">{error}</p>}
 
-      <div className={`grid gap-3 ${viewMode === 'map' ? 'grid-cols-1 md:grid-cols-[2fr_3fr]' : ''}`}>
-        <div className={`${viewMode === 'map' ? 'hidden md:block' : ''} ${viewMode === 'list' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'overflow-y-auto max-h-[calc(100vh-18rem)] pr-1.5 space-y-2.5'}`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {isLoading ? (
-             Array.from({ length: viewMode === 'list' ? 8 : 3 }).map((_, index) => (
+             Array.from({ length: 8 }).map((_, index) => (
               <Card key={index} className="animate-pulse bg-card h-[280px] rounded-xl shadow-md border-border"></Card> 
              ))
           ) : displayedGoldsmiths.length > 0 ? (
@@ -315,19 +278,6 @@ export default function DiscoverPage() {
              !isLoading && !error && <p className="col-span-full text-center text-muted-foreground py-6 text-sm">No goldsmiths found based on your criteria.</p>
           )}
         </div>
-
-        {viewMode === 'map' && (
-          <div className="md:col-span-1">
-            {isLoading && !currentLocation ? (
-                <div className="w-full h-[300px] md:h-full bg-card/80 rounded-xl flex items-center justify-center text-muted-foreground border border-border shadow-inner">
-                    <Loader2 className="h-8 w-8 animate-spin mr-2 text-primary" /> Loading Map Data...
-                </div>
-            ) : (
-                 <MapPlaceholder locations={goldsmithLocations} />
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
