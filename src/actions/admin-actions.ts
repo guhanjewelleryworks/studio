@@ -41,7 +41,7 @@ async function seedDefaultAdmin(): Promise<void> {
       await collection.insertOne(newAdmin);
       console.log('[Admin Actions] Default admin user has been successfully created.');
       
-      logAuditEvent('Default admin account seeded', { type: 'system', id: 'init' }, { email: adminEmail });
+      await logAuditEvent('Default admin account seeded', { type: 'system', id: 'init' }, { email: adminEmail });
 
     } else {
         console.log('[Admin Actions] Default admin user already exists. Seed unnecessary.');
@@ -80,7 +80,7 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
 
     if (passwordMatch) {
       console.log(`[Admin Actions] Admin login successful for ${credentials.email}.`);
-      logAuditEvent('Admin successful login', { type: 'admin', id: adminUser.id }, { email: adminUser.email });
+      await logAuditEvent('Admin successful login', { type: 'admin', id: adminUser.id }, { email: adminUser.email });
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...adminDataToReturn } = adminUser;
