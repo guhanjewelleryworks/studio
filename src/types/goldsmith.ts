@@ -147,7 +147,7 @@ export interface AuditLog {
 export interface AdminNotification {
   _id?: ObjectId | string;
   id: string; // UUID
-  type: 'new_goldsmith_registration' | 'new_order_request' | 'new_contact_message';
+  type: 'new_goldsmith_registration' | 'new_order_request' | 'new_contact_message' | 'order_status_update';
   message: string;
   link: string; // e.g., /admin/goldsmiths
   isRead: boolean;

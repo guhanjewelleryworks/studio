@@ -474,13 +474,12 @@ export async function updateOrderStatus(
   orderId: string,
   newStatus: OrderRequestStatus
 ): Promise<{ success: boolean; error?: string; data?: OrderRequest }> {
-  console.log(`[Action: updateOrderStatus] Admin updating order ${orderId} to status ${newStatus}`);
+  console.log(`[Action: updateOrderStatus] Updating order ${orderId} to status ${newStatus}`);
   try {
     if (!orderId || !newStatus) {
       return { success: false, error: 'Order ID and new status are required.' };
     }
 
-    // Ensure the newStatus is a valid OrderRequestStatus
     const validStatuses: OrderRequestStatus[] = [
       'new', 'pending_goldsmith_review', 'in_progress', 
       'artwork_completed', 'customer_review_requested', 'shipped', 
@@ -500,22 +499,32 @@ export async function updateOrderStatus(
     };
     const options: FindOneAndUpdateOptions = {
       returnDocument: 'after',
-      projection: { _id: 0 } as any, // Cast to any to bypass strict BSON projection type for now
+      projection: { _id: 0 } as any,
     };
 
     const result = await collection.findOneAndUpdate(filter, updateDoc, options);
-
+    
     if (result) {
-      console.log(`[Action: updateOrderStatus] Successfully updated order ${orderId} to ${newStatus}.`);
-      logAuditEvent(
-        `Updated order status to "${newStatus}"`,
-        { type: 'admin', id: 'admin_user' }, // Placeholder for actual admin ID
-        { orderId, newStatus }
-      );
-      return { success: true, data: result as OrderRequest };
+        const orderData = result as OrderRequest;
+        console.log(`[Action: updateOrderStatus] Successfully updated order ${orderId} to ${newStatus}.`);
+
+        logAuditEvent(
+            `Updated order status to "${newStatus}"`,
+            { type: 'admin', id: 'system_or_user' }, 
+            { orderId, newStatus }
+        );
+        
+        // Notify admin about the status change
+        await createAdminNotification({
+            type: 'order_status_update',
+            message: `Order #${orderId.substring(0, 8)} status updated to "${newStatus.replace(/_/g, ' ')}" for customer ${orderData.customerName}.`,
+            link: `/admin/orders/${orderId}`,
+        });
+
+        return { success: true, data: orderData };
     } else {
-      console.log(`[Action: updateOrderStatus] Order ${orderId} not found or not updated.`);
-      return { success: false, error: 'Order not found or status not updated.' };
+        console.log(`[Action: updateOrderStatus] Order ${orderId} not found or not updated.`);
+        return { success: false, error: 'Order not found or status not updated.' };
     }
   } catch (error) {
     console.error(`[Action: updateOrderStatus] Error updating order status for ${orderId}:`, error);
