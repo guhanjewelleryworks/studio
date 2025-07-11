@@ -1,3 +1,4 @@
+
 // src/app/page.tsx
 'use client'; 
 
@@ -48,7 +49,26 @@ export default function Home() {
       setErrorFeatured(null);
       try {
         const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
-        setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 4));
+        
+        // --- Shuffle Algorithm (Fisher-Yates) ---
+        let currentIndex = allVerifiedGoldsmiths.length;
+        let randomIndex;
+        const shuffledGoldsmiths = [...allVerifiedGoldsmiths]; // Create a copy to shuffle
+
+        // While there remain elements to shuffle.
+        while (currentIndex !== 0) {
+          // Pick a remaining element.
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+
+          // And swap it with the current element.
+          [shuffledGoldsmiths[currentIndex], shuffledGoldsmiths[randomIndex]] = [
+            shuffledGoldsmiths[randomIndex], shuffledGoldsmiths[currentIndex]];
+        }
+        // --- End of Shuffle ---
+
+        setFeaturedGoldsmiths(shuffledGoldsmiths.slice(0, 4));
+
       } catch (err) {
         console.error("Error fetching featured goldsmiths:", err);
         setErrorFeatured("Could not load featured artisans. Please try again later.");
