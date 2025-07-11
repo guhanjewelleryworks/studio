@@ -25,7 +25,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge'; // Import Badge component
+import { Badge } from '@/components/ui/badge';
 import { differenceInDays } from 'date-fns';
 
 export default function DiscoverPage() {
@@ -250,9 +250,11 @@ export default function DiscoverPage() {
                          {isNew && (
                             <Badge variant="destructive" className="animate-pulse">New</Badge>
                          )}
-                         <div className="bg-primary/80 backdrop-blur-sm text-primary-foreground px-2 py-0.5 rounded-full text-xs font-semibold flex items-center shadow-md">
-                           <Star className="h-3 w-3 mr-0.5 fill-current" /> {goldsmith.rating > 0 ? goldsmith.rating.toFixed(1) : 'New'}
-                         </div>
+                         {goldsmith.rating > 0 && (
+                            <div className="bg-primary/80 backdrop-blur-sm text-primary-foreground px-2 py-0.5 rounded-full text-xs font-semibold flex items-center shadow-md">
+                              <Star className="h-3 w-3 mr-0.5 fill-current" /> {goldsmith.rating.toFixed(1)}
+                            </div>
+                         )}
                       </div>
                     </CardHeader>
                     <CardContent className="p-3 flex-grow flex flex-col justify-between">
