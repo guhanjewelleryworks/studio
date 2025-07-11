@@ -4,7 +4,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings, Lock, ArrowLeft, Loader2 } from 'lucide-react';
+import { Settings, Lock, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,11 @@ export default function GoldsmithSettingsPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [isSavingPassword, setIsSavingPassword] = useState(false);
+  
+  // State for password visibility
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const userString = localStorage.getItem('currentGoldsmithUser');
@@ -126,41 +131,50 @@ export default function GoldsmithSettingsPage() {
                 className="bg-muted/50 text-muted-foreground" 
               />
             </div>
-            <div>
+            <div className="relative">
               <Label htmlFor="current-password">Current Password</Label>
               <Input 
                 id="current-password" 
-                type="password" 
+                type={showCurrentPassword ? 'text' : 'password'}
                 placeholder="Enter current password" 
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 required
                 disabled={isSavingPassword}
               />
+               <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowCurrentPassword(!showCurrentPassword)} tabIndex={-1}>
+                  {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+               </Button>
             </div>
-            <div>
+            <div className="relative">
               <Label htmlFor="new-password">New Password (min. 8 characters)</Label>
               <Input 
                 id="new-password" 
-                type="password" 
+                type={showNewPassword ? 'text' : 'password'} 
                 placeholder="Enter new password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
                 disabled={isSavingPassword}
               />
+               <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowNewPassword(!showNewPassword)} tabIndex={-1}>
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+               </Button>
             </div>
-            <div>
+            <div className="relative">
               <Label htmlFor="confirm-password">Confirm New Password</Label>
               <Input 
                 id="confirm-password" 
-                type="password" 
+                type={showConfirmPassword ? 'text' : 'password'} 
                 placeholder="Confirm new password" 
                 value={confirmNewPassword}
                 onChange={(e) => setConfirmNewPassword(e.target.value)}
                 required
                 disabled={isSavingPassword}
               />
+              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowConfirmPassword(!showConfirmPassword)} tabIndex={-1}>
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+               </Button>
             </div>
             <div className="flex justify-end">
                 <Button type="submit" variant="outline" className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground" disabled={isSavingPassword}>
