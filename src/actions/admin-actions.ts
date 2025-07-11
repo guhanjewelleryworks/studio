@@ -6,12 +6,13 @@ import type { Admin, NewAdminInput } from '@/types/goldsmith';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { logAuditEvent } from './audit-log-actions';
+import { revalidatePath } from 'next/cache';
 
 const SALT_ROUNDS = 10;
 
 /**
  * Creates the default admin user if one doesn't exist, using credentials from environment variables.
- * This function is now called internally by loginAdmin only when necessary.
+ * This function should only be called when an admin user is confirmed not to exist.
  */
 async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'password'>): Promise<Admin | null> {
   const adminEmail = process.env.ADMIN_EMAIL;
@@ -22,13 +23,15 @@ async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'pass
     return null;
   }
   
-  // Only seed if the provided credentials match the environment variables
+  // Extra safeguard: Only seed if the provided credentials match the environment variables
   if (credentials.email !== adminEmail || credentials.password !== adminPassword) {
+      console.log("[Admin Actions] Credentials do not match .env, seeding skipped.");
       return null;
   }
 
   try {
     const collection = await getAdminsCollection();
+    // Double-check existence inside the function to be safe
     const existingAdmin = await collection.findOne({ email: adminEmail });
 
     if (!existingAdmin) {
@@ -48,13 +51,14 @@ async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'pass
       
       await logAuditEvent('Default admin account seeded', { type: 'system', id: 'init' }, { email: adminEmail });
       
-      // Return the newly created admin document
+      // Return the newly created admin document by fetching it again
       const createdAdmin = await collection.findOne({ email: adminEmail });
       return createdAdmin as Admin | null;
     }
   } catch (error) {
     console.error('[Admin Actions] Error seeding default admin:', error);
   }
+  // Return null if it already existed or an error occurred
   return null;
 }
 
@@ -64,6 +68,8 @@ async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'pass
  * @returns An object indicating success, a message, and optionally the admin data.
  */
 export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'password'>): Promise<{ success: boolean; message: string; admin?: Omit<Admin, 'password'> }> {
+  // CRITICAL: Revalidate the path to prevent server-side caching of this action's result.
+  revalidatePath('/admin/login');
   console.log(`[Admin Actions] Attempting admin login for email: ${credentials.email}`);
 
   try {
@@ -74,12 +80,13 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
     // This will only succeed if the credentials match the .env variables.
     if (!adminUser) {
         console.log(`[Admin Actions] Admin not found for ${credentials.email}. Attempting to seed.`);
+        // The seed function has its own check against .env variables.
         adminUser = await seedDefaultAdmin(credentials);
     }
     
     // If after attempting to find or seed, the user still doesn't exist, fail the login.
     if (!adminUser) {
-      console.warn(`[Admin Actions] Login failed: No admin found with email ${credentials.email} and seeding failed or was not applicable.`);
+      console.warn(`[Admin Actions] Login failed: No admin found with email ${credentials.email} and seeding was not applicable.`);
       return { success: false, message: 'Invalid email or password.' };
     }
 
