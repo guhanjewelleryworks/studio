@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LogIn, Loader2, MailCheck } from 'lucide-react'; // Added MailCheck
+import { LogIn, Loader2, MailCheck, Eye, EyeOff } from 'lucide-react'; // Added MailCheck, Eye, EyeOff
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { loginGoldsmith, requestGoldsmithPasswordReset } from '@/actions/goldsmith-actions';
@@ -30,6 +30,7 @@ export default function GoldsmithLoginPage() {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showResend, setShowResend] = useState(false);
 
@@ -157,18 +158,22 @@ export default function GoldsmithLoginPage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 relative">
                 <Label htmlFor="password" className="text-foreground">Password</Label>
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   required
-                  className="text-base py-2 text-foreground"
+                  className="text-base py-2 pr-10 text-foreground"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
                 />
+                 <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
+                </Button>
               </div>
 
               <div className="flex items-center justify-end pt-0.5">

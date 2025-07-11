@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CheckCircle, Briefcase, Loader2, ShieldCheck, MailCheck } from 'lucide-react';
+import { CheckCircle, Briefcase, Loader2, ShieldCheck, MailCheck, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -44,6 +44,9 @@ export default function GoldsmithRegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [yearsExperience, setYearsExperience] = useState<number | undefined>(undefined);
   const [responseTime, setResponseTime] = useState('');
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 
   const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -286,13 +289,19 @@ export default function GoldsmithRegisterPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
-              <div className="space-y-1">
+              <div className="space-y-1 relative">
                 <Label htmlFor="password" className="text-foreground">Create Password (min. 8 characters)</Label>
-                <Input id="password" type="password" placeholder="Min. 8 characters" required className="text-foreground" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isFormDisabled}/>
+                <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="Min. 8 characters" required className="text-foreground pr-10" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isFormDisabled}/>
+                <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-6 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
               </div>
-               <div className="space-y-1">
+               <div className="space-y-1 relative">
                 <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
-                <Input id="confirmPassword" type="password" placeholder="Re-enter your password" required className="text-foreground" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isFormDisabled}/>
+                <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} placeholder="Re-enter your password" required className="text-foreground pr-10" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isFormDisabled}/>
+                <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-6 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowConfirmPassword(!showConfirmPassword)} tabIndex={-1}>
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
               </div>
             </div>
 
