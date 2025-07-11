@@ -248,11 +248,14 @@ export default function DiscoverPage() {
                       />
                       <div className="absolute top-2 right-2 flex items-center gap-1.5">
                          {isNew && (
-                            <Badge variant="destructive" className="animate-pulse">New</Badge>
+                            <Badge variant="default" className="animate-pulse flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-current" />
+                              New
+                            </Badge>
                          )}
                          {goldsmith.rating > 0 && (
-                            <div className="bg-primary/80 backdrop-blur-sm text-primary-foreground px-2 py-0.5 rounded-full text-xs font-semibold flex items-center shadow-md">
-                              <Star className="h-3 w-3 mr-0.5 fill-current" /> {goldsmith.rating.toFixed(1)}
+                            <div className="bg-background/80 backdrop-blur-sm text-foreground px-2 py-0.5 rounded-full text-xs font-semibold flex items-center shadow-md">
+                              <Star className="h-3 w-3 mr-0.5 fill-current text-yellow-400" /> {goldsmith.rating.toFixed(1)}
                             </div>
                          )}
                       </div>
