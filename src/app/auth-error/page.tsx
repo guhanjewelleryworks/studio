@@ -22,7 +22,7 @@ export default function AuthErrorPage() {
           </p>
           <Button asChild size="lg" className="w-full shadow-md rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
             <Link href="/login">
-              Tap to Login Page
+              Proceed to Login
             </Link>
           </Button>
         </CardContent>
