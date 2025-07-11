@@ -46,7 +46,11 @@ export function Header() {
             const parsedUser = JSON.parse(storedUser);
             if (parsedUser && parsedUser.isLoggedIn) {
                  setGoldsmithUser(parsedUser);
+            } else {
+                 setGoldsmithUser(null);
             }
+        } else {
+             setGoldsmithUser(null);
         }
     } catch (e) {
         console.error("Failed to parse goldsmith user from localStorage", e);
@@ -59,9 +63,13 @@ export function Header() {
   };
   
   const handleGoldsmithLogout = () => {
-    localStorage.removeItem('currentGoldsmithUser');
+    // Clear the user state immediately
     setGoldsmithUser(null);
-    router.push('/');
+    // Remove from local storage
+    localStorage.removeItem('currentGoldsmithUser');
+    // Force a full page reload to ensure all state is cleared, then navigate.
+    // This is more robust than a simple router.push for logout scenarios.
+    window.location.href = '/'; 
   };
   
   const renderDesktopUserActions = () => {
