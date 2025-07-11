@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, Edit, LayoutDashboard, Home } from 'lucide-react';
+import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, Edit, LayoutDashboard, Home, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image'; 
 import { useState, useEffect } from 'react';
@@ -24,22 +24,87 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const navLinkClasses = "relative text-sm font-medium text-foreground/80 transition-colors hover:text-primary after:absolute after:bottom-[-5px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full";
 
-// This header now prioritizes the next-auth session for customers.
-// The goldsmith portal login is a separate concern and should ideally have its own layout,
-// but for now, we will handle customer auth here.
+interface GoldsmithUser {
+    id: string;
+    name: string;
+    email: string;
+}
+
 export function Header() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const [goldsmithUser, setGoldsmithUser] = useState<GoldsmithUser | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // This effect runs only on the client, where localStorage is available.
+    setIsClient(true);
+    try {
+        const storedUser = localStorage.getItem('currentGoldsmithUser');
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            if (parsedUser && parsedUser.isLoggedIn) {
+                 setGoldsmithUser(parsedUser);
+            }
+        }
+    } catch (e) {
+        console.error("Failed to parse goldsmith user from localStorage", e);
+        setGoldsmithUser(null);
+    }
+  }, [pathname]); // Re-check on path change
 
   const handleCustomerLogout = async () => {
-    // This performs the sign-out and then redirects the browser, ensuring a clean state.
     await signOut({ callbackUrl: '/' });
   };
-
+  
+  const handleGoldsmithLogout = () => {
+    localStorage.removeItem('currentGoldsmithUser');
+    setGoldsmithUser(null);
+    router.push('/');
+  };
+  
   const renderDesktopUserActions = () => {
-    if (status === 'loading') {
+    if (status === 'loading' || !isClient) {
       return <Skeleton className="h-10 w-40 rounded-full" />;
+    }
+
+    if (goldsmithUser) {
+        return (
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className="flex items-center gap-2 h-10 rounded-full px-3"
+                >
+                  <Avatar className="h-9 w-9">
+                    <AvatarFallback>{goldsmithUser.name?.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="text-left hidden sm:block">
+                    <p className="text-sm font-medium text-foreground">{goldsmithUser.name}</p>
+                    <p className="text-xs text-muted-foreground">Goldsmith Portal</p>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                    <p className="font-medium">{goldsmithUser.name}</p>
+                    <p className="text-xs text-muted-foreground font-normal whitespace-normal break-words">{goldsmithUser.email}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/goldsmith-portal/dashboard"><Briefcase className="mr-2 h-4 w-4" />Goldsmith Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/goldsmith-portal/profile/edit"><Edit className="mr-2 h-4 w-4" />Edit Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleGoldsmithLogout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" /> Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+        );
     }
 
     if (status === 'authenticated') {
@@ -109,8 +174,21 @@ export function Header() {
   };
   
   const renderMobileUserActions = () => {
-     if (status === 'loading') {
+     if (status === 'loading' || !isClient) {
       return <Skeleton className="h-12 w-full rounded-full" />;
+     }
+     
+     if (goldsmithUser) {
+        return (
+            <>
+                <Link href="/goldsmith-portal/dashboard" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+                    <Briefcase className="mr-2 h-4 w-4" /> Goldsmith Dashboard
+                </Link>
+                <Button onClick={handleGoldsmithLogout} variant="destructive" size="lg" className="w-full rounded-full text-base">
+                    <LogOut className="mr-2 h-4 w-4" /> Logout
+                </Button>
+            </>
+        );
      }
 
      if (status === 'authenticated') {
