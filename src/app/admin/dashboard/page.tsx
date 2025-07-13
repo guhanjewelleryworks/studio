@@ -29,11 +29,12 @@ import {
   Loader2,
   AlertTriangle,
   MessageSquare,
+  Users2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { fetchLatestCustomers, fetchAdminCustomers } from '@/actions/customer-actions';
-import { getUnarchivedContactSubmissionsCount } from '@/actions/contact-actions'; // New import
+import { getUnarchivedContactSubmissionsCount } from '@/actions/contact-actions';
 import { 
   fetchAdminGoldsmiths, 
   getPlatformPendingOrderCount, 
@@ -392,12 +393,12 @@ export default function AdminDashboardPage() {
           linkHref="/admin/communications"
           notificationCount={unreadContactCount}
         />
-        <DashboardCard
-          title="Database Records"
-          description="View and manage raw data records for users, goldsmiths, and orders (requires caution)."
-          icon={Database}
-          linkText="View Database"
-          linkHref="/admin/database"
+         <DashboardCard
+          title="Manage Admins"
+          description="Add, view, and manage administrator accounts and their roles for the platform."
+          icon={Users2}
+          linkText="Manage Admins"
+          linkHref="/admin/admins"
         />
         <DashboardCard
           title="Platform Settings"
@@ -464,7 +465,7 @@ export default function AdminDashboardPage() {
             <CardTitle className="text-md text-accent font-heading flex items-center"><ShieldCheck className="h-4 w-4 mr-2 text-primary"/>Admin Notes & Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-1 text-xs text-muted-foreground">
-            <p>Quick links: <Link href="/admin/audit-logs" className="text-primary hover:underline">View Audit Logs</Link> | <Link href="/admin/reports" className="text-primary hover:underline">Generate Reports</Link></p>
+            <p>Quick links: <Link href="/admin/audit-logs" className="text-primary hover:underline">View Audit Logs</Link> | <Link href="/admin/reports" className="text-primary hover:underline">Generate Reports</Link> | <Link href="/admin/database" className="text-primary hover:underline">View Database</Link></p>
           </CardContent>
         </Card>
       </section>

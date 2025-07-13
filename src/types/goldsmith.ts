@@ -116,6 +116,7 @@ export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'register
 export interface Admin {
   _id?: ObjectId;
   id: string;
+  name: string;
   email: string;
   password?: string;
   role: 'superadmin' | 'admin';

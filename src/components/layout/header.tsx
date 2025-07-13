@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogIn, UserPlus, UserCircle, LogOut, ShoppingBag, Edit, LayoutDashboard, Home, Briefcase } from 'lucide-react';
+import { Menu, LogIn, UserPlus, LogOut, ShoppingBag, Edit, LayoutDashboard, Home, Briefcase, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image'; 
 import { useState, useEffect } from 'react';
@@ -277,7 +277,7 @@ export function Header() {
                   <Link href="/#how-it-works" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">How It Works</Link>
                   <Link href="/pricing" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Pricing</Link>
                   <Link href="/goldsmith-portal" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Goldsmith Portal</Link>
-                  <Link href="/admin" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Admin Portal</Link>
+                  <Link href="/admin/login" className="flex items-center text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary"><Shield className="mr-2 h-4 w-4"/>Admin Portal</Link>
                 </nav>
                 <div className="px-6 pb-8 mt-auto flex flex-col gap-3 border-t border-border/20 pt-6">
                    {renderMobileUserActions()}
