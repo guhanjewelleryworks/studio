@@ -108,9 +108,10 @@ export interface Customer {
   passwordResetTokenExpires?: Date;
   isDeleted?: boolean; // For soft delete
   deletedAt?: Date; // For soft delete
+  emailHash?: string; // For preventing re-registration of deleted emails
 }
 
-export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken' | 'passwordResetToken' | 'passwordResetTokenExpires' | 'isDeleted' | 'deletedAt'>;
+export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken' | 'passwordResetToken' | 'passwordResetTokenExpires' | 'isDeleted' | 'deletedAt' | 'emailHash'>;
 
 
 // --- Admin Type ---

@@ -13,6 +13,16 @@ import bcrypt from 'bcryptjs';
 
 const SALT_ROUNDS = 10;
 
+/**
+ * Creates a SHA-256 hash of a given string (email).
+ * @param email The email to hash.
+ * @returns The hex representation of the hash.
+ */
+function createEmailHash(email: string): string {
+    return crypto.createHash('sha256').update(email.toLowerCase().trim()).digest('hex');
+}
+
+
 export async function saveCustomer(data: NewCustomerInput): Promise<{ success: boolean; message: string; error?: string }> {
   console.log('[Action: saveCustomer] Received data for customer registration:', JSON.stringify(data));
   try {
@@ -28,17 +38,33 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
     }
 
     const normalizedEmail = data.email.toLowerCase().trim();
+    const emailHash = createEmailHash(normalizedEmail);
 
-    const existingCustomer = await collection.findOne({ email: normalizedEmail });
-    if (existingCustomer) {
-      if (!existingCustomer.emailVerified) {
-        // If user exists but is not verified, allow them to get a new verification email
+    // CRITICAL: Check for existing active user OR a deleted user's email hash
+    const existingUserCheck = await collection.findOne({
+      $or: [
+        { email: normalizedEmail },
+        { emailHash: emailHash } // Check if this email has been deleted before
+      ]
+    });
+    
+    if (existingUserCheck) {
+      if (existingUserCheck.isDeleted) {
+        // This email belongs to a deleted account. Registration is blocked.
+        console.warn(`[Action: saveCustomer] Registration blocked for previously deleted email: ${normalizedEmail}`);
+        return { success: false, message: 'An account with this email has been deleted and cannot be reused.' };
+      }
+      
+      // Handle the case where the user exists but is not verified
+      if (!existingUserCheck.emailVerified) {
         await resendVerificationEmail(normalizedEmail);
         return { success: true, message: `An unverified account with this email already exists. We've sent a new verification link to ${normalizedEmail}. Please check your inbox and spam folder.` };
       }
+      
       console.error(`[Action: saveCustomer] Validation failed: Email ${normalizedEmail} already exists and is verified.`);
       return { success: false, message: 'An account with this email already exists. Please log in or use a different email.' };
     }
+
 
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const hashedPassword = await bcrypt.hash(data.password.trim(), SALT_ROUNDS);
@@ -61,7 +87,7 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
 
     if (result.insertedId) {
       // Send verification email
-      await sendVerificationEmail(newCustomer.email, verificationToken);
+      await sendVerificationEmail(newCustomer.email, verificationToken, 'customer');
 
       logAuditEvent(
         'Customer account created (pending verification)',
@@ -136,7 +162,7 @@ export async function resendVerificationEmail(email: string): Promise<{ success:
     );
     
     // Send the new verification email
-    await sendVerificationEmail(customer.email, newVerificationToken);
+    await sendVerificationEmail(customer.email, newVerificationToken, 'customer');
     
     logAuditEvent('Resent verification email', { type: 'customer', id: customer.id }, { email: customer.email });
     return { success: true, message: genericSuccessMessage };
@@ -447,6 +473,9 @@ export async function deleteCustomer(customerId: string): Promise<{ success: boo
     if (!customer) {
       return { success: false, error: 'Customer not found.' };
     }
+    
+    const originalEmail = customer.email;
+    const emailHash = createEmailHash(originalEmail);
 
     // Anonymize personal data and mark as deleted
     const result = await collection.updateOne(
@@ -455,6 +484,7 @@ export async function deleteCustomer(customerId: string): Promise<{ success: boo
         $set: {
           name: 'Deleted User',
           email: `deleted-${customer._id}@goldsmithconnect.local`,
+          emailHash: emailHash, // Add the hash of the original email
           isDeleted: true,
           deletedAt: new Date(),
         },
@@ -469,7 +499,7 @@ export async function deleteCustomer(customerId: string): Promise<{ success: boo
     );
 
     if (result.modifiedCount === 1) {
-      logAuditEvent('Customer account deleted (soft)', { type: 'customer', id: customerId }, { originalEmail: customer.email });
+      logAuditEvent('Customer account deleted (soft)', { type: 'customer', id: customerId }, { originalEmail });
       return { success: true };
     } else {
       return { success: false, error: 'Failed to delete customer profile.' };
