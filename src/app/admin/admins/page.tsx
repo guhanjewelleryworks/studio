@@ -5,7 +5,7 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Users2, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Trash2, UserPlus, Eye, EyeOff } from 'lucide-react';
+import { Users2, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Trash2, UserPlus, Eye, EyeOff, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAllAdmins, createAdmin, deleteAdmin } from '@/actions/admin-actions';
 import type { Admin, NewAdminInput } from '@/types/goldsmith';
@@ -33,12 +33,20 @@ export default function AdminAdminsPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const [adminRole, setAdminRole] = useState<'superadmin' | 'admin' | null>(null);
 
   // Form state
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    // Check for role from localStorage on client side
+    const role = localStorage.getItem('adminRole') as 'superadmin' | 'admin' | null;
+    setAdminRole(role);
+    loadAdmins();
+  }, []);
 
   const loadAdmins = async () => {
     setIsLoading(true);
@@ -54,12 +62,13 @@ export default function AdminAdminsPage() {
     }
   };
 
-  useEffect(() => {
-    loadAdmins();
-  }, []);
-
   const handleCreateAdmin = async (event: FormEvent) => {
     event.preventDefault();
+    if (adminRole !== 'superadmin') {
+        toast({ title: "Access Denied", description: "You do not have permission to create new admins.", variant: "destructive" });
+        return;
+    }
+
     if (!name || !email || !password) {
         toast({ title: "Missing fields", description: "Please provide name, email, and a password.", variant: "destructive" });
         return;
@@ -86,6 +95,10 @@ export default function AdminAdminsPage() {
   };
   
   const handleDeleteAdmin = async (adminId: string, adminName: string) => {
+    if (adminRole !== 'superadmin') {
+        toast({ title: "Access Denied", description: "You do not have permission to delete admins.", variant: "destructive" });
+        return;
+    }
     setIsProcessing(true);
     const result = await deleteAdmin(adminId);
      if (result.success) {
@@ -158,7 +171,7 @@ export default function AdminAdminsPage() {
                                     <TableCell><Badge variant={admin.role === 'superadmin' ? 'destructive' : 'secondary'} className="capitalize">{admin.role}</Badge></TableCell>
                                     <TableCell className="text-muted-foreground">{format(new Date(admin.createdAt), 'PPp')}</TableCell>
                                     <TableCell className="text-right">
-                                        {admin.role !== 'superadmin' ? (
+                                        {(admin.role !== 'superadmin' && adminRole === 'superadmin') ? (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
                                                 <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" disabled={isProcessing}>
@@ -181,7 +194,9 @@ export default function AdminAdminsPage() {
                                             </AlertDialogContent>
                                         </AlertDialog>
                                         ) : (
+                                            admin.role === 'superadmin' ?
                                             <span className="text-xs text-muted-foreground italic">Cannot delete superadmin</span>
+                                            : null
                                         )}
                                     </TableCell>
                                 </TableRow>
@@ -194,37 +209,51 @@ export default function AdminAdminsPage() {
             </Card>
         </div>
         <div className="lg:col-span-1">
-            <Card className="shadow-lg bg-card border-primary/10 rounded-xl">
-                <CardHeader>
-                    <CardTitle className="text-xl text-accent font-heading">Add New Administrator</CardTitle>
-                    <CardDescription className="text-muted-foreground">
-                        New users will be assigned the 'admin' role by default.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleCreateAdmin} className="space-y-4">
-                        <div className="space-y-1.5">
-                            <Label htmlFor="name">Full Name</Label>
-                            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Jane Doe" required disabled={isProcessing}/>
-                        </div>
-                         <div className="space-y-1.5">
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. jane@example.com" required disabled={isProcessing}/>
-                        </div>
-                        <div className="space-y-1.5 relative">
-                            <Label htmlFor="password">Initial Password</Label>
-                            <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Set a strong initial password" required disabled={isProcessing}/>
-                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
-                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                        </div>
-                        <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isProcessing}>
-                            {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4"/>}
-                            {isProcessing ? "Creating..." : "Create Admin"}
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
+            {adminRole === 'superadmin' ? (
+              <Card className="shadow-lg bg-card border-primary/10 rounded-xl">
+                  <CardHeader>
+                      <CardTitle className="text-xl text-accent font-heading">Add New Administrator</CardTitle>
+                      <CardDescription className="text-muted-foreground">
+                          New users will be assigned the 'admin' role by default.
+                      </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                      <form onSubmit={handleCreateAdmin} className="space-y-4">
+                          <div className="space-y-1.5">
+                              <Label htmlFor="name">Full Name</Label>
+                              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Jane Doe" required disabled={isProcessing}/>
+                          </div>
+                          <div className="space-y-1.5">
+                              <Label htmlFor="email">Email Address</Label>
+                              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. jane@example.com" required disabled={isProcessing}/>
+                          </div>
+                          <div className="space-y-1.5 relative">
+                              <Label htmlFor="password">Initial Password</Label>
+                              <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Set a strong initial password" required disabled={isProcessing}/>
+                              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
+                                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </Button>
+                          </div>
+                          <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isProcessing}>
+                              {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4"/>}
+                              {isProcessing ? "Creating..." : "Create Admin"}
+                          </Button>
+                      </form>
+                  </CardContent>
+              </Card>
+            ) : (
+                 <Card className="shadow-lg bg-card border-destructive/20 rounded-xl">
+                    <CardHeader className="text-center">
+                        <ShieldAlert className="h-10 w-10 mx-auto text-destructive mb-2" />
+                        <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-center text-sm text-muted-foreground">
+                            You do not have the required permissions to add or manage administrators. This action is restricted to superadmins only.
+                        </p>
+                    </CardContent>
+                </Card>
+            )}
         </div>
       </div>
     </div>

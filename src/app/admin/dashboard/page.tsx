@@ -263,6 +263,7 @@ export default function AdminDashboardPage() {
   const handleAdminLogout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem('isAdminLoggedIn');
+      localStorage.removeItem('adminRole'); // Clear role on logout
     }
     toast({ title: "Logged Out", description: "You have been logged out from the admin panel." });
     router.push('/admin/login');

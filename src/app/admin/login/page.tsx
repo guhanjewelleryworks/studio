@@ -24,6 +24,7 @@ export default function AdminLoginPage() {
     // This prevents a stale flag from causing an automatic redirect.
     if (typeof window !== "undefined") {
       localStorage.removeItem('isAdminLoggedIn');
+      localStorage.removeItem('adminRole'); // Clear the role as well
     }
   }, []);
 
@@ -34,9 +35,10 @@ export default function AdminLoginPage() {
     try {
       const result = await loginAdmin({ email, password });
       
-      if (result.success) { 
+      if (result.success && result.admin) { 
         if (typeof window !== "undefined") {
           localStorage.setItem('isAdminLoggedIn', 'true');
+          localStorage.setItem('adminRole', result.admin.role); // Store the role
         }
         toast({
           title: 'Login Successful',

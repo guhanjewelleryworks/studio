@@ -44,7 +44,7 @@ async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'pass
         name: 'Super Admin', // Default name for the seeded admin
         email: adminEmail,
         password: hashedPassword,
-        role: 'superadmin',
+        role: 'superadmin', // Default admin is a superadmin
         createdAt: new Date(),
       };
 
