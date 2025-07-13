@@ -16,6 +16,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -39,6 +46,7 @@ export default function AdminAdminsPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'superadmin'>('admin');
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -69,8 +77,8 @@ export default function AdminAdminsPage() {
         return;
     }
 
-    if (!name || !email || !password) {
-        toast({ title: "Missing fields", description: "Please provide name, email, and a password.", variant: "destructive" });
+    if (!name || !email || !password || !selectedRole) {
+        toast({ title: "Missing fields", description: "Please provide name, email, a password, and a role.", variant: "destructive" });
         return;
     }
     setIsProcessing(true);
@@ -78,7 +86,7 @@ export default function AdminAdminsPage() {
         name,
         email,
         password,
-        role: 'admin' // New admins are standard admins by default
+        role: selectedRole
     };
 
     const result = await createAdmin(newAdminData);
@@ -87,6 +95,7 @@ export default function AdminAdminsPage() {
         setName('');
         setEmail('');
         setPassword('');
+        setSelectedRole('admin');
         loadAdmins();
     } else {
         toast({ title: "Creation Failed", description: result.error, variant: "destructive" });
@@ -214,7 +223,7 @@ export default function AdminAdminsPage() {
                   <CardHeader>
                       <CardTitle className="text-xl text-accent font-heading">Add New Administrator</CardTitle>
                       <CardDescription className="text-muted-foreground">
-                          New users will be assigned the 'admin' role by default.
+                          Assign a role to the new administrator.
                       </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -233,6 +242,18 @@ export default function AdminAdminsPage() {
                               <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
                                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                               </Button>
+                          </div>
+                           <div className="space-y-1.5">
+                              <Label htmlFor="role">Role</Label>
+                              <Select onValueChange={(value: 'admin' | 'superadmin') => setSelectedRole(value)} value={selectedRole} disabled={isProcessing}>
+                                <SelectTrigger id="role" className="w-full">
+                                  <SelectValue placeholder="Select a role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                  <SelectItem value="superadmin">Superadmin</SelectItem>
+                                </SelectContent>
+                              </Select>
                           </div>
                           <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isProcessing}>
                               {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4"/>}

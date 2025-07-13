@@ -146,13 +146,13 @@ export async function createAdmin(data: NewAdminInput): Promise<{ success: boole
             name: data.name,
             email: data.email,
             password: hashedPassword,
-            role: 'admin', // New admins are standard admins by default
+            role: data.role, // Use the role from the input data
             createdAt: new Date(),
         };
 
         await collection.insertOne(newAdmin);
         
-        await logAuditEvent('Admin account created', { type: 'admin', id: 'superadmin_user' }, { newAdminEmail: newAdmin.email });
+        await logAuditEvent('Admin account created', { type: 'admin', id: 'superadmin_user' }, { newAdminEmail: newAdmin.email, role: newAdmin.role });
         revalidatePath('/admin/admins'); // Revalidate the page to show the new admin
         return { success: true };
     } catch (error) {
