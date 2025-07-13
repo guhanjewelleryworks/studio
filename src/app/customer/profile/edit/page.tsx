@@ -3,17 +3,29 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Edit, UserCircle, Loader2, ArrowLeft, Lock } from 'lucide-react';
+import { Edit, UserCircle, Loader2, ArrowLeft, Lock, Trash2, ShieldAlert } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { fetchCustomerById, updateCustomerProfile, changeCustomerPassword } from '@/actions/customer-actions';
+import { fetchCustomerById, updateCustomerProfile, changeCustomerPassword, deleteCustomer } from '@/actions/customer-actions';
 import type { Customer } from '@/types/goldsmith';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 
 export default function EditCustomerProfilePage() {
   const router = useRouter();
@@ -30,6 +42,8 @@ export default function EditCustomerProfilePage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [isSavingPassword, setIsSavingPassword] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -119,6 +133,30 @@ export default function EditCustomerProfilePage() {
       toast({ title: "Password Change Failed", description: "An unexpected error occurred.", variant: "destructive" });
     } finally {
       setIsSavingPassword(false);
+    }
+  };
+
+  const handleDeleteProfile = async () => {
+    if (!session?.user?.id) return;
+
+    setIsDeleting(true);
+    const result = await deleteCustomer(session.user.id);
+    setIsDeleting(false);
+
+    if (result.success) {
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been deleted. You are now being logged out.",
+        duration: 5000,
+      });
+      // Force sign out and redirect to homepage
+      await signOut({ callbackUrl: '/' });
+    } else {
+      toast({
+        title: "Deletion Failed",
+        description: result.error || "Could not delete your account. Please try again or contact support.",
+        variant: "destructive",
+      });
     }
   };
   
@@ -258,6 +296,39 @@ export default function EditCustomerProfilePage() {
             </Card>
             </>
         )}
+
+        {/* Delete Account Section */}
+        <Separator />
+        <Card className="shadow-xl bg-card border-destructive/30 rounded-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive"><ShieldAlert /> Danger Zone</CardTitle>
+            <CardDescription className="text-muted-foreground">This action is permanent and cannot be undone.</CardDescription>
+          </CardHeader>
+          <CardContent>
+             <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="w-full sm:w-auto" disabled={isDeleting}>
+                  <Trash2 className="mr-2 h-4 w-4" /> Delete My Account
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete your account and remove your personal data from our systems. Your order history will be anonymized. This action cannot be reversed.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteProfile} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                    {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Yes, delete my account
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

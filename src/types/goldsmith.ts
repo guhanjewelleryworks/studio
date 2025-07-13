@@ -1,4 +1,3 @@
-
 // src/types/goldsmith.ts
 import type { Location } from '@/services/geolocation';
 import type { ObjectId } from 'mongodb';
@@ -107,9 +106,11 @@ export interface Customer {
   verificationToken: string | null;
   passwordResetToken?: string;
   passwordResetTokenExpires?: Date;
+  isDeleted?: boolean; // For soft delete
+  deletedAt?: Date; // For soft delete
 }
 
-export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken' | 'passwordResetToken' | 'passwordResetTokenExpires'>;
+export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken' | 'passwordResetToken' | 'passwordResetTokenExpires' | 'isDeleted' | 'deletedAt'>;
 
 
 // --- Admin Type ---

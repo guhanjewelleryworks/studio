@@ -52,6 +52,7 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
       lastLoginAt: undefined, 
       emailVerified: null,
       verificationToken: verificationToken,
+      isDeleted: false,
     };
 
     console.log('[Action: saveCustomer] Attempting to insert new customer.');
@@ -152,7 +153,7 @@ export async function fetchAdminCustomers(): Promise<Omit<Customer, 'password' |
   console.log('[Action: fetchAdminCustomers] Attempting to fetch customers for admin panel.');
   try {
     const collection = await getCustomersCollection();
-    const customersCursor = collection.find({}).sort({ registeredAt: -1 });
+    const customersCursor = collection.find({ isDeleted: { $ne: true } }).sort({ registeredAt: -1 }); // Exclude soft-deleted users
     const customersArray: WithId<Customer>[] = await customersCursor.toArray();
     console.log(`[Action: fetchAdminCustomers] Found ${customersArray.length} customers.`);
     
@@ -171,13 +172,13 @@ export async function fetchLatestCustomers(limit: number = 3): Promise<Omit<Cust
   console.log(`[Action: fetchLatestCustomers] Attempting to fetch latest ${limit} customers.`);
   try {
     const collection = await getCustomersCollection();
-    const customersCursor = collection.find({}).sort({ registeredAt: -1 }).limit(limit);
+    const customersCursor = collection.find({ isDeleted: { $ne: true } }).sort({ registeredAt: -1 }).limit(limit);
     const customersArray: WithId<Customer>[] = await customersCursor.toArray();
     console.log(`[Action: fetchLatestCustomers] Found ${customersArray.length} customers.`);
     return customersArray.map(c => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { _id, password, ...customerData } = c;
-      return customerData as Omit<Customer, 'password' | '_id'>;
+      const { _id, password, ...rest } = c;
+      return rest as Omit<Customer, 'password' | '_id'>;
     });
   } catch (error) {
     console.error(`[Action: fetchLatestCustomers] Error fetching latest customers:`, error);
@@ -195,9 +196,14 @@ export async function fetchCustomerById(id: string): Promise<Omit<Customer, 'pas
     // This query now handles both custom UUIDs (from credential signup) 
     // and MongoDB ObjectIDs (from OAuth providers like Google).
     const query = {
-      $or: [
-        { id: id },
-        ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: 'invalid-object-id' }
+      $and: [
+        {
+          $or: [
+            { id: id },
+            ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: 'invalid-object-id' }
+          ]
+        },
+        { isDeleted: { $ne: true } } // Ensure user is not deleted
       ]
     };
     
@@ -416,5 +422,60 @@ export async function resetCustomerPasswordWithToken(token: string, newPassword:
   } catch (error) {
     console.error('[Action: resetCustomerPasswordWithToken] Error:', error);
     return { success: false, error: 'An unexpected server error occurred.' };
+  }
+}
+
+// --- New Soft Delete Action ---
+
+export async function deleteCustomer(customerId: string): Promise<{ success: boolean; error?: string }> {
+  console.log(`[Action: deleteCustomer] Attempting to soft delete customer ID ${customerId}.`);
+  try {
+    if (!customerId) {
+      return { success: false, error: 'Customer ID is required.' };
+    }
+    
+    const collection = await getCustomersCollection();
+    
+    const filter = {
+      $or: [
+        { id: customerId },
+        ObjectId.isValid(customerId) ? { _id: new ObjectId(customerId) } : { id: 'invalid-object-id' }
+      ]
+    };
+    
+    const customer = await collection.findOne(filter);
+    if (!customer) {
+      return { success: false, error: 'Customer not found.' };
+    }
+
+    // Anonymize personal data and mark as deleted
+    const result = await collection.updateOne(
+      { _id: customer._id },
+      {
+        $set: {
+          name: 'Deleted User',
+          email: `deleted-${customer._id}@goldsmithconnect.local`,
+          isDeleted: true,
+          deletedAt: new Date(),
+        },
+        $unset: {
+          password: "",
+          image: "",
+          verificationToken: "",
+          passwordResetToken: "",
+          passwordResetTokenExpires: ""
+        }
+      }
+    );
+
+    if (result.modifiedCount === 1) {
+      logAuditEvent('Customer account deleted (soft)', { type: 'customer', id: customerId }, { originalEmail: customer.email });
+      return { success: true };
+    } else {
+      return { success: false, error: 'Failed to delete customer profile.' };
+    }
+  } catch (error) {
+    console.error(`[Action: deleteCustomer] Error deleting customer ${customerId}:`, error);
+    return { success: false, error: 'An unexpected server error occurred during profile deletion.' };
   }
 }
