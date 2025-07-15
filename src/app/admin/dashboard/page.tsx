@@ -1,4 +1,3 @@
-
 // src/app/admin/dashboard/page.tsx
 'use client'; 
 
@@ -263,7 +262,7 @@ export default function AdminDashboardPage() {
   const handleAdminLogout = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem('isAdminLoggedIn');
-      localStorage.removeItem('adminRole'); // Clear role on logout
+      localStorage.removeItem('adminPermissions'); // Clear permissions on logout
     }
     toast({ title: "Logged Out", description: "You have been logged out from the admin panel." });
     router.push('/admin/login');

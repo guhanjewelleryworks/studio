@@ -2,7 +2,7 @@
 'use server';
 
 import { getAdminsCollection } from '@/lib/mongodb';
-import type { Admin, NewAdminInput } from '@/types/goldsmith';
+import type { Admin, NewAdminInput, Permission, validPermissions } from '@/types/goldsmith';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { logAuditEvent } from './audit-log-actions';
@@ -44,7 +44,8 @@ async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'pass
         name: 'Super Admin', // Default name for the seeded admin
         email: adminEmail,
         password: hashedPassword,
-        role: 'superadmin', // Default admin is a superadmin
+        role: 'superadmin',
+        permissions: [...validPermissions], // Superadmin gets all permissions
         createdAt: new Date(),
       };
 
@@ -111,6 +112,7 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
         name: adminUser.name,
         email: adminUser.email,
         role: adminUser.role,
+        permissions: adminUser.permissions || [],
         createdAt: adminUser.createdAt.toISOString(), // Convert Date to string
       };
 
@@ -146,7 +148,8 @@ export async function createAdmin(data: NewAdminInput): Promise<{ success: boole
             name: data.name,
             email: data.email,
             password: hashedPassword,
-            role: data.role, // Use the role from the input data
+            role: data.permissions.includes('canManageAdmins') ? 'superadmin' : 'admin',
+            permissions: data.permissions,
             createdAt: new Date(),
         };
 
@@ -174,7 +177,10 @@ export async function fetchAllAdmins(): Promise<Omit<Admin, 'password'>[]> {
         return adminsArray.map(admin => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { _id, password, ...adminData } = admin;
-            return adminData as Omit<Admin, 'password'>;
+            return {
+                ...adminData,
+                permissions: adminData.permissions || [], // Ensure permissions is always an array
+            } as Omit<Admin, 'password'>;
         });
     } catch (error) {
         console.error('[Admin Actions] Error fetching admins:', error);

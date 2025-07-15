@@ -115,6 +115,20 @@ export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'register
 
 
 // --- Admin Type ---
+export const validPermissions = [
+  'canManageAdmins',
+  'canManageCustomers',
+  'canManageGoldsmiths',
+  'canManageOrders',
+  'canManageCommunications',
+  'canManageSettings',
+  'canViewAuditLogs',
+  'canGenerateReports',
+  'canViewDatabase',
+] as const;
+
+export type Permission = typeof validPermissions[number];
+
 export interface Admin {
   _id?: ObjectId;
   id: string;
@@ -122,10 +136,14 @@ export interface Admin {
   email: string;
   password?: string;
   role: 'superadmin' | 'admin';
+  permissions: Permission[];
   createdAt: Date;
 }
 
-export type NewAdminInput = Omit<Admin, '_id' | 'id' | 'createdAt'>;
+export type NewAdminInput = Omit<Admin, '_id' | 'id' | 'createdAt' | 'role'> & {
+    // Role is now derived from permissions, but let's keep it simple for input
+    // The create action will handle the logic
+};
 
 
 // --- New Type for Stored Metal Prices ---
