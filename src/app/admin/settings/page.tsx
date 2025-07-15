@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Settings, ArrowLeft, Megaphone, Loader2 } from 'lucide-react';
+import { Settings, ArrowLeft, Megaphone, Loader2, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -13,8 +13,10 @@ import { useToast } from '@/hooks/use-toast';
 import { fetchPlatformSettings, updatePlatformSettings } from '@/actions/settings-actions';
 import type { PlatformSettings } from '@/types/goldsmith';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAdminAccess } from '@/hooks/useAdminAccess';
 
 export default function AdminSettingsPage() {
+  const { hasPermission, isAccessLoading } = useAdminAccess('canManageSettings');
   const [settings, setSettings] = useState<Partial<PlatformSettings>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -27,8 +29,12 @@ export default function AdminSettingsPage() {
       setSettings(fetchedSettings);
       setIsLoading(false);
     };
-    loadSettings();
-  }, []);
+
+    if (!isAccessLoading && hasPermission) {
+      loadSettings();
+    }
+  }, [isAccessLoading, hasPermission]);
+
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -53,6 +59,35 @@ export default function AdminSettingsPage() {
     }
     setIsSaving(false);
   };
+  
+  if (isAccessLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (!hasPermission) {
+    return (
+      <div className="container py-8 text-center">
+        <Card className="max-w-md mx-auto shadow-lg bg-card border-destructive/20">
+          <CardHeader>
+            <ShieldAlert className="h-12 w-12 mx-auto text-destructive" />
+            <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">You do not have the required permissions to manage platform settings.</p>
+            <Button asChild className="mt-4">
+              <Link href="/admin/dashboard">Return to Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">

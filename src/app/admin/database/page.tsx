@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Database, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Search } from 'lucide-react';
+import { Database, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Search, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAdminCustomers } from '@/actions/customer-actions';
 import { fetchAdminGoldsmiths, fetchAllPlatformOrderRequests } from '@/actions/goldsmith-actions';
@@ -16,10 +16,12 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
+import { useAdminAccess } from '@/hooks/useAdminAccess';
 
 type TabValue = 'customers' | 'goldsmiths' | 'orders' | 'prices';
 
 export default function AdminDatabasePage() {
+  const { hasPermission, isAccessLoading } = useAdminAccess('canViewDatabase');
   const [activeTab, setActiveTab] = useState<TabValue>('customers');
   const [data, setData] = useState<{
     customers: Omit<Customer, 'password' | '_id'>[];
@@ -64,8 +66,11 @@ export default function AdminDatabasePage() {
   };
 
   useEffect(() => {
-    loadAllData();
-  }, []);
+    if (!isAccessLoading && hasPermission) {
+      loadAllData();
+    }
+  }, [isAccessLoading, hasPermission]);
+
 
   useEffect(() => {
     const sourceData = data[activeTab] || [];
@@ -141,6 +146,34 @@ export default function AdminDatabasePage() {
         );
     }
     return String(content);
+  }
+
+  if (isAccessLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (!hasPermission) {
+    return (
+      <div className="container py-8 text-center">
+        <Card className="max-w-md mx-auto shadow-lg bg-card border-destructive/20">
+          <CardHeader>
+            <ShieldAlert className="h-12 w-12 mx-auto text-destructive" />
+            <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">You do not have the required permissions to view the database.</p>
+            <Button asChild className="mt-4">
+              <Link href="/admin/dashboard">Return to Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (

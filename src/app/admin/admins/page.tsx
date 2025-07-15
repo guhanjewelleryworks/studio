@@ -9,7 +9,7 @@ import { Users2, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Trash2, UserPlus,
 import Link from 'next/link';
 import { fetchAllAdmins, createAdmin, deleteAdmin } from '@/actions/admin-actions';
 import type { Admin, NewAdminInput, Permission } from '@/types/goldsmith';
-import { validPermissions } from '@/types/goldsmith'; // <-- FIX: Import the missing constant
+import { validPermissions } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from "@/components/ui/checkbox";
+import { useAdminAccess } from '@/hooks/useAdminAccess'; // Import the hook
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,14 +29,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
 
 const permissionDescriptions: Record<Permission, string> = {
     canManageAdmins: "Add, edit, and delete other administrators.",
@@ -50,30 +43,19 @@ const permissionDescriptions: Record<Permission, string> = {
 };
 
 export default function AdminAdminsPage() {
+  const { hasPermission, isAccessLoading } = useAdminAccess('canManageAdmins');
   const [admins, setAdmins] = useState<Omit<Admin, 'password'>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  const [permissions, setPermissions] = useState<Permission[]>([]);
 
   // Form state
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'superadmin'>('admin');
   const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    const storedPerms = localStorage.getItem('adminPermissions');
-    if (storedPerms) {
-      setPermissions(JSON.parse(storedPerms));
-    }
-    loadAdmins();
-  }, []);
-
-  const hasPermission = (perm: Permission) => permissions.includes(perm);
 
   const loadAdmins = async () => {
     setIsLoading(true);
@@ -89,9 +71,17 @@ export default function AdminAdminsPage() {
     }
   };
 
+  useEffect(() => {
+    // Only load admins if access check is complete and permission is granted
+    if (!isAccessLoading && hasPermission) {
+      loadAdmins();
+    }
+  }, [isAccessLoading, hasPermission]);
+
+
   const handleCreateAdmin = async (event: FormEvent) => {
     event.preventDefault();
-    if (!hasPermission('canManageAdmins')) {
+    if (!hasPermission) {
         toast({ title: "Access Denied", description: "You do not have permission to create new admins.", variant: "destructive" });
         return;
     }
@@ -106,7 +96,6 @@ export default function AdminAdminsPage() {
         email,
         password,
         permissions: selectedPermissions,
-        role: selectedPermissions.includes('canManageAdmins') ? 'superadmin' : 'admin',
     };
 
     const result = await createAdmin(newAdminData);
@@ -124,7 +113,7 @@ export default function AdminAdminsPage() {
   };
   
   const handleDeleteAdmin = async (adminId: string, adminName: string) => {
-    if (!hasPermission('canManageAdmins')) {
+    if (!hasPermission) {
         toast({ title: "Access Denied", description: "You do not have permission to delete admins.", variant: "destructive" });
         return;
     }
@@ -146,6 +135,34 @@ export default function AdminAdminsPage() {
         : [...prev, permission]
     );
   };
+
+  if (isAccessLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (!hasPermission) {
+    return (
+      <div className="container py-8 text-center">
+        <Card className="max-w-md mx-auto shadow-lg bg-card border-destructive/20">
+          <CardHeader>
+            <ShieldAlert className="h-12 w-12 mx-auto text-destructive" />
+            <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">You do not have the required permissions to manage administrators.</p>
+            <Button asChild className="mt-4">
+              <Link href="/admin/dashboard">Return to Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">
@@ -213,7 +230,7 @@ export default function AdminAdminsPage() {
                                         }
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        {(admin.role !== 'superadmin' && hasPermission('canManageAdmins')) ? (
+                                        {(admin.role !== 'superadmin' && hasPermission) ? (
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
                                                 <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" disabled={isProcessing}>
@@ -251,80 +268,66 @@ export default function AdminAdminsPage() {
             </Card>
         </div>
         <div className="lg:col-span-1">
-            {hasPermission('canManageAdmins') ? (
-              <Card className="shadow-lg bg-card border-primary/10 rounded-xl">
-                  <CardHeader>
-                      <CardTitle className="text-xl text-accent font-heading">Add New Administrator</CardTitle>
-                      <CardDescription className="text-muted-foreground">
-                          Assign permissions to the new administrator.
-                      </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                      <form onSubmit={handleCreateAdmin} className="space-y-4">
-                          <div className="space-y-1.5">
-                              <Label htmlFor="name">Full Name</Label>
-                              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Jane Doe" required disabled={isProcessing}/>
-                          </div>
-                          <div className="space-y-1.5">
-                              <Label htmlFor="email">Email Address</Label>
-                              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. jane@example.com" required disabled={isProcessing}/>
-                          </div>
-                          <div className="space-y-1.5 relative">
-                              <Label htmlFor="password">Initial Password</Label>
-                              <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Set a strong initial password" required disabled={isProcessing}/>
-                              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
-                                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                              </Button>
-                          </div>
-                           <div className="space-y-3">
-                              <Label>Permissions</Label>
-                              <Alert variant="default" className="p-2 border-blue-500/20 bg-blue-500/5">
-                                <BadgeInfo className="h-4 w-4 !text-blue-500"/>
-                                <AlertDescription className="text-xs text-blue-800 dark:text-blue-300">
-                                  Assigning 'Manage Admins' will grant superadmin privileges.
-                                </AlertDescription>
-                              </Alert>
-                              <div className="space-y-2 rounded-md border p-3 max-h-60 overflow-y-auto">
-                                {validPermissions.map(permission => (
-                                    <div key={permission} className="flex items-start space-x-2">
-                                        <Checkbox 
-                                            id={permission} 
-                                            checked={selectedPermissions.includes(permission)}
-                                            onCheckedChange={() => togglePermission(permission)}
-                                            disabled={isProcessing}
-                                        />
-                                        <div className="grid gap-1.5 leading-none">
-                                            <label htmlFor={permission} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                {permission.replace(/([A-Z])/g, ' $1').replace('can ', '').trim()}
-                                            </label>
-                                            <p className="text-xs text-muted-foreground">
-                                                {permissionDescriptions[permission]}
-                                            </p>
-                                        </div>
+            <Card className="shadow-lg bg-card border-primary/10 rounded-xl">
+                <CardHeader>
+                    <CardTitle className="text-xl text-accent font-heading">Add New Administrator</CardTitle>
+                    <CardDescription className="text-muted-foreground">
+                        Assign permissions to the new administrator.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleCreateAdmin} className="space-y-4">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="name">Full Name</Label>
+                            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Jane Doe" required disabled={isProcessing}/>
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="email">Email Address</Label>
+                            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. jane@example.com" required disabled={isProcessing}/>
+                        </div>
+                        <div className="space-y-1.5 relative">
+                            <Label htmlFor="password">Initial Password</Label>
+                            <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Set a strong initial password" required disabled={isProcessing}/>
+                            <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </Button>
+                        </div>
+                            <div className="space-y-3">
+                            <Label>Permissions</Label>
+                            <Alert variant="default" className="p-2 border-blue-500/20 bg-blue-500/5">
+                            <BadgeInfo className="h-4 w-4 !text-blue-500"/>
+                            <AlertDescription className="text-xs text-blue-800 dark:text-blue-300">
+                                Assigning 'Manage Admins' will grant superadmin privileges.
+                            </AlertDescription>
+                            </Alert>
+                            <div className="space-y-2 rounded-md border p-3 max-h-60 overflow-y-auto">
+                            {validPermissions.map(permission => (
+                                <div key={permission} className="flex items-start space-x-2">
+                                    <Checkbox 
+                                        id={permission} 
+                                        checked={selectedPermissions.includes(permission)}
+                                        onCheckedChange={() => togglePermission(permission)}
+                                        disabled={isProcessing}
+                                    />
+                                    <div className="grid gap-1.5 leading-none">
+                                        <label htmlFor={permission} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                            {permission.replace(/([A-Z])/g, ' $1').replace('can ', '').trim()}
+                                        </label>
+                                        <p className="text-xs text-muted-foreground">
+                                            {permissionDescriptions[permission]}
+                                        </p>
                                     </div>
-                                ))}
-                              </div>
-                          </div>
-                          <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isProcessing}>
-                              {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4"/>}
-                              {isProcessing ? "Creating..." : "Create Admin"}
-                          </Button>
-                      </form>
-                  </CardContent>
-              </Card>
-            ) : (
-                 <Card className="shadow-lg bg-card border-destructive/20 rounded-xl">
-                    <CardHeader className="text-center">
-                        <ShieldAlert className="h-10 w-10 mx-auto text-destructive mb-2" />
-                        <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-center text-sm text-muted-foreground">
-                            You do not have the required permissions to add or manage administrators. This action is restricted to superadmins only.
-                        </p>
-                    </CardContent>
-                </Card>
-            )}
+                                </div>
+                            ))}
+                            </div>
+                        </div>
+                        <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isProcessing}>
+                            {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4"/>}
+                            {isProcessing ? "Creating..." : "Create Admin"}
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
       </div>
     </div>

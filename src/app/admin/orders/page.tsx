@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Send, Eye, Search } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Send, Eye, Search, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAllPlatformOrderRequests, updateOrderStatus, fetchAdminGoldsmiths } from '@/actions/goldsmith-actions';
 import type { OrderRequest, OrderRequestStatus, Goldsmith } from '@/types/goldsmith';
@@ -14,8 +14,10 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
+import { useAdminAccess } from '@/hooks/useAdminAccess';
 
 export default function AdminOrdersPage() {
+  const { hasPermission, isAccessLoading } = useAdminAccess('canManageOrders');
   const [orders, setOrders] = useState<OrderRequest[]>([]);
   const [goldsmiths, setGoldsmiths] = useState<Goldsmith[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,8 +57,10 @@ export default function AdminOrdersPage() {
   };
   
   useEffect(() => {
-    loadData();
-  }, []);
+    if (!isAccessLoading && hasPermission) {
+      loadData();
+    }
+  }, [isAccessLoading, hasPermission]);
   
   useEffect(() => {
     const lowercasedFilter = searchTerm.toLowerCase();
@@ -106,6 +110,34 @@ export default function AdminOrdersPage() {
       default: return 'outline';
     }
   };
+
+  if (isAccessLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (!hasPermission) {
+    return (
+      <div className="container py-8 text-center">
+        <Card className="max-w-md mx-auto shadow-lg bg-card border-destructive/20">
+          <CardHeader>
+            <ShieldAlert className="h-12 w-12 mx-auto text-destructive" />
+            <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">You do not have the required permissions to manage orders.</p>
+            <Button asChild className="mt-4">
+              <Link href="/admin/dashboard">Return to Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">

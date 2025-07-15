@@ -4,13 +4,13 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Archive, Phone, Inbox, Undo } from 'lucide-react';
+import { MessageSquare, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Archive, Phone, Inbox, Undo, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import {
   fetchContactSubmissions,
   archiveContactSubmission,
-  fetchArchivedContactSubmissions, // New import
-  unarchiveContactSubmission,     // New import
+  fetchArchivedContactSubmissions,
+  unarchiveContactSubmission,
 } from '@/actions/contact-actions';
 import type { ContactSubmission } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
@@ -18,6 +18,7 @@ import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAdminAccess } from '@/hooks/useAdminAccess';
 
 const SubmissionCard = ({ submission, onArchive, onUnarchive, isArchiving, isUnarchiving }: {
   submission: ContactSubmission;
@@ -73,6 +74,7 @@ const SubmissionCard = ({ submission, onArchive, onUnarchive, isArchiving, isUna
 );
 
 export default function AdminCommunicationsPage() {
+  const { hasPermission, isAccessLoading } = useAdminAccess('canManageCommunications');
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
   const [archivedSubmissions, setArchivedSubmissions] = useState<ContactSubmission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,8 +107,10 @@ export default function AdminCommunicationsPage() {
   };
 
   useEffect(() => {
-    loadSubmissions();
-  }, []);
+    if (!isAccessLoading && hasPermission) {
+      loadSubmissions();
+    }
+  }, [isAccessLoading, hasPermission]);
 
   const handleArchive = async (id: string) => {
     setIsArchiving(prev => ({...prev, [id]: true}));
@@ -173,6 +177,34 @@ export default function AdminCommunicationsPage() {
           </p>
       </div>
      )
+  }
+
+  if (isAccessLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (!hasPermission) {
+    return (
+      <div className="container py-8 text-center">
+        <Card className="max-w-md mx-auto shadow-lg bg-card border-destructive/20">
+          <CardHeader>
+            <ShieldAlert className="h-12 w-12 mx-auto text-destructive" />
+            <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">You do not have the required permissions to manage communications.</p>
+            <Button asChild className="mt-4">
+              <Link href="/admin/dashboard">Return to Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (

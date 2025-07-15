@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ClipboardList, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Search, Filter } from 'lucide-react';
+import { ClipboardList, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Search, Filter, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAuditLogs } from '@/actions/audit-log-actions';
 import type { AuditLog } from '@/types/goldsmith';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
+import { useAdminAccess } from '@/hooks/useAdminAccess';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -26,6 +27,7 @@ import {
 const actorTypes: AuditLog['actor']['type'][] = ['admin', 'customer', 'goldsmith', 'system'];
 
 export default function AdminAuditLogsPage() {
+  const { hasPermission, isAccessLoading } = useAdminAccess('canViewAuditLogs');
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [actorTypeFilters, setActorTypeFilters] = useState<string[]>([]);
@@ -53,10 +55,13 @@ export default function AdminAuditLogsPage() {
       setIsLoading(false);
     }
   };
-
+  
   useEffect(() => {
-    loadLogs();
-  }, []);
+    if (!isAccessLoading && hasPermission) {
+      loadLogs();
+    }
+  }, [isAccessLoading, hasPermission]);
+
 
   useEffect(() => {
     const lowercasedFilter = searchTerm.toLowerCase();
@@ -73,6 +78,34 @@ export default function AdminAuditLogsPage() {
     setFilteredLogs(filteredData);
   }, [searchTerm, logs, actorTypeFilters]);
 
+
+  if (isAccessLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (!hasPermission) {
+    return (
+      <div className="container py-8 text-center">
+        <Card className="max-w-md mx-auto shadow-lg bg-card border-destructive/20">
+          <CardHeader>
+            <ShieldAlert className="h-12 w-12 mx-auto text-destructive" />
+            <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">You do not have the required permissions to view audit logs.</p>
+            <Button asChild className="mt-4">
+              <Link href="/admin/dashboard">Return to Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">

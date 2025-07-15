@@ -1,17 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Download, FileText, Loader2, AlertTriangle } from 'lucide-react';
+import { Download, FileText, Loader2, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ReportData } from '@/actions/report-actions';
 import { generateReport } from '@/actions/report-actions';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminAccess } from '@/hooks/useAdminAccess';
+import Link from 'next/link';
 
 const reportTypes = [
     { value: "user_activity", label: "User Activity Report" },
@@ -30,6 +32,7 @@ const DynamicSelectContent = dynamic(() => import('@/components/ui/select').then
 const DynamicSelectItem = dynamic(() => import('@/components/ui/select').then(mod => mod.SelectItem), { ssr: false });
 
 export function ReportForm() {
+  const { hasPermission, isAccessLoading } = useAdminAccess('canGenerateReports');
   const { toast } = useToast();
   const [selectedReport, setSelectedReport] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -96,6 +99,34 @@ export function ReportForm() {
         description: `${fileName} is being downloaded.`
     })
   };
+
+  if (isAccessLoading) {
+    return (
+      <div className="flex justify-center items-center py-10">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (!hasPermission) {
+    return (
+      <div className="text-center py-8">
+        <Card className="max-w-md mx-auto shadow-lg bg-card border-destructive/20">
+          <CardHeader>
+            <ShieldAlert className="h-12 w-12 mx-auto text-destructive" />
+            <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">You do not have the required permissions to generate reports.</p>
+            <Button asChild className="mt-4">
+              <Link href="/admin/dashboard">Return to Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

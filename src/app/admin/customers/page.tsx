@@ -1,4 +1,3 @@
-
 // src/app/admin/customers/page.tsx
 'use client';
 
@@ -6,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Users, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Search } from 'lucide-react';
+import { Users, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Search, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAdminCustomers } from '@/actions/customer-actions';
 import type { Customer } from '@/types/goldsmith';
@@ -14,8 +13,10 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
+import { useAdminAccess } from '@/hooks/useAdminAccess';
 
 export default function AdminCustomersPage() {
+  const { hasPermission, isAccessLoading } = useAdminAccess('canManageCustomers');
   const [customers, setCustomers] = useState<Omit<Customer, 'password' | '_id'>[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredCustomers, setFilteredCustomers] = useState<Omit<Customer, 'password' | '_id'>[]>([]);
@@ -44,8 +45,11 @@ export default function AdminCustomersPage() {
   };
 
   useEffect(() => {
-    loadCustomers();
-  }, []);
+    if (!isAccessLoading && hasPermission) {
+      loadCustomers();
+    }
+  }, [isAccessLoading, hasPermission]);
+
 
   useEffect(() => {
     const lowercasedFilter = searchTerm.toLowerCase();
@@ -55,6 +59,34 @@ export default function AdminCustomersPage() {
     );
     setFilteredCustomers(filteredData);
   }, [searchTerm, customers]);
+
+  if (isAccessLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-8rem)]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="ml-2 text-muted-foreground">Verifying access...</p>
+      </div>
+    );
+  }
+
+  if (!hasPermission) {
+    return (
+      <div className="container py-8 text-center">
+        <Card className="max-w-md mx-auto shadow-lg bg-card border-destructive/20">
+          <CardHeader>
+            <ShieldAlert className="h-12 w-12 mx-auto text-destructive" />
+            <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">You do not have the required permissions to manage customers.</p>
+            <Button asChild className="mt-4">
+              <Link href="/admin/dashboard">Return to Dashboard</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">
