@@ -53,6 +53,11 @@ export function ReportForm() {
 
   const isReportDateSensitive = reportTypes.find(r => r.value === selectedReport)?.dateSensitive ?? false;
 
+  // FIX: Define dateRange in the component scope
+  const dateRange: ReportDateRange | undefined = isReportDateSensitive && date?.from && date?.to
+      ? { from: date.from, to: date.to }
+      : undefined;
+
   const handleGenerateReport = async () => {
     if (!selectedReport) {
         toast({ title: 'No Report Selected', description: 'Please choose a report type to generate.', variant: 'destructive' });
@@ -62,10 +67,7 @@ export function ReportForm() {
     setError(null);
     setReportData(null);
     
-    const dateRange: ReportDateRange | undefined = isReportDateSensitive && date?.from && date?.to
-      ? { from: date.from, to: date.to }
-      : undefined;
-
+    // The dateRange variable is now available from the component's scope.
     const result = await generateReport(selectedReport, dateRange);
 
     if (result.success && result.data) {
