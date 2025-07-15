@@ -156,7 +156,11 @@ export function Header() {
       );
     }
     
-    // Guest view
+    // Guest view - Hide Login/Signup on Admin pages
+    if (pathname.startsWith('/admin')) {
+      return null;
+    }
+    
     return (
       <>
         <Link
@@ -212,7 +216,11 @@ export function Header() {
        );
      }
      
-     // Guest view
+    // Guest view - Hide Login/Signup on Admin pages
+    if (pathname.startsWith('/admin')) {
+      return null;
+    }
+     
      return (
         <>
           <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
