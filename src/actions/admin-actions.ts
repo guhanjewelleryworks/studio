@@ -113,7 +113,7 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
         email: adminUser.email,
         role: adminUser.role,
         permissions: adminUser.permissions || [],
-        createdAt: adminUser.createdAt.toISOString(), // Convert Date to string
+        createdAt: adminUser.createdAt instanceof Date ? adminUser.createdAt.toISOString() : adminUser.createdAt,
       };
 
       return { success: true, message: 'Login successful!', admin: adminDataToReturn as any };
