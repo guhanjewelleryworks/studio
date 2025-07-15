@@ -2,7 +2,8 @@
 'use server';
 
 import { getAdminsCollection } from '@/lib/mongodb';
-import type { Admin, NewAdminInput, Permission, validPermissions } from '@/types/goldsmith';
+import type { Admin, NewAdminInput, Permission } from '@/types/goldsmith';
+import { validPermissions } from '@/types/goldsmith';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { logAuditEvent } from './audit-log-actions';
@@ -74,9 +75,9 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
   // CRITICAL: Revalidate the path to prevent server-side caching of this action's result.
   revalidatePath('/admin/login');
   console.log(`[Admin Actions] Attempting admin login for email: ${credentials.email}`);
+  const collection = await getAdminsCollection();
 
   try {
-    const collection = await getAdminsCollection();
     let adminUser = await collection.findOne({ email: credentials.email });
 
     // If the admin user does not exist, try to seed it.
@@ -106,13 +107,24 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
       console.log(`[Admin Actions] Admin login successful for ${credentials.email}.`);
       await logAuditEvent('Admin successful login', { type: 'admin', id: adminUser.id }, { email: adminUser.email });
 
-      // FIX: Manually create a plain object to avoid serialization errors
+      // FIX: Ensure superadmins always have all permissions
+      let finalPermissions = adminUser.permissions || [];
+      if (adminUser.role === 'superadmin') {
+          finalPermissions = [...validPermissions];
+          // Good practice: update the DB record if it's incorrect
+          if (adminUser.permissions.length !== validPermissions.length) {
+              console.log(`[Admin Actions] Correcting permissions for superadmin ${adminUser.email} in database.`);
+              await collection.updateOne({ _id: adminUser._id }, { $set: { permissions: finalPermissions } });
+          }
+      }
+
+      // Manually create a plain object to avoid serialization errors
       const adminDataToReturn = {
         id: adminUser.id,
         name: adminUser.name,
         email: adminUser.email,
         role: adminUser.role,
-        permissions: adminUser.permissions || [],
+        permissions: finalPermissions, // Use the corrected permissions
         createdAt: adminUser.createdAt instanceof Date ? adminUser.createdAt.toISOString() : adminUser.createdAt,
       };
 
@@ -143,13 +155,21 @@ export async function createAdmin(data: NewAdminInput): Promise<{ success: boole
 
         const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
+        let finalPermissions = data.permissions;
+        const role = data.permissions.includes('canManageAdmins') ? 'superadmin' : 'admin';
+        
+        // If the role is superadmin, ensure they get all permissions
+        if (role === 'superadmin') {
+            finalPermissions = [...validPermissions];
+        }
+
         const newAdmin: Omit<Admin, '_id'> = {
             id: uuidv4(),
             name: data.name,
             email: data.email,
             password: hashedPassword,
-            role: data.permissions.includes('canManageAdmins') ? 'superadmin' : 'admin',
-            permissions: data.permissions,
+            role: role,
+            permissions: finalPermissions,
             createdAt: new Date(),
         };
 
@@ -177,9 +197,16 @@ export async function fetchAllAdmins(): Promise<Omit<Admin, 'password'>[]> {
         return adminsArray.map(admin => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { _id, password, ...adminData } = admin;
+            
+            // Retroactively apply full permissions for display if superadmin, mimicking login logic
+            let displayPermissions = adminData.permissions || [];
+            if (adminData.role === 'superadmin') {
+                displayPermissions = [...validPermissions];
+            }
+
             return {
                 ...adminData,
-                permissions: adminData.permissions || [], // Ensure permissions is always an array
+                permissions: displayPermissions,
             } as Omit<Admin, 'password'>;
         });
     } catch (error) {
