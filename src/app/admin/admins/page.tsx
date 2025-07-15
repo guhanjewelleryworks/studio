@@ -2,13 +2,13 @@
 'use client';
 
 import { useState, useEffect, type FormEvent } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Users2, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Trash2, UserPlus, Eye, EyeOff, ShieldAlert, BadgeInfo } from 'lucide-react';
+import { Users2, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Trash2, UserPlus, Eye, EyeOff, ShieldAlert, BadgeInfo, Pencil } from 'lucide-react';
 import Link from 'next/link';
-import { fetchAllAdmins, createAdmin, deleteAdmin } from '@/actions/admin-actions';
-import type { Admin, NewAdminInput, Permission } from '@/types/goldsmith';
+import { fetchAllAdmins, createAdmin, deleteAdmin, updateAdmin } from '@/actions/admin-actions';
+import type { Admin, NewAdminInput, Permission, UpdateAdminInput } from '@/types/goldsmith';
 import { validPermissions } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAdminAccess } from '@/hooks/useAdminAccess'; // Import the hook
+import { useAdminAccess } from '@/hooks/useAdminAccess';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +29,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
 
 const permissionDescriptions: Record<Permission, string> = {
     canManageAdmins: "Add, edit, and delete other administrators.",
@@ -50,12 +60,18 @@ export default function AdminAdminsPage() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Form state
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
+  // Create Form state
+  const [newName, setNewName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newSelectedPermissions, setNewSelectedPermissions] = useState<Permission[]>([]);
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Edit Dialog state
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState<Omit<Admin, 'password'> | null>(null);
+  const [editingName, setEditingName] = useState('');
+  const [editingPermissions, setEditingPermissions] = useState<Permission[]>([]);
 
   const loadAdmins = async () => {
     setIsLoading(true);
@@ -72,7 +88,6 @@ export default function AdminAdminsPage() {
   };
 
   useEffect(() => {
-    // Only load admins if access check is complete and permission is granted
     if (!isAccessLoading && hasPermission) {
       loadAdmins();
     }
@@ -86,25 +101,25 @@ export default function AdminAdminsPage() {
         return;
     }
 
-    if (!name || !email || !password || selectedPermissions.length === 0) {
+    if (!newName || !newEmail || !newPassword || newSelectedPermissions.length === 0) {
         toast({ title: "Missing fields", description: "Please provide name, email, password, and at least one permission.", variant: "destructive" });
         return;
     }
     setIsProcessing(true);
     const newAdminData: NewAdminInput = {
-        name,
-        email,
-        password,
-        permissions: selectedPermissions,
+        name: newName,
+        email: newEmail,
+        password: newPassword,
+        permissions: newSelectedPermissions,
     };
 
     const result = await createAdmin(newAdminData);
     if (result.success) {
-        toast({ title: "Admin Created", description: `Administrator account for ${name} has been created.` });
-        setName('');
-        setEmail('');
-        setPassword('');
-        setSelectedPermissions([]);
+        toast({ title: "Admin Created", description: `Administrator account for ${newName} has been created.` });
+        setNewName('');
+        setNewEmail('');
+        setNewPassword('');
+        setNewSelectedPermissions([]);
         loadAdmins();
     } else {
         toast({ title: "Creation Failed", description: result.error, variant: "destructive" });
@@ -112,6 +127,35 @@ export default function AdminAdminsPage() {
     setIsProcessing(false);
   };
   
+  const handleEditAdmin = (admin: Omit<Admin, 'password'>) => {
+    setSelectedAdmin(admin);
+    setEditingName(admin.name);
+    setEditingPermissions(admin.permissions || []);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateAdmin = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!selectedAdmin || !hasPermission) return;
+    
+    setIsProcessing(true);
+    const updateData: UpdateAdminInput = {
+      id: selectedAdmin.id,
+      name: editingName,
+      permissions: editingPermissions
+    };
+
+    const result = await updateAdmin(updateData);
+    if (result.success) {
+      toast({ title: "Admin Updated", description: `Details for ${editingName} have been updated.` });
+      setIsEditDialogOpen(false);
+      loadAdmins();
+    } else {
+      toast({ title: "Update Failed", description: result.error, variant: "destructive" });
+    }
+    setIsProcessing(false);
+  };
+
   const handleDeleteAdmin = async (adminId: string, adminName: string) => {
     if (!hasPermission) {
         toast({ title: "Access Denied", description: "You do not have permission to delete admins.", variant: "destructive" });
@@ -128,12 +172,20 @@ export default function AdminAdminsPage() {
     setIsProcessing(false);
   };
   
-  const togglePermission = (permission: Permission) => {
-    setSelectedPermissions(prev => 
+  const togglePermission = (permission: Permission, isEditing: boolean = false) => {
+    if (isEditing) {
+       setEditingPermissions(prev => 
         prev.includes(permission) 
         ? prev.filter(p => p !== permission)
         : [...prev, permission]
-    );
+      );
+    } else {
+      setNewSelectedPermissions(prev => 
+          prev.includes(permission) 
+          ? prev.filter(p => p !== permission)
+          : [...prev, permission]
+      );
+    }
   };
 
   if (isAccessLoading) {
@@ -229,32 +281,37 @@ export default function AdminAdminsPage() {
                                         : `${admin.permissions.length || 0} assigned`
                                         }
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-right space-x-1">
                                         {(admin.role !== 'superadmin' && hasPermission) ? (
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" disabled={isProcessing}>
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    This action cannot be undone. This will permanently delete the admin account for <span className="font-bold text-accent">{admin.name}</span>.
-                                                </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => handleDeleteAdmin(admin.id, admin.name)} className="bg-destructive hover:bg-destructive/90">
-                                                    Yes, delete admin
-                                                </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
+                                        <>
+                                            <Button variant="ghost" size="icon" className="text-accent hover:bg-accent/10" onClick={() => handleEditAdmin(admin)}>
+                                                <Pencil className="h-4 w-4"/>
+                                            </Button>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" disabled={isProcessing}>
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        This action cannot be undone. This will permanently delete the admin account for <span className="font-bold text-accent">{admin.name}</span>.
+                                                    </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDeleteAdmin(admin.id, admin.name)} className="bg-destructive hover:bg-destructive/90">
+                                                        Yes, delete admin
+                                                    </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </>
                                         ) : (
                                             admin.role === 'superadmin' ?
-                                            <span className="text-xs text-muted-foreground italic">Cannot delete superadmin</span>
+                                            <span className="text-xs text-muted-foreground italic pr-4">Cannot modify superadmin</span>
                                             : null
                                         )}
                                     </TableCell>
@@ -279,15 +336,15 @@ export default function AdminAdminsPage() {
                     <form onSubmit={handleCreateAdmin} className="space-y-4">
                         <div className="space-y-1.5">
                             <Label htmlFor="name">Full Name</Label>
-                            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Jane Doe" required disabled={isProcessing}/>
+                            <Input id="name" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="e.g. Jane Doe" required disabled={isProcessing}/>
                         </div>
                         <div className="space-y-1.5">
                             <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="e.g. jane@example.com" required disabled={isProcessing}/>
+                            <Input id="email" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="e.g. jane@example.com" required disabled={isProcessing}/>
                         </div>
                         <div className="space-y-1.5 relative">
                             <Label htmlFor="password">Initial Password</Label>
-                            <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Set a strong initial password" required disabled={isProcessing}/>
+                            <Input id="password" type={showPassword ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Set a strong initial password" required disabled={isProcessing}/>
                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
                                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </Button>
@@ -305,8 +362,8 @@ export default function AdminAdminsPage() {
                                 <div key={permission} className="flex items-start space-x-2">
                                     <Checkbox 
                                         id={permission} 
-                                        checked={selectedPermissions.includes(permission)}
-                                        onCheckedChange={() => togglePermission(permission)}
+                                        checked={newSelectedPermissions.includes(permission)}
+                                        onCheckedChange={() => togglePermission(permission, false)}
                                         disabled={isProcessing}
                                     />
                                     <div className="grid gap-1.5 leading-none">
@@ -330,6 +387,59 @@ export default function AdminAdminsPage() {
             </Card>
         </div>
       </div>
+      
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Administrator</DialogTitle>
+            <DialogDescription>
+              Modify the name and permissions for {selectedAdmin?.email}.
+            </DialogDescription>
+          </DialogHeader>
+           <form onSubmit={handleUpdateAdmin} className="space-y-4 pt-4">
+              <div className="space-y-1.5">
+                  <Label htmlFor="editingName">Full Name</Label>
+                  <Input id="editingName" value={editingName} onChange={(e) => setEditingName(e.target.value)} disabled={isProcessing} />
+              </div>
+               <div className="space-y-3">
+                  <Label>Permissions</Label>
+                  <Alert variant="default" className="p-2 border-blue-500/20 bg-blue-500/5">
+                  <BadgeInfo className="h-4 w-4 !text-blue-500"/>
+                  <AlertDescription className="text-xs text-blue-800 dark:text-blue-300">
+                      Assigning 'Manage Admins' will grant superadmin privileges.
+                  </AlertDescription>
+                  </Alert>
+                  <div className="space-y-2 rounded-md border p-3 max-h-60 overflow-y-auto">
+                  {validPermissions.map(permission => (
+                      <div key={`edit-${permission}`} className="flex items-start space-x-2">
+                          <Checkbox 
+                              id={`edit-${permission}`}
+                              checked={editingPermissions.includes(permission)}
+                              onCheckedChange={() => togglePermission(permission, true)}
+                              disabled={isProcessing}
+                          />
+                          <div className="grid gap-1.5 leading-none">
+                              <label htmlFor={`edit-${permission}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                  {permission.replace(/([A-Z])/g, ' $1').replace('can ', '').trim()}
+                              </label>
+                          </div>
+                      </div>
+                  ))}
+                  </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button type="submit" disabled={isProcessing}>
+                    {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Save changes
+                </Button>
+              </DialogFooter>
+           </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

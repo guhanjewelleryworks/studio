@@ -2,7 +2,7 @@
 'use server';
 
 import { getAdminsCollection } from '@/lib/mongodb';
-import type { Admin, NewAdminInput, Permission } from '@/types/goldsmith';
+import type { Admin, NewAdminInput, Permission, UpdateAdminInput } from '@/types/goldsmith';
 import { validPermissions } from '@/types/goldsmith';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
@@ -183,6 +183,51 @@ export async function createAdmin(data: NewAdminInput): Promise<{ success: boole
         return { success: false, error: 'An unexpected server error occurred.' };
     }
 }
+
+/**
+ * Updates an existing administrator's name and permissions.
+ */
+export async function updateAdmin(data: UpdateAdminInput): Promise<{ success: boolean, error?: string }> {
+    console.log('[Admin Actions] Attempting to update admin:', data.id);
+    try {
+        if (!data.id || !data.name || !data.permissions) {
+            return { success: false, error: 'Incomplete data provided for update.' };
+        }
+
+        const collection = await getAdminsCollection();
+        const adminToUpdate = await collection.findOne({ id: data.id });
+
+        if (!adminToUpdate) {
+            return { success: false, error: 'Admin not found.' };
+        }
+        
+        // Prevent a superadmin from being demoted by this action
+        if (adminToUpdate.role === 'superadmin') {
+            return { success: false, error: 'Cannot modify a superadmin account from this action.' };
+        }
+
+        // Determine role based on new permissions
+        const newRole = data.permissions.includes('canManageAdmins') ? 'superadmin' : 'admin';
+        
+        const result = await collection.updateOne(
+            { id: data.id },
+            { $set: { name: data.name, permissions: data.permissions, role: newRole } }
+        );
+
+        if (result.modifiedCount > 0) {
+            await logAuditEvent('Admin account updated', { type: 'admin', id: 'superadmin_user' }, { updatedAdminEmail: adminToUpdate.email });
+            revalidatePath('/admin/admins');
+            return { success: true };
+        }
+        
+        return { success: false, error: 'Failed to update admin. Data may be the same.' };
+
+    } catch (error) {
+        console.error('[Admin Actions] Error updating admin:', error);
+        return { success: false, error: 'An unexpected server error occurred.' };
+    }
+}
+
 
 /**
  * Fetches all administrators.

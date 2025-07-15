@@ -140,9 +140,12 @@ export interface Admin {
   createdAt: Date;
 }
 
-export type NewAdminInput = Omit<Admin, '_id' | 'id' | 'createdAt' | 'role'> & {
-    // Role is now derived from permissions, but let's keep it simple for input
-    // The create action will handle the logic
+export type NewAdminInput = Omit<Admin, '_id' | 'id' | 'createdAt' | 'role'>;
+
+export type UpdateAdminInput = {
+    id: string;
+    name: string;
+    permissions: Permission[];
 };
 
 
