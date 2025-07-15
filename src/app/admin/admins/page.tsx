@@ -8,7 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Users2, ArrowLeft, RefreshCw, Loader2, AlertTriangle, Trash2, UserPlus, Eye, EyeOff, ShieldAlert, BadgeInfo } from 'lucide-react';
 import Link from 'next/link';
 import { fetchAllAdmins, createAdmin, deleteAdmin } from '@/actions/admin-actions';
-import type { Admin, NewAdminInput, Permission, validPermissions } from '@/types/goldsmith';
+import type { Admin, NewAdminInput, Permission } from '@/types/goldsmith';
+import { validPermissions } from '@/types/goldsmith'; // <-- FIX: Import the missing constant
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -27,6 +28,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 const permissionDescriptions: Record<Permission, string> = {
@@ -42,7 +50,7 @@ const permissionDescriptions: Record<Permission, string> = {
 };
 
 export default function AdminAdminsPage() {
-  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [admins, setAdmins] = useState<Omit<Admin, 'password'>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,6 +61,7 @@ export default function AdminAdminsPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'superadmin'>('admin');
   const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -97,6 +106,7 @@ export default function AdminAdminsPage() {
         email,
         password,
         permissions: selectedPermissions,
+        role: selectedPermissions.includes('canManageAdmins') ? 'superadmin' : 'admin',
     };
 
     const result = await createAdmin(newAdminData);
@@ -271,7 +281,7 @@ export default function AdminAdminsPage() {
                               <Alert variant="default" className="p-2 border-blue-500/20 bg-blue-500/5">
                                 <BadgeInfo className="h-4 w-4 !text-blue-500"/>
                                 <AlertDescription className="text-xs text-blue-800 dark:text-blue-300">
-                                  'Manage Admins' is a superadmin-only permission.
+                                  Assigning 'Manage Admins' will grant superadmin privileges.
                                 </AlertDescription>
                               </Alert>
                               <div className="space-y-2 rounded-md border p-3 max-h-60 overflow-y-auto">
