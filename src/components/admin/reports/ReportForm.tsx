@@ -1,25 +1,32 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Download, FileText, Loader2, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { Download, FileText, Loader2, AlertTriangle, ShieldAlert, CalendarIcon } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { ReportData } from '@/actions/report-actions';
+import type { ReportData, ReportDateRange } from '@/actions/report-actions';
 import { generateReport } from '@/actions/report-actions';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminAccess } from '@/hooks/useAdminAccess';
 import Link from 'next/link';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { addDays, format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
+import { cn } from '@/lib/utils';
+
 
 const reportTypes = [
-    { value: "user_activity", label: "User Activity Report" },
-    { value: "goldsmith_performance", label: "Goldsmith Performance Report" },
-    { value: "sales_summary", label: "Sales Summary Report" },
-    { value: "platform_traffic", label: "Platform Traffic Analysis (Coming Soon)" },
+    { value: "user_activity", label: "User Activity Report", dateSensitive: true },
+    { value: "goldsmith_performance", label: "Goldsmith Performance Report", dateSensitive: true },
+    { value: "sales_summary", label: "Sales Summary Report", dateSensitive: true },
+    { value: "goldsmith_payout", label: "Goldsmith Payout Report", dateSensitive: true },
+    { value: "platform_traffic", label: "Platform Traffic Analysis (Coming Soon)", dateSensitive: false },
 ];
 
 const DynamicSelect = dynamic(() => import('@/components/ui/select').then(mod => mod.Select), {
@@ -38,6 +45,13 @@ export function ReportForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: addDays(new Date(), -30),
+    to: new Date(),
+  });
+
+  const isReportDateSensitive = reportTypes.find(r => r.value === selectedReport)?.dateSensitive ?? false;
 
   const handleGenerateReport = async () => {
     if (!selectedReport) {
@@ -48,7 +62,11 @@ export function ReportForm() {
     setError(null);
     setReportData(null);
     
-    const result = await generateReport(selectedReport);
+    const dateRange: ReportDateRange | undefined = isReportDateSensitive && date?.from && date?.to
+      ? { from: date.from, to: date.to }
+      : undefined;
+
+    const result = await generateReport(selectedReport, dateRange);
 
     if (result.success && result.data) {
         setReportData(result.data);
@@ -144,6 +162,48 @@ export function ReportForm() {
               </DynamicSelectContent>
           </DynamicSelect>
         </div>
+
+        <div className="space-y-2">
+            <Label htmlFor="date-range" className="text-foreground">Date Range</Label>
+            <Popover>
+                <PopoverTrigger asChild>
+                    <Button
+                        id="date"
+                        variant={"outline"}
+                        className={cn(
+                            "w-full md:w-[300px] justify-start text-left font-normal",
+                            !date && "text-muted-foreground"
+                        )}
+                        disabled={!isReportDateSensitive}
+                    >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date?.from ? (
+                            date.to ? (
+                                <>
+                                    {format(date.from, "LLL dd, y")} -{" "}
+                                    {format(date.to, "LLL dd, y")}
+                                </>
+                            ) : (
+                                format(date.from, "LLL dd, y")
+                            )
+                        ) : (
+                            <span>Pick a date</span>
+                        )}
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                        initialFocus
+                        mode="range"
+                        defaultMonth={date?.from}
+                        selected={date}
+                        onSelect={setDate}
+                        numberOfMonths={2}
+                    />
+                </PopoverContent>
+            </Popover>
+        </div>
+
         <div className="flex gap-3 w-full md:w-auto">
           <Button onClick={handleGenerateReport} disabled={isLoading} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
@@ -179,6 +239,11 @@ export function ReportForm() {
                 <Card className="bg-muted/30">
                   <CardHeader>
                     <CardTitle className="text-accent">{reportData.title}</CardTitle>
+                    {dateRange && isReportDateSensitive && (
+                        <CardDescription>
+                            For period: {format(dateRange.from, "PPP")} to {format(dateRange.to, "PPP")}
+                        </CardDescription>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <Table>
@@ -195,6 +260,19 @@ export function ReportForm() {
                         ))}
                       </TableBody>
                     </Table>
+                     {reportData.summary && reportData.summary.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-border">
+                            <h4 className="font-semibold text-foreground mb-2">Report Summary</h4>
+                            <div className="space-y-1 text-sm">
+                                {reportData.summary.map(item => (
+                                    <div key={item.label} className="flex justify-between">
+                                        <span className="text-muted-foreground">{item.label}:</span>
+                                        <span className="font-medium text-foreground">{item.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                   </CardContent>
                 </Card>
             )}

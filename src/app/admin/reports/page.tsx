@@ -1,14 +1,11 @@
 // src/app/admin/reports/page.tsx
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, ArrowLeft, Loader2, ShieldAlert } from 'lucide-react';
+import { BarChart3, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { ReportForm } from '@/components/admin/reports/ReportForm'; // Import the new client component
-import { useAdminAccess } from '@/hooks/useAdminAccess'; // We can use the hook directly in the Server Component wrapper
+import { ReportForm } from '@/components/admin/reports/ReportForm';
 
 export default function AdminReportsPage() {
-    // This is a server component, so we can't use the hook directly here.
-    // The permission check will happen inside the ReportForm client component.
     return (
         <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">
         <header className="mb-6 flex items-center justify-between">
@@ -28,7 +25,7 @@ export default function AdminReportsPage() {
             <CardHeader>
             <CardTitle className="text-xl text-accent font-heading">Reporting Tools</CardTitle>
             <CardDescription className="text-muted-foreground">
-                Generate various platform reports using the tools below.
+                Generate various platform reports using the tools below. Select a date range for applicable reports.
             </CardDescription>
             </CardHeader>
             <CardContent>

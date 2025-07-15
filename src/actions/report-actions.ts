@@ -4,7 +4,8 @@
 import { fetchAdminCustomers } from './customer-actions';
 import { fetchAdminGoldsmiths, fetchAllPlatformOrderRequests } from './goldsmith-actions';
 import { logAuditEvent } from './audit-log-actions';
-import { startOfMonth } from 'date-fns';
+import { startOfMonth, isWithinInterval } from 'date-fns';
+import type { OrderRequest } from '@/types/goldsmith';
 
 export type ReportData = {
   title: string;
@@ -13,46 +14,68 @@ export type ReportData = {
   summary?: { label: string, value: string | number }[];
 }
 
-export async function generateReport(reportType: string): Promise<{ success: boolean; data?: ReportData; error?: string }> {
+export type ReportDateRange = {
+    from: Date;
+    to: Date;
+}
+
+// Assume a fixed commission rate for payout calculations. This could be moved to settings later.
+const PLATFORM_COMMISSION_RATE = 0.15; // 15%
+
+// Helper function to generate a random price for an order for simulation
+const getSimulatedOrderPrice = (orderId: string): number => {
+  // Use a simple hash of the order ID to get a deterministic "random" price
+  const hash = orderId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return 5000 + (hash % 25000); // Generates a price between 5,000 and 30,000
+};
+
+
+export async function generateReport(
+    reportType: string,
+    dateRange?: ReportDateRange
+): Promise<{ success: boolean; data?: ReportData; error?: string }> {
   
   // Log the report generation event
   logAuditEvent(
     `Generated report: ${reportType}`,
-    { type: 'admin', id: 'admin_user' } // Placeholder admin ID
+    { type: 'admin', id: 'admin_user' }, // Placeholder admin ID
+    { dateRange: dateRange ? `${dateRange.from.toDateString()} - ${dateRange.to.toDateString()}` : 'All Time' }
   );
 
   try {
+    const orders = await fetchAllPlatformOrderRequests();
+    
+    // Filter orders based on date range if provided
+    const filteredOrders = dateRange
+      ? orders.filter(o => isWithinInterval(new Date(o.requestedAt), { start: dateRange.from, end: dateRange.to }))
+      : orders;
+
     switch (reportType) {
       case 'user_activity': {
-        const customers = await fetchAdminCustomers();
-        const now = new Date();
-        const startOfThisMonth = startOfMonth(now);
+        let customers = await fetchAdminCustomers();
         
-        const newCustomersThisMonth = customers.filter(c => 
-            c.registeredAt && new Date(c.registeredAt) >= startOfThisMonth
-        ).length;
-
+        // Filter customers based on date range if provided
+        const filteredCustomers = dateRange
+          ? customers.filter(c => c.registeredAt && isWithinInterval(new Date(c.registeredAt), { start: dateRange.from, end: dateRange.to }))
+          : customers;
+          
         return {
           success: true,
           data: {
             title: 'User Activity Report',
             headers: ["Metric", "Value"],
             rows: [
-              ["Total Registered Customers", customers.length],
-              [`New Customers This Month (${now.toLocaleString('default', { month: 'long' })})`, newCustomersThisMonth],
+              ["Total Registered Customers (in range)", filteredCustomers.length],
             ],
           },
         };
       }
 
       case 'goldsmith_performance': {
-        const [goldsmiths, orders] = await Promise.all([
-          fetchAdminGoldsmiths(),
-          fetchAllPlatformOrderRequests()
-        ]);
+        const goldsmiths = await fetchAdminGoldsmiths();
         
         const reportRows = goldsmiths.map(g => {
-          const goldsmithOrders = orders.filter(o => o.goldsmithId === g.id);
+          const goldsmithOrders = filteredOrders.filter(o => o.goldsmithId === g.id);
           const completedOrders = goldsmithOrders.filter(o => o.status === 'completed').length;
           return [
             g.name,
@@ -67,19 +90,18 @@ export async function generateReport(reportType: string): Promise<{ success: boo
           success: true,
           data: {
             title: 'Goldsmith Performance Report',
-            headers: ["Goldsmith Name", "Status", "Total Orders Assigned", "Completed Orders", "Completion Rate"],
+            headers: ["Goldsmith Name", "Status", "Total Orders Assigned (in range)", "Completed Orders (in range)", "Completion Rate (in range)"],
             rows: reportRows,
           }
         };
       }
       
       case 'sales_summary': {
-        const orders = await fetchAllPlatformOrderRequests();
-        const totalOrders = orders.length;
-        const completed = orders.filter(o => o.status === 'completed').length;
-        const cancelled = orders.filter(o => o.status === 'cancelled').length;
-        const inProgress = orders.filter(o => ['in_progress', 'artwork_completed', 'customer_review_requested', 'shipped'].includes(o.status)).length;
-        const pending = orders.filter(o => ['new', 'pending_goldsmith_review'].includes(o.status)).length;
+        const totalOrders = filteredOrders.length;
+        const completed = filteredOrders.filter(o => o.status === 'completed').length;
+        const cancelled = filteredOrders.filter(o => o.status === 'cancelled').length;
+        const inProgress = filteredOrders.filter(o => ['in_progress', 'artwork_completed', 'customer_review_requested', 'shipped'].includes(o.status)).length;
+        const pending = filteredOrders.filter(o => ['new', 'pending_goldsmith_review'].includes(o.status)).length;
         
         return {
           success: true,
@@ -87,12 +109,51 @@ export async function generateReport(reportType: string): Promise<{ success: boo
             title: 'Sales Summary Report',
             headers: ["Metric", "Value"],
             rows: [
-              ["Total Order Requests", totalOrders],
-              ["Orders Completed", completed],
-              ["Orders Cancelled", cancelled],
-              ["Orders In Progress", inProgress],
-              ["Orders Pending Review", pending],
+              ["Total Order Requests (in range)", totalOrders],
+              ["Orders Completed (in range)", completed],
+              ["Orders Cancelled (in range)", cancelled],
+              ["Orders In Progress (in range)", inProgress],
+              ["Orders Pending Review (in range)", pending],
             ],
+          }
+        };
+      }
+      
+      case 'goldsmith_payout': {
+        const goldsmiths = await fetchAdminGoldsmiths();
+
+        const completedOrdersInRange = filteredOrders.filter(o => o.status === 'completed');
+
+        const payoutRows = goldsmiths.map(g => {
+            const completedGoldsmithOrders = completedOrdersInRange.filter(o => o.goldsmithId === g.id);
+            const totalRevenue = completedGoldsmithOrders.reduce((sum, order) => sum + getSimulatedOrderPrice(order.id), 0);
+            const commission = totalRevenue * PLATFORM_COMMISSION_RATE;
+            const payout = totalRevenue - commission;
+
+            return [
+                g.name,
+                completedGoldsmithOrders.length,
+                `₹${totalRevenue.toFixed(2)}`,
+                `₹${commission.toFixed(2)}`,
+                `₹${payout.toFixed(2)}`,
+            ];
+        });
+        
+         const totalRevenueAll = completedOrdersInRange.reduce((sum, order) => sum + getSimulatedOrderPrice(order.id), 0);
+         const totalCommission = totalRevenueAll * PLATFORM_COMMISSION_RATE;
+         const totalPayout = totalRevenueAll - totalCommission;
+
+        return {
+          success: true,
+          data: {
+            title: 'Goldsmith Payout Report (Simulated)',
+            headers: ["Goldsmith Name", "Completed Orders", "Total Revenue", `Commission (${(PLATFORM_COMMISSION_RATE * 100)}%)`, "Net Payout"],
+            rows: payoutRows,
+            summary: [
+                { label: 'Total Revenue (All Goldsmiths)', value: `₹${totalRevenueAll.toFixed(2)}` },
+                { label: 'Total Commission (Platform)', value: `₹${totalCommission.toFixed(2)}` },
+                { label: 'Total Payout (All Goldsmiths)', value: `₹${totalPayout.toFixed(2)}` },
+            ]
           }
         };
       }

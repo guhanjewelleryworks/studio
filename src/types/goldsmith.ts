@@ -87,9 +87,11 @@ export interface OrderRequest {
   status: OrderRequestStatus;
   requestedAt: Date;
   updatedAt: Date;
+  // New field for simulated order price for reports
+  simulatedPrice?: number;
 }
 
-export type NewOrderRequestInput = Omit<OrderRequest, '_id' | 'id' | 'status' | 'requestedAt' | 'updatedAt'>;
+export type NewOrderRequestInput = Omit<OrderRequest, '_id' | 'id' | 'status' | 'requestedAt' | 'updatedAt' | 'simulatedPrice'>;
 
 
 // --- Customer Types ---
