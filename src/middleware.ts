@@ -2,6 +2,11 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { fetchPlatformSettings } from '@/actions/settings-actions';
 
+// Force the middleware to run on the Node.js runtime.
+// This is required because it uses database actions (via fetchPlatformSettings)
+// which rely on Node.js APIs not available in the Edge runtime.
+export const runtime = 'nodejs';
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
