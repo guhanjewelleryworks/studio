@@ -1,9 +1,11 @@
+
 'use server';
 
 import { getSettingsCollection } from '@/lib/mongodb';
 import type { PlatformSettings } from '@/types/goldsmith';
 import { revalidatePath } from 'next/cache';
 import { logAuditEvent } from './audit-log-actions';
+import { cookies } from 'next/headers';
 
 const defaultSettings: PlatformSettings = {
     key: 'platform_main',
@@ -51,6 +53,16 @@ export async function updatePlatformSettings(data: Partial<Omit<PlatformSettings
       { upsert: true, returnDocument: 'after', projection: { _id: 0 } }
     );
     
+    // --- THIS IS THE CORRECT PLACE TO HANDLE THE COOKIE ---
+    // If maintenance mode was part of the update, set/delete the cookie.
+    if (data.isMaintenanceModeEnabled === true) {
+      cookies().set('maintenance_mode', 'true', { path: '/', httpOnly: true });
+      console.log('[Action: updatePlatformSettings] Maintenance mode enabled, setting cookie.');
+    } else if (data.isMaintenanceModeEnabled === false) {
+      cookies().delete('maintenance_mode');
+      console.log('[Action: updatePlatformSettings] Maintenance mode disabled, deleting cookie.');
+    }
+    
     if (result) {
         logAuditEvent(
           'Updated platform settings',
@@ -60,6 +72,7 @@ export async function updatePlatformSettings(data: Partial<Omit<PlatformSettings
         // Revalidate paths that use these settings
         revalidatePath('/');
         revalidatePath('/pricing');
+        revalidatePath('/admin/settings');
         return { success: true, data: { ...defaultSettings, ...result } as Omit<PlatformSettings, '_id'> };
     } else {
         return { success: false, error: 'Settings not found or not updated.' };

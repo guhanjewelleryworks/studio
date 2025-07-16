@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { Poppins, Playfair_Display } from 'next/font/google';
@@ -9,8 +10,6 @@ import { Toaster } from "@/components/ui/toaster";
 import AuthProvider from '@/components/auth/AuthProvider';
 import { fetchPlatformSettings } from '@/actions/settings-actions';
 import { AnnouncementBanner } from '@/components/layout/AnnouncementBanner';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 
 const geistSans = GeistSans;
 
@@ -39,23 +38,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The layout's only job is to fetch settings for display purposes, not for logic.
   const settings = await fetchPlatformSettings();
-  
-  // New Maintenance Mode Logic
-  const cookieStore = cookies();
-  const maintenanceCookie = cookieStore.get('maintenance_mode');
-
-  if (settings.isMaintenanceModeEnabled && !maintenanceCookie) {
-    // Set the cookie if maintenance mode is on and the cookie isn't set.
-    // The middleware will use this cookie on the *next* request to redirect.
-    cookies().set('maintenance_mode', 'true', { path: '/' });
-    // For the current request, perform the redirect directly from the server.
-    redirect('/maintenance');
-  } else if (!settings.isMaintenanceModeEnabled && maintenanceCookie) {
-    // Clear the cookie if maintenance mode is off and the cookie is present.
-    cookies().delete('maintenance_mode');
-  }
-
 
   return (
     <html lang="en" className={cn("h-full antialiased", poppins.variable, playfairDisplay.variable, geistSans.variable)}>
