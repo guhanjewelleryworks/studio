@@ -10,6 +10,7 @@ import { logAuditEvent } from './audit-log-actions';
 import crypto from 'crypto';
 import { sendVerificationEmail, sendPasswordResetEmail } from '@/lib/email';
 import bcrypt from 'bcryptjs';
+import { fetchPlatformSettings } from './settings-actions';
 
 const SALT_ROUNDS = 10;
 
@@ -26,6 +27,12 @@ function createEmailHash(email: string): string {
 export async function saveCustomer(data: NewCustomerInput): Promise<{ success: boolean; message: string; error?: string }> {
   console.log('[Action: saveCustomer] Received data for customer registration:', JSON.stringify(data));
   try {
+    // Check if registration is enabled
+    const settings = await fetchPlatformSettings();
+    if (!settings.allowCustomerRegistration) {
+      return { success: false, message: 'New customer registration is currently disabled.' };
+    }
+
     const collection: Collection<Customer> = await getCustomersCollection();
 
     if (!data.name || !data.email || !data.password) {
@@ -87,7 +94,7 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
 
     if (result.insertedId) {
       // Send verification email
-      await sendVerificationEmail(newCustomer.email, verificationToken, 'customer');
+      await sendVerificationEmail(newCustomer.email, newCustomer.verificationToken, 'customer');
 
       logAuditEvent(
         'Customer account created (pending verification)',

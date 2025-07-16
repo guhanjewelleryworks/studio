@@ -1,19 +1,20 @@
 // src/app/goldsmith-portal/register/page.tsx
 'use client';
 
-import type { NewGoldsmithInput } from '@/types/goldsmith';
+import type { NewGoldsmithInput, PlatformSettings } from '@/types/goldsmith';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CheckCircle, Briefcase, Loader2, ShieldCheck, MailCheck, Eye, EyeOff } from 'lucide-react';
+import { CheckCircle, Briefcase, Loader2, ShieldCheck, MailCheck, Eye, EyeOff, UserX } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { useState, type FormEvent, type ChangeEvent } from 'react';
+import { useState, type FormEvent, type ChangeEvent, useEffect } from 'react';
 import { saveGoldsmith } from '@/actions/goldsmith-actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { fetchPlatformSettings } from '@/actions/settings-actions';
 
 const indianStates: { [key: string]: string[] } = {
   "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur"],
@@ -29,6 +30,8 @@ export default function GoldsmithRegisterPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmittedSuccessfully, setIsSubmittedSuccessfully] = useState(false);
+  const [settings, setSettings] = useState<Partial<PlatformSettings>>({});
+  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
 
   // Form state
   const [workshopName, setWorkshopName] = useState('');
@@ -45,6 +48,25 @@ export default function GoldsmithRegisterPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const fetchedSettings = await fetchPlatformSettings();
+        setSettings(fetchedSettings);
+      } catch (error) {
+        console.error("Failed to load platform settings:", error);
+        toast({
+          title: "Error",
+          description: "Could not load page settings. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingSettings(false);
+      }
+    }
+    loadSettings();
+  }, [toast]);
 
 
   const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -161,6 +183,14 @@ export default function GoldsmithRegisterPage() {
   };
 
   const isFormDisabled = isSubmitting;
+  
+  if (isLoadingSettings) {
+     return (
+        <div className="flex justify-center items-center min-h-[calc(100vh-10rem)]">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+    );
+  }
 
   if (isSubmittedSuccessfully) {
     return (
@@ -187,6 +217,30 @@ export default function GoldsmithRegisterPage() {
       </div>
     );
   }
+  
+  if (!settings.allowGoldsmithRegistration) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/20 to-background">
+        <Card className="w-full max-w-md text-center shadow-xl border-primary/10 rounded-xl bg-card">
+          <CardHeader className="pt-8 pb-4">
+            <UserX className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+            <CardTitle className="text-3xl text-accent">Registrations Paused</CardTitle>
+          </CardHeader>
+          <CardContent className="px-6 pb-8">
+            <p className="text-foreground/80 mb-6">
+              We are not accepting new goldsmith registrations at this time. Please check back later.
+            </p>
+            <Button asChild size="lg" className="w-full shadow-md rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Link href="/">
+                Return to Homepage
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/20 to-background">

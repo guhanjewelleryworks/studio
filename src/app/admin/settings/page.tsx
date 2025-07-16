@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Settings, ArrowLeft, Megaphone, Loader2, ShieldAlert, DollarSign, Gem, CheckCircle, Hammer } from 'lucide-react';
+import { Settings, ArrowLeft, Megaphone, Loader2, ShieldAlert, DollarSign, Gem, CheckCircle, Hammer, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -49,6 +49,8 @@ export default function AdminSettingsPage() {
       goldsmithPartnerPriceMonthly: Number(settings.goldsmithPartnerPriceMonthly),
       goldsmithPartnerPriceAnnual: Number(settings.goldsmithPartnerPriceAnnual),
       isMaintenanceModeEnabled: settings.isMaintenanceModeEnabled,
+      allowCustomerRegistration: settings.allowCustomerRegistration,
+      allowGoldsmithRegistration: settings.allowGoldsmithRegistration,
     };
     
     const result = await updatePlatformSettings(settingsToUpdate);
@@ -212,6 +214,50 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
             )}
+          </section>
+
+          <Separator />
+          
+           {/* Registration Settings */}
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+              <UserPlus className="mr-2 h-5 w-5 text-primary/80" /> Registration Control
+            </h2>
+             {isLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+             ) : (
+                <div className="space-y-4 rounded-lg border p-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="customer-registration">Allow New Customer Signups</Label>
+                      <p className="text-xs text-muted-foreground">
+                        If disabled, the customer registration form will be hidden.
+                      </p>
+                    </div>
+                    <Switch
+                      id="customer-registration"
+                      checked={settings.allowCustomerRegistration ?? false}
+                      onCheckedChange={(checked) => setSettings(prev => ({ ...prev, allowCustomerRegistration: checked }))}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="goldsmith-registration">Allow New Goldsmith Registrations</Label>
+                      <p className="text-xs text-muted-foreground">
+                        If disabled, the goldsmith registration form will be hidden.
+                      </p>
+                    </div>
+                    <Switch
+                      id="goldsmith-registration"
+                      checked={settings.allowGoldsmithRegistration ?? false}
+                      onCheckedChange={(checked) => setSettings(prev => ({ ...prev, allowGoldsmithRegistration: checked }))}
+                    />
+                  </div>
+                </div>
+             )}
           </section>
 
            <Separator />

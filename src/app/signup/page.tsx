@@ -5,14 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UserPlus, Loader2, MailCheck } from 'lucide-react';
+import { UserPlus, Loader2, MailCheck, UserX } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { saveCustomer } from '@/actions/customer-actions'; // Import the action
-import type { NewCustomerInput } from '@/types/goldsmith';
+import { saveCustomer } from '@/actions/customer-actions';
+import type { NewCustomerInput, PlatformSettings } from '@/types/goldsmith';
+import { fetchPlatformSettings } from '@/actions/settings-actions';
 
 export default function SignUpPage() {
   const { toast } = useToast();
@@ -22,6 +23,28 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  
+  const [settings, setSettings] = useState<Partial<PlatformSettings>>({});
+  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const fetchedSettings = await fetchPlatformSettings();
+        setSettings(fetchedSettings);
+      } catch (error) {
+        console.error("Failed to load platform settings:", error);
+        toast({
+          title: "Error",
+          description: "Could not load page settings. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingSettings(false);
+      }
+    }
+    loadSettings();
+  }, [toast]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -65,6 +88,14 @@ export default function SignUpPage() {
     }
   };
   
+  if (isLoadingSettings) {
+    return (
+        <div className="flex justify-center items-center min-h-[calc(100vh-10rem)]">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+    );
+  }
+
   if (isSubmitted) {
       return (
         <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
@@ -83,6 +114,29 @@ export default function SignUpPage() {
                 <Button asChild size="lg" className="w-full shadow-md rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
                 <Link href="/login">
                     Proceed to Login
+                </Link>
+                </Button>
+            </CardContent>
+          </Card>
+        </div>
+      );
+  }
+  
+  if (!settings.allowCustomerRegistration) {
+    return (
+        <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
+          <Card className="w-full max-w-md text-center shadow-xl border-primary/10 rounded-xl bg-card">
+            <CardHeader className="pt-8 pb-4">
+                <UserX className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <CardTitle className="text-3xl text-accent">Registrations Paused</CardTitle>
+            </CardHeader>
+             <CardContent className="px-6 pb-8">
+                <p className="text-foreground/80 mb-6">
+                    We are not accepting new customer registrations at this time. Please check back later.
+                </p>
+                <Button asChild size="lg" className="w-full shadow-md rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Link href="/">
+                    Return to Homepage
                 </Link>
                 </Button>
             </CardContent>

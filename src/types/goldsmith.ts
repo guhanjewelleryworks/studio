@@ -167,13 +167,16 @@ export interface PlatformSettings {
   key: 'platform_main'; // A fixed key to ensure only one settings document
   announcementText: string;
   isAnnouncementVisible: boolean;
-  // New fields for pricing
+  // Pricing fields
   customerPremiumPriceMonthly: number;
   customerPremiumPriceAnnual: number;
   goldsmithPartnerPriceMonthly: number;
   goldsmithPartnerPriceAnnual: number;
-  // New field for maintenance mode
-  isMaintenanceModeEnabled?: boolean;
+  // Maintenance mode
+  isMaintenanceModeEnabled: boolean;
+  // Registration control
+  allowCustomerRegistration: boolean;
+  allowGoldsmithRegistration: boolean;
 }
 
 // --- New Type for Audit Logs ---

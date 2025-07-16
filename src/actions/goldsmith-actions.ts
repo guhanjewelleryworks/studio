@@ -10,6 +10,7 @@ import { createAdminNotification } from './notification-actions';
 import { sendGoldsmithPasswordResetEmail, sendVerificationEmail } from '@/lib/email';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import { fetchPlatformSettings } from './settings-actions';
 
 const SALT_ROUNDS = 10;
 const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Example: Los Angeles
@@ -17,6 +18,12 @@ const defaultLocation = { lat: 34.0522, lng: -118.2437 }; // Example: Los Angele
 export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success: boolean; data?: Goldsmith; error?: string }> {
   console.log('[Action: saveGoldsmith] Received data for registration:', JSON.stringify(data));
   try {
+    // Check if registration is enabled
+    const settings = await fetchPlatformSettings();
+    if (!settings.allowGoldsmithRegistration) {
+      return { success: false, error: 'New goldsmith registration is currently disabled.' };
+    }
+
     const collection: Collection<Goldsmith> = await getGoldsmithsCollection();
 
     // Basic validation

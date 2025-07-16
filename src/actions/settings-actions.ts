@@ -16,6 +16,8 @@ const defaultSettings: PlatformSettings = {
     goldsmithPartnerPriceMonthly: 49,
     goldsmithPartnerPriceAnnual: 499,
     isMaintenanceModeEnabled: false,
+    allowCustomerRegistration: true, // Default to true
+    allowGoldsmithRegistration: true, // Default to true
 };
 
 /**
@@ -72,6 +74,8 @@ export async function updatePlatformSettings(data: Partial<Omit<PlatformSettings
         // Revalidate paths that use these settings
         revalidatePath('/');
         revalidatePath('/pricing');
+        revalidatePath('/signup');
+        revalidatePath('/goldsmith-portal/register');
         revalidatePath('/admin/settings');
         return { success: true, data: { ...defaultSettings, ...result } as Omit<PlatformSettings, '_id'> };
     } else {
