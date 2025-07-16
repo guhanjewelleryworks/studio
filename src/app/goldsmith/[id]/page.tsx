@@ -1,3 +1,4 @@
+
 // src/app/goldsmith/[id]/page.tsx
 'use client';
 
@@ -44,6 +45,7 @@ const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id
     certifications: profile.certifications || [],
     responseTime: profile.responseTime || "Within 2 business days",
     ordersCompleted: profile.ordersCompleted || 0,
+    profileViews: profile.profileViews || 0,
     status: profile.status || 'pending_verification',
     ...profile,
   };

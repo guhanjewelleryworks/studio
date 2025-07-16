@@ -125,7 +125,7 @@ export default function Home() {
              <div className="relative mx-auto aspect-[6/5] w-full lg:col-span-2 group rounded-xl shadow-xl overflow-hidden border-2 border-primary/10">
               <Image
                 src="/images/my-hero-image.png"
-                alt="Placeholder image for hero section jewelry"
+                alt="Goldsmith at work bench crafting a piece of jewelry"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 550px"

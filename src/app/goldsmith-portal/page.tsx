@@ -1,4 +1,5 @@
 
+
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,7 +49,7 @@ export default function GoldsmithPortalPage() {
             <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-xl shadow-2xl group border-2 border-primary/20">
               <Image
                 src="/images/goldsmith_crafting.png"
-                alt="Goldsmith crafting jewelry"
+                alt="Goldsmith crafting a detailed piece of jewelry with a torch"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, 600px"

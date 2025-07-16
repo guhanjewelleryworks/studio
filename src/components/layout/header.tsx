@@ -1,3 +1,4 @@
+
 // src/components/layout/header.tsx
 'use client';
 
@@ -36,6 +37,7 @@ export function Header() {
   const pathname = usePathname();
   const [goldsmithUser, setGoldsmithUser] = useState<GoldsmithUser | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   useEffect(() => {
     // This effect runs only on the client, where localStorage is available.
@@ -193,7 +195,7 @@ export function Header() {
      if (goldsmithUser) {
         return (
             <>
-                <Link href="/goldsmith-portal/dashboard" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+                <Link href="/goldsmith-portal/dashboard" onClick={() => setIsSheetOpen(false)} className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
                     <Briefcase className="mr-2 h-4 w-4" /> Goldsmith Dashboard
                 </Link>
                 <Button onClick={handleGoldsmithLogout} variant="destructive" size="lg" className="w-full rounded-full text-base">
@@ -206,7 +208,7 @@ export function Header() {
      if (status === 'authenticated') {
        return (
         <>
-           <Link href="/customer/dashboard" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+           <Link href="/customer/dashboard" onClick={() => setIsSheetOpen(false)} className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
             <LayoutDashboard className="mr-2 h-4 w-4" /> My Dashboard
           </Link>
           <Button onClick={handleCustomerLogout} variant="destructive" size="lg" className="w-full rounded-full text-base">
@@ -223,10 +225,10 @@ export function Header() {
      
      return (
         <>
-          <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
+          <Link href="/login" onClick={() => setIsSheetOpen(false)} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
             <LogIn className="mr-2 h-4 w-4" /> Login
           </Link>
-          <Link href="/signup" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+          <Link href="/signup" onClick={() => setIsSheetOpen(false)} className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
             <UserPlus className="mr-2 h-4 w-4" /> Sign Up
           </Link>
         </>
@@ -257,7 +259,7 @@ export function Header() {
 
         {/* Mobile Menu Trigger & Logo grouping for mobile */}
         <div className="flex flex-1 items-center justify-between md:hidden">
-          <Sheet>
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="p-2">
                 <Menu className="h-6 w-6 text-foreground" />
@@ -270,6 +272,7 @@ export function Header() {
                   <SheetTitle asChild>
                     <Link
                       href="/"
+                      onClick={() => setIsSheetOpen(false)}
                       className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
                     >
                       <Image src="/logo_header.png" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary" />
@@ -281,11 +284,11 @@ export function Header() {
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="flex-grow flex flex-col space-y-1 px-4 pt-4">
-                  <Link href="/discover" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Discover</Link>
-                  <Link href="/#how-it-works" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">How It Works</Link>
-                  <Link href="/pricing" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Pricing</Link>
-                  <Link href="/goldsmith-portal" className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Goldsmith Portal</Link>
-                  <Link href="/admin/login" className="flex items-center text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary"><Shield className="mr-2 h-4 w-4"/>Admin Portal</Link>
+                  <Link href="/discover" onClick={() => setIsSheetOpen(false)} className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Discover</Link>
+                  <Link href="/#how-it-works" onClick={() => setIsSheetOpen(false)} className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">How It Works</Link>
+                  <Link href="/pricing" onClick={() => setIsSheetOpen(false)} className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Pricing</Link>
+                  <Link href="/goldsmith-portal" onClick={() => setIsSheetOpen(false)} className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">Goldsmith Portal</Link>
+                  <Link href="/admin/login" onClick={() => setIsSheetOpen(false)} className="flex items-center text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary"><Shield className="mr-2 h-4 w-4"/>Admin Portal</Link>
                 </nav>
                 <div className="px-6 pb-8 mt-auto flex flex-col gap-3 border-t border-border/20 pt-6">
                    {renderMobileUserActions()}
