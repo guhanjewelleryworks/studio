@@ -13,6 +13,7 @@ const defaultSettings: PlatformSettings = {
     customerPremiumPriceAnnual: 199,
     goldsmithPartnerPriceMonthly: 49,
     goldsmithPartnerPriceAnnual: 499,
+    isMaintenanceModeEnabled: false,
 };
 
 /**

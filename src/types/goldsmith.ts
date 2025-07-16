@@ -172,6 +172,8 @@ export interface PlatformSettings {
   customerPremiumPriceAnnual: number;
   goldsmithPartnerPriceMonthly: number;
   goldsmithPartnerPriceAnnual: number;
+  // New field for maintenance mode
+  isMaintenanceModeEnabled?: boolean;
 }
 
 // --- New Type for Audit Logs ---

@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Settings, ArrowLeft, Megaphone, Loader2, ShieldAlert, DollarSign, Gem, CheckCircle } from 'lucide-react';
+import { Settings, ArrowLeft, Megaphone, Loader2, ShieldAlert, DollarSign, Gem, CheckCircle, Hammer } from 'lucide-react';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -48,6 +48,7 @@ export default function AdminSettingsPage() {
       customerPremiumPriceAnnual: Number(settings.customerPremiumPriceAnnual),
       goldsmithPartnerPriceMonthly: Number(settings.goldsmithPartnerPriceMonthly),
       goldsmithPartnerPriceAnnual: Number(settings.goldsmithPartnerPriceAnnual),
+      isMaintenanceModeEnabled: settings.isMaintenanceModeEnabled,
     };
     
     const result = await updatePlatformSettings(settingsToUpdate);
@@ -211,6 +212,32 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
             )}
+          </section>
+
+           <Separator />
+
+          {/* Maintenance Mode */}
+          <section>
+            <h2 className="text-lg font-semibold text-destructive mb-3 flex items-center">
+              <Hammer className="mr-2 h-5 w-5" /> Maintenance Mode
+            </h2>
+             {isLoading ? (
+                <Skeleton className="h-10 w-full" />
+             ) : (
+                <div className="flex items-center justify-between rounded-lg border border-destructive/20 bg-destructive/5 p-3 shadow-sm">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="maintenance-mode" className="text-destructive font-medium">Enable Maintenance Mode</Label>
+                    <p className="text-xs text-muted-foreground">
+                      If enabled, all public pages will show a maintenance notice. The admin portal will remain accessible.
+                    </p>
+                  </div>
+                  <Switch
+                    id="maintenance-mode"
+                    checked={settings.isMaintenanceModeEnabled || false}
+                    onCheckedChange={(checked) => setSettings(prev => ({ ...prev, isMaintenanceModeEnabled: checked }))}
+                  />
+                </div>
+             )}
           </section>
 
           <div className="pt-4 text-right">
