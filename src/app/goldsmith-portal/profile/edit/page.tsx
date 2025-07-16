@@ -54,7 +54,6 @@ export default function EditGoldsmithProfilePage() {
     state: '',
     district: '',
     specialty: '',
-    portfolioLink: '',
     bio: '',
     tagline: '',
     yearsExperience: 0,
@@ -89,7 +88,6 @@ export default function EditGoldsmithProfilePage() {
             state: data.state || '',
             district: data.district || '',
             specialty: Array.isArray(data.specialty) ? data.specialty.join(', ') : data.specialty || '',
-            portfolioLink: data.portfolioLink || '',
             bio: data.bio || '',
             tagline: data.tagline || '',
             yearsExperience: data.yearsExperience || 0,
@@ -357,10 +355,6 @@ export default function EditGoldsmithProfilePage() {
                     <Label htmlFor="responseTime">Typical Response Time</Label>
                     <Input id="responseTime" name="responseTime" placeholder="e.g., Within 24 hours" value={formData.responseTime} onChange={handleInputChange} disabled={isSaving} />
                 </div>
-            </div>
-             <div className="space-y-1.5">
-                <Label htmlFor="portfolioLink">Portfolio Link (Website, Instagram, etc.)</Label>
-                <Input id="portfolioLink" name="portfolioLink" type="url" value={formData.portfolioLink} onChange={handleInputChange} disabled={isSaving} />
             </div>
 
             <div className="flex justify-end pt-4">

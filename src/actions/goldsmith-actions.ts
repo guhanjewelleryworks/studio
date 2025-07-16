@@ -74,7 +74,6 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       state: data.state,
       district: data.district,
       specialty: Array.isArray(data.specialty) ? data.specialty.map(s => s.trim()).filter(s => s) : (data.specialty?.toString().trim() || ''),
-      portfolioLink: data.portfolioLink?.trim() || '',
       password: hashedPassword, 
       id: uuidv4(),
       rating: 0,
@@ -537,7 +536,7 @@ export async function updateOrderStatus(
 
 export async function updateGoldsmithProfile(
   id: string, 
-  data: Partial<Pick<Goldsmith, 'name' | 'contactPerson' | 'phone' | 'state' | 'district' | 'specialty' | 'portfolioLink' | 'bio' | 'tagline' | 'yearsExperience' | 'responseTime'>>
+  data: Partial<Pick<Goldsmith, 'name' | 'contactPerson' | 'phone' | 'state' | 'district' | 'specialty' | 'bio' | 'tagline' | 'yearsExperience' | 'responseTime'>>
 ): Promise<{ success: boolean; data?: Goldsmith; error?: string }> {
   console.log(`[Action: updateGoldsmithProfile] Updating profile for goldsmith ID ${id} with data:`, data);
   try {
@@ -560,7 +559,6 @@ export async function updateGoldsmithProfile(
             updateData.specialty = data.specialty.split(',').map(s => s.trim()).filter(s => s);
         }
     }
-    if (data.portfolioLink) updateData.portfolioLink = data.portfolioLink.trim();
     if (data.bio) updateData.bio = data.bio.trim();
     if (data.tagline) updateData.tagline = data.tagline.trim();
     if (data.yearsExperience !== undefined) updateData.yearsExperience = data.yearsExperience;

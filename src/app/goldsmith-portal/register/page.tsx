@@ -1,4 +1,3 @@
-
 // src/app/goldsmith-portal/register/page.tsx
 'use client';
 
@@ -39,7 +38,6 @@ export default function GoldsmithRegisterPage() {
   const [selectedState, setSelectedState] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [specialties, setSpecialties] = useState('');
-  const [portfolioLink, setPortfolioLink] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [yearsExperience, setYearsExperience] = useState<number | undefined>(undefined);
@@ -74,7 +72,6 @@ export default function GoldsmithRegisterPage() {
     const trimmedContactPerson = contactPerson.trim();
     const trimmedPhone = phone.trim();
     const trimmedSpecialtiesArray = specialties.split(',').map(s => s.trim()).filter(s => s);
-    const trimmedPortfolioLink = portfolioLink.trim();
     const trimmedResponseTime = responseTime.trim();
 
     // Client-side validation
@@ -124,7 +121,6 @@ export default function GoldsmithRegisterPage() {
         state: selectedState,
         district: selectedDistrict,
         specialty: trimmedSpecialtiesArray,
-        portfolioLink: trimmedPortfolioLink,
         password: trimmedPassword,
         yearsExperience: yearsExperience || 0,
         responseTime: trimmedResponseTime || "Varies",
@@ -281,11 +277,6 @@ export default function GoldsmithRegisterPage() {
                 <Label htmlFor="responseTime" className="text-foreground">Typical Response Time</Label>
                 <Input id="responseTime" placeholder="e.g., Within 24 hours" className="text-foreground" value={responseTime} onChange={(e) => setResponseTime(e.target.value)} disabled={isFormDisabled}/>
               </div>
-            </div>
-
-            <div className="space-y-1">
-              <Label htmlFor="portfolioLink" className="text-foreground">Portfolio Link (Optional)</Label>
-              <Input id="portfolioLink" type="url" placeholder="https://yourportfolio.com" className="text-foreground" value={portfolioLink} onChange={(e) => setPortfolioLink(e.target.value)} disabled={isFormDisabled}/>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">

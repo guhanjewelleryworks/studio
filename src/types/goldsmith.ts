@@ -26,7 +26,6 @@ export interface Goldsmith {
   email: string;
   phone?: string;
   password?: string; 
-  portfolioLink?: string;
   status: 'pending_email_verification' | 'pending_verification' | 'verified' | 'rejected';
   registeredAt: Date; // Added for tracking registration time
   lastLoginAt?: Date; // Added for tracking login time
@@ -59,9 +58,7 @@ export type NewGoldsmithInput = Omit<
   | 'verificationToken'
   | 'passwordResetToken'
   | 'passwordResetTokenExpires'
-> & {
-  portfolioLink?: string; // Make portfolioLink optional here
-};
+>;
 
 // New Types for Orders and Inquiries
 
