@@ -59,7 +59,9 @@ export type NewGoldsmithInput = Omit<
   | 'verificationToken'
   | 'passwordResetToken'
   | 'passwordResetTokenExpires'
->;
+> & {
+  portfolioLink?: string; // Make portfolioLink optional here
+};
 
 // New Types for Orders and Inquiries
 
