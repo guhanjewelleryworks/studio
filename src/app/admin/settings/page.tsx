@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Settings, ArrowLeft, Megaphone, Loader2, ShieldAlert } from 'lucide-react';
+import { Settings, ArrowLeft, Megaphone, Loader2, ShieldAlert, DollarSign, Gem, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -14,6 +14,8 @@ import { fetchPlatformSettings, updatePlatformSettings } from '@/actions/setting
 import type { PlatformSettings } from '@/types/goldsmith';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAdminAccess } from '@/hooks/useAdminAccess';
+import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
 
 export default function AdminSettingsPage() {
   const { hasPermission, isAccessLoading } = useAdminAccess('canManageSettings');
@@ -38,10 +40,18 @@ export default function AdminSettingsPage() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    const result = await updatePlatformSettings({
+    // Prepare only the intended fields to be updated
+    const settingsToUpdate = {
       announcementText: settings.announcementText,
       isAnnouncementVisible: settings.isAnnouncementVisible,
-    });
+      customerPremiumPriceMonthly: Number(settings.customerPremiumPriceMonthly),
+      customerPremiumPriceAnnual: Number(settings.customerPremiumPriceAnnual),
+      goldsmithPartnerPriceMonthly: Number(settings.goldsmithPartnerPriceMonthly),
+      goldsmithPartnerPriceAnnual: Number(settings.goldsmithPartnerPriceAnnual),
+    };
+    
+    const result = await updatePlatformSettings(settingsToUpdate);
+
     if (result.success) {
       toast({
         title: "Settings Saved",
@@ -154,10 +164,59 @@ export default function AdminSettingsPage() {
             )}
           </section>
 
+          <Separator />
+
+          {/* Pricing Settings */}
+          <section>
+            <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+              <DollarSign className="mr-2 h-5 w-5 text-primary/80" /> Pricing Tiers
+            </h2>
+            {isLoading ? (
+              <div className="space-y-4">
+                 <Skeleton className="h-10 w-full" />
+                 <Skeleton className="h-10 w-full" />
+              </div>
+            ) : (
+              <div className="space-y-4 rounded-lg border p-4 shadow-sm">
+                {/* Customer Premium Tier */}
+                <div className="space-y-2">
+                    <h3 className="font-medium text-foreground flex items-center"><CheckCircle className="h-4 w-4 mr-2 text-green-500" /> Customer Premium Plan</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-6">
+                        <div>
+                            <Label htmlFor="customer-monthly">Monthly Price ($)</Label>
+                            <Input id="customer-monthly" type="number" value={settings.customerPremiumPriceMonthly ?? ''} onChange={(e) => setSettings(prev => ({ ...prev, customerPremiumPriceMonthly: parseFloat(e.target.value) || 0 }))} />
+                        </div>
+                         <div>
+                            <Label htmlFor="customer-annual">Annual Price ($)</Label>
+                            <Input id="customer-annual" type="number" value={settings.customerPremiumPriceAnnual ?? ''} onChange={(e) => setSettings(prev => ({ ...prev, customerPremiumPriceAnnual: parseFloat(e.target.value) || 0 }))} />
+                        </div>
+                    </div>
+                </div>
+                
+                <Separator className="my-4"/>
+
+                {/* Goldsmith Partner Tier */}
+                <div className="space-y-2">
+                    <h3 className="font-medium text-foreground flex items-center"><Gem className="h-4 w-4 mr-2 text-blue-500" /> Goldsmith Partner Plan</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-6">
+                        <div>
+                            <Label htmlFor="goldsmith-monthly">Monthly Price ($)</Label>
+                            <Input id="goldsmith-monthly" type="number" value={settings.goldsmithPartnerPriceMonthly ?? ''} onChange={(e) => setSettings(prev => ({ ...prev, goldsmithPartnerPriceMonthly: parseFloat(e.target.value) || 0 }))} />
+                        </div>
+                         <div>
+                            <Label htmlFor="goldsmith-annual">Annual Price ($)</Label>
+                            <Input id="goldsmith-annual" type="number" value={settings.goldsmithPartnerPriceAnnual ?? ''} onChange={(e) => setSettings(prev => ({ ...prev, goldsmithPartnerPriceAnnual: parseFloat(e.target.value) || 0 }))} />
+                        </div>
+                    </div>
+                </div>
+              </div>
+            )}
+          </section>
+
           <div className="pt-4 text-right">
             <Button onClick={handleSave} disabled={isSaving || isLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {isSaving ? "Saving..." : "Save Settings"}
+              {isSaving ? "Saving..." : "Save All Settings"}
             </Button>
           </div>
         </CardContent>

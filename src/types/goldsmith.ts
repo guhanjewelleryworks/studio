@@ -167,6 +167,11 @@ export interface PlatformSettings {
   key: 'platform_main'; // A fixed key to ensure only one settings document
   announcementText: string;
   isAnnouncementVisible: boolean;
+  // New fields for pricing
+  customerPremiumPriceMonthly: number;
+  customerPremiumPriceAnnual: number;
+  goldsmithPartnerPriceMonthly: number;
+  goldsmithPartnerPriceAnnual: number;
 }
 
 // --- New Type for Audit Logs ---

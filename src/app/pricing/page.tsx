@@ -1,71 +1,74 @@
-
+// src/app/pricing/page.tsx
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { fetchPlatformSettings } from '@/actions/settings-actions';
 
-const tiers = [
-  {
-    name: 'Customer Basic',
-    id: 'tier-customer-basic',
-    href: '/signup',
-    priceMonthly: 'Free',
-    priceAnnual: null,
-    description: 'Discover artisans and explore their creations. Perfect for browsing and initial inquiries.',
-    features: [
-      'View goldsmith portfolios & specialties',
-      'See general artisan locations',
-      'Submit admin-mediated order inquiries',
-      'Save favorite artisans',
-    ],
-    mostPopular: false,
-    cta: 'Get Started',
-  },
-  {
-    name: 'Customer Premium',
-    id: 'tier-customer-premium',
-    href: '/signup',
-    priceMonthly: '$19',
-    priceAnnual: '$199',
-    description: 'Unlock direct communication and enhanced features for a personalized experience.',
-    features: [
-      'All Basic features',
-      'Request direct introductions (Admin approved)',
-      'Priority support for inquiries',
-      'Exclusive access to new artisan showcases',
-      'Early access to platform features',
-    ],
-    mostPopular: true,
-    cta: 'Go Premium',
-  },
-  {
-    name: 'Goldsmith Partner',
-    id: 'tier-goldsmith-partner',
-    href: '/goldsmith-portal/register',
-    priceMonthly: '$49',
-    priceAnnual: '$499',
-    description: 'Showcase your artistry, receive curated order requests, and grow your bespoke business.',
-    features: [
-      'Verified profile listing with portfolio showcase',
-      'Receive admin-approved custom order requests',
-      'Secure, mediated communication channel',
-      'Analytics on profile views and inquiries',
-      'Featured artisan opportunities',
-    ],
-    mostPopular: false,
-    cta: 'Become a Partner',
-  },
-];
+export default async function PricingPage() {
+  const settings = await fetchPlatformSettings();
 
-export default function PricingPage() {
+  const tiers = [
+    {
+      name: 'Customer Basic',
+      id: 'tier-customer-basic',
+      href: '/signup',
+      priceMonthly: 'Free',
+      priceAnnual: null,
+      description: 'Discover artisans and explore their creations. Perfect for browsing and initial inquiries.',
+      features: [
+        'View goldsmith portfolios & specialties',
+        'See general artisan locations',
+        'Submit admin-mediated order inquiries',
+        'Save favorite artisans',
+      ],
+      mostPopular: false,
+      cta: 'Get Started',
+    },
+    {
+      name: 'Customer Premium',
+      id: 'tier-customer-premium',
+      href: '/signup',
+      priceMonthly: `$${settings.customerPremiumPriceMonthly}`,
+      priceAnnual: `$${settings.customerPremiumPriceAnnual}`,
+      description: 'Unlock direct communication and enhanced features for a personalized experience.',
+      features: [
+        'All Basic features',
+        'Request direct introductions (Admin approved)',
+        'Priority support for inquiries',
+        'Exclusive access to new artisan showcases',
+        'Early access to platform features',
+      ],
+      mostPopular: true,
+      cta: 'Go Premium',
+    },
+    {
+      name: 'Goldsmith Partner',
+      id: 'tier-goldsmith-partner',
+      href: '/goldsmith-portal/register',
+      priceMonthly: `$${settings.goldsmithPartnerPriceMonthly}`,
+      priceAnnual: `$${settings.goldsmithPartnerPriceAnnual}`,
+      description: 'Showcase your artistry, receive curated order requests, and grow your bespoke business.',
+      features: [
+        'Verified profile listing with portfolio showcase',
+        'Receive admin-approved custom order requests',
+        'Secure, mediated communication channel',
+        'Analytics on profile views and inquiries',
+        'Featured artisan opportunities',
+      ],
+      mostPopular: false,
+      cta: 'Become a Partner',
+    },
+  ];
+
   return (
     <div className="bg-gradient-to-br from-background via-secondary/5 to-background py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 lg:px-6">
         <div className="mx-auto max-w-4xl text-center mb-8">
            <Sparkles className="h-9 w-9 mx-auto text-primary mb-2" />
           <h2 className="text-base font-semibold leading-7 text-primary uppercase tracking-wider font-poppins">Pricing Plans</h2>
-          <p className="font-heading mt-1 text-4xl tracking-tight text-foreground sm:text-5xl"> {/* Changed to text-foreground */}
+          <p className="font-heading mt-1 text-4xl tracking-tight text-foreground sm:text-5xl"> 
             Connect & Create with Goldsmith Connect
           </p>
         </div>

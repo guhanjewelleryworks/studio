@@ -9,6 +9,10 @@ const defaultSettings: PlatformSettings = {
     key: 'platform_main',
     announcementText: '',
     isAnnouncementVisible: false,
+    customerPremiumPriceMonthly: 19,
+    customerPremiumPriceAnnual: 199,
+    goldsmithPartnerPriceMonthly: 49,
+    goldsmithPartnerPriceAnnual: 499,
 };
 
 /**
@@ -23,7 +27,8 @@ export async function fetchPlatformSettings(): Promise<Omit<PlatformSettings, '_
     if (settings) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, ...settingsData } = settings;
-      return settingsData as Omit<PlatformSettings, '_id'>;
+      // Ensure all fields from defaultSettings are present
+      return { ...defaultSettings, ...settingsData } as Omit<PlatformSettings, '_id'>;
     }
     return defaultSettings;
   } catch (error) {
@@ -51,9 +56,10 @@ export async function updatePlatformSettings(data: Partial<Omit<PlatformSettings
           { type: 'admin', id: 'admin_user' }, // Placeholder admin ID
           { changes: data }
         );
-        // Revalidate the homepage path to show the new announcement immediately
+        // Revalidate paths that use these settings
         revalidatePath('/');
-        return { success: true, data: result as Omit<PlatformSettings, '_id'> };
+        revalidatePath('/pricing');
+        return { success: true, data: { ...defaultSettings, ...result } as Omit<PlatformSettings, '_id'> };
     } else {
         return { success: false, error: 'Settings not found or not updated.' };
     }
