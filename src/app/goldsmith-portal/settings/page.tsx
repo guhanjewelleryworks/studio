@@ -17,6 +17,7 @@ interface CurrentGoldsmithUser {
   isLoggedIn: boolean;
   id: string;
   email: string;
+  loginTimestamp: number;
 }
 
 export default function GoldsmithSettingsPage() {
@@ -41,7 +42,10 @@ export default function GoldsmithSettingsPage() {
     const userString = localStorage.getItem('currentGoldsmithUser');
     if (userString) {
       const user = JSON.parse(userString);
-      if (user.isLoggedIn && user.id && user.email) {
+      const oneHour = 60 * 60 * 1000;
+      const sessionExpired = new Date().getTime() - user.loginTimestamp > oneHour;
+
+      if (user.isLoggedIn && user.id && user.email && !sessionExpired) {
         setCurrentUser(user);
         setIsLoading(false);
       } else {

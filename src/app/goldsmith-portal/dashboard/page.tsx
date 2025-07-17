@@ -33,6 +33,7 @@ interface CurrentGoldsmithUser {
   isLoggedIn: boolean;
   id: string;
   name: string;
+  loginTimestamp: number;
 }
 
 const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
@@ -44,7 +45,7 @@ const calculateProfileCompletion = (goldsmith: Goldsmith | null): number => {
   if (goldsmith.state && goldsmith.state.trim() !== '' && goldsmith.district && goldsmith.district.trim() !== '') completedFields++;
   if (goldsmith.specialty && (Array.isArray(goldsmith.specialty) ? goldsmith.specialty.length > 0 : (typeof goldsmith.specialty === 'string' && goldsmith.specialty.trim() !== ''))) completedFields++;
   if (goldsmith.bio && goldsmith.bio.trim() !== '') completedFields++;
-  if (goldsmith.portfolioLink && goldsmith.portfolioLink.trim() !== '') completedFields++;
+  if (goldsmith.portfolioImages && goldsmith.portfolioImages.length > 0) completedFields++;
   if (goldsmith.yearsExperience && goldsmith.yearsExperience > 0) completedFields++;
   if (goldsmith.phone && goldsmith.phone.trim() !== '') completedFields++;
   
@@ -113,15 +114,20 @@ export default function GoldsmithDashboardPage() {
       if (storedUser) {
         try {
           const parsedUser: CurrentGoldsmithUser = JSON.parse(storedUser);
-          if (parsedUser.isLoggedIn && parsedUser.id) {
+          const oneHour = 60 * 60 * 1000;
+          const sessionExpired = new Date().getTime() - parsedUser.loginTimestamp > oneHour;
+
+          if (parsedUser.isLoggedIn && parsedUser.id && !sessionExpired) {
             setLoggedInGoldsmithId(parsedUser.id);
           } else {
             toast({ title: "Session Expired", description: "Please log in again.", variant: "destructive" });
+            localStorage.removeItem('currentGoldsmithUser');
             router.push('/goldsmith-portal/login?reason=session_expired');
           }
         } catch (e) {
           console.error("Failed to parse currentGoldsmithUser from localStorage", e);
           toast({ title: "Error", description: "Could not verify session. Please log in.", variant: "destructive" });
+          localStorage.removeItem('currentGoldsmithUser');
           router.push('/goldsmith-portal/login?reason=parse_error');
         }
       } else {

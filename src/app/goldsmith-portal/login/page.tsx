@@ -1,4 +1,3 @@
-
 // src/app/goldsmith-portal/login/page.tsx
 'use client';
 
@@ -77,7 +76,8 @@ export default function GoldsmithLoginPage() {
           isLoggedIn: true,
           id: goldsmith.id,
           name: goldsmith.name,
-          email: goldsmith.email
+          email: goldsmith.email,
+          loginTimestamp: new Date().getTime(), // Add login timestamp for session timeout
         }));
       }
 

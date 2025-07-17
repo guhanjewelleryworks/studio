@@ -22,6 +22,7 @@ import Link from 'next/link';
 interface CurrentGoldsmithUser {
   isLoggedIn: boolean;
   id: string;
+  loginTimestamp: number;
 }
 
 const MAX_PORTFOLIO_IMAGES = 8;
@@ -46,7 +47,9 @@ export default function ManageGoldsmithPortfolioPage() {
     const user = localStorage.getItem('currentGoldsmithUser');
     if (user) {
       const parsedUser: CurrentGoldsmithUser = JSON.parse(user);
-      if (parsedUser.isLoggedIn && parsedUser.id) {
+      const oneHour = 60 * 60 * 1000;
+      const sessionExpired = new Date().getTime() - parsedUser.loginTimestamp > oneHour;
+      if (parsedUser.isLoggedIn && parsedUser.id && !sessionExpired) {
         setCurrentUser(parsedUser);
         loadGoldsmithData(parsedUser.id);
       } else {

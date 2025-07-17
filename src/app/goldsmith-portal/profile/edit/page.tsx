@@ -21,6 +21,7 @@ interface CurrentGoldsmithUser {
   isLoggedIn: boolean;
   id: string;
   name: string;
+  loginTimestamp: number;
 }
 
 const indianStates: { [key: string]: string[] } = {
@@ -64,7 +65,9 @@ export default function EditGoldsmithProfilePage() {
     const user = localStorage.getItem('currentGoldsmithUser');
     if (user) {
       const parsedUser: CurrentGoldsmithUser = JSON.parse(user);
-      if (parsedUser.isLoggedIn && parsedUser.id) {
+       const oneHour = 60 * 60 * 1000;
+      const sessionExpired = new Date().getTime() - parsedUser.loginTimestamp > oneHour;
+      if (parsedUser.isLoggedIn && parsedUser.id && !sessionExpired) {
         setCurrentGoldsmithUser(parsedUser);
         fetchProfileData(parsedUser.id);
       } else {
@@ -194,7 +197,9 @@ export default function EditGoldsmithProfilePage() {
         toast({ title: "Profile Updated", description: "Your workshop profile has been successfully updated." });
         setGoldsmithData(result.data); // Refresh local data with the updated version
         if (currentGoldsmithUser.name !== result.data.name) {
-            localStorage.setItem('currentGoldsmithUser', JSON.stringify({ ...currentGoldsmithUser, name: result.data.name }));
+            const updatedUser = { ...currentGoldsmithUser, name: result.data.name, loginTimestamp: new Date().getTime() };
+            localStorage.setItem('currentGoldsmithUser', JSON.stringify(updatedUser));
+            setCurrentGoldsmithUser(updatedUser);
         }
       } else {
         toast({ title: "Update Failed", description: result.error || "Could not update your profile.", variant: "destructive" });

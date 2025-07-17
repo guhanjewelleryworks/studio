@@ -33,6 +33,7 @@ interface PageParams {
 interface CurrentGoldsmithUser {
   isLoggedIn: boolean;
   id: string;
+  loginTimestamp: number;
 }
 
 const GoldsmithAuthLoader = () => (
@@ -60,7 +61,9 @@ export default function GoldsmithOrderDetailPage({ params: paramsPromise }: { pa
     const user = localStorage.getItem('currentGoldsmithUser');
     if (user) {
         const parsedUser: CurrentGoldsmithUser = JSON.parse(user);
-        if (parsedUser.isLoggedIn && parsedUser.id) {
+        const oneHour = 60 * 60 * 1000;
+        const sessionExpired = new Date().getTime() - parsedUser.loginTimestamp > oneHour;
+        if (parsedUser.isLoggedIn && parsedUser.id && !sessionExpired) {
             setCurrentUser(parsedUser);
         } else {
             router.replace(`/goldsmith-portal/login?redirect=/goldsmith-portal/orders/${orderId}`);
