@@ -11,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Search, ShieldCheck, Gift, MapPin, UserCheck, Handshake, Gem, Loader2, Star } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { MetalPricesWidget } from '@/components/metal-prices-widget';
 import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions'; 
 import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -96,8 +95,8 @@ export default function Home() {
           <div className="container max-w-screen-xl px-4 md:px-6 relative z-10">
             <div className="grid gap-6 lg:grid-cols-5 lg:gap-12 lg:items-center">
               <div className="lg:col-span-3 flex flex-col items-center text-center lg:items-start lg:text-left space-y-4">
-                <MetalPricesWidget />
-                <div className="space-y-1.5">
+                
+                <div className="space-y-1.5 pt-8">
                   <h1 className="font-heading text-accent leading-tight text-3xl sm:text-4xl xl:text-5xl/none">
                     Discover Local Goldsmiths,
                     <br />
