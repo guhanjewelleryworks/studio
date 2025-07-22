@@ -174,18 +174,26 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     const adminLoggedIn = localStorage.getItem('isAdminLoggedIn');
     const storedPerms = localStorage.getItem('adminPermissions');
-    if (adminLoggedIn !== 'true' || !storedPerms) {
+    const loginTimestamp = localStorage.getItem('adminLoginTimestamp');
+    const now = new Date().getTime();
+    const threeHours = 3 * 60 * 60 * 1000;
+
+    if (adminLoggedIn !== 'true' || !storedPerms || !loginTimestamp || (now - parseInt(loginTimestamp)) > threeHours) {
+        if (loginTimestamp && (now - parseInt(loginTimestamp)) > threeHours) {
+            toast({ title: "Session Expired", description: "Your admin session has expired. Please log in again.", variant: "destructive" });
+        }
       router.replace('/admin/login?redirect=/admin/dashboard');
     } else {
       setPermissions(JSON.parse(storedPerms));
       setIsCheckingAuth(false);
       fetchDashboardData();
     }
-  }, [router]);
+  }, [router, toast]);
   
   const handleAdminLogout = () => {
     localStorage.removeItem('isAdminLoggedIn');
     localStorage.removeItem('adminPermissions');
+    localStorage.removeItem('adminLoginTimestamp');
     toast({ title: "Logged Out", description: "You have been logged out from the admin panel." });
     router.push('/admin/login');
   };

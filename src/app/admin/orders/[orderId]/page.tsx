@@ -49,21 +49,28 @@ export default function AdminOrderDetailPage({ params: paramsPromise }: { params
   const [goldsmith, setGoldsmith] = useState<Goldsmith | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
 
   useEffect(() => {
-    const adminLoggedInStatus = typeof window !== "undefined" ? localStorage.getItem('isAdminLoggedIn') : null;
-    if (adminLoggedInStatus !== 'true') {
+    const adminLoggedIn = localStorage.getItem('isAdminLoggedIn');
+    const loginTimestamp = localStorage.getItem('adminLoginTimestamp');
+    const now = new Date().getTime();
+    const threeHours = 3 * 60 * 60 * 1000;
+
+    if (adminLoggedIn !== 'true' || !loginTimestamp || (now - parseInt(loginTimestamp)) > threeHours) {
+        if (loginTimestamp && (now - parseInt(loginTimestamp)) > threeHours) {
+            toast({ title: "Session Expired", description: "Your admin session has expired. Please log in again.", variant: "destructive" });
+        }
       router.replace(`/admin/login?redirect=/admin/orders/${orderId}`);
     } else {
-      setIsAdminLoggedIn(true);
+      setIsCheckingAuth(false);
     }
-  }, [router, orderId]);
+  }, [router, orderId, toast]);
 
   useEffect(() => {
-    if (!orderId || !isAdminLoggedIn) return; 
+    if (!orderId || isCheckingAuth) return; 
 
     const loadOrderDetails = async () => {
       setIsLoading(true);
@@ -89,7 +96,7 @@ export default function AdminOrderDetailPage({ params: paramsPromise }: { params
     };
 
     loadOrderDetails();
-  }, [orderId, isAdminLoggedIn, toast]);
+  }, [orderId, isCheckingAuth, toast]);
 
   const handleStatusChange = async (newStatus: OrderRequestStatus) => {
     if (!order) return;
@@ -117,7 +124,7 @@ export default function AdminOrderDetailPage({ params: paramsPromise }: { params
   ];
 
 
-  if (!isAdminLoggedIn || (isLoading && !order)) {
+  if (isCheckingAuth || (isLoading && !order)) {
     return <AdminAuthLoader />;
   }
 
