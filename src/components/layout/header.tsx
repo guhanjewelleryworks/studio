@@ -1,11 +1,10 @@
-
 // src/components/layout/header.tsx
 'use client';
 
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogIn, UserPlus, LogOut, ShoppingBag, Edit, LayoutDashboard, Home, Briefcase, Shield } from 'lucide-react';
+import { Menu, LogIn, UserPlus, LogOut, ShoppingBag, Edit, LayoutDashboard, Home, Briefcase, Shield, Contact } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image'; 
 import { useState, useEffect } from 'react';
@@ -240,14 +239,16 @@ export function Header() {
       <div className="container flex h-20 max-w-screen-xl items-center px-4 md:px-6">
         {/* Desktop Navigation */}
         <div className="mr-6 hidden md:flex items-center">
-          <Link href="/" className="mr-8 flex items-center space-x-2">
-            { <Image src="/logo_header.png" alt="Goldsmith Connect Logo" width={36} height={36} className="h-9 w-9 text-primary" /> }
-            <div className="flex flex-col">
-              <span className="font-bold text-lg text-accent">
-                Goldsmith Connect
-              </span>
-              <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
-            </div>
+          <Link href="/" className="mr-8 flex items-center">
+            {/* LOGO PLACEHOLDER: Replace src="/logo-wordmark.png" with your actual logo file path. */}
+            <Image 
+              src="/logo-wordmark.png" 
+              alt="Goldsmith Connect Logo" 
+              width={180} 
+              height={45} 
+              className="h-auto"
+              priority
+            />
           </Link>
           <nav className="flex items-center gap-8 text-sm">
             <Link href="/discover" className={cn(navLinkClasses)}>Discover</Link>
@@ -276,11 +277,14 @@ export function Header() {
                       onClick={() => setIsSheetOpen(false)}
                       className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
                     >
-                      <Image src="/logo_header.png" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary" />
-                      <div className="flex flex-col">
-                        <span className="font-bold text-lg text-accent">Goldsmith Connect</span>
-                        <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
-                      </div>
+                       {/* LOGO PLACEHOLDER (MOBILE): Replace src="/logo-wordmark.png" with your actual logo file path. */}
+                       <Image 
+                         src="/logo-wordmark.png" 
+                         alt="Goldsmith Connect Logo" 
+                         width={160} 
+                         height={40} 
+                         className="h-auto"
+                       />
                     </Link>
                   </SheetTitle>
                 </SheetHeader>
@@ -299,14 +303,15 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          <Link href="/" className="flex items-center space-x-2">
-            <Image src="/logo_header.png" alt="Goldsmith Connect Logo" width={32} height={32} className="h-8 w-8 text-primary md:hidden" />
-            <div className="flex flex-col md:hidden">
-              <span className="font-bold text-lg text-accent">
-                Goldsmith Connect
-              </span>
-               <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
-            </div>
+          <Link href="/" className="flex items-center">
+            {/* This is the logo that shows in the middle on mobile. */}
+            <Image 
+                src="/logo-wordmark.png" 
+                alt="Goldsmith Connect Logo" 
+                width={160} 
+                height={40} 
+                className="h-auto md:hidden" 
+            />
           </Link>
           <div className="w-10 h-10 md:hidden" /> {/* Spacer for mobile */}
         </div>
