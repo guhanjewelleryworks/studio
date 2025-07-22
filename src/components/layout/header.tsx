@@ -240,9 +240,9 @@ export function Header() {
         {/* Desktop Navigation */}
         <div className="mr-6 hidden md:flex items-center">
           <Link href="/" className="mr-8 flex items-center">
-            {/* LOGO PLACEHOLDER: Replace src="/logo-wordmark.png" with your actual logo file path. */}
+            {/* LOGO PLACEHOLDER: Replace src="/logo_wordmark.png" with your actual logo file path. */}
             <Image 
-              src="/logo-wordmark.png" 
+              src="/logo_wordmark.png" 
               alt="Goldsmith Connect Logo" 
               width={180} 
               height={45} 
@@ -277,9 +277,9 @@ export function Header() {
                       onClick={() => setIsSheetOpen(false)}
                       className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
                     >
-                       {/* LOGO PLACEHOLDER (MOBILE): Replace src="/logo-wordmark.png" with your actual logo file path. */}
+                       {/* LOGO PLACEHOLDER (MOBILE): Replace src="/logo_wordmark.png" with your actual logo file path. */}
                        <Image 
-                         src="/logo-wordmark.png" 
+                         src="/logo_wordmark.png" 
                          alt="Goldsmith Connect Logo" 
                          width={160} 
                          height={40} 
@@ -306,7 +306,7 @@ export function Header() {
           <Link href="/" className="flex items-center">
             {/* This is the logo that shows in the middle on mobile. */}
             <Image 
-                src="/logo-wordmark.png" 
+                src="/logo_wordmark.png" 
                 alt="Goldsmith Connect Logo" 
                 width={160} 
                 height={40} 
