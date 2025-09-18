@@ -40,7 +40,10 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
     // No async/await here. signIn handles the browser navigation.
     // On success, it redirects to callbackUrl.
     // On error, it redirects to the error page (/login) with a query param.
-    signIn('google', { callbackUrl: '/customer/dashboard' });
+    signIn('google', { 
+        callbackUrl: '/customer/dashboard',
+        prompt: "select_account"
+    });
   };
 
   const buttonTextPrefix = mode === 'login' ? 'Continue' : 'Sign up';
