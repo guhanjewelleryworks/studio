@@ -19,9 +19,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      // This is crucial: By default, Auth.js v5 disallows linking accounts with the same email.
-      // We are relying on this default behavior to throw the `OAuthAccountNotLinked` error.
-      allowDangerousEmailAccountLinking: false,
+      // This is the key change. By setting this to true, we tell NextAuth to
+      // automatically link an OAuth login with an existing user account if the email matches.
+      // This is safe for trusted providers like Google that have already verified the user's email.
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           prompt: "select_account",
