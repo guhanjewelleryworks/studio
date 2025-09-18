@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { Goldsmith } from '@/types/goldsmith';
@@ -261,26 +262,29 @@ export default function DiscoverPage() {
                       </div>
                     </CardHeader>
                     <CardContent className="p-3 flex-grow flex flex-col justify-between">
-                      <div>
-                        <CardTitle className="font-heading text-md text-accent mb-0.5 group-hover:text-primary transition-colors flex items-center gap-1.5">
+                      <div className="space-y-1">
+                        <CardTitle className="font-heading text-md text-accent group-hover:text-primary transition-colors flex items-center gap-1.5">
                           {goldsmith.name}
                           {goldsmith.status === 'verified' && (
                             <ShieldCheck className="h-4 w-4 text-green-500" title="Verified Goldsmith" />
                           )}
                         </CardTitle>
-                        <CardDescription className="text-xs text-muted-foreground mb-0.5 line-clamp-1">
-                          <MapPin className="inline-block h-3 w-3 mr-0.5" /> {goldsmith.district}, {goldsmith.state}
+                        <CardDescription className="text-xs text-muted-foreground flex items-center">
+                          <MapPin className="h-3 w-3 mr-1 shrink-0" /> <span className="line-clamp-1">{goldsmith.district}, {goldsmith.state}</span>
                         </CardDescription>
-                        <p className="text-xs text-muted-foreground mb-1 font-medium flex items-center capitalize">
-                          <Palette className="inline-block h-3 w-3 mr-0.5 text-primary"/>Specialty: {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty}
+                        <p className="text-xs text-muted-foreground font-medium flex items-center capitalize">
+                          <Palette className="h-3 w-3 mr-1 shrink-0 text-primary"/>
+                          <span className="line-clamp-1">
+                            {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty}
+                          </span>
                         </p>
-                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2 mb-2">{goldsmith.shortBio}</p>
+                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2 !mt-2">{goldsmith.shortBio}</p>
                       </div>
                       <NextLink
                         href={`/goldsmith/${goldsmith.id}`}
                         className={cn(
                            buttonVariants({ variant: "outline", size: "xs" }),
-                           'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-1.5 w-full rounded-lg text-xs py-1.5 shadow-md'
+                           'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-2 w-full rounded-lg text-xs py-1.5 shadow-md'
                         )}
                       >
                         <LinkIcon className="mr-1 h-3 w-3"/>View Profile & Connect
