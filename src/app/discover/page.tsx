@@ -259,33 +259,33 @@ export default function DiscoverPage() {
                          )}
                       </div>
                     </CardHeader>
-                    <CardContent className="p-3 flex-grow flex flex-col justify-between">
-                      <div className="space-y-1">
-                        <CardTitle className="font-heading text-md text-accent group-hover:text-primary transition-colors flex items-center gap-1.5">
-                          {goldsmith.name}
+                    <CardContent className="p-4 flex-grow flex flex-col justify-between">
+                      <div className="space-y-1.5">
+                        <CardTitle className="font-heading text-lg text-accent group-hover:text-primary transition-colors flex items-center gap-1.5">
+                          <span className="truncate">{goldsmith.name}</span>
                           {goldsmith.status === 'verified' && (
-                            <ShieldCheck className="h-4 w-4 text-green-500" title="Verified Goldsmith" />
+                            <ShieldCheck className="h-4 w-4 text-green-500 shrink-0" title="Verified Goldsmith" />
                           )}
                         </CardTitle>
                         <CardDescription className="text-xs text-muted-foreground flex items-center">
-                          <MapPin className="h-3 w-3 mr-1 shrink-0" /> <span className="line-clamp-1">{goldsmith.district}, {goldsmith.state}</span>
+                          <MapPin className="h-3.5 w-3.5 mr-1.5 shrink-0" /> <span className="line-clamp-1">{goldsmith.district || 'Location'}, {goldsmith.state || 'N/A'}</span>
                         </CardDescription>
                         <p className="text-xs text-muted-foreground font-medium flex items-center capitalize">
-                          <Palette className="h-3 w-3 mr-1 shrink-0 text-primary"/>
+                          <Palette className="h-3.5 w-3.5 mr-1.5 shrink-0 text-primary"/>
                           <span className="line-clamp-1">
                             {Array.isArray(goldsmith.specialty) ? goldsmith.specialty.join(', ') : goldsmith.specialty}
                           </span>
                         </p>
-                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2 !mt-2">{goldsmith.shortBio}</p>
+                        <p className="text-xs text-muted-foreground leading-snug line-clamp-2 !mt-2.5">{goldsmith.shortBio}</p>
                       </div>
                       <NextLink
                         href={`/goldsmith/${goldsmith.id}`}
                         className={cn(
                            buttonVariants({ variant: "outline", size: "sm" }),
-                           'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-3 w-full rounded-full text-xs py-1.5 shadow-sm'
+                           'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-4 w-full rounded-full text-xs py-1.5 shadow-sm'
                         )}
                       >
-                        <LinkIcon className="mr-1 h-3 w-3"/>View Profile & Connect
+                        <LinkIcon className="mr-1.5 h-3.5 w-3.5"/>View Profile & Connect
                       </NextLink>
                     </CardContent>
                   </Card>
