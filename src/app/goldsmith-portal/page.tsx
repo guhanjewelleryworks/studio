@@ -11,7 +11,7 @@ export default function GoldsmithPortalPage() {
     <div className="flex flex-col items-center bg-background min-h-[calc(100vh-8rem)]">
       {/* Hero Section */}
       <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/10 via-background to-background">
-        <div className="container px-4 md:px-6">
+        <div className="container mx-auto px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-10 xl:items-center">
             <div className="flex flex-col justify-center space-y-4">
               <div className="space-y-2">
@@ -61,7 +61,7 @@ export default function GoldsmithPortalPage() {
 
       {/* Benefits Section */}
       <section id="benefits" className="w-full py-12 md:py-16 lg:py-20 bg-background">
-        <div className="container px-4 md:px-6">
+        <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8 md:mb-10">
             <div className="space-y-1.5">
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Why Partner with Goldsmith Connect?</h2>
@@ -96,7 +96,7 @@ export default function GoldsmithPortalPage() {
 
        {/* How to Join Section */}
       <section className="w-full py-12 md:py-16 lg:py-20 bg-secondary/20">
-        <div className="container px-4 md:px-6">
+        <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8 md:mb-10">
             <div className="space-y-1.5">
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Joining is Simple</h2>
@@ -127,7 +127,7 @@ export default function GoldsmithPortalPage() {
 
       {/* Call to Action Section */}
       <section className="w-full py-12 md:py-16 lg:py-20 border-t border-border/15 bg-background">
-        <div className="container grid items-center justify-center gap-2 px-4 text-center md:px-6">
+        <div className="container mx-auto grid items-center justify-center gap-2 px-4 text-center md:px-6">
           <div className="space-y-2">
              <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
             <h2 className="font-heading text-accent text-2xl sm:text-3xl">

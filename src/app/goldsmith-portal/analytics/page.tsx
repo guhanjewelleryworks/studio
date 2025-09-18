@@ -150,122 +150,124 @@ export default function GoldsmithAnalyticsPage() {
 
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8 px-4 md:px-6">
-      <header className="max-w-4xl mx-auto mb-6 flex items-center justify-between">
-         <div className="flex items-center gap-3">
-            <BarChart3 className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-heading text-accent">Performance Analytics</h1>
-        </div>
-        <Button asChild variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-          <Link href="/goldsmith-portal/dashboard">
-            <ArrowLeft className="mr-1.5 h-4 w-4" />
-            Back to Dashboard
-          </Link>
-        </Button>
-      </header>
-      
-      <Card className="max-w-4xl mx-auto shadow-xl bg-card border-primary/10">
-        <CardHeader>
-          <CardDescription className="text-muted-foreground">
-            Insights into your profile views, customer inquiries, and order trends.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error ? (
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Error Loading Analytics</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          ) : (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <StatCard 
-                      title="Total Orders"
-                      value={analyticsData?.totalOrders ?? '...'}
-                      icon={ShoppingBag}
-                      description="Total orders assigned to you."
-                      isLoading={isLoading}
-                  />
-                  <StatCard 
-                      title="Orders Completed"
-                      value={analyticsData?.ordersCompleted ?? '...'}
-                      icon={ListChecks}
-                      description="Orders successfully completed."
-                      isLoading={isLoading}
-                  />
-                  <StatCard 
-                      title="Completion Rate"
-                      value={`${analyticsData?.completionRate.toFixed(1) ?? '...'}%`}
-                      icon={Percent}
-                      description="Percentage of orders completed."
-                      isLoading={isLoading}
-                  />
-                  <StatCard 
-                      title="Profile Views"
-                      value={analyticsData?.profileViews ?? '...'}
-                      icon={Eye}
-                      description="Times your profile was viewed."
-                      isLoading={isLoading}
-                  />
-              </div>
+      <div className="container mx-auto max-w-4xl">
+        <header className="mb-6 flex items-center justify-between">
+           <div className="flex items-center gap-3">
+              <BarChart3 className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-heading text-accent">Performance Analytics</h1>
+          </div>
+          <Button asChild variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
+            <Link href="/goldsmith-portal/dashboard">
+              <ArrowLeft className="mr-1.5 h-4 w-4" />
+              Back to Dashboard
+            </Link>
+          </Button>
+        </header>
+        
+        <Card className="shadow-xl bg-card border-primary/10">
+          <CardHeader>
+            <CardDescription className="text-muted-foreground">
+              Insights into your profile views, customer inquiries, and order trends.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {error ? (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Error Loading Analytics</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <StatCard 
+                        title="Total Orders"
+                        value={analyticsData?.totalOrders ?? '...'}
+                        icon={ShoppingBag}
+                        description="Total orders assigned to you."
+                        isLoading={isLoading}
+                    />
+                    <StatCard 
+                        title="Orders Completed"
+                        value={analyticsData?.ordersCompleted ?? '...'}
+                        icon={ListChecks}
+                        description="Orders successfully completed."
+                        isLoading={isLoading}
+                    />
+                    <StatCard 
+                        title="Completion Rate"
+                        value={`${analyticsData?.completionRate.toFixed(1) ?? '...'}%`}
+                        icon={Percent}
+                        description="Percentage of orders completed."
+                        isLoading={isLoading}
+                    />
+                    <StatCard 
+                        title="Profile Views"
+                        value={analyticsData?.profileViews ?? '...'}
+                        icon={Eye}
+                        description="Times your profile was viewed."
+                        isLoading={isLoading}
+                    />
+                </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="bg-card/70 border-border/50 shadow-md">
-                    <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-accent">Most Popular Item Type</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <p className="text-lg font-semibold text-foreground truncate" title={analyticsData?.mostFrequentItem}>{analyticsData?.mostFrequentItem ?? '...'}</p>}
-                        <p className="text-xs text-muted-foreground">Based on completed orders.</p>
-                    </CardContent>
-                </Card>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card className="bg-card/70 border-border/50 shadow-md">
+                      <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-accent">Most Popular Item Type</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : <p className="text-lg font-semibold text-foreground truncate" title={analyticsData?.mostFrequentItem}>{analyticsData?.mostFrequentItem ?? '...'}</p>}
+                          <p className="text-xs text-muted-foreground">Based on completed orders.</p>
+                      </CardContent>
+                  </Card>
 
-                <Card className="bg-card/70 border-border/50 shadow-md">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-accent">Live Order Status Breakdown</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {isLoading ? (
-                            <div className="flex items-center justify-center h-[150px]">
-                                <Loader2 className="h-8 w-8 animate-spin" />
-                            </div>
-                        ) : analyticsData && analyticsData.orderStatusBreakdown.length > 0 ? (
-                            <ChartContainer config={chartConfig} className="h-[150px] w-full">
-                                <RechartsBarChart
-                                    accessibilityLayer
-                                    data={analyticsData.orderStatusBreakdown}
-                                    layout="vertical"
-                                    margin={{ left: 10, right: 10, top: 10, bottom: 10 }}
-                                >
-                                    <XAxis type="number" hide />
-                                    <YAxis
-                                        dataKey="status"
-                                        type="category"
-                                        tickLine={false}
-                                        axisLine={false}
-                                        tickMargin={10}
-                                        width={110}
-                                        tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }}
-                                    />
-                                    <ChartTooltip
-                                        cursor={false}
-                                        content={<ChartTooltipContent indicator="line" />}
-                                    />
-                                    <Bar dataKey="count" fill="var(--color-count)" radius={4} />
-                                </RechartsBarChart>
-                            </ChartContainer>
-                        ) : (
-                            <div className="flex items-center justify-center h-[150px]">
-                                <p className="text-sm text-muted-foreground">No active orders to display.</p>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                  <Card className="bg-card/70 border-border/50 shadow-md">
+                      <CardHeader className="pb-2">
+                          <CardTitle className="text-sm font-medium text-accent">Live Order Status Breakdown</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          {isLoading ? (
+                              <div className="flex items-center justify-center h-[150px]">
+                                  <Loader2 className="h-8 w-8 animate-spin" />
+                              </div>
+                          ) : analyticsData && analyticsData.orderStatusBreakdown.length > 0 ? (
+                              <ChartContainer config={chartConfig} className="h-[150px] w-full">
+                                  <RechartsBarChart
+                                      accessibilityLayer
+                                      data={analyticsData.orderStatusBreakdown}
+                                      layout="vertical"
+                                      margin={{ left: 10, right: 10, top: 10, bottom: 10 }}
+                                  >
+                                      <XAxis type="number" hide />
+                                      <YAxis
+                                          dataKey="status"
+                                          type="category"
+                                          tickLine={false}
+                                          axisLine={false}
+                                          tickMargin={10}
+                                          width={110}
+                                          tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }}
+                                      />
+                                      <ChartTooltip
+                                          cursor={false}
+                                          content={<ChartTooltipContent indicator="line" />}
+                                      />
+                                      <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+                                  </RechartsBarChart>
+                              </ChartContainer>
+                          ) : (
+                              <div className="flex items-center justify-center h-[150px]">
+                                  <p className="text-sm text-muted-foreground">No active orders to display.</p>
+                              </div>
+                          )}
+                      </CardContent>
+                  </Card>
+                </div>
               </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -172,7 +172,7 @@ export default function EditCustomerProfilePage() {
   const isOAuthUser = !customerData.password;
 
   return (
-    <div className="container max-w-screen-xl py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background">
+    <div className="container mx-auto max-w-2xl py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background">
        <header className="max-w-3xl mx-auto mb-6 flex items-center justify-between">
          <div className="flex items-center gap-3">
             <Edit className="h-8 w-8 text-primary" />
