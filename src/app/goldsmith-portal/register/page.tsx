@@ -243,7 +243,7 @@ export default function GoldsmithRegisterPage() {
 
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/20 to-background">
+    <div className="flex justify-center items-center min-h-svh py-10 bg-gradient-to-br from-secondary/20 to-background">
       <Card className="w-full max-w-2xl shadow-xl border-primary/15 rounded-xl bg-card">
         <CardHeader className="text-center pt-6 pb-4">
           <Briefcase className="h-12 w-12 mx-auto text-primary mb-3" />
@@ -251,31 +251,31 @@ export default function GoldsmithRegisterPage() {
           <CardDescription className="text-muted-foreground mt-1 text-sm font-poppins">Join our curated network of skilled artisans. Please fill in your details below.</CardDescription>
         </CardHeader>
         <CardContent className="px-6 pb-6 pt-4">
-          <form className="space-y-3.5" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
-               <div className="space-y-1">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+               <div className="space-y-1.5">
                 <Label htmlFor="workshopName" className="text-foreground">Workshop Name</Label>
-                <Input id="workshopName" placeholder="e.g., Aura & Gold Creations" required className="text-foreground" value={workshopName} onChange={(e) => setWorkshopName(e.target.value)} disabled={isFormDisabled}/>
+                <Input id="workshopName" placeholder="e.g., Aura & Gold Creations" required className="text-foreground h-11" value={workshopName} onChange={(e) => setWorkshopName(e.target.value)} disabled={isFormDisabled}/>
               </div>
-               <div className="space-y-1">
+               <div className="space-y-1.5">
                 <Label htmlFor="contactPerson" className="text-foreground">Contact Person</Label>
-                <Input id="contactPerson" placeholder="Your Full Name" required className="text-foreground" value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} disabled={isFormDisabled}/>
+                <Input id="contactPerson" placeholder="Your Full Name" required className="text-foreground h-11" value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} disabled={isFormDisabled}/>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
-              <div className="space-y-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+              <div className="space-y-1.5">
                   <Label htmlFor="email" className="text-foreground">Business Email Address</Label>
-                  <Input id="email" type="email" placeholder="contact@auragold.com" required className="text-foreground" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isFormDisabled}/>
+                  <Input id="email" type="email" placeholder="contact@auragold.com" required className="text-foreground h-11" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isFormDisabled}/>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                   <Label htmlFor="phone" className="text-foreground">Business Phone Number (10 digits)</Label>
                   <Input 
                     id="phone" 
                     type="tel" 
                     placeholder="e.g., 9876543210"
                     required 
-                    className="text-foreground" 
+                    className="text-foreground h-11" 
                     value={phone} 
                     onChange={handlePhoneChange} 
                     maxLength={10} 
@@ -286,11 +286,11 @@ export default function GoldsmithRegisterPage() {
               </div>
             </div>
             
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
-                <div className="space-y-1">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+                <div className="space-y-1.5">
                   <Label htmlFor="state" className="text-foreground">State</Label>
                   <Select onValueChange={handleStateChange} value={selectedState} required disabled={isFormDisabled}>
-                    <SelectTrigger id="state" className="text-foreground">
+                    <SelectTrigger id="state" className="text-foreground h-11">
                       <SelectValue placeholder="Select your state" />
                     </SelectTrigger>
                     <SelectContent>
@@ -300,10 +300,10 @@ export default function GoldsmithRegisterPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <Label htmlFor="district" className="text-foreground">District / City</Label>
                   <Select onValueChange={setSelectedDistrict} value={selectedDistrict} required disabled={isFormDisabled || !selectedState}>
-                    <SelectTrigger id="district" className="text-foreground">
+                    <SelectTrigger id="district" className="text-foreground h-11">
                       <SelectValue placeholder="Select your district/city" />
                     </SelectTrigger>
                     <SelectContent>
@@ -316,35 +316,35 @@ export default function GoldsmithRegisterPage() {
               </div>
 
 
-             <div className="space-y-1">
+             <div className="space-y-1.5">
               <Label htmlFor="specialties" className="text-foreground">Specialties & Techniques</Label>
-              <Input id="specialties" placeholder="e.g., Custom Engagement Rings, Hand Engraving" required className="text-foreground" value={specialties} onChange={(e) => setSpecialties(e.target.value)} disabled={isFormDisabled}/>
+              <Input id="specialties" placeholder="e.g., Custom Engagement Rings, Hand Engraving" required className="text-foreground h-11" value={specialties} onChange={(e) => setSpecialties(e.target.value)} disabled={isFormDisabled}/>
                <p className="text-xs text-muted-foreground pt-0.5">Separate multiple specialties with commas.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
-              <div className="space-y-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+              <div className="space-y-1.5">
                 <Label htmlFor="yearsExperience" className="text-foreground">Years of Experience</Label>
-                <Input id="yearsExperience" type="number" placeholder="e.g., 10" className="text-foreground" value={yearsExperience === undefined ? '' : yearsExperience} onChange={(e) => setYearsExperience(e.target.value === '' ? undefined : parseInt(e.target.value, 10))} disabled={isFormDisabled}/>
+                <Input id="yearsExperience" type="number" placeholder="e.g., 10" className="text-foreground h-11" value={yearsExperience === undefined ? '' : yearsExperience} onChange={(e) => setYearsExperience(e.target.value === '' ? undefined : parseInt(e.target.value, 10))} disabled={isFormDisabled}/>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <Label htmlFor="responseTime" className="text-foreground">Typical Response Time</Label>
-                <Input id="responseTime" placeholder="e.g., Within 24 hours" className="text-foreground" value={responseTime} onChange={(e) => setResponseTime(e.target.value)} disabled={isFormDisabled}/>
+                <Input id="responseTime" placeholder="e.g., Within 24 hours" className="text-foreground h-11" value={responseTime} onChange={(e) => setResponseTime(e.target.value)} disabled={isFormDisabled}/>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3">
-              <div className="space-y-1 relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+              <div className="space-y-1.5 relative">
                 <Label htmlFor="password" className="text-foreground">Create Password (min. 8 characters)</Label>
-                <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="Min. 8 characters" required className="text-foreground pr-10" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isFormDisabled}/>
-                <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-6 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
+                <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="Min. 8 characters" required className="text-foreground pr-10 h-11" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isFormDisabled}/>
+                <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-               <div className="space-y-1 relative">
+               <div className="space-y-1.5 relative">
                 <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
-                <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} placeholder="Re-enter your password" required className="text-foreground pr-10" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isFormDisabled}/>
-                <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-6 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowConfirmPassword(!showConfirmPassword)} tabIndex={-1}>
+                <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} placeholder="Re-enter your password" required className="text-foreground pr-10 h-11" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isFormDisabled}/>
+                <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => setShowConfirmPassword(!showConfirmPassword)} tabIndex={-1}>
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>

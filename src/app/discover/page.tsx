@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import type { Goldsmith } from '@/types/goldsmith';
@@ -143,7 +141,7 @@ export default function DiscoverPage() {
             <Input
               type="search"
               placeholder="Search by name, specialty, or location..."
-              className="w-full rounded-lg text-sm px-4 py-2 shadow-md border-border focus:ring-primary focus:border-primary text-foreground pl-10"
+              className="w-full rounded-lg text-sm px-4 py-2 shadow-md border-border focus:ring-primary focus:border-primary text-foreground pl-10 h-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -151,7 +149,7 @@ export default function DiscoverPage() {
         
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
-                <Button type="button" variant="outline" className="w-full sm:w-auto rounded-lg shadow-md border-border hover:bg-secondary/30">
+                <Button type="button" variant="outline" className="w-full sm:w-auto rounded-lg shadow-md border-border hover:bg-secondary/30 h-10">
                     <SlidersHorizontal className="mr-2 h-4 w-4 text-muted-foreground" /> Filters
                 </Button>
             </SheetTrigger>
@@ -205,7 +203,7 @@ export default function DiscoverPage() {
                                                 const newSpecs = checked
                                                     ? [...filters.specialties, spec]
                                                     : filters.specialties.filter(s => s !== spec);
-                                                setFilters(prev => ({...prev, specialties: newSpecs}));
+                setFilters(prev => ({...prev, specialties: newSpecs}));
                                             }}
                                         />
                                         <Label htmlFor={`spec-${spec}`} className="font-normal capitalize">{spec}</Label>
@@ -228,10 +226,10 @@ export default function DiscoverPage() {
 
        {error && <p className="text-destructive text-center mb-3 text-sm">{error}</p>}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {isLoading ? (
              Array.from({ length: 8 }).map((_, index) => (
-              <Card key={index} className="animate-pulse bg-card h-[280px] rounded-xl shadow-md border-border"></Card> 
+              <Card key={index} className="animate-pulse bg-card h-[320px] rounded-xl shadow-md border-border"></Card> 
              ))
           ) : displayedGoldsmiths.length > 0 ? (
              displayedGoldsmiths.map((goldsmith) => {
@@ -283,8 +281,8 @@ export default function DiscoverPage() {
                       <NextLink
                         href={`/goldsmith/${goldsmith.id}`}
                         className={cn(
-                           buttonVariants({ variant: "outline", size: "xs" }),
-                           'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-2 w-full rounded-lg text-xs py-1.5 shadow-md'
+                           buttonVariants({ variant: "outline", size: "sm" }),
+                           'text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground mt-3 w-full rounded-full text-xs py-1.5 shadow-sm'
                         )}
                       >
                         <LinkIcon className="mr-1 h-3 w-3"/>View Profile & Connect

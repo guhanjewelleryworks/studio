@@ -1,5 +1,3 @@
-
-
 import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,22 +13,22 @@ export default function GoldsmithPortalPage() {
       <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/10 via-background to-background">
         <div className="container px-4 md:px-6">
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-10 xl:items-center">
-            <div className="flex flex-col justify-center space-y-3">
-              <div className="space-y-1.5">
+            <div className="flex flex-col justify-center space-y-4">
+              <div className="space-y-2">
                  <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary shadow-sm font-poppins">Goldsmith Partner Portal</div>
-                <h1 className="font-heading text-foreground leading-tight">
+                <h1 className="font-heading text-accent leading-tight text-3xl sm:text-4xl xl:text-5xl/none">
                   Showcase Your Artistry, Expand Your Reach
                 </h1>
                 <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed">
                   Join Goldsmith Connect to receive custom order inquiries, manage your bespoke creations, and connect with a discerning clientele passionate about fine jewelry.
                 </p>
               </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row pt-1.5">
+              <div className="flex flex-col gap-2 min-[400px]:flex-row pt-2">
                 <Link
                   href="/goldsmith-portal/register"
                   className={cn(
                     buttonVariants({ size: 'lg', variant: 'default' }),
-                    'shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-2 text-base bg-primary text-primary-foreground hover:bg-primary/90' // Removed transform
+                    'shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-2.5 text-base bg-primary text-primary-foreground hover:bg-primary/90'
                   )}
                 >
                   <span>Register Your Workshop</span>
@@ -39,7 +37,7 @@ export default function GoldsmithPortalPage() {
                   href="/goldsmith-portal/login"
                   className={cn(
                     buttonVariants({ variant: 'outline', size: 'lg' }),
-                    'shadow-lg hover:shadow-xl transition-all duration-300 border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 text-base' // Removed transform
+                    'shadow-lg hover:shadow-xl transition-all duration-300 border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2.5 text-base'
                   )}
                 >
                   <span>Login to Dashboard</span>
@@ -64,9 +62,9 @@ export default function GoldsmithPortalPage() {
       {/* Benefits Section */}
       <section id="benefits" className="w-full py-12 md:py-16 lg:py-20 bg-background">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8">
-            <div className="space-y-1">
-              <h2 className="font-heading text-foreground">Why Partner with Goldsmith Connect?</h2>
+          <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8 md:mb-10">
+            <div className="space-y-1.5">
+              <h2 className="font-heading text-accent text-2xl sm:text-3xl">Why Partner with Goldsmith Connect?</h2>
               <p className="max-w-[850px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-lg/relaxed">
                 Expand your reach, streamline your custom orders, and focus on what you do best – creating beautiful, timeless jewelry.
               </p>
@@ -80,7 +78,7 @@ export default function GoldsmithPortalPage() {
             ].map((benefit, index) => (
               <Card key={index} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-card border-primary/10 rounded-xl flex flex-col text-center p-4">
                 <CardHeader className="items-center pb-1.5">
-                  <div className="p-1.5 rounded-full bg-primary/10 text-primary mb-1.5 shadow-md">
+                  <div className="p-2.5 rounded-full bg-primary/10 text-primary mb-2 shadow-md">
                     <benefit.icon className="h-5 w-5" />
                   </div>
                   <CardTitle className="text-md text-accent">{benefit.title}</CardTitle>
@@ -99,9 +97,9 @@ export default function GoldsmithPortalPage() {
        {/* How to Join Section */}
       <section className="w-full py-12 md:py-16 lg:py-20 bg-secondary/20">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8">
-            <div className="space-y-1">
-              <h2 className="font-heading text-foreground">Joining is Simple</h2>
+          <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8 md:mb-10">
+            <div className="space-y-1.5">
+              <h2 className="font-heading text-accent text-2xl sm:text-3xl">Joining is Simple</h2>
                <p className="max-w-[850px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-lg/relaxed">
                 Start connecting with customers in just a few easy steps.
               </p>
@@ -113,9 +111,9 @@ export default function GoldsmithPortalPage() {
                { step: 2, title: "Verification Process", description: "Our team will review and verify your details to maintain a high standard of quality and trust within our network." },
                { step: 3, title: "Start Connecting", description: "Once approved, you'll begin receiving order inquiries and can manage everything from your personalized dashboard." },
              ].map((item) => (
-               <div key={item.step} className="grid gap-1 text-center items-center p-2 rounded-lg hover:bg-card/60 transition-colors">
-                  <div className="flex justify-center items-center mb-1.5">
-                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg font-poppins">{item.step}</span>
+               <div key={item.step} className="grid gap-1.5 text-center items-center p-2 rounded-lg hover:bg-card/60 transition-colors">
+                  <div className="flex justify-center items-center mb-2">
+                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg font-poppins text-md">{item.step}</span>
                   </div>
                   <h3 className="font-heading text-sm font-semibold text-accent">{item.title}</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
@@ -130,9 +128,9 @@ export default function GoldsmithPortalPage() {
       {/* Call to Action Section */}
       <section className="w-full py-12 md:py-16 lg:py-20 border-t border-border/15 bg-background">
         <div className="container grid items-center justify-center gap-2 px-4 text-center md:px-6">
-          <div className="space-y-1.5">
+          <div className="space-y-2">
              <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
-            <h2 className="font-heading text-foreground">
+            <h2 className="font-heading text-accent text-2xl sm:text-3xl">
               Ready to Elevate Your Goldsmith Business?
             </h2>
             <p className="mx-auto max-w-[600px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-lg/relaxed">
@@ -144,7 +142,7 @@ export default function GoldsmithPortalPage() {
                 href="/goldsmith-portal/register"
                 className={cn(
                     buttonVariants({ size: 'lg', variant: 'default' }),
-                    'shadow-xl hover:shadow-2xl transition-all duration-300 rounded-full px-6 py-2 text-base bg-primary text-primary-foreground hover:bg-primary/90' // Removed transform
+                    'shadow-xl hover:shadow-2xl transition-all duration-300 rounded-full px-6 py-2.5 text-base bg-primary text-primary-foreground hover:bg-primary/90'
                 )}
               >
                 <span>

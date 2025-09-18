@@ -143,7 +143,7 @@ export default function GoldsmithLoginPage() {
                   type="email"
                   placeholder="your.workshop@example.com"
                   required
-                  className="text-base py-2 text-foreground"
+                  className="text-base py-2 text-foreground h-11"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
@@ -157,12 +157,12 @@ export default function GoldsmithLoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   required
-                  className="text-base py-2 pr-10 text-foreground"
+                  className="text-base py-2 pr-10 text-foreground h-11"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
                 />
-                 <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
+                 <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
                 </Button>

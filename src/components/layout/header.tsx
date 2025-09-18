@@ -163,12 +163,12 @@ export function Header() {
     }
     
     return (
-      <>
+      <div className="flex items-center gap-2">
         <Link
           href="/login"
           className={cn(
-            buttonVariants({ variant: 'outline', size: 'default' }),
-            'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2'
+            buttonVariants({ variant: 'outline', size: 'sm' }),
+            'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-5 py-1.5'
           )}
         >
           <span>Login</span>
@@ -176,13 +176,13 @@ export function Header() {
         <Link
           href="/signup"
           className={cn(
-            buttonVariants({ size: 'default', variant: 'default' }),
-            'ml-2 shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 py-2'
+            buttonVariants({ size: 'sm', variant: 'default' }),
+            'shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5 py-1.5'
           )}
         >
           <span>Sign Up</span>
         </Link>
-      </>
+      </div>
     );
   };
   
@@ -235,17 +235,16 @@ export function Header() {
   };
 
   return (
-    <header className="w-full border-b border-border/20 bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 shadow-sm">
-      <div className="container flex h-20 max-w-screen-xl items-center px-4 md:px-6">
+    <header className="w-full border-b border-border/20 bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 shadow-sm h-16">
+      <div className="container flex h-full max-w-screen-xl items-center px-4 md:px-6">
         {/* Desktop Navigation */}
         <div className="mr-6 hidden md:flex items-center">
           <Link href="/" className="mr-8 flex items-center">
-            {/* LOGO PLACEHOLDER: Replace src="/logo_wordmark.png" with your actual logo file path. */}
             <Image 
               src="/logo_wordmark.png" 
               alt="Goldsmith Connect Logo" 
-              width={180} 
-              height={45} 
+              width={160} 
+              height={40} 
               className="h-auto"
               priority
             />
@@ -277,7 +276,6 @@ export function Header() {
                       onClick={() => setIsSheetOpen(false)}
                       className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
                     >
-                       {/* LOGO PLACEHOLDER (MOBILE): Replace src="/logo_wordmark.png" with your actual logo file path. */}
                        <Image 
                          src="/logo_wordmark.png" 
                          alt="Goldsmith Connect Logo" 
@@ -304,12 +302,11 @@ export function Header() {
           </Sheet>
 
           <Link href="/" className="flex items-center">
-            {/* This is the logo that shows in the middle on mobile. */}
             <Image 
                 src="/logo_wordmark.png" 
                 alt="Goldsmith Connect Logo" 
-                width={160} 
-                height={40} 
+                width={150} 
+                height={38} 
                 className="h-auto md:hidden" 
             />
           </Link>

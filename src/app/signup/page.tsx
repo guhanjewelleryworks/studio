@@ -157,21 +157,21 @@ export default function SignUpPage() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
               <Label htmlFor="name" className="text-foreground">Full Name</Label>
-              <Input id="name" placeholder="e.g., Alex Smith" required className="text-base text-foreground py-2" value={name} onChange={(e) => setName(e.target.value)} disabled={isLoading} />
+              <Input id="name" placeholder="e.g., Alex Smith" required className="text-base text-foreground h-11" value={name} onChange={(e) => setName(e.target.value)} disabled={isLoading} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-foreground">Email Address</Label>
-              <Input id="email" type="email" placeholder="alex.smith@example.com" required className="text-base text-foreground py-2" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
+              <Input id="email" type="email" placeholder="alex.smith@example.com" required className="text-base text-foreground h-11" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-foreground">Create Password</Label>
-              <Input id="password" type="password" placeholder="Min. 6 characters" required className="text-base text-foreground py-2" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
+              <Input id="password" type="password" placeholder="Min. 6 characters" required className="text-base text-foreground h-11" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
             </div>
              <div className="space-y-1.5">
               <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
-              <Input id="confirmPassword" type="password" placeholder="Re-enter your password" required className="text-base text-foreground py-2" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isLoading} />
+              <Input id="confirmPassword" type="password" placeholder="Re-enter your password" required className="text-base text-foreground h-11" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isLoading} />
             </div>
-            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
+            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-3 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Sign Up"}
             </Button>
             <Separator className="my-5" />

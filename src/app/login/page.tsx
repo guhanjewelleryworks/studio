@@ -162,13 +162,13 @@ export default function LoginPage() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-foreground">Email Address</Label>
-              <Input id="email" type="email" placeholder="you@example.com" required className="text-base text-foreground py-2" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
+              <Input id="email" type="email" placeholder="you@example.com" required className="text-base text-foreground py-2 h-11" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
             </div>
 
             <div className="space-y-1.5 relative">
               <Label htmlFor="password" className="text-foreground">Password</Label>
-              <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" required className="text-base text-foreground py-2 pr-10" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
-              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-7 w-7 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1} >
+              <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" required className="text-base text-foreground py-2 pr-10 h-11" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
+              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-7 h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1} >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
               </Button>
@@ -234,7 +234,7 @@ export default function LoginPage() {
             </Dialog>
             </div>
 
-            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
+            <Button type="submit" size="lg" className="w-full shadow-md hover:shadow-lg transition-shadow rounded-full text-base py-3 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
             </Button>
 
@@ -249,14 +249,16 @@ export default function LoginPage() {
 
             <Separator className="my-5" />
             <SocialAuthButtons mode="login" />
-            <p className="text-center text-sm text-muted-foreground pt-3.5">
-              Don&apos;t have an account?{' '}
-              <Link href="/signup" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">Sign up here</Link>
-            </p>
-            <p className="text-center text-sm text-muted-foreground">
-              Are you a Goldsmith?{' '}
-              <Link href="/goldsmith-portal/login" className="font-semibold text-accent hover:text-accent/80 underline underline-offset-2 transition-colors">Login to Goldsmith Portal</Link>
-            </p>
+            <div className="text-center text-sm text-muted-foreground pt-3.5 space-y-2">
+              <p>
+                Don&apos;t have an account?{' '}
+                <Link href="/signup" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">Sign up here</Link>
+              </p>
+              <p>
+                Are you a Goldsmith?{' '}
+                <Link href="/goldsmith-portal/login" className="font-semibold text-accent hover:text-accent/80 underline underline-offset-2 transition-colors">Login to Goldsmith Portal</Link>
+              </p>
+            </div>
           </form>
         </CardContent>
       </Card>

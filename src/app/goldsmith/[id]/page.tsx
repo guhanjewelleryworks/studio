@@ -1,4 +1,3 @@
-
 // src/app/goldsmith/[id]/page.tsx
 'use client';
 
@@ -191,8 +190,8 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   
   if (isLoading) {
      return (
-      <div className="container max-w-screen-xl py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-background text-foreground">
-        <div className="grid md:grid-cols-3 gap-6">
+      <div className="container max-w-screen-xl py-10 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-background text-foreground">
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
           <div className="md:col-span-1 space-y-5">
             <Skeleton className="h-32 w-32 rounded-full mx-auto bg-muted/70" />
             <Skeleton className="h-7 w-4/5 mx-auto bg-muted/70" />
@@ -219,11 +218,11 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   }
 
    if (error) {
-     return <div className="container max-w-screen-xl py-6 md:py-10 px-4 md:px-6 text-center text-destructive text-lg">{error}</div>;
+     return <div className="container max-w-screen-xl py-10 px-4 md:px-6 text-center text-destructive text-lg">{error}</div>;
    }
 
   if (!profile) {
-    return <div className="container max-w-screen-xl py-6 md:py-10 px-4 md:px-6 text-center text-muted-foreground text-lg">Profile not found.</div>;
+    return <div className="container max-w-screen-xl py-10 px-4 md:px-6 text-center text-muted-foreground text-lg">Profile not found.</div>;
   }
   
   const renderContactForm = () => {
@@ -275,7 +274,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                   )}
                 </div>
 
-              <Button type="submit" size="default" className="shadow-md rounded-full text-xs py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isSubmittingForm}>
+              <Button type="submit" size="default" className="shadow-md rounded-full text-sm py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isSubmittingForm}>
                   <Send className="mr-1.5 h-3.5 w-3.5"/> {isSubmittingForm ? "Sending Request..." : "Submit Custom Order request"}
               </Button>
               <p className="text-[0.65rem] text-muted-foreground pt-1.5">Your request will be reviewed by an administrator before being forwarded to the goldsmith if appropriate.</p>
@@ -384,7 +383,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
                 <Button 
                   variant="default" 
                   size="default" 
-                  className="w-full border-primary text-primary-foreground bg-primary hover:bg-primary/90 rounded-full text-xs py-2.5 shadow-sm" 
+                  className="w-full border-primary text-primary-foreground bg-primary hover:bg-primary/90 rounded-full text-sm py-2.5 shadow-sm !mt-4" 
                   onClick={(e) => { e.preventDefault(); document.getElementById('contact-form-section')?.scrollIntoView({ behavior: 'smooth' }); }}
                 >
                   <Send className="mr-1.5 h-3.5 w-3.5"/> Request Custom Order 
