@@ -71,7 +71,7 @@ export default function AdminCustomersPage() {
 
   if (!hasPermission) {
     return (
-      <div className="container py-8 text-center">
+      <div className="container py-8 text-center mx-auto">
         <Card className="max-w-md mx-auto shadow-lg bg-card border-destructive/20">
           <CardHeader>
             <ShieldAlert className="h-12 w-12 mx-auto text-destructive" />
@@ -90,7 +90,7 @@ export default function AdminCustomersPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-background via-secondary/5 to-background py-6 px-4 md:px-6">
-      <header className="mb-6 flex items-center justify-between">
+      <header className="mb-6 flex items-center justify-between container mx-auto max-w-screen-xl">
         <div className="flex items-center gap-3">
           <Users className="h-8 w-8 text-primary" />
           <h1 className="text-3xl font-heading text-accent">Manage Customer Accounts</h1>
@@ -109,7 +109,7 @@ export default function AdminCustomersPage() {
         </div>
       </header>
 
-      <Card className="shadow-lg bg-card border-primary/10 rounded-xl">
+      <Card className="shadow-lg bg-card border-primary/10 rounded-xl container mx-auto max-w-screen-xl">
         <CardHeader>
           <CardTitle className="text-xl text-accent font-heading">Customer List</CardTitle>
           <CardDescription className="text-muted-foreground">
