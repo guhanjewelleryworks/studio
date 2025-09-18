@@ -251,7 +251,7 @@ export default function LoginPage() {
             <SocialAuthButtons mode="login" />
             <div className="text-center text-sm text-muted-foreground pt-3.5 space-y-2">
               <p>
-                Don&apos;t have an account?{' '}
+                Don't have an account?{' '}
                 <Link href="/signup" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">Sign up here</Link>
               </p>
               <p>
