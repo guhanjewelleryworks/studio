@@ -54,9 +54,8 @@ export function Footer() {
             </nav>
           </div>
           <div className="md:col-span-2">
-             <h3 className="font-semibold text-foreground mb-2.5 text-sm">Admin & Legal</h3>
+             <h3 className="font-semibold text-foreground mb-2.5 text-sm">Legal</h3>
             <nav className="flex flex-col gap-1.5">
-               <Link href="/admin/login" className={footerLinkClasses}>Admin Portal</Link>
                <Link href="/terms" className={footerLinkClasses}>Terms of Service</Link>
               <Link href="/privacy" className={footerLinkClasses}>Privacy Policy</Link>
             </nav>
