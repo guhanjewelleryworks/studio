@@ -30,6 +30,7 @@ import {
   MessageSquare,
   Users2,
   ClipboardList,
+  RefreshCw,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
@@ -69,6 +70,7 @@ export default function AdminDashboardPage() {
   const { toast } = useToast();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [isDashboardLoading, setIsDashboardLoading] = useState(true);
   const [overviewStats, setOverviewStats] = useState({
     totalUsers: { value: 0, isLoading: true },
     activeGoldsmiths: { value: 0, isLoading: true },
@@ -117,6 +119,7 @@ export default function AdminDashboardPage() {
   
   const fetchDashboardData = async () => {
     setIsActivityLoading(true);
+    setIsDashboardLoading(true);
     setOverviewStats(prev => ({
       totalUsers: { ...prev.totalUsers, isLoading: true },
       activeGoldsmiths: { ...prev.activeGoldsmiths, isLoading: true },
@@ -168,6 +171,7 @@ export default function AdminDashboardPage() {
       toast({ title: "Error", description: "Could not load dashboard data.", variant: "destructive" });
     } finally {
       setIsActivityLoading(false);
+      setIsDashboardLoading(false);
     }
   };
 
@@ -217,6 +221,10 @@ export default function AdminDashboardPage() {
           <p className="text-muted-foreground text-md">Welcome, Admin! Oversee and manage platform operations.</p>
         </div>
         <div className="flex items-center gap-3">
+            <Button onClick={fetchDashboardData} variant="outline" size="icon" className="rounded-full border-border hover:bg-secondary/30" disabled={isDashboardLoading}>
+                {isDashboardLoading ? <Loader2 className="h-5 w-5 animate-spin text-muted-foreground"/> : <RefreshCw className="h-5 w-5 text-muted-foreground"/>}
+                <span className="sr-only">Refresh Dashboard</span>
+            </Button>
             <DropdownMenu onOpenChange={handleMarkNotificationsRead}>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="relative rounded-full border-border hover:bg-secondary/30">
