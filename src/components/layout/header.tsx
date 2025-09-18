@@ -1,3 +1,4 @@
+
 // src/components/layout/header.tsx
 'use client';
 
@@ -236,7 +237,7 @@ export function Header() {
 
   return (
     <header className="w-full border-b border-border/20 bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 shadow-sm h-16">
-      <div className="container flex h-full max-w-screen-xl items-center px-4 md:px-6">
+      <div className="container mx-auto flex h-full max-w-screen-xl items-center px-4 md:px-6">
         {/* Desktop Navigation */}
         <div className="mr-6 hidden md:flex items-center">
           <Link href="/" className="mr-8 flex items-center">
