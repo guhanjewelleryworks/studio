@@ -28,7 +28,7 @@ interface DashboardActionCardProps {
 
 const DashboardActionCard: React.FC<DashboardActionCardProps> = ({ title, description, icon: Icon, linkHref, linkText, notificationCount }) => (
   <Card className="shadow-lg hover:shadow-xl transition-shadow bg-card border-primary/10 rounded-xl">
-    <CardHeader>
+    <CardHeader className="pb-4">
       <div className="flex items-center justify-between gap-3 mb-2">
         <div className="flex items-center gap-3">
             <Icon className="h-7 w-7 text-primary" />
@@ -108,47 +108,46 @@ export default function CustomerDashboardPage() {
 
 
   return (
-    <div className="container max-w-screen-xl py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background">
-      <header className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
+    <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8">
+      <div className="container max-w-4xl mx-auto px-4 md:px-6">
+        <header className="mb-8">
           <h1 className="text-3xl font-heading text-accent">Welcome, {session.user?.name}!</h1>
           <p className="text-muted-foreground text-lg">Manage your profile, orders, and inquiries.</p>
-        </div>
-        {/* Logout button is now in the header dropdown */}
-      </header>
+        </header>
 
-      {/* Overview Stats */}
-      <section className="mb-8 grid grid-cols-1 max-w-sm">
-        <Card className="shadow-lg bg-card border-primary/10">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-accent">My Orders</CardTitle>
-            <ShoppingBag className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            {isLoadingStats ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold text-foreground">{stats.orderCount}</div>}
-            <p className="text-xs text-muted-foreground">Total orders placed</p>
-          </CardContent>
-        </Card>
-      </section>
+        {/* Overview Stats */}
+        <section className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="shadow-lg bg-card border-primary/10">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-accent">My Orders</CardTitle>
+              <ShoppingBag className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              {isLoadingStats ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold text-foreground">{stats.orderCount}</div>}
+              <p className="text-xs text-muted-foreground">Total orders placed</p>
+            </CardContent>
+          </Card>
+        </section>
 
-      {/* Quick Links */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <DashboardActionCard
-          title="Edit Profile"
-          description="Update your personal information."
-          icon={Edit}
-          linkHref="/customer/profile/edit"
-          linkText="Go to Profile"
-        />
-        <DashboardActionCard
-          title="View Orders"
-          description="Track your custom order requests."
-          icon={ShoppingBag}
-          linkHref="/customer/orders"
-          linkText="See Order History"
-          notificationCount={stats.notificationCount}
-        />
-      </section>
+        {/* Quick Links */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <DashboardActionCard
+            title="Edit Profile"
+            description="Update your personal information."
+            icon={Edit}
+            linkHref="/customer/profile/edit"
+            linkText="Go to Profile"
+          />
+          <DashboardActionCard
+            title="View Orders"
+            description="Track your custom order requests."
+            icon={ShoppingBag}
+            linkHref="/customer/orders"
+            linkText="See Order History"
+            notificationCount={stats.notificationCount}
+          />
+        </section>
+      </div>
     </div>
   );
 }

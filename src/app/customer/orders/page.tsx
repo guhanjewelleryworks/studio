@@ -70,93 +70,95 @@ export default function CustomerOrdersPage() {
   }
 
   return (
-    <div className="container max-w-screen-xl py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background">
-      <header className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <ShoppingBag className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-heading text-accent">My Orders</h1>
-        </div>
-        <Button asChild variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-          <Link href="/customer/dashboard">
-            <ArrowLeft className="mr-1.5 h-4 w-4" />
-            Back to Dashboard
-          </Link>
-        </Button>
-      </header>
+    <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background py-8">
+      <div className="container max-w-4xl mx-auto px-4 md:px-6">
+        <header className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <ShoppingBag className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-heading text-accent">My Orders</h1>
+          </div>
+          <Button asChild variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
+            <Link href="/customer/dashboard">
+              <ArrowLeft className="mr-1.5 h-4 w-4" />
+              Back to Dashboard
+            </Link>
+          </Button>
+        </header>
 
-      {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2].map(i => (
-            <Card key={i} className="shadow-md bg-card border-border/20 rounded-xl animate-pulse">
-              <CardHeader className="p-4"><div className="h-6 bg-muted rounded w-3/4"></div><div className="h-4 bg-muted rounded w-1/2 mt-1"></div></CardHeader>
-              <CardContent className="p-4"><div className="h-10 bg-muted rounded w-full mb-3"></div><div className="h-4 bg-muted rounded w-full"></div><div className="h-4 bg-muted rounded w-5/6 mt-1"></div></CardContent>
-              <CardFooter className="p-4"><div className="h-8 bg-muted rounded w-1/4"></div></CardFooter>
-            </Card>
-          ))}
-        </div>
-      ) : error ? (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Error Loading Orders</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : orders.length === 0 ? (
-        <Card className="shadow-lg bg-card border-primary/10 rounded-xl text-center py-12">
-          <CardHeader>
-            <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <CardTitle className="text-xl text-accent">No Orders Yet</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CardDescription className="text-muted-foreground">
-              You haven't placed any custom orders yet. Explore goldsmiths and start creating!
-            </CardDescription>
-            <Button asChild className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full">
-              <Link href="/discover">Discover Goldsmiths</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          {orders.map((order) => (
-            <Card key={order.id} className="shadow-lg bg-card border-primary/10 rounded-xl hover:shadow-2xl transition-shadow duration-300">
-              <CardHeader className="p-4 sm:p-5">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                  <CardTitle className="text-lg sm:text-xl text-accent font-heading mb-1 sm:mb-0">{order.itemDescription}</CardTitle>
-                  <Badge variant={getStatusBadgeVariant(order.status)} className="capitalize text-xs px-2.5 py-1 rounded-full self-start sm:self-center">
-                     {order.status.replace(/_/g, ' ')}
-                  </Badge>
-                </div>
-                <CardDescription className="text-xs text-muted-foreground mt-1">
-                  Order ID: {order.id.substring(0,18)}... | Requested: {format(new Date(order.requestedAt), 'PPp')}
-                </CardDescription>
-              </CardHeader>
-              
-              <Separator className="bg-border/30"/>
+        {isLoading ? (
+          <div className="space-y-4">
+            {[1, 2].map(i => (
+              <Card key={i} className="shadow-md bg-card border-border/20 rounded-xl animate-pulse">
+                <CardHeader className="p-4"><div className="h-6 bg-muted rounded w-3/4"></div><div className="h-4 bg-muted rounded w-1/2 mt-1"></div></CardHeader>
+                <CardContent className="p-4"><div className="h-10 bg-muted rounded w-full mb-3"></div><div className="h-4 bg-muted rounded w-full"></div><div className="h-4 bg-muted rounded w-5/6 mt-1"></div></CardContent>
+                <CardFooter className="p-4"><div className="h-8 bg-muted rounded w-1/4"></div></CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : error ? (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Error Loading Orders</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        ) : orders.length === 0 ? (
+          <Card className="shadow-lg bg-card border-primary/10 rounded-xl text-center py-12">
+            <CardHeader>
+              <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+              <CardTitle className="text-xl text-accent">No Orders Yet</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-muted-foreground">
+                You haven't placed any custom orders yet. Explore goldsmiths and start creating!
+              </CardDescription>
+              <Button asChild className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full">
+                <Link href="/discover">Discover Goldsmiths</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-6">
+            {orders.map((order) => (
+              <Card key={order.id} className="shadow-lg bg-card border-primary/10 rounded-xl hover:shadow-2xl transition-shadow duration-300">
+                <CardHeader className="p-4 sm:p-5">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <CardTitle className="text-lg sm:text-xl text-accent font-heading mb-1 sm:mb-0">{order.itemDescription}</CardTitle>
+                    <Badge variant={getStatusBadgeVariant(order.status)} className="capitalize text-xs px-2.5 py-1 rounded-full self-start sm:self-center">
+                       {order.status.replace(/_/g, ' ')}
+                    </Badge>
+                  </div>
+                  <CardDescription className="text-xs text-muted-foreground mt-1">
+                    Order ID: {order.id.substring(0,18)}... | Requested: {format(new Date(order.requestedAt), 'PPp')}
+                  </CardDescription>
+                </CardHeader>
+                
+                <Separator className="bg-border/30"/>
 
-              <CardContent className="p-4 sm:p-5">
-                <OrderStatusProgress currentStatus={order.status} />
-                {order.details && (
-                   <>
-                    <Separator className="my-3 bg-border/20"/>
-                    <p className="text-xs text-foreground/80 mt-2 line-clamp-2"><span className="font-medium text-foreground">Details:</span> {order.details}</p>
-                   </>
-                )}
-              </CardContent>
+                <CardContent className="p-4 sm:p-5">
+                  <OrderStatusProgress currentStatus={order.status} />
+                  {order.details && (
+                     <>
+                      <Separator className="my-3 bg-border/20"/>
+                      <p className="text-xs text-foreground/80 mt-2 line-clamp-2"><span className="font-medium text-foreground">Details:</span> {order.details}</p>
+                     </>
+                  )}
+                </CardContent>
 
-              <Separator className="bg-border/30"/>
-              
-              <CardFooter className="p-4 sm:p-5 flex justify-end">
-                <Button asChild variant="outline" size="sm" className="text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full text-xs">
-                  <Link href={`/customer/orders/${order.id}`}>
-                    <Eye className="mr-1.5 h-3.5 w-3.5" />
-                     View Order Details
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
+                <Separator className="bg-border/30"/>
+                
+                <CardFooter className="p-4 sm:p-5 flex justify-end">
+                  <Button asChild variant="outline" size="sm" className="text-primary border-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full text-xs">
+                    <Link href={`/customer/orders/${order.id}`}>
+                      <Eye className="mr-1.5 h-3.5 w-3.5" />
+                       View Order Details
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
