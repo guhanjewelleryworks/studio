@@ -22,6 +22,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // This is crucial: By default, Auth.js v5 disallows linking accounts with the same email.
       // We are relying on this default behavior to throw the `OAuthAccountNotLinked` error.
       allowDangerousEmailAccountLinking: false,
+      authorization: {
+        params: {
+          prompt: "select_account",
+        },
+      },
     }),
     Credentials({
       name: 'Credentials',

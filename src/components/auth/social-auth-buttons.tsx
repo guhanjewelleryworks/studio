@@ -42,7 +42,6 @@ export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
     // On error, it redirects to the error page (/login) with a query param.
     signIn('google', { 
         callbackUrl: '/customer/dashboard',
-        prompt: "select_account"
     });
   };
 
