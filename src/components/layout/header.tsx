@@ -39,6 +39,9 @@ export function Header() {
   const [isClient, setIsClient] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
+  // New state to check if we are in the admin portal
+  const isAdminPortal = pathname.startsWith('/admin');
+
   useEffect(() => {
     // This effect runs only on the client, where localStorage is available.
     setIsClient(true);
@@ -75,6 +78,12 @@ export function Header() {
   };
   
   const renderDesktopUserActions = () => {
+    // If in admin portal, don't show any other user dropdowns.
+    // The admin dashboard has its own logout/user management.
+    if (isAdminPortal) {
+        return null;
+    }
+    
     if (status === 'loading' || !isClient) {
       return <Skeleton className="h-10 w-40 rounded-full" />;
     }
@@ -158,11 +167,6 @@ export function Header() {
       );
     }
     
-    // Guest view - Hide Login/Signup on Admin pages
-    if (pathname.startsWith('/admin')) {
-      return null;
-    }
-    
     return (
       <div className="flex items-center gap-2">
         <Link
@@ -192,6 +196,11 @@ export function Header() {
       return <Skeleton className="h-12 w-full rounded-full" />;
      }
      
+     // In admin portal on mobile, don't show other user login buttons either
+     if (isAdminPortal) {
+         return null;
+     }
+
      if (goldsmithUser) {
         return (
             <>
@@ -217,11 +226,6 @@ export function Header() {
         </>
        );
      }
-     
-    // Guest view - Hide Login/Signup on Admin pages
-    if (pathname.startsWith('/admin')) {
-      return null;
-    }
      
      return (
         <>
