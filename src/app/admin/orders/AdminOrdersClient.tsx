@@ -1,7 +1,7 @@
 // src/app/admin/orders/AdminOrdersClient.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -35,14 +35,15 @@ export default function AdminOrdersClient({ initialOrders = [], initialGoldsmith
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
-  const getGoldsmithName = (goldsmithId: string) => {
+  const getGoldsmithName = useCallback((goldsmithId: string) => {
+    if (!goldsmithId) return 'Unassigned';
     // Defensive lookup
     const goldsmith = goldsmiths.find(g => g.id === goldsmithId || String((g as any)._id) === goldsmithId);
     return goldsmith ? goldsmith.name : 'N/A';
-  };
+  }, [goldsmiths]);
   
   // Manual refresh logic
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -69,7 +70,7 @@ export default function AdminOrdersClient({ initialOrders = [], initialGoldsmith
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     // This effect now only handles client-side filtering
@@ -94,7 +95,7 @@ export default function AdminOrdersClient({ initialOrders = [], initialGoldsmith
         setError("An error occurred while filtering orders.");
         setFilteredOrders(orders); // Fallback to showing all orders
     }
-  }, [searchTerm, orders, goldsmiths]);
+  }, [searchTerm, orders, goldsmiths, getGoldsmithName]);
 
 
   const handleUpdateStatus = async (orderId: string, newStatus: OrderRequestStatus) => {
@@ -200,10 +201,10 @@ export default function AdminOrdersClient({ initialOrders = [], initialGoldsmith
               />
             </div>
           </div>
-          {isLoading ? (
+          {isLoading && orders.length === 0 ? (
             <div className="flex justify-center items-center py-10">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="ml-2 text-muted-foreground">Refreshing orders...</p>
+              <p className="ml-2 text-muted-foreground">Loading orders...</p>
             </div>
           ) : error ? (
              <Alert variant="destructive" className="mb-6">
