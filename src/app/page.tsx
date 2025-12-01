@@ -14,6 +14,7 @@ import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions';
 import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { differenceInDays } from 'date-fns';
+import { usePathname } from 'next/navigation';
 
 // Subtle pattern for hero section
 const HeroPattern = () => (
@@ -40,6 +41,7 @@ export default function Home() {
   const [featuredGoldsmiths, setFeaturedGoldsmiths] = useState<Goldsmith[]>([]);
   const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
   const [errorFeatured, setErrorFeatured] = useState<string | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const loadFeaturedGoldsmiths = async () => {
@@ -247,7 +249,7 @@ export default function Home() {
         </section>
 
         {/* Call to Action Section */}
-        <section className="w-full py-10 md:py-16 lg:py-20 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background">
+        <section className="w-full pt-12 pb-16 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background">
           <div className="container max-w-screen-xl grid items-center justify-center gap-2 px-4 text-center md:px-6 mx-auto">
             <div className="space-y-2 mb-3 md:mb-4">
                <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
