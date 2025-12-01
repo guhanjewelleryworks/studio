@@ -1,4 +1,5 @@
 
+
 // src/app/page.tsx
 'use client'; 
 
@@ -112,7 +113,7 @@ export default function Home() {
             <div className="relative z-10 container max-w-screen-xl px-4 md:px-6 mx-auto">
                 <div className="max-w-2xl text-left">
                     <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight mb-4 text-shadow-md">
-                        Discover Skilled Goldsmiths, Craft Jewelry That Tells Your Story.
+                        Discover Local Goldsmiths, Craft Your Dreams.
                     </h1>
                     <p className="text-base md:text-lg text-gray-200 max-w-lg mb-6 text-shadow-sm font-poppins">
                         Verified artisans. Secure mediation. 100% customized jewelry.
