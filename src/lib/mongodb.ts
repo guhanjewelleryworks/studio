@@ -91,16 +91,17 @@ export async function getDb(): Promise<Db> {
     const mongoClient = await clientPromise;
     console.log(`Successfully connected to MongoDB. Accessing database: ${DB_NAME}`);
     return mongoClient.db(DB_NAME);
-  } catch (error) {
-    console.error("Error getting database instance from clientPromise:", error);
-    // Log the URI again here in case of failure for easier debugging
-    if (MONGODB_URI) {
-      const maskedUri = MONGODB_URI.replace(/:([^:@]*)(?=@)/, ':********');
-      console.error("Failed to connect with MONGODB_URI (password masked):", maskedUri);
+  } catch (error: any) {
+    let errorMessage: string;
+    if (error.name === 'MongoServerError' && (error.code === 18 || error.message.includes('auth'))) {
+      errorMessage = "Authentication failed. The username or password in your MONGODB_URI is incorrect. Please reset the password in MongoDB Atlas and update your .env file.";
+    } else if (error.name === 'MongoServerSelectionError') {
+      errorMessage = "Could not connect to any server in your MongoDB cluster. This is often a network issue. Please ensure your server's IP address is whitelisted in MongoDB Atlas under 'Network Access'.";
     } else {
-      console.error("Failed to connect because MONGODB_URI was not defined.");
+      errorMessage = `An unexpected error occurred: ${error.message}`;
     }
-    throw error; // Re-throw the error to be caught by the caller
+    console.error("[ Server ] MongoDB Connection Error:", errorMessage);
+    throw new Error(errorMessage);
   }
 }
 

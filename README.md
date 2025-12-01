@@ -1,3 +1,4 @@
+
 # Goldsmith Connect.
 
 This is a Next.js application built with Firebase Studio for Goldsmith Connect.
@@ -142,11 +143,37 @@ curl -X GET -H "Authorization: Bearer <YOUR_SECRET_STRING_HERE>" http://localhos
 
 ## Troubleshooting
 
-### MongoDB Connection Errors (`querySrv ENOTFOUND`, etc.)
+### MongoDB Connection Errors (`Authentication failed`, `Server selection timed out`)
 
-This is almost always an issue with the `MONGODB_URI` in your `.env` file on the server.
-1.  **VERIFY `MONGODB_URI`:** Double and triple-check the connection string. Ensure the hostname is correct (e.g., `goldsmithconnect.01ffnmh.mongodb.net`) and that you've replaced `<password>` with your real password.
-2.  **Network Access in Atlas:** Confirm your server's IP address is whitelisted in MongoDB Atlas under "Network Access".
+This is almost always an issue with either the credentials in your `MONGODB_URI` or the network access settings in MongoDB Atlas. Follow these steps carefully.
+
+**1. Verify Database Credentials:**
+
+The most reliable way to ensure you have the correct password is to reset it.
+
+1.  **Log in to your MongoDB Atlas account** and navigate to your `goldsmithconnect` cluster.
+2.  In the left-hand navigation, under the "Security" section, click on **"Database Access"**.
+3.  Find the user your application connects with (e.g., `guhanjewelleryworks`).
+4.  Click **"Edit"** for that user.
+5.  In the "Password" section, click **"Edit Password"**.
+6.  Choose **"Autogenerate Secure Password"**, click **"Show"**, and then click the **"Copy"** button to copy the new password.
+7.  Paste this new password directly into the `<password>` section of your `MONGODB_URI` in your `.env` file.
+
+**2. Verify Network Access (IP Whitelist):**
+
+If the error is a timeout, this is the most likely cause.
+
+1.  In the same left-hand navigation pane, click on **"Network Access"** under the "Security" section.
+2.  This page lists all IP addresses that are allowed to connect to your database. The IP address of the machine running your application **MUST** be on this list.
+3.  To test, you can click **"Add IP Address"** and then select **"Allow Access From Anywhere"** (which adds `0.0.0.0/0`).
+    *   **Note:** This is insecure for production. For a live server, you should add its specific IP address.
+
+**3. Restart Your Application:**
+
+After changing your `.env` file, you **must** restart the application for the changes to take effect.
+
+*   **Local Development:** Stop your `npm run dev` process (usually with `Ctrl+C`) and run it again.
+*   **Production Server (with PM2):** Follow the update steps outlined in the "Updating an Existing Deployment" section above.
 
 ### Application Not Running or Unstyled After Closing Terminal
 
