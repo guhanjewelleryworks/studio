@@ -86,9 +86,7 @@ export default function Home() {
   ];
   
   const heroStats = [
-    { icon: CustomerIcon, value: "1000+", label: "Customers" },
     { icon: VerifiedIcon, value: "100% Verified", label: "Artisans" },
-    { icon: LocationIcon, value: "Serving", label: "Pan India" },
     { icon: GovtIdIcon, value: "Govt ID Verified", label: "Goldsmiths" },
   ];
 
@@ -111,7 +109,7 @@ export default function Home() {
             </div>
             
             <div className="relative z-10 container max-w-screen-xl px-4 md:px-6 mx-auto">
-                <div className="max-w-xl text-left">
+                <div className="max-w-md text-left">
                     <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight mb-4 text-shadow-md">
                         Discover Local Goldsmiths, Craft Your Dreams.
                     </h1>
@@ -133,7 +131,7 @@ export default function Home() {
                         </Link>
                     </div>
 
-                    <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <div className="mt-10 grid grid-cols-2 gap-4 text-center">
                         {heroStats.map((stat, index) => (
                             <div key={index} className="flex flex-col items-center justify-center">
                                 <stat.icon className="w-6 h-6 mb-1 text-primary-foreground/80"/>
