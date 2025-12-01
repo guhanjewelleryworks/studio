@@ -7,7 +7,7 @@ import Link from 'next/link';
 import NextLink from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Search, ShieldCheck, Gift, MapPin, UserCheck, Handshake, Gem, Loader2, Star } from 'lucide-react';
+import { Search, ShieldCheck, Gift, MapPin, User, Handshake, Gem, Loader2, Star, Users } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions'; 
@@ -16,25 +16,21 @@ import { Badge } from '@/components/ui/badge';
 import { differenceInDays } from 'date-fns';
 import { usePathname } from 'next/navigation';
 
-// Subtle pattern for hero section
-const HeroPattern = () => (
-  <div className="absolute inset-0 opacity-[0.02] [mask-image:radial-gradient(farthest-side_at_top_left,white,transparent)]">
-    <svg aria-hidden="true" className="absolute inset-0 h-full w-full">
-      <defs>
-        <pattern
-          id="hero-pattern"
-          width="80"
-          height="80"
-          patternUnits="userSpaceOnUse"
-          patternContentUnits="userSpaceOnUse"
-        >
-          <path d="M0 80L80 0ZM80 80L0 0Z" className="stroke-primary/30 fill-none" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#hero-pattern)" />
-    </svg>
-  </div>
+// --- Icons for the hero stats section ---
+
+const CustomerIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
 );
+const VerifiedIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19.4 12.6c0-4.2.9-7.6 2.6-10.6-1.6.4-3.5 1-5 2.1-1.2 1-2.2 2.3-2.8 3.8-1.5-.2-3.2-.3-4.9-.3-5.2 0-8.3 3.5-9.3 8.1.5-3.3 3.2-5.7 6.7-5.7 1.4 0 2.7.3 3.9.8.3 1.1.7 2.1 1.2 3.1 2.4 4.5 5.6 7.8 9.8 9.9-2.7-.4-5.2-1.5-7.3-3.4-2-1.8-3.4-4.2-4-6.8-1.7.2-3.3.5-4.8.9.5-6.2 4.6-10.4 10.8-10.4 2.3 0 4.5.6 6.3 1.6z"/></svg>
+);
+const LocationIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+);
+const GovtIdIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+);
+// --- End Icons ---
 
 
 export default function Home() {
@@ -86,56 +82,67 @@ export default function Home() {
     { icon: ShieldCheck, title: "2. Admin Mediation", description: "Our team reviews your request, ensuring a secure and smooth process. We facilitate introductions and order details." },
     { icon: Gift, title: "3. Create & Cherish", description: "Collaborate with your chosen artisan. They craft your piece with passion, and you receive your dream jewelry." },
   ];
+  
+  const heroStats = [
+    { icon: CustomerIcon, value: "1000+", label: "Customers" },
+    { icon: VerifiedIcon, value: "100% Verified", label: "Artisans" },
+    { icon: LocationIcon, value: "Serving", label: "Pan India" },
+    { icon: GovtIdIcon, value: "Govt ID Verified", label: "Goldsmiths" },
+  ];
 
   return (
     <>
       <div className="flex flex-col items-center bg-background text-foreground">
         {/* Hero Section */}
-        <section className="relative w-full py-10 md:py-16 lg:py-20 bg-gradient-to-br from-secondary/10 via-background to-background overflow-hidden">
-          <HeroPattern />
-          <div className="container max-w-screen-xl px-4 md:px-6 relative z-10 mx-auto">
-            <div className="grid gap-6 lg:grid-cols-5 lg:gap-12 lg:items-center">
-              <div className="lg:col-span-3 flex flex-col items-center text-center lg:items-start lg:text-left space-y-4">
-                
-                <div className="space-y-2">
-                  <h1 className="font-heading text-accent leading-tight text-3xl sm:text-4xl xl:text-5xl/none">
-                    Discover Local Goldsmiths,
-                    <br />
-                    <span className="text-primary">Craft Your Dreams.</span>
-                  </h1>
-                  <p className="max-w-[600px] text-foreground/85 md:text-lg leading-relaxed font-poppins">
-                    Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row pt-2">
-                  <Link
-                    href="/discover"
-                    className={cn(buttonVariants({ size: 'lg', variant: 'default' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2.5 text-base")}
-                  >
-                    <span>Find a Goldsmith <MapPin className="ml-1.5 h-4 w-4 inline" /></span>
-                  </Link>
-                  <Link
-                    href="/goldsmith-portal"
-                    className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2.5 text-base")}
-                  >
-                     <span>Join as a Goldsmith <UserCheck className="ml-1.5 h-4 w-4 inline" /></span>
-                  </Link>
-                </div>
-              </div>
-             <div className="relative mx-auto aspect-[6/5] w-full lg:col-span-2 group rounded-xl shadow-xl overflow-hidden border-2 border-primary/10">
-              <Image
-                src="/images/my-hero-image.png"
-                alt="Goldsmith at work bench crafting a piece of jewelry"
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 1024px) 100vw, 550px"
-                data-ai-hint="jewelry hero background"
-                priority
-              />
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-transparent via-black/5 to-black/20 pointer-events-none group-hover:bg-black/5 transition-colors"></div>
+        <section className="relative w-full h-[75vh] min-h-[600px] max-h-[800px] flex items-center justify-center text-white">
+            <div className="absolute inset-0 z-0">
+                <Image
+                    src="/images/my-hero-image.png"
+                    alt="A skilled goldsmith meticulously crafting a piece of jewelry."
+                    fill
+                    className="object-cover"
+                    priority
+                    data-ai-hint="goldsmith artisan jewelry"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent" />
+                 <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
             </div>
+            
+            <div className="relative z-10 container max-w-screen-xl px-4 md:px-6 mx-auto">
+                <div className="max-w-2xl text-left">
+                    <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight mb-4 text-shadow-md">
+                        Discover Skilled Goldsmiths, Craft Jewelry That Tells Your Story.
+                    </h1>
+                    <p className="text-base md:text-lg text-gray-200 max-w-lg mb-6 text-shadow-sm font-poppins">
+                        Verified artisans. Secure mediation. 100% customized jewelry.
+                    </p>
+                     <div className="flex flex-col sm:flex-row gap-3">
+                        <Link
+                            href="/discover"
+                            className={cn(buttonVariants({ size: 'lg', variant: 'default' }), "shadow-lg hover:shadow-xl transition-shadow rounded-full px-8 py-3 text-base")}
+                        >
+                            <span>Find a Goldsmith</span>
+                        </Link>
+                        <Link
+                            href="/goldsmith-portal"
+                            className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-lg hover:shadow-xl transition-shadow bg-white/90 text-primary hover:bg-white border-transparent rounded-full px-8 py-3 text-base")}
+                        >
+                            <span>Join as a Goldsmith</span>
+                        </Link>
+                    </div>
+
+                    <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        {heroStats.map((stat, index) => (
+                            <div key={index} className="flex flex-col items-center justify-center">
+                                <stat.icon className="w-6 h-6 mb-1 text-primary-foreground/80"/>
+                                <p className="text-sm font-bold text-primary-foreground leading-none">{stat.value}</p>
+                                <p className="text-xs text-primary-foreground/70">{stat.label}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                </div>
             </div>
-          </div>
         </section>
 
         {/* How It Works Section */}
@@ -249,7 +256,7 @@ export default function Home() {
         </section>
 
         {/* Call to Action Section */}
-        <section className="w-full pt-12 pb-16 border-t border-border/10 bg-gradient-to-t from-secondary/10 to-background">
+        <section className="w-full pt-10 pb-16 border-t border-border/10 bg-background">
           <div className="container max-w-screen-xl grid items-center justify-center gap-2 px-4 text-center md:px-6 mx-auto">
             <div className="space-y-2 mb-3 md:mb-4">
                <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
@@ -271,7 +278,7 @@ export default function Home() {
                 href="/goldsmith-portal/register"
                 className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 text-sm")}
               >
-                 <span>Register as a Goldsmith <UserCheck className="ml-1.5 h-4 w-4 inline" /></span>
+                 <span>Register as a Goldsmith <User className="ml-1.5 h-4 w-4 inline" /></span>
               </Link>
             </div>
           </div>
