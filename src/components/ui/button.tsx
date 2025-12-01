@@ -13,7 +13,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/85 shadow-sm",
         outline:
-          "border border-primary bg-transparent text-primary hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary-foreground dark:hover:text-card-foreground shadow-sm", // Updated dark mode hover
+          "border border-primary bg-transparent text-primary hover:bg-primary/10 shadow-sm", // Simplified outline for clarity
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm",
         ghost: "hover:bg-accent/10 hover:text-accent-foreground",
