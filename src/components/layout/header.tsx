@@ -1,4 +1,3 @@
-
 // src/components/layout/header.tsx
 'use client';
 
@@ -170,7 +169,7 @@ export function Header() {
     return (
       <div className="flex items-center gap-2">
         <Link
-          href="/login"
+          href={`/login?redirect=${pathname}`}
           className={cn(
             buttonVariants({ variant: 'outline', size: 'sm' }),
             'border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-5 py-1.5'
@@ -179,7 +178,7 @@ export function Header() {
           <span>Login</span>
         </Link>
         <Link
-          href="/signup"
+          href={`/signup?redirect=${pathname}`}
           className={cn(
             buttonVariants({ size: 'sm', variant: 'default' }),
             'shadow-sm hover:shadow-md transition-shadow bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5 py-1.5'
@@ -229,10 +228,10 @@ export function Header() {
      
      return (
         <>
-          <Link href="/login" onClick={() => setIsSheetOpen(false)} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
+          <Link href={`/login?redirect=${pathname}`} onClick={() => setIsSheetOpen(false)} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "w-full rounded-full text-base border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground")}>
             <LogIn className="mr-2 h-4 w-4" /> Login
           </Link>
-          <Link href="/signup" onClick={() => setIsSheetOpen(false)} className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
+          <Link href={`/signup?redirect=${pathname}`} onClick={() => setIsSheetOpen(false)} className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full rounded-full text-base")}>
             <UserPlus className="mr-2 h-4 w-4" /> Sign Up
           </Link>
         </>

@@ -4,6 +4,7 @@
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { signIn } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 
 // Inline SVG for Google Icon
 const GoogleIcon = () => (
@@ -35,13 +36,15 @@ interface SocialAuthButtonsProps {
 
 export function SocialAuthButtons({ mode }: SocialAuthButtonsProps) {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('redirect') || '/customer/dashboard';
 
   const handleGoogleAuth = () => {
     // No async/await here. signIn handles the browser navigation.
     // On success, it redirects to callbackUrl.
     // On error, it redirects to the error page (/login) with a query param.
     signIn('google', { 
-        callbackUrl: '/customer/dashboard',
+        callbackUrl: callbackUrl,
     });
   };
 

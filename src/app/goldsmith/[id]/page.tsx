@@ -18,7 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { fetchGoldsmithById, saveOrderRequest, incrementProfileView } from '@/actions/goldsmith-actions';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface PageParams {
   id: string;
@@ -56,6 +56,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   const { id } = params;
   
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, status: sessionStatus } = useSession();
   const [profile, setProfile] = useState<GoldsmithProfileType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -294,13 +295,13 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
           </CardHeader>
           <CardContent className="p-5 pt-0 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Button asChild className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90">
-                  <Link href={`/login?redirect=/goldsmith/${profile.id}`}>
+                  <Link href={`/login?redirect=${pathname}`}>
                       <LogIn className="mr-2 h-4 w-4" />
                       Login
                   </Link>
               </Button>
               <Button asChild variant="outline" className="w-full sm:w-auto border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground">
-                  <Link href={`/signup?redirect=/goldsmith/${profile.id}`}>
+                  <Link href={`/signup?redirect=${pathname}`}>
                       <UserPlus className="mr-2 h-4 w-4" />
                       Sign Up
                   </Link>

@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ import { requestCustomerPasswordReset } from '@/actions/customer-actions';
 
 export default function LoginPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const { status } = useSession();
@@ -252,7 +253,7 @@ export default function LoginPage() {
             <div className="text-center text-sm text-muted-foreground pt-3.5 space-y-2">
               <p>
                 Don't have an account?{' '}
-                <Link href="/signup" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">Sign up here</Link>
+                <Link href={`/signup?redirect=${pathname}`} className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">Sign up here</Link>
               </p>
               <p>
                 Are you a Goldsmith?{' '}

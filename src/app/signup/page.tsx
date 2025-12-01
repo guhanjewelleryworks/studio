@@ -14,9 +14,11 @@ import { useToast } from '@/hooks/use-toast';
 import { saveCustomer } from '@/actions/customer-actions';
 import type { NewCustomerInput, PlatformSettings } from '@/types/goldsmith';
 import { fetchPlatformSettings } from '@/actions/settings-actions';
+import { usePathname } from 'next/navigation';
 
 export default function SignUpPage() {
   const { toast } = useToast();
+  const pathname = usePathname();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -179,7 +181,7 @@ export default function SignUpPage() {
             <div className="text-center text-sm text-muted-foreground pt-3.5 space-y-2">
               <p>
                 Already have an account?{' '}
-                <Link href="/login" className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
+                <Link href={`/login?redirect=${pathname}`} className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
                   Login here
                 </Link>
               </p>
