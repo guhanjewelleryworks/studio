@@ -111,7 +111,7 @@ export default function Home() {
             </div>
             
             <div className="relative z-10 container max-w-screen-xl px-4 md:px-6 mx-auto">
-                <div className="max-w-2xl text-left">
+                <div className="max-w-xl text-left">
                     <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight mb-4 text-shadow-md">
                         Discover Local Goldsmiths, Craft Your Dreams.
                     </h1>
