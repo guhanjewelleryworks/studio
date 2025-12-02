@@ -97,7 +97,7 @@ export default function Home() {
         <section className="relative w-full h-[75vh] min-h-[600px] max-h-[800px] flex items-center justify-center text-white">
             <div className="absolute inset-0 z-0">
                 <Image
-                    src="/hero_image.png"
+                    src="/heroimage.png"
                     alt="A skilled goldsmith meticulously crafting a piece of jewelry."
                     fill
                     className="object-cover"
@@ -108,7 +108,7 @@ export default function Home() {
                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
             </div>
             
-            <div className="relative z-10 container max-w-screen-xl px-4 md:px-6 mx-auto">
+            <div className="relative z-10 container max-w-7xl px-4 md:px-6 mx-auto">
                 <div className="max-w-md text-left">
                     <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight mb-4 text-shadow-md">
                         Discover Local Goldsmiths, Craft Your Dreams.
@@ -150,7 +150,7 @@ export default function Home() {
 
         {/* How It Works Section */}
         <section id="how-it-works" className="w-full py-10 md:py-16 lg:py-20 bg-background">
-          <div className="container max-w-screen-xl px-4 md:px-6 mx-auto">
+          <div className="container max-w-7xl px-4 md:px-6 mx-auto">
             <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8 md:mb-10">
               <div className="space-y-1.5">
                 <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-xs font-medium text-secondary-foreground shadow-sm font-poppins">How It Works</div>
@@ -178,7 +178,7 @@ export default function Home() {
 
         {/* Featured Goldsmiths Section */}
         <section className="w-full py-10 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/20 to-background">
-          <div className="container max-w-screen-xl px-4 md:px-6 mx-auto">
+          <div className="container max-w-7xl px-4 md:px-6 mx-auto">
             <div className="space-y-2 mb-6 md:mb-8 text-center">
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Meet Our Talented Artisans</h2>
               <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins">
@@ -260,7 +260,7 @@ export default function Home() {
 
         {/* Call to Action Section */}
         <section className="w-full py-10 md:py-16 lg:py-20 border-t border-border/10 bg-background">
-          <div className="container max-w-screen-xl grid items-center justify-center gap-2 px-4 text-center md:px-6 mx-auto">
+          <div className="container max-w-7xl grid items-center justify-center gap-2 px-4 text-center md:px-6 mx-auto">
             <div className="space-y-2 mb-3 md:mb-4">
                <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">

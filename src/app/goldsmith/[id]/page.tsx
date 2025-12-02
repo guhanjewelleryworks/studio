@@ -191,7 +191,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   
   if (isLoading) {
      return (
-      <div className="container mx-auto max-w-screen-xl py-10 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-background text-foreground">
+      <div className="container mx-auto max-w-7xl py-10 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-background text-foreground">
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
           <div className="md:col-span-1 space-y-5">
             <Skeleton className="h-32 w-32 rounded-full mx-auto bg-muted/70" />
@@ -219,11 +219,11 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   }
 
    if (error) {
-     return <div className="container mx-auto max-w-screen-xl py-10 px-4 md:px-6 text-center text-destructive text-lg">{error}</div>;
+     return <div className="container mx-auto max-w-7xl py-10 px-4 md:px-6 text-center text-destructive text-lg">{error}</div>;
    }
 
   if (!profile) {
-    return <div className="container mx-auto max-w-screen-xl py-10 px-4 md:px-6 text-center text-muted-foreground text-lg">Profile not found.</div>;
+    return <div className="container mx-auto max-w-7xl py-10 px-4 md:px-6 text-center text-muted-foreground text-lg">Profile not found.</div>;
   }
   
   const renderContactForm = () => {
@@ -313,7 +313,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
 
 
   return (
-    <div className="container mx-auto max-w-screen-xl py-10 md:py-14 px-4 md:px-6 bg-background text-foreground">
+    <div className="container mx-auto max-w-7xl py-10 md:py-14 px-4 md:px-6 bg-background text-foreground">
         <Alert variant="default" className="mb-6 border-accent/50 text-accent-foreground bg-accent/10 rounded-lg p-3 shadow-sm">
           <ShieldCheck className="h-4 w-4 !text-accent mr-1.5" />
           <AlertTitle className="font-poppins font-semibold text-sm text-foreground">Secure & Mediated Connection</AlertTitle>

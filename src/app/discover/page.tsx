@@ -130,7 +130,7 @@ export default function DiscoverPage() {
   };
 
   return (
-    <div className="container max-w-screen-xl py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)] mx-auto">
+    <div className="container max-w-7xl py-6 px-4 md:px-6 min-h-[calc(100vh-8rem)] mx-auto">
       <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-6">
         <h1 className="text-3xl font-heading text-accent tracking-tight">Find a Goldsmith</h1>
       </div>
