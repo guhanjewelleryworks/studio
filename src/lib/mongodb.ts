@@ -99,6 +99,7 @@ export async function getDb(): Promise<Db> {
   try {
     const mongoClient = await clientPromise;
     console.log(`Successfully connected to MongoDB. Accessing database: ${DB_NAME}`);
+<<<<<<< HEAD
     const db = mongoClient.db(DB_NAME);
     // Ensure indexes are created after connecting.
     await createIndexes(db);
@@ -108,10 +109,24 @@ export async function getDb(): Promise<Db> {
     if (MONGODB_URI) {
       const maskedUri = MONGODB_URI.replace(/:([^:@]*)(?=@)/, ':********');
       console.error("Failed to connect with MONGODB_URI (password masked):", maskedUri);
+=======
+    return mongoClient.db(DB_NAME);
+  } catch (error: any) {
+    let errorMessage: string;
+    if (error.name === 'MongoServerError' && (error.code === 18 || error.message.includes('auth'))) {
+      errorMessage = "Authentication failed. The username or password in your MONGODB_URI is incorrect. Please reset the password in MongoDB Atlas and update your .env file.";
+    } else if (error.name === 'MongoServerSelectionError') {
+      errorMessage = "Could not connect to any server in your MongoDB cluster. This is often a network issue. Please ensure your server's IP address is whitelisted in MongoDB Atlas under 'Network Access'.";
+>>>>>>> de9922490da8d483771ae6789108b11356d904bf
     } else {
-      console.error("Failed to connect because MONGODB_URI was not defined.");
+      errorMessage = `An unexpected error occurred: ${error.message}`;
     }
+<<<<<<< HEAD
     throw error;
+=======
+    console.error("[ Server ] MongoDB Connection Error:", errorMessage);
+    throw new Error(errorMessage);
+>>>>>>> de9922490da8d483771ae6789108b11356d904bf
   }
 }
 
