@@ -97,7 +97,7 @@ export default function Home() {
         <section className="relative w-full h-[75vh] min-h-[600px] max-h-[800px] flex items-center justify-center text-white">
             <div className="absolute inset-0 z-0">
                 <Image
-                    src="/hero_image.png"
+                    src="/heroimage.png"
                     alt="A skilled goldsmith meticulously crafting a piece of jewelry."
                     fill
                     className="object-cover"
