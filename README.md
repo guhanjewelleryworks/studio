@@ -36,6 +36,34 @@ This is a Next.js application built with Firebase Studio for Goldsmith Connect.
     ```
     The application will be available at http://localhost:9002 (or the port specified in `package.json`).
 
+## Customizing Your Application
+
+### Changing the Hero Image
+
+The main image on the homepage can be easily changed.
+
+1.  **Upload Your Image:** Place your new image file (e.g., `new-hero-background.jpg`) inside the `public/` directory at the root of your project.
+
+2.  **Edit the Homepage File:** Open the file `src/app/page.tsx`.
+
+3.  **Update the Image Path:** Find the `<Image>` component inside the main hero `<section>`. Change the `src` property to point to your new image. The path should start with a `/`.
+
+    ```jsx
+    // Before
+    <Image
+        src="/heroimage.png"
+        ...
+    />
+
+    // After
+    <Image
+        src="/new-hero-background.jpg"
+        ...
+    />
+    ```
+
+4.  **Save the file.** The homepage will automatically update with your new image.
+
 ## Deployment & Updates (EC2 Server)
 
 Follow these steps to deploy, run, or update the application on your EC2 server.
