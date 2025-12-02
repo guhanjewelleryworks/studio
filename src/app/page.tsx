@@ -125,7 +125,10 @@ export default function Home() {
                         </Link>
                         <Link
                             href="/goldsmith-portal"
-                            className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-lg hover:shadow-xl transition-shadow bg-white/90 text-primary border-transparent rounded-full px-8 py-3 text-base")}
+                            className={cn(
+                                buttonVariants({ variant: 'outline', size: 'lg' }),
+                                "shadow-lg hover:shadow-xl transition-shadow bg-white/90 text-primary border-transparent hover:bg-white rounded-full px-8 py-3 text-base"
+                            )}
                         >
                             <span>Join as a Goldsmith</span>
                         </Link>
