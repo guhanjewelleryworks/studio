@@ -97,7 +97,7 @@ export default function Home() {
         <section className="relative w-full h-[75vh] min-h-[600px] max-h-[800px] flex items-center justify-center text-white">
             <div className="absolute inset-0 z-0">
                 <Image
-                    src="/hero_image.png"
+                    src="/heroimage.png"
                     alt="A skilled goldsmith meticulously crafting a piece of jewelry."
                     fill
                     className="object-cover"
@@ -125,7 +125,7 @@ export default function Home() {
                         </Link>
                         <Link
                             href="/goldsmith-portal"
-                            className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-lg hover:shadow-xl transition-shadow bg-white/90 text-primary hover:bg-white border-transparent rounded-full px-8 py-3 text-base")}
+                            className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-lg hover:shadow-xl transition-shadow bg-white/90 text-primary border-transparent rounded-full px-8 py-3 text-base")}
                         >
                             <span>Join as a Goldsmith</span>
                         </Link>
@@ -159,7 +159,7 @@ export default function Home() {
             </div>
             <div className="mx-auto grid max-w-5xl items-start gap-5 md:gap-6 lg:grid-cols-3 lg:max-w-none pt-4 md:pt-6">
               {howItWorksSteps.map((step, index) => (
-                <div key={index} className="grid gap-1.5 text-center group p-4 rounded-xl bg-card hover:shadow-lg transition-shadow duration-300 border border-transparent hover:border-primary/20">
+                <div key={index} className="grid gap-1.5 text-center group p-4 rounded-xl bg-card hover:shadow-lg transition-all duration-300 ease-in-out border border-transparent hover:border-primary/20 hover:-translate-y-2">
                   <div className="flex justify-center items-center mb-2">
                     <div className="p-2.5 rounded-full bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-105 shadow-md">
                       <step.icon className="h-5 w-5" />
