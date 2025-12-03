@@ -1,9 +1,7 @@
 
+'use client';
 
-// src/app/page.tsx
-'use client'; 
-
-import type { Goldsmith } from '@/types/goldsmith'; 
+import type { Goldsmith } from '@/types/goldsmith';
 import type { SVGProps } from 'react';
 import Link from 'next/link';
 import NextLink from 'next/link';
@@ -12,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Search, ShieldCheck, Gift, MapPin, User, Handshake, Gem, Loader2, Star, Users } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions'; 
+import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions';
 import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { differenceInDays } from 'date-fns';
@@ -47,7 +45,7 @@ export default function Home() {
       setErrorFeatured(null);
       try {
         const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
-        
+
         // --- Shuffle Algorithm (Fisher-Yates) ---
         let currentIndex = allVerifiedGoldsmiths.length;
         let randomIndex;
@@ -84,7 +82,7 @@ export default function Home() {
     { icon: ShieldCheck, title: "2. Admin Mediation", description: "Our team reviews your request, ensuring a secure and smooth process. We facilitate introductions and order details." },
     { icon: Gift, title: "3. Create & Cherish", description: "Collaborate with your chosen artisan. They craft your piece with passion, and you receive your dream jewelry." },
   ];
-  
+
   const heroStats = [
     { icon: VerifiedIcon, value: "100% Verified", label: "Artisans" },
     { icon: GovtIdIcon, value: "Govt ID Verified", label: "Goldsmiths" },
@@ -92,65 +90,66 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col items-center bg-background text-foreground">
+      <div className="flex flex-col bg-background text-foreground">
         {/* Hero Section */}
-        <section className="relative w-full h-[75vh] min-h-[600px] max-h-[800px] flex items-center justify-center text-white">
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/hero_image.png"
-                    alt="A skilled goldsmith meticulously crafting a piece of jewelry."
-                    fill
-                    className="object-cover"
-                    priority
-                    data-ai-hint="goldsmith artisan jewelry"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent" />
-                 <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
-            </div>
-            
-            <div className="relative z-10 container mx-auto px-4 md:px-6">
-                <div className="max-w-md text-left">
-                    <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight mb-4 text-shadow-md">
-                        Discover Local Goldsmiths, Craft Your Dreams.
-                    </h1>
-                    <p className="text-base md:text-lg text-gray-200 max-w-lg mb-6 text-shadow-sm font-poppins">
-                        Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
-                    </p>
-                     <div className="flex flex-col sm:flex-row gap-3">
-                        <Link
-                            href="/discover"
-                            className={cn(buttonVariants({ size: 'lg', variant: 'default' }), "shadow-lg hover:shadow-xl transition-shadow rounded-full px-8 py-3 text-base")}
-                        >
-                            <span>Find a Goldsmith</span>
-                        </Link>
-                        <Link
-                            href="/goldsmith-portal"
-                            className={cn(
-                                buttonVariants({ variant: 'outline', size: 'lg' }),
-                                "shadow-lg hover:shadow-xl transition-shadow bg-white/90 text-primary border-transparent hover:bg-white rounded-full px-8 py-3 text-base"
-                            )}
-                        >
-                            <span>Join as a Goldsmith</span>
-                        </Link>
-                    </div>
+        <section className="relative w-full h-[75vh] min-h-[560px] max-h-[800px] flex items-center text-white overflow-hidden">
+          {/* full-bleed image / overlay */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/hero_image.png"
+              alt="A skilled goldsmith meticulously crafting a piece of jewelry."
+              fill
+              className="object-cover w-full h-full"
+              priority
+              data-ai-hint="goldsmith artisan jewelry"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+          </div>
 
-                    <div className="mt-10 grid grid-cols-2 gap-4 text-center">
-                        {heroStats.map((stat, index) => (
-                            <div key={index} className="flex flex-col items-center justify-center">
-                                <stat.icon className="w-6 h-6 mb-1 text-primary-foreground/80"/>
-                                <p className="text-sm font-bold text-primary-foreground leading-none">{stat.value}</p>
-                                <p className="text-xs text-primary-foreground/70">{stat.label}</p>
-                            </div>
-                        ))}
-                    </div>
+          {/* constrained content — consistent gutters */}
+          <div className="relative z-10 mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl text-left">
+              <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight mb-4 text-shadow-md">
+                Discover Local Goldsmiths, Craft Your Dreams.
+              </h1>
+              <p className="text-base md:text-lg text-gray-200 max-w-lg mb-6 text-shadow-sm font-poppins">
+                Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  href="/discover"
+                  className={cn(buttonVariants({ size: 'lg', variant: 'default' }), "shadow-lg hover:shadow-xl transition-shadow rounded-full px-8 py-3 text-base")}
+                >
+                  <span>Find a Goldsmith</span>
+                </Link>
+                <Link
+                  href="/goldsmith-portal"
+                  className={cn(
+                    buttonVariants({ variant: 'outline', size: 'lg' }),
+                    "shadow-lg hover:shadow-xl transition-shadow bg-white/90 text-primary border-transparent hover:bg-white rounded-full px-8 py-3 text-base"
+                  )}
+                >
+                  <span>Join as a Goldsmith</span>
+                </Link>
+              </div>
 
-                </div>
+              <div className="mt-10 grid grid-cols-2 gap-4 text-center">
+                {heroStats.map((stat, index) => (
+                  <div key={index} className="flex flex-col items-center justify-center">
+                    <stat.icon className="w-6 h-6 mb-1 text-primary-foreground/80"/>
+                    <p className="text-sm font-bold text-primary-foreground leading-none">{stat.value}</p>
+                    <p className="text-xs text-primary-foreground/70">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
+          </div>
         </section>
 
         {/* How It Works Section */}
         <section id="how-it-works" className="w-full py-10 md:py-16 lg:py-20 bg-background">
-          <div className="container mx-auto px-4 md:px-6">
+          <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8 md:mb-10">
               <div className="space-y-1.5">
                 <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-xs font-medium text-secondary-foreground shadow-sm font-poppins">How It Works</div>
@@ -178,7 +177,7 @@ export default function Home() {
 
         {/* Featured Goldsmiths Section */}
         <section className="w-full py-10 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/20 to-background">
-          <div className="container mx-auto px-4 md:px-6">
+          <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8">
             <div className="space-y-2 mb-6 md:mb-8 text-center">
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Meet Our Talented Artisans</h2>
               <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins">
@@ -260,29 +259,31 @@ export default function Home() {
 
         {/* Call to Action Section */}
         <section className="w-full py-10 md:py-16 lg:py-20 border-t border-border/10 bg-background">
-          <div className="container mx-auto grid items-center justify-center gap-2 px-4 text-center md:px-6">
-            <div className="space-y-2 mb-3 md:mb-4">
-               <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
-              <h2 className="font-heading text-accent text-2xl sm:text-3xl">
-                Ready to Create or Connect?
-              </h2>
-              <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins">
-                Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmith Connect is your platform.
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center pt-1">
-              <Link
-                href="/discover"
-                className={cn(buttonVariants({ size: 'lg', variant: 'default' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2 text-sm")}
-              >
-                <span>Start Your Search <Search className="ml-1.5 h-4 w-4 inline" /></span>
-              </Link>
-              <Link
-                href="/goldsmith-portal/register"
-                className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 text-sm")}
-              >
-                 <span>Register as a Goldsmith <User className="ml-1.5 h-4 w-4 inline" /></span>
-              </Link>
+          <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8">
+            <div className="container mx-auto grid items-center justify-center gap-2 px-4 text-center md:px-6">
+              <div className="space-y-2 mb-3 md:mb-4">
+                 <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
+                <h2 className="font-heading text-accent text-2xl sm:text-3xl">
+                  Ready to Create or Connect?
+                </h2>
+                <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins">
+                  Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmith Connect is your platform.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center pt-1">
+                <Link
+                  href="/discover"
+                  className={cn(buttonVariants({ size: 'lg', variant: 'default' }), "shadow-md hover:shadow-lg transition-shadow rounded-full px-6 py-2 text-sm")}
+                >
+                  <span>Start Your Search <Search className="ml-1.5 h-4 w-4 inline" /></span>
+                </Link>
+                <Link
+                  href="/goldsmith-portal/register"
+                  className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), "shadow-md hover:shadow-lg transition-shadow border-primary text-primary hover:bg-primary/10 hover:text-primary-foreground rounded-full px-6 py-2 text-sm")}
+                >
+                   <span>Register as a Goldsmith <User className="ml-1.5 h-4 w-4 inline" /></span>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -291,4 +292,3 @@ export default function Home() {
   );
 }
 
-    
