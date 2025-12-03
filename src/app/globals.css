@@ -1,23 +1,28 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------- */
+/* TYPOGRAPHY (your settings)   */
+/* ---------------------------- */
+
 body {
-  font-family: var(--font-poppins), var(--font-geist-sans), Arial, Helvetica, sans-serif; /* Updated to Poppins */
+  font-family: var(--font-poppins), var(--font-geist-sans), Arial, Helvetica, sans-serif;
   font-size: 1.125rem; /* 18px */
   line-height: 1.6;
   color: hsl(var(--foreground));
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-playfair-display), var(--font-geist-sans), Arial, Helvetica, sans-serif; /* Updated to Playfair Display */
+  font-family: var(--font-playfair-display), var(--font-geist-sans), Arial, Helvetica, sans-serif;
   font-weight: 700;
   line-height: 1.3;
-  color: hsl(var(--accent)); /* Headings use accent color */
+  color: hsl(var(--accent));
 }
 
 h1 {
-  font-size: 3rem; 
+  font-size: 3rem;
 }
 
 h2 {
@@ -28,77 +33,78 @@ h3 {
   @apply text-xl font-bold;
 }
 
+/* ---------------------------- */
+/* COLOR THEME (your settings)  */
+/* ---------------------------- */
 
 @layer base {
   :root {
-    /* Soft Pink Theme - Light Mode */
-    --background: 348 100% 98%; /* Light blush (#FFF5F7) */
-    --foreground: 210 4% 40%; /* Soft Gray (#5f6368) for body text */
+    --background: 348 100% 98%;
+    --foreground: 210 4% 40%;
 
-    --card: 0 0% 100%; /* White for cards */
-    --card-foreground: 210 4% 35%; /* Darker gray for card text, slightly darker than body */
+    --card: 0 0% 100%;
+    --card-foreground: 210 4% 35%;
 
-    --popover: 0 0% 100%; /* White for popovers */
+    --popover: 0 0% 100%;
     --popover-foreground: 210 4% 35%;
 
-    --primary: 340 87% 76%; /* Rose-pink (#F78FB3) for buttons */
-    --primary-foreground: 0 0% 100%; /* White text on primary buttons */
+    --primary: 340 87% 76%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 345 100% 92%; /* Lighter pink */
-    --secondary-foreground: 330 57% 64%; /* Darker pink for text on secondary elements */
+    --secondary: 345 100% 92%;
+    --secondary-foreground: 330 57% 64%;
 
-    --muted: 348 60% 95%; /* Very light, almost white pink */
-    --muted-foreground: 330 20% 55%; /* Medium grey-pink for less important text */
+    --muted: 348 60% 95%;
+    --muted-foreground: 330 20% 55%;
 
-    --accent: 330 57% 64%; /* Darker pink (#D96B9B) for headings & accents */
-    --accent-foreground: 0 0% 100%; /* White text on accent elements */
-    
-    --destructive: 0 80% 65%; /* A slightly softer, but still clear Red */
-    --destructive-foreground: 0 0% 100%; /* White */
+    --accent: 330 57% 64%;
+    --accent-foreground: 0 0% 100%;
 
-    --border: 345 50% 90%; /* Light pink/grey border */
-    --input: 348 100% 97%;   /* Very light blush for input backgrounds */
-    --ring: 340 87% 70%;   /* Slightly darker/desaturated rose-pink for focus rings */
+    --destructive: 0 80% 65%;
+    --destructive-foreground: 0 0% 100%;
 
-    --chart-1: 340 87% 76%; /* Rose-pink */
-    --chart-2: 330 57% 64%; /* Darker Pink */
-    --chart-3: 350 70% 80%; /* Another shade of Pink */
-    --chart-4: 335 65% 70%; /* Muted Rose */
-    --chart-5: 340 40% 60%; /* Desaturated Pink */
+    --border: 345 50% 90%;
+    --input: 348 100% 97%;
+    --ring: 340 87% 70%;
 
-    --radius: 0.75rem; /* Slightly more rounded corners */
+    --chart-1: 340 87% 76%;
+    --chart-2: 330 57% 64%;
+    --chart-3: 350 70% 80%;
+    --chart-4: 335 65% 70%;
+    --chart-5: 340 40% 60%;
+
+    --radius: 0.75rem;
   }
 
   .dark {
-    /* Soft Pink Theme - Dark Mode */
-    --background: 330 15% 10%; /* Very dark desaturated pink/purple */
-    --foreground: 345 40% 85%; /* Light pinkish grey for dark mode text */
+    --background: 330 15% 10%;
+    --foreground: 345 40% 85%;
 
-    --card: 330 15% 13%; /* Slightly lighter dark background for cards */
-    --card-foreground: 345 40% 90%; /* Lighter pinkish grey for card text */
+    --card: 330 15% 13%;
+    --card-foreground: 345 40% 90%;
 
-    --popover: 330 15% 8%; /* Even darker for popovers */
+    --popover: 330 15% 8%;
     --popover-foreground: 345 40% 90%;
 
-    --primary: 340 75% 70%;  /* Slightly lighter Rose-pink for dark mode buttons */
-    --primary-foreground: 330 15% 10%; /* Dark text for primary buttons in dark mode */
+    --primary: 340 75% 70%;
+    --primary-foreground: 330 15% 10%;
 
-    --secondary: 330 20% 20%; /* Darker muted pink */
-    --secondary-foreground: 345 50% 80%; /* Lighter text on secondary */
+    --secondary: 330 20% 20%;
+    --secondary-foreground: 345 50% 80%;
 
-    --muted: 330 15% 22%; /* Dark muted pink/grey */
-    --muted-foreground: 345 30% 70%; /* Medium light pink/grey for muted text */
+    --muted: 330 15% 22%;
+    --muted-foreground: 345 30% 70%;
 
-    --accent: 330 65% 70%; /* Lighter version of the accent pink for dark mode */
-    --accent-foreground: 330 15% 10%; /* Dark text on accent */
+    --accent: 330 65% 70%;
+    --accent-foreground: 330 15% 10%;
 
-    --destructive: 0 70% 60%; /* Softer Red for dark mode */
-    --destructive-foreground: 0 0% 100%; /* White */
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 330 15% 25%; /* Dark pink/grey border */
-    --input: 330 15% 18%; /* Dark input background */
-    --ring: 340 75% 65%; /* Lighter focus ring for dark mode */
-    
+    --border: 330 15% 25%;
+    --input: 330 15% 18%;
+    --ring: 340 75% 65%;
+
     --chart-1: 340 75% 70%;
     --chart-2: 330 65% 70%;
     --chart-3: 350 60% 75%;
@@ -113,20 +119,69 @@ h3 {
   * {
     @apply border-border transition-colors duration-200 ease-in-out;
   }
+
   body {
-    @apply bg-background antialiased; 
+    @apply bg-background antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-   *:focus-visible {
-     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
-   }
-   html {
-      scroll-behavior: smooth;
-   }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
-/* Subtle gradient background example - apply to body or specific sections */
+/* ---------------------------- */
+/* OPTIONAL GRADIENT BG CLASS   */
+/* ---------------------------- */
+
 .bg-blush-gradient {
   background-image: linear-gradient(to bottom, hsl(348, 100%, 98%), hsl(0, 0%, 100%));
 }
+
+/* ================================================================= */
+/*  🚀 FIX FOR FULL-BLEED LAYOUT (THIS REMOVES UNWANTED SIDE GUTTERS) */
+/* ================================================================= */
+
+html, body, #__next {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+/* Many components (Navbar, Footer, Pages) used Tailwind's `.container`.
+   But Tailwind's container **adds left/right padding based on breakpoints**.
+   That padding was causing the unwanted side gutter.
+*/
+.container {
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+}
+
+/* Use this instead of container for consistent alignment */
+.site-inner {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 1280px; /* same as max-w-screen-xl */
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .site-inner { padding-left: 1.5rem; padding-right: 1.5rem; }
+}
+@media (min-width: 1024px) {
+  .site-inner { padding-left: 2rem; padding-right: 2rem; }
+}
+
+/* Debug helper (optional)
+.debug-outline * { outline: 1px solid rgba(255,0,0,0.1); } */
