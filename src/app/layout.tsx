@@ -38,27 +38,30 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // The layout's only job is to fetch settings for display purposes, not for logic.
   const settings = await fetchPlatformSettings();
 
   return (
     <html lang="en" className={cn("h-full antialiased", poppins.variable, playfairDisplay.variable, geistSans.variable)}>
-      <body
-        className={cn(
-          'min-h-full font-body flex flex-col text-foreground'
-        )}
-      >
+      <body className={cn('min-h-full font-body flex flex-col text-foreground')}>
         <AuthProvider>
           <div className="relative flex min-h-dvh flex-col bg-transparent z-0">
+            {/* header + optional announcement — header is full-bleed but inner content constrained */}
             <div className="sticky top-0 z-50">
               <Header />
               {settings.isAnnouncementVisible && settings.announcementText && (
                 <AnnouncementBanner text={settings.announcementText} />
               )}
             </div>
-            <main className="flex-1">{children}</main>
+
+            {/* Main content — children are free to be full width or constrained as they see fit */}
+            <main className="flex-1">
+              {children}
+            </main>
+
+            {/* Footer — full-bleed background; inner content constrained inside Footer component */}
             <Footer />
           </div>
+
           <Toaster />
         </AuthProvider>
       </body>
