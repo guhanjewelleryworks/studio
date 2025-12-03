@@ -32,9 +32,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  devIndicators: {
-    buildActivity: false,
-  },
   // Add the allowed origin for the development server
   ...(process.env.NODE_ENV === 'development' && {
     experimental: {
