@@ -286,7 +286,7 @@ export function Header() {
   return (
     <header className="w-full border-b border-border/20 bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 shadow-sm h-16">
       {/* inner constrained wrapper — removes global container usage while aligning content */}
-      <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8 flex h-full items-center">
+      <div className="site-inner flex h-full items-center">
         {/* Desktop Navigation */}
         <div className="mr-6 hidden md:flex items-center">
           <Link href="/" className="mr-8 flex items-center">
