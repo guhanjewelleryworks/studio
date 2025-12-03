@@ -20,7 +20,10 @@ export function middleware(request: NextRequest) {
   // If the maintenance cookie is set to 'true' and the path is not exempt,
   // rewrite the user to the maintenance page.
   if (maintenanceCookie?.value === 'true' && !isExemptPath) {
-    return NextResponse.rewrite(new URL('/maintenance', request.url));
+    // Correctly rewrite to the maintenance page
+    const url = request.nextUrl.clone();
+    url.pathname = '/maintenance';
+    return NextResponse.rewrite(url);
   }
 
   // Allow all other requests to proceed as normal.
@@ -29,5 +32,13 @@ export function middleware(request: NextRequest) {
 
 // We run this middleware on every request.
 export const config = {
-  matcher: '/((?!_next/static|_next/image|favicon.ico).*)',
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 };
