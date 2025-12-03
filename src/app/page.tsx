@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { Goldsmith } from '@/types/goldsmith';
@@ -108,7 +107,7 @@ export default function Home() {
           </div>
 
           {/* constrained content — consistent gutters */}
-          <div className="relative z-10 mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8">
+          <div className="relative z-10 site-inner">
             <div className="max-w-2xl text-left">
               <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight mb-4 text-shadow-md">
                 Discover Local Goldsmiths, Craft Your Dreams.
@@ -149,7 +148,7 @@ export default function Home() {
 
         {/* How It Works Section */}
         <section id="how-it-works" className="w-full py-10 md:py-16 lg:py-20 bg-background">
-          <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8">
+          <div className="site-inner">
             <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8 md:mb-10">
               <div className="space-y-1.5">
                 <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-xs font-medium text-secondary-foreground shadow-sm font-poppins">How It Works</div>
@@ -177,7 +176,7 @@ export default function Home() {
 
         {/* Featured Goldsmiths Section */}
         <section className="w-full py-10 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/20 to-background">
-          <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8">
+          <div className="site-inner">
             <div className="space-y-2 mb-6 md:mb-8 text-center">
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Meet Our Talented Artisans</h2>
               <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins">
@@ -259,7 +258,7 @@ export default function Home() {
 
         {/* Call to Action Section */}
         <section className="w-full py-10 md:py-16 lg:py-20 border-t border-border/10 bg-background">
-          <div className="mx-auto w-full max-w-screen-xl px-4 sm:px-6 lg:px-8">
+          <div className="site-inner">
             <div className="container mx-auto grid items-center justify-center gap-2 px-4 text-center md:px-6">
               <div className="space-y-2 mb-3 md:mb-4">
                  <Handshake className="h-8 w-8 mx-auto text-primary mb-1" />
@@ -291,4 +290,3 @@ export default function Home() {
     </>
   );
 }
-
