@@ -133,7 +133,7 @@ export default function Home() {
                 </Link>
               </div>
 
-              <div className="mt-10 grid grid-cols-2 gap-4 text-center">
+              <div className="mt-10 flex gap-8 text-center">
                 {heroStats.map((stat, index) => (
                   <div key={index} className="flex flex-col items-center justify-center">
                     <stat.icon className="w-6 h-6 mb-1 text-primary-foreground/80"/>
