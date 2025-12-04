@@ -268,7 +268,7 @@ export default function Home() {
         </section>
 
         {/* Call to Action Section */}
-        <section className="w-full py-10 md:py-16 lg:py-20 border-t border-border/10 bg-background">
+        <section className="w-full py-10 md:py-12 border-t border-border/10 bg-background">
           <div className="site-inner">
             <div className="container mx-auto grid items-center justify-center gap-2 px-4 text-center md:px-6">
               <div className="space-y-2 mb-3 md:mb-4">
