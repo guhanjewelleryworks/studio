@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import type { Goldsmith } from '@/types/goldsmith';
@@ -116,7 +115,7 @@ export default function Home() {
                 Discover Local Goldsmiths, Craft Your Dreams.
               </h1>
               <p className="text-base md:text-lg text-gray-200 max-w-lg mb-6 text-shadow-sm font-poppins">
-                Goldsmith Connect links you with skilled artisans in your area through a secure, mediated process. Find the perfect goldsmith to bring your custom jewelry vision to life.
+                Connect with skilled local artisans through a secure, mediated process. Let's bring your custom jewelry vision to life.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
