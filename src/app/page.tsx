@@ -111,7 +111,7 @@ export default function Home() {
           {/* constrained content — consistent gutters */}
           <div className="relative z-10 site-inner">
             <div className="max-w-2xl text-left">
-              <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight mb-4 text-shadow-md">
+              <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl leading-tight mb-4 text-shadow-md max-w-xl">
                 Discover Local Goldsmiths, Craft Your Dreams.
               </h1>
               <p className="text-base md:text-lg text-gray-200 max-w-lg mb-6 text-shadow-sm font-poppins">
@@ -210,7 +210,7 @@ export default function Home() {
                     <Card key={goldsmith.id} className="shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1.5 bg-card border-primary/20 overflow-hidden group rounded-xl flex flex-col">
                       <CardHeader className="p-0 relative">
                         <Image
-                          src={goldsmith.profileImageUrl || goldsmith.imageUrl || `https://placehold.co/400x300.png`}
+                          src={goldsmith.profileImageUrl || `https://placehold.co/400x300.png`}
                           alt={goldsmith.name || 'Featured Goldsmith'}
                           width={400}
                           height={300}
