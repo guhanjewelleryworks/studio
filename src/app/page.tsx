@@ -160,7 +160,7 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-5 md:gap-6 lg:grid-cols-3 lg:max-w-none pt-4 md:pt-6">
+            <div className="mx-auto grid max-w-5xl items-stretch gap-5 md:gap-6 lg:grid-cols-3 lg:max-w-none pt-4 md:pt-6">
               {howItWorksSteps.map((step, index) => (
                 <div key={index} className="grid gap-1.5 text-center group p-4 rounded-xl bg-card hover:shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-2 border border-transparent hover:border-primary/20">
                   <div className="flex justify-center items-center mb-2">
