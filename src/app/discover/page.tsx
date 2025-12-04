@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Goldsmith } from '@/types/goldsmith';
@@ -27,6 +28,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { differenceInDays } from 'date-fns';
 import { Switch } from '@/components/ui/switch';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const experienceRanges = [
   "0-5 years",
@@ -349,7 +351,16 @@ export default function DiscoverPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {isLoading ? (
              Array.from({ length: 8 }).map((_, index) => (
-              <Card key={index} className="animate-pulse bg-card h-[320px] rounded-xl shadow-md border-border"></Card> 
+                <Card key={index} className="bg-card border-border/10 rounded-xl overflow-hidden shadow-lg">
+                  <Skeleton className="w-full aspect-[16/9]" />
+                  <CardContent className="p-4 space-y-2">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-4 w-full mt-2" />
+                    <Skeleton className="h-4 w-5/6" />
+                    <Skeleton className="h-9 w-full rounded-full mt-3" />
+                  </CardContent>
+                </Card>
              ))
           ) : displayedGoldsmiths.length > 0 ? (
              displayedGoldsmiths.map((goldsmith) => {

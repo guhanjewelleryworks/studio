@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Goldsmith } from '@/types/goldsmith';
@@ -14,6 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { differenceInDays } from 'date-fns';
 import { usePathname } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // --- Icons for the hero stats section ---
 
@@ -186,7 +188,16 @@ export default function Home() {
             {isLoadingFeatured ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 pt-4 md:pt-5">
                 {Array.from({ length: 4 }).map((_, index) => (
-                   <Card key={index} className="animate-pulse bg-card/80 rounded-xl shadow-lg border-border h-[420px]"></Card>
+                  <Card key={index} className="bg-card border-border/10 rounded-xl overflow-hidden shadow-lg">
+                    <Skeleton className="w-full aspect-[4/3]" />
+                    <CardContent className="p-4 space-y-2">
+                      <Skeleton className="h-5 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-4 w-full mt-2" />
+                      <Skeleton className="h-4 w-5/6" />
+                      <Skeleton className="h-9 w-full rounded-full mt-3" />
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             ) : errorFeatured ? (
