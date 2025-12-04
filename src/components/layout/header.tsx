@@ -355,10 +355,6 @@ export function Header() {
                   <Link href="/contact" onClick={() => setIsSheetOpen(false)} className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">
                     Contact Us
                   </Link>
-                  <Link href="/admin/login" onClick={() => setIsSheetOpen(false)} className="flex items-center text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">
-                    <Shield className="mr-2 h-4 w-4" />
-                    Admin Portal
-                  </Link>
                 </nav>
                 <div className="px-6 pb-8 mt-auto flex flex-col gap-3 border-t border-border/20 pt-6">
                   {renderMobileUserActions()}
