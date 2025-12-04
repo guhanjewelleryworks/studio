@@ -177,7 +177,7 @@ export default function Home() {
         </section>
 
         {/* Featured Goldsmiths Section */}
-        <section className="w-full py-10 md:py-16 lg:py-20 bg-gradient-to-b from-secondary/20 to-background">
+        <section className="w-full py-10 md:py-12 bg-gradient-to-b from-secondary/20 to-background">
           <div className="site-inner">
             <div className="space-y-2 mb-6 md:mb-8 text-center">
               <h2 className="font-heading text-accent text-2xl sm:text-3xl">Meet Our Talented Artisans</h2>
