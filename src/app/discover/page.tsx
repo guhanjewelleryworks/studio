@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Search, Star, Loader2, SlidersHorizontal, Palette, ShieldCheck, MapPin } from 'lucide-react';
+import { Search, Star, Loader2, SlidersHorizontal, Palette, ShieldCheck, MapPin, Sparkles, Award } from 'lucide-react';
 import { Link as LinkIcon } from 'lucide-react';
 import Image from 'next/image';
 import NextLink from 'next/link';
@@ -26,6 +26,13 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { differenceInDays } from 'date-fns';
+import { Switch } from '@/components/ui/switch';
+
+const experienceRanges = [
+  "0-5 years",
+  "5-10 years",
+  "10+ years",
+];
 
 export default function DiscoverPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,6 +45,9 @@ export default function DiscoverPage() {
   const [filters, setFilters] = useState({
     specialties: [] as string[],
     states: [] as string[],
+    districts: [] as string[],
+    experience: [] as string[],
+    isNew: false,
   });
 
   // Initial data fetch
@@ -59,10 +69,11 @@ export default function DiscoverPage() {
   }, []);
 
   // Memoize unique values to avoid recalculating on every render
-  const { uniqueSpecialties, uniqueStates } = useMemo(() => {
-    if (!allGoldsmiths) return { uniqueSpecialties: [], uniqueStates: [] };
+  const { uniqueSpecialties, uniqueStates, uniqueDistricts } = useMemo(() => {
+    if (!allGoldsmiths) return { uniqueSpecialties: [], uniqueStates: [], uniqueDistricts: [] };
     const specialtiesSet = new Set<string>();
     const statesSet = new Set<string>();
+    const districtsSet = new Set<string>();
     allGoldsmiths.forEach(g => {
         if (Array.isArray(g.specialty)) {
             g.specialty.forEach(s => s && specialtiesSet.add(s));
@@ -72,10 +83,14 @@ export default function DiscoverPage() {
         if (g.state) {
             statesSet.add(g.state);
         }
+        if (g.district) {
+            districtsSet.add(g.district);
+        }
     });
     return { 
         uniqueSpecialties: Array.from(specialtiesSet).sort(),
         uniqueStates: Array.from(statesSet).sort(),
+        uniqueDistricts: Array.from(districtsSet).sort(),
     };
   }, [allGoldsmiths]);
 
@@ -98,22 +113,54 @@ export default function DiscoverPage() {
         });
     }
 
-    // 2. Filter by selected specialties
+    // 2. Filter by "Newly Joined"
+    if (filters.isNew) {
+        filtered = filtered.filter(g => g.registeredAt && differenceInDays(new Date(), new Date(g.registeredAt)) <= 30);
+    }
+    
+    // 3. Filter by selected experience ranges
+    if (filters.experience.length > 0) {
+        filtered = filtered.filter(g => {
+            const years = g.yearsExperience || 0;
+            return filters.experience.some(range => {
+                if (range === '0-5 years') return years >= 0 && years <= 5;
+                if (range === '5-10 years') return years > 5 && years <= 10;
+                if (range === '10+ years') return years > 10;
+                return false;
+            });
+        });
+    }
+
+    // 4. Filter by selected states
+    if (filters.states.length > 0) {
+        filtered = filtered.filter(g => filters.states.includes(g.state));
+    }
+    
+    // 5. Filter by selected districts
+    if (filters.districts.length > 0) {
+        filtered = filtered.filter(g => filters.districts.includes(g.district));
+    }
+
+    // 6. Filter by selected specialties
     if (filters.specialties.length > 0) {
         filtered = filtered.filter(g => {
             const goldsmithSpecs = Array.isArray(g.specialty) ? g.specialty : [g.specialty];
             return filters.specialties.every(filterSpec => goldsmithSpecs.includes(filterSpec));
         });
     }
-
-    // 3. Filter by selected states
-    if (filters.states.length > 0) {
-        filtered = filtered.filter(g => filters.states.includes(g.state));
-    }
     
     setDisplayedGoldsmiths(filtered);
     
-    if (filtered.length === 0 && (searchTerm.trim() || filters.specialties.length > 0 || filters.states.length > 0)) {
+    const noMatches = filtered.length === 0 && (
+        searchTerm.trim() ||
+        filters.isNew ||
+        filters.experience.length > 0 ||
+        filters.states.length > 0 ||
+        filters.districts.length > 0 ||
+        filters.specialties.length > 0
+    );
+
+    if (noMatches) {
         setError(`No goldsmiths found matching your criteria. Try adjusting your search or filters.`);
     } else {
         setError(null);
@@ -126,6 +173,9 @@ export default function DiscoverPage() {
     setFilters({
         specialties: [],
         states: [],
+        districts: [],
+        experience: [],
+        isNew: false,
     });
   };
 
@@ -163,36 +213,106 @@ export default function DiscoverPage() {
                 <Separator className="my-3"/>
                 <div className="flex-grow overflow-y-auto pr-4 space-y-6">
                     
-                    {/* State Filter */}
-                    {uniqueStates.length > 0 && (
-                        <div>
-                            <Label className="text-base font-semibold text-foreground">Filter by State</Label>
-                            <div className="mt-2 space-y-2">
-                                {uniqueStates.map(state => (
-                                    <div key={state} className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id={`state-${state}`}
-                                            checked={filters.states.includes(state)}
-                                            onCheckedChange={(checked) => {
-                                                const newStates = checked
-                                                    ? [...filters.states, state]
-                                                    : filters.states.filter(s => s !== state);
-                                                setFilters(prev => ({...prev, states: newStates}));
-                                            }}
-                                        />
-                                        <Label htmlFor={`state-${state}`} className="font-normal capitalize">{state}</Label>
-                                    </div>
-                                ))}
-                            </div>
+                     {/* Newly Joined Filter */}
+                    <div>
+                        <Label className="text-base font-semibold text-foreground">Quick Filters</Label>
+                        <div className="mt-2 flex items-center space-x-2 p-2 rounded-md border border-border/50">
+                            <Switch 
+                                id="newly-joined-filter"
+                                checked={filters.isNew}
+                                onCheckedChange={(checked) => setFilters(prev => ({...prev, isNew: checked}))}
+                            />
+                            <Label htmlFor="newly-joined-filter" className="font-normal flex items-center gap-2">
+                                <Sparkles className="h-4 w-4 text-primary" /> Newly Joined
+                            </Label>
                         </div>
-                    )}
+                    </div>
+
+                    <Separator />
+
+                    {/* Experience Filter */}
+                    <div>
+                        <Label className="text-base font-semibold text-foreground">Years of Experience</Label>
+                        <div className="mt-2 space-y-2">
+                            {experienceRanges.map(range => (
+                                <div key={range} className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id={`exp-${range}`}
+                                        checked={filters.experience.includes(range)}
+                                        onCheckedChange={(checked) => {
+                                            const newExp = checked
+                                                ? [...filters.experience, range]
+                                                : filters.experience.filter(e => e !== range);
+                                            setFilters(prev => ({...prev, experience: newExp}));
+                                        }}
+                                    />
+                                    <Label htmlFor={`exp-${range}`} className="font-normal capitalize flex items-center gap-2">
+                                        <Award className="h-4 w-4 text-muted-foreground" /> {range}
+                                    </Label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Location Filters */}
+                    <div>
+                        <Label className="text-base font-semibold text-foreground">Location</Label>
+                        <div className="mt-2 space-y-4">
+                            {uniqueStates.length > 0 && (
+                                <div>
+                                    <h4 className="text-sm font-medium mb-1.5 text-foreground/80">State</h4>
+                                    <div className="max-h-40 overflow-y-auto space-y-2 pr-2">
+                                        {uniqueStates.map(state => (
+                                            <div key={state} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`state-${state}`}
+                                                    checked={filters.states.includes(state)}
+                                                    onCheckedChange={(checked) => {
+                                                        const newStates = checked
+                                                            ? [...filters.states, state]
+                                                            : filters.states.filter(s => s !== state);
+                                                        setFilters(prev => ({...prev, states: newStates}));
+                                                    }}
+                                                />
+                                                <Label htmlFor={`state-${state}`} className="font-normal capitalize">{state}</Label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                             {uniqueDistricts.length > 0 && (
+                                <div>
+                                    <h4 className="text-sm font-medium mb-1.5 text-foreground/80">District / City</h4>
+                                    <div className="max-h-40 overflow-y-auto space-y-2 pr-2">
+                                        {uniqueDistricts.map(district => (
+                                            <div key={district} className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id={`district-${district}`}
+                                                    checked={filters.districts.includes(district)}
+                                                    onCheckedChange={(checked) => {
+                                                        const newDistricts = checked
+                                                            ? [...filters.districts, district]
+                                                            : filters.districts.filter(d => d !== district);
+                                                        setFilters(prev => ({...prev, districts: newDistricts}));
+                                                    }}
+                                                />
+                                                <Label htmlFor={`district-${district}`} className="font-normal capitalize">{district}</Label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                     
                     <Separator />
 
                     {/* Specialty Filter */}
                     {uniqueSpecialties.length > 0 && (
                         <div>
-                            <Label className="text-base font-semibold text-foreground">Filter by Specialties</Label>
+                            <Label className="text-base font-semibold text-foreground">Specialties</Label>
                             <div className="mt-2 space-y-2">
                                 {uniqueSpecialties.map(spec => (
                                     <div key={spec} className="flex items-center space-x-2">
@@ -203,7 +323,7 @@ export default function DiscoverPage() {
                                                 const newSpecs = checked
                                                     ? [...filters.specialties, spec]
                                                     : filters.specialties.filter(s => s !== spec);
-                setFilters(prev => ({...prev, specialties: newSpecs}));
+                                                setFilters(prev => ({...prev, specialties: newSpecs}));
                                             }}
                                         />
                                         <Label htmlFor={`spec-${spec}`} className="font-normal capitalize">{spec}</Label>
@@ -233,7 +353,7 @@ export default function DiscoverPage() {
              ))
           ) : displayedGoldsmiths.length > 0 ? (
              displayedGoldsmiths.map((goldsmith) => {
-                const isNew = goldsmith.registeredAt && differenceInDays(new Date(), new Date(goldsmith.registeredAt)) <= 15;
+                const isNew = goldsmith.registeredAt && differenceInDays(new Date(), new Date(goldsmith.registeredAt)) <= 30;
                 return (
                   <Card key={goldsmith.id} className="shadow-lg hover:shadow-2xl transition-all duration-300 bg-card border-primary/15 flex flex-col rounded-xl overflow-hidden group">
                     <CardHeader className="p-0 relative">
