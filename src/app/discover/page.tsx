@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { Goldsmith } from '@/types/goldsmith';
@@ -369,7 +370,7 @@ export default function DiscoverPage() {
                   <Card key={goldsmith.id} className="shadow-lg hover:shadow-2xl transition-all duration-300 bg-card border-primary/15 flex flex-col rounded-xl overflow-hidden group">
                     <CardHeader className="p-0 relative">
                       <Image
-                        src={goldsmith.imageUrl || 'https://picsum.photos/seed/default-goldsmith/400/300'}
+                        src={goldsmith.profileImageUrl || goldsmith.imageUrl || 'https://picsum.photos/seed/default-goldsmith/400/300'}
                         alt={goldsmith.name}
                         width={400}
                         height={200}

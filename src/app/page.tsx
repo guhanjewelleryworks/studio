@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { Goldsmith } from '@/types/goldsmith';
@@ -210,7 +211,7 @@ export default function Home() {
                     <Card key={goldsmith.id} className="shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1.5 bg-card border-primary/20 overflow-hidden group rounded-xl flex flex-col">
                       <CardHeader className="p-0 relative">
                         <Image
-                          src={goldsmith.imageUrl || `https://placehold.co/400x300.png`}
+                          src={goldsmith.profileImageUrl || goldsmith.imageUrl || `https://placehold.co/400x300.png`}
                           alt={goldsmith.name || 'Featured Goldsmith'}
                           width={400}
                           height={300}
