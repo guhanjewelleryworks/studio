@@ -149,7 +149,7 @@ export default function Home() {
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="w-full py-10 md:py-16 lg:py-20 bg-background">
+        <section id="how-it-works" className="w-full py-10 md:py-12 bg-background">
           <div className="site-inner">
             <div className="flex flex-col items-center justify-center space-y-2 text-center mb-8 md:mb-10">
               <div className="space-y-1.5">
