@@ -41,7 +41,7 @@ export default async function RootLayout({
   const settings = await fetchPlatformSettings();
 
   return (
-    <html lang="en" className={cn("h-full antialiased", poppins.variable, playfairDisplay.variable, geistSans.variable)}>
+    <html lang="en" className={cn("h-full antialiased", poppins.variable, playfairDisplay.variable, geistSans.variable)} suppressHydrationWarning={true}>
       <body className={cn('min-h-full font-body flex flex-col text-foreground')}>
         <AuthProvider>
           <div className="relative flex min-h-dvh flex-col bg-transparent z-0">
