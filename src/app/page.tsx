@@ -80,7 +80,7 @@ export default function Home() {
 
   const howItWorksSteps = [
     { icon: Search, title: "1. Discover & Inquire", description: "Browse verified goldsmith profiles. Submit an introduction or custom order request through our elegant platform." },
-    { icon: ShieldCheck, title: "2. Admin Mediation", description: "Our team reviews your request, ensuring a secure and smooth process. We facilitate introductions and order details." },
+    { icon: ShieldCheck, title: "2. Verified Introduction", description: "Our team reviews your request, ensuring a secure and smooth process. We facilitate introductions and order details." },
     { icon: Gift, title: "3. Create & Cherish", description: "Collaborate with your chosen artisan. They craft your piece with passion, and you receive your dream jewelry." },
   ];
 
