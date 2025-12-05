@@ -7,7 +7,7 @@ export default function TermsPage() {
        <Card className="shadow-lg border-primary/20 bg-card">
         <CardHeader className="pb-3 pt-5">
            <CardTitle className="text-3xl text-accent mb-3">Terms of Service</CardTitle> {/* Updated to text-accent */}
-           <p className="text-sm text-muted-foreground">Last Updated: {new Date().toLocaleDateString()}</p>
+           <p className="text-sm text-muted-foreground">Last Updated: July 26, 2024</p>
         </CardHeader>
         <CardContent className="prose prose-stone dark:prose-invert max-w-none text-foreground/85 space-y-3 px-6 pb-6 pt-0">
             <p>Welcome to Goldsmith Connect!</p>

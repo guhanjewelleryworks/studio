@@ -46,25 +46,11 @@ export default function Home() {
       setErrorFeatured(null);
       try {
         const allVerifiedGoldsmiths = await fetchAllGoldsmiths();
-
-        // --- Shuffle Algorithm (Fisher-Yates) ---
-        let currentIndex = allVerifiedGoldsmiths.length;
-        let randomIndex;
-        const shuffledGoldsmiths = [...allVerifiedGoldsmiths]; // Create a copy to shuffle
-
-        // While there remain elements to shuffle.
-        while (currentIndex !== 0) {
-          // Pick a remaining element.
-          randomIndex = Math.floor(Math.random() * currentIndex);
-          currentIndex--;
-
-          // And swap it with the current element.
-          [shuffledGoldsmiths[currentIndex], shuffledGoldsmiths[randomIndex]] = [
-            shuffledGoldsmiths[randomIndex], shuffledGoldsmiths[currentIndex]];
-        }
-        // --- End of Shuffle ---
-
-        setFeaturedGoldsmiths(shuffledGoldsmiths.slice(0, 4));
+        
+        // Removed the random shuffle to prevent hydration errors.
+        // Simply take the first 4 results. For more variety, the server-side
+        // fetch could be made to randomize, but this is safest for hydration.
+        setFeaturedGoldsmiths(allVerifiedGoldsmiths.slice(0, 4));
 
       } catch (err) {
         console.error("Error fetching featured goldsmiths:", err);
