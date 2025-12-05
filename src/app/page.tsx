@@ -156,7 +156,7 @@ export default function Home() {
                 <div className="inline-block rounded-full bg-secondary/70 px-3 py-1 text-xs font-medium text-secondary-foreground shadow-sm font-poppins">How It Works</div>
                 <h2 className="font-heading text-accent text-2xl sm:text-3xl">Your Secure Path to Custom Jewelry</h2>
                 <p className="max-w-[800px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins">
-                  We connect you with talented goldsmiths through a verified and mediated process, ensuring quality and trust.
+                  We connect you with talented goldsmiths through a secure and verified process, ensuring quality and trust.
                 </p>
               </div>
             </div>
