@@ -10,10 +10,14 @@ export function useIsMobile() {
     const onChange = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
-    mql.addEventListener("change", onChange)
+    
+    // Set the initial value on the client after mount
     setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+
+    mql.addEventListener("change", onChange)
+
     return () => mql.removeEventListener("change", onChange)
   }, [])
 
-  return !!isMobile
+  return isMobile // Return the state value, which may be undefined initially
 }
