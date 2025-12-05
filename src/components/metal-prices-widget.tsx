@@ -118,19 +118,22 @@ export const MetalPricesWidget: React.FC = () => {
 
     // Interval to update the relative time display every minute
     const timeUpdateInterval = setInterval(() => {
-        setRelativeTime(calculateRelativeTime(lastUpdated));
+        if(lastUpdated) {
+           setRelativeTime(calculateRelativeTime(lastUpdated));
+        }
     }, 60 * 1000);
 
     return () => {
         clearInterval(dataFetchInterval);
         clearInterval(timeUpdateInterval);
     };
-  }, [lastUpdated]); // Rerun intervals if lastUpdated date changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Card className="bg-card/80 backdrop-blur-sm border-primary/20 shadow-md hover:shadow-lg transition-shadow rounded-lg w-full max-w-xs">
       <CardHeader className="pb-2 pt-3 px-4">
-        <CardTitle className="text-xs font-semibold text-accent uppercase tracking-wider text-center">
+        <CardTitle suppressHydrationWarning className="text-xs font-semibold text-accent uppercase tracking-wider text-center">
           {isLoading && !lastUpdated ? 'Loading prices...' : `Updated ${relativeTime}`}
         </CardTitle>
       </CardHeader>
@@ -175,7 +178,7 @@ export const MetalPricesWidget: React.FC = () => {
         )}
       </CardContent>
        <CardFooter className="pt-0 pb-2 px-4">
-        <p className="text-[0.65rem] text-muted-foreground text-center w-full flex items-center justify-center">
+        <p suppressHydrationWarning className="text-[0.65rem] text-muted-foreground text-center w-full flex items-center justify-center">
             <Info className="h-3 w-3 mr-1" />
             {nextUpdateTimeMessage}
         </p>
