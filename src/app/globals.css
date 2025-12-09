@@ -176,15 +176,15 @@ html, body, #__next {
   margin-right: auto;
   width: 100%;
   max-width: 1280px; /* same as max-w-screen-xl */
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: 0; /* Changed from 1rem to 0 */
+  padding-right: 0; /* Changed from 1rem to 0 */
 }
 
 @media (min-width: 640px) {
-  .site-inner { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .site-inner { padding-left: 0; padding-right: 0; } /* Changed from 1.5rem to 0 */
 }
 @media (min-width: 1024px) {
-  .site-inner { padding-left: 2rem; padding-right: 2rem; }
+  .site-inner { padding-left: 0; padding-right: 0; } /* Changed from 2rem to 0 */
 }
 
 /* Debug helper (optional)
