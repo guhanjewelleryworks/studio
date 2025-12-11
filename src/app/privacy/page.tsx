@@ -1,5 +1,4 @@
 // src/app/privacy/page.tsx
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from 'next/link';
 
@@ -13,60 +12,103 @@ export default function PrivacyPage() {
          </CardHeader>
         <CardContent className="prose prose-stone dark:prose-invert max-w-none text-foreground/85 space-y-3 px-6 pb-6 pt-0">
 
-            <p>Welcome to Goldsmith Connect. Your privacy is one of our top priorities. This Privacy Policy outlines the types of information we collect and record and how we use it to provide our services.</p>
+            <p>Welcome to Goldsmith Connect. Your privacy is one of our top priorities. This Privacy Policy explains what information we collect, how we use it, and the choices you have.</p>
+            <p>By using our platform, you consent to the practices described in this Privacy Policy.</p>
 
             <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">1. Information We Collect</h2>
-            <p>We collect information necessary to operate our platform and facilitate connections between customers and goldsmiths. The type of information we collect depends on how you interact with our service.</p>
             
-            <h3 className="font-heading text-lg text-accent/90 mt-3 mb-1">a. Information You Provide to Us</h3>
-            <ul className="space-y-1.5">
-                <li><strong>For Customers:</strong> When you create an account, we collect your name, and email address. When you request a custom order, we also collect your phone number and the details and images related to your request.</li>
-                <li><strong>For Goldsmiths:</strong> When you register as a partner, we collect your workshop name, contact person, email address, phone number, location (state and district), specialties, years of experience, and a password. You may also provide a detailed bio and upload images to your portfolio.</li>
-                <li><strong>For All Users:</strong> When you use our contact form, we collect your name, email, phone number, and the message you send.</li>
-            </ul>
+            <h3 className="font-heading text-lg text-accent/90 mt-3 mb-1">a. Information You Provide</h3>
+            <p><strong>For Customers</strong></p>
+            <p>When you create an account, we collect your name and email address. When you request a custom order, we collect your phone number and any design details, descriptions, and images you submit.</p>
+            
+            <p><strong>For Goldsmiths</strong></p>
+            <p>Goldsmith registration requires workshop name, contact person, email, phone number, location (state & district), specialties, years of experience, and a password. You may optionally provide a bio and upload portfolio images.</p>
+            
+            <p><strong>For All Users</strong></p>
+            <p>When you contact us through our site, we collect your name, email, phone number, and message.</p>
 
-            <h3 className="font-heading text-lg text-accent/90 mt-3 mb-1">b. Information We Collect Automatically</h3>
-            <ul className="space-y-1.5">
-                <li><strong>Usage Data:</strong> We automatically collect information about your interactions with our service, such as login dates and, for goldsmiths, profile view counts to provide you with performance analytics.</li>
-                <li><strong>Cookies:</strong> We use cookies to manage your login sessions and maintain your authentication status. Our authentication provider (Google) may also use cookies if you choose to sign in with their service.</li>
-            </ul>
+            <h3 className="font-heading text-lg text-accent/90 mt-3 mb-1">b. Information Collected Automatically</h3>
+            <p><strong>Usage Data</strong></p>
+            <p>We collect information such as login timestamps and, for goldsmiths, profile view counts to provide performance insights.</p>
+            <p><strong>Cookies</strong></p>
+            <p>We use essential cookies to maintain authentication and session stability. If you choose Google login, Google may also place cookies according to their privacy policy.</p>
+            <p>We do not use advertising or tracking cookies.</p>
+
 
             <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">2. How We Use Your Information</h2>
-            <p>We use your information for the following purposes:</p>
-            <ul className="space-y-1.5">
-                <li><strong>To Provide Our Service:</strong> To create and maintain your account, and to facilitate the core function of connecting customers with goldsmiths for custom jewelry orders.</li>
-                <li><strong>To Communicate With You:</strong> To send essential transactional emails, such as account verification links and password reset instructions.</li>
-                <li><strong>To Ensure Platform Integrity:</strong> Our administrators use the information to verify goldsmith profiles and to review and mediate order requests, ensuring a secure and trusted marketplace.</li>
-                <li><strong>To Improve Our Services:</strong> We analyze usage data to understand how our platform is used, fix issues, and develop new features.</li>
-                <li><strong>For Security:</strong> To protect against fraud, abuse, and unauthorized access to accounts.</li>
+            <p>We use your data to:</p>
+            <ul className="space-y-1.5 list-disc pl-5">
+                <li>Provide and maintain your account</li>
+                <li>Facilitate customer–goldsmith order interactions</li>
+                <li>Send essential communications (verification, password reset, updates)</li>
+                <li>Verify goldsmith profiles and maintain marketplace integrity</li>
+                <li>Improve platform performance and features</li>
+                <li>Protect against fraud, abuse, and unauthorized access</li>
             </ul>
+            <p>We do not sell your personal information.</p>
 
             <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">3. How We Share Your Information</h2>
-            <p>Your information is shared only when necessary to provide our services. We do not sell your personal data.</p>
-             <ul className="space-y-1.5">
-                <li><strong>Between Customers and Goldsmiths:</strong> A customer's order request details are shared with our administrators and, upon approval, with the intended goldsmith. A goldsmith's profile information (name, general location, specialties) is publicly visible. Direct contact information is only shared through our mediated process to protect all parties.</li>
-                <li><strong>With Service Providers:</strong> We rely on trusted third-party services to operate our platform, including database hosting (MongoDB), email delivery (Resend), and authentication (Google, if you opt-in). These providers are only authorized to use your information to perform services for us.</li>
-                <li><strong>For Legal Reasons:</strong> We may share information if required to do so by law or in response to valid requests by public authorities.</li>
+            <p><strong>Customer ↔ Goldsmith (Mediated Sharing)</strong></p>
+            <p>Customer order details are shared with administrators and, upon approval, with the selected goldsmith. Goldsmith profiles (name, general location, specialties) are publicly visible. Direct contact information is shared only through our mediated workflow to protect privacy.</p>
+            <p><strong>Service Providers</strong></p>
+            <p>We work with reputable third-party providers including:</p>
+            <ul className="space-y-1.5 list-disc pl-5">
+                <li>MongoDB (database hosting)</li>
+                <li>Resend (email service)</li>
+                <li>Google (authentication, if chosen)</li>
             </ul>
+            <p>These providers access data only to perform their services.</p>
+            <p><strong>Legal Requirements</strong></p>
+            <p>We may disclose information to comply with legal obligations or valid government requests.</p>
 
-
-            <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">4. Data Security</h2>
-            <p>We are committed to protecting your data. We use industry-standard measures, including password encryption (hashing) and secure HTTPS connections, to safeguard your information from unauthorized access.</p>
-
-
-            <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">5. Your Data Rights & Choices</h2>
-            <p>You have control over your personal information.</p>
-             <ul className="space-y-1.5">
-                <li><strong>Access and Update:</strong> You can access and update your profile information at any time through your Customer or Goldsmith dashboard.</li>
-                <li><strong>Account Deletion:</strong> You can request the deletion of your account. Please note that for reporting and integrity purposes, we may retain anonymized data (e.g., order records without personal identifiers).</li>
-                <li><strong>Communications:</strong> You can manage your communication preferences for non-essential emails. Transactional emails (like password resets) are required for account maintenance.</li>
+            <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">4. Data Transfers</h2>
+            <p>Your information may be stored or processed outside India, depending on the server region used by our hosting providers. We ensure such transfers comply with applicable data protection laws.</p>
+            
+            <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">5. Data Retention</h2>
+            <p>We retain personal information only as long as necessary to:</p>
+            <ul className="space-y-1.5 list-disc pl-5">
+                <li>Provide our services</li>
+                <li>Comply with legal requirements</li>
+                <li>Resolve disputes</li>
+                <li>Enforce agreements</li>
             </ul>
+            <p>Upon account deletion, we may retain anonymized order records without personal identifiers.</p>
 
-            <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">6. Children's Privacy</h2>
-            <p>Our service is not intended for individuals under the age of 18. We do not knowingly collect personal information from children. If we become aware that we have collected data from a child without parental consent, we will take steps to remove that information.</p>
+            <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">6. Data Security</h2>
+            <p>We use industry-standard security measures including:</p>
+            <ul className="space-y-1.5 list-disc pl-5">
+                <li>Password hashing</li>
+                <li>Encrypted connections (HTTPS)</li>
+                <li>Role-based access controls</li>
+            </ul>
+            <p>While no system is 100% secure, we work continuously to protect your data.</p>
+
+            <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">7. Your Rights & Choices</h2>
+            <p>You may:</p>
+             <ul className="space-y-1.5 list-disc pl-5">
+                <li>Access and update your profile anytime</li>
+                <li>Request deletion of your account</li>
+                <li>Adjust non-essential communication preferences</li>
+            </ul>
+            <p>Transactional communications (e.g., password reset) cannot be opted out of.</p>
+
+            <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">8. Children’s Privacy</h2>
+            <p>Our platform is not intended for anyone under 18. If we learn that a minor has provided personal information, we will remove it promptly.</p>
+
+            <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">9. Grievance Officer (As per IT Rules, India)</h2>
+            <p>For concerns or complaints, contact:</p>
+            <p>
+                Grievance Officer<br />
+                Email: support@goldsmithconnect.com
+            </p>
+            <p>We aim to respond within 15 business days.</p>
+            
+            <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">10. Updates to This Policy</h2>
+            <p>We may update this Privacy Policy occasionally. Your continued use of the platform after changes indicates your acceptance of the updated policy.</p>
 
             <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">Contact Us</h2>
-            <p>If you have any questions or concerns about this Privacy Policy, please contact us through our <Link href="/contact" className="text-primary hover:underline">contact page</Link>.</p>
+            <p>If you have any questions or concerns, please reach out through our <Link href="/contact" className="text-primary hover:underline">Contact Page</Link>.</p>
+            
         </CardContent>
       </Card>
     </div>
