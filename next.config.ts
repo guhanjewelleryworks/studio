@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
   ...(process.env.NODE_ENV === 'development' && {
     experimental: {
       allowedDevOrigins: [
-        "https://6000-idx-studio-1745814910643.cluster-ubrd2huk7jh6otbgyei4h62ope.cloudworkstations.dev"
+        "https://9000-idx-studio-1745814910643.cluster-ubrd2huk7jh6otbgyei4h62ope.cloudworkstations.dev"
       ],
     },
   }),
