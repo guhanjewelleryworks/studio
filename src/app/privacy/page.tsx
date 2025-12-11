@@ -1,3 +1,4 @@
+// src/app/privacy/page.tsx
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from 'next/link';
@@ -19,7 +20,7 @@ export default function PrivacyPage() {
             
             <h3 className="font-heading text-lg text-accent/90 mt-3 mb-1">a. Information You Provide to Us</h3>
             <ul className="space-y-1.5">
-                <li><strong>For Customers:</strong> When you create an account, we collect your name, email address, and an encrypted password. When you request a custom order, we also collect your phone number and the details and images related to your request.</li>
+                <li><strong>For Customers:</strong> When you create an account, we collect your name, and email address. When you request a custom order, we also collect your phone number and the details and images related to your request.</li>
                 <li><strong>For Goldsmiths:</strong> When you register as a partner, we collect your workshop name, contact person, email address, phone number, location (state and district), specialties, years of experience, and a password. You may also provide a detailed bio and upload images to your portfolio.</li>
                 <li><strong>For All Users:</strong> When you use our contact form, we collect your name, email, phone number, and the message you send.</li>
             </ul>
