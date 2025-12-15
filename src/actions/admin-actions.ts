@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { logAuditEvent } from './audit-log-actions';
 import { revalidatePath } from 'next/cache';
-import { type WithId } from 'mongodb';
+import { type WithId, type ObjectId } from 'mongodb';
 
 const SALT_ROUNDS = 10;
 
@@ -50,13 +50,13 @@ async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'pass
         createdAt: new Date(),
       };
 
-      await collection.insertOne(newAdmin);
+      const result = await collection.insertOne(newAdmin);
       console.log('[Admin Actions] Default admin user has been successfully created.');
       
       await logAuditEvent('Default admin account seeded', { type: 'system', id: 'init' }, { email: adminEmail });
       
-      // Return the newly created admin document by fetching it again
-      const createdAdmin = await collection.findOne({ email: adminEmail });
+      // Return the newly created admin document by fetching it again, now with the _id
+      const createdAdmin = await collection.findOne({ _id: result.insertedId });
       return createdAdmin;
     }
   } catch (error) {
