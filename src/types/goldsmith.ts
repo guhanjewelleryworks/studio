@@ -135,7 +135,7 @@ export interface Admin {
   id: string;
   name: string;
   email: string;
-  password?: string;
+  password: string; // Made password mandatory
   role: 'superadmin' | 'admin';
   permissions: Permission[];
   createdAt: Date;

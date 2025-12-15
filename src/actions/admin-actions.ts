@@ -95,12 +95,7 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
     }
 
     // From this point, we have a valid adminUser object from the database.
-    // Now, we must always perform the password check.
-    if (!adminUser.password) {
-      console.error(`[Admin Actions] Security Alert: Admin user ${credentials.email} has no password set.`);
-      return { success: false, message: 'Invalid account configuration. Please contact support.' };
-    }
-
+    // The password field is now guaranteed by the Admin type, so we can use it directly.
     const passwordMatch = await bcrypt.compare(credentials.password, adminUser.password);
 
     if (passwordMatch) {
