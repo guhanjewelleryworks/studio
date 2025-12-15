@@ -1,3 +1,4 @@
+
 // src/actions/customer-actions.ts
 'use server';
 
@@ -93,8 +94,14 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
     console.log('[Action: saveCustomer] MongoDB insert result:', result.insertedId);
 
     if (result.insertedId) {
-      // Send verification email
-      await sendVerificationEmail(newCustomer.email, newCustomer.verificationToken, 'customer');
+      // Send verification email - with a check to satisfy TypeScript
+      if (newCustomer.verificationToken) {
+        await sendVerificationEmail(newCustomer.email, newCustomer.verificationToken, 'customer');
+      } else {
+        // This case should ideally never be reached, but it handles the possibility
+        console.error(`[Action: saveCustomer] CRITICAL: Verification token was null for new user ${newCustomer.email}. Email not sent.`);
+      }
+
 
       logAuditEvent(
         'Customer account created (pending verification)',
@@ -162,11 +169,15 @@ export async function resendVerificationEmail(email: string): Promise<{ success:
       return { success: true, message: genericSuccessMessage };
     }
 
-    const newVerificationToken = crypto.randomBytes(32).toString('hex');
-    await collection.updateOne(
-      { _id: customer._id },
-      { $set: { verificationToken: newVerificationToken } }
-    );
+    // Ensure there's a token to use or create a new one.
+    const newVerificationToken = customer.verificationToken || crypto.randomBytes(32).toString('hex');
+    if (!customer.verificationToken) {
+        // Update the user document if a new token was generated
+        await collection.updateOne(
+          { _id: customer._id },
+          { $set: { verificationToken: newVerificationToken } }
+        );
+    }
     
     // Send the new verification email
     await sendVerificationEmail(customer.email, newVerificationToken, 'customer');
@@ -516,3 +527,5 @@ export async function deleteCustomer(customerId: string): Promise<{ success: boo
     return { success: false, error: 'An unexpected server error occurred during profile deletion.' };
   }
 }
+
+    
