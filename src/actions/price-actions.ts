@@ -3,7 +3,7 @@
 
 import { getMetalPricesCollection } from '@/lib/mongodb';
 import type { StoredMetalPrice } from '@/types/goldsmith';
-import type { Collection } from 'mongodb';
+import type { Collection, AnyBulkWriteOperation } from 'mongodb';
 
 /**
  * Fetches live metal prices from GoldAPI.io and stores them in the database.
@@ -54,7 +54,7 @@ export async function fetchAndStoreLiveMetalPrices() {
 
         const results = await Promise.allSettled(pricePromises);
         
-        const operations = [];
+        const operations: AnyBulkWriteOperation<StoredMetalPrice>[] = [];
         const errors: string[] = [];
         const now = new Date();
 
