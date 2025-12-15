@@ -16,7 +16,7 @@ const SALT_ROUNDS = 10;
  * Creates the default admin user if one doesn't exist, using credentials from environment variables.
  * This function should only be called when an admin user is confirmed not to exist.
  */
-async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'password'>): Promise<Admin | null> {
+async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'password'>): Promise<WithId<Admin> | null> {
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
 
@@ -57,7 +57,7 @@ async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'pass
       
       // Return the newly created admin document by fetching it again
       const createdAdmin = await collection.findOne({ email: adminEmail });
-      return createdAdmin as Admin | null;
+      return createdAdmin;
     }
   } catch (error) {
     console.error('[Admin Actions] Error seeding default admin:', error);
@@ -78,7 +78,7 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
   const collection = await getAdminsCollection();
 
   try {
-    let adminUser = await collection.findOne({ email: credentials.email });
+    let adminUser: WithId<Admin> | null = await collection.findOne({ email: credentials.email });
 
     // If the admin user does not exist, try to seed it.
     // This will only succeed if the credentials match the .env variables.
