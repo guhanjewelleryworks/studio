@@ -115,6 +115,9 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       // Send verification email
       if (newGoldsmith.verificationToken) {
         await sendVerificationEmail(newGoldsmith.email, newGoldsmith.verificationToken, 'goldsmith');
+      } else {
+        // This case should ideally never be reached, but it handles the possibility
+        console.error(`[Action: saveGoldsmith] CRITICAL: Verification token was null for new user ${newGoldsmith.email}. Email not sent.`);
       }
       
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
@@ -316,6 +319,10 @@ export async function fetchGoldsmithByEmailForLogin(email: string): Promise<Gold
 export async function loginGoldsmith(credentials: Pick<NewGoldsmithInput, 'email' | 'password'>): Promise<{ success: boolean; data?: Omit<Goldsmith, 'password' | '_id'>; error?: string }> {
   console.log('[Action: loginGoldsmith] Attempting login for email:', credentials.email);
   try {
+    if (!credentials.email || !credentials.password) {
+        return { success: false, error: "Email and password must be provided." };
+    }
+
     const goldsmith = await fetchGoldsmithByEmailForLogin(credentials.email);
 
     if (!goldsmith || !goldsmith.password) {
