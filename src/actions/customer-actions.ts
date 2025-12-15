@@ -8,7 +8,7 @@ import type { Collection, WithId, Filter } from 'mongodb';
 import { ObjectId } from 'mongodb'; // Import ObjectId
 import { logAuditEvent } from './audit-log-actions';
 import crypto from 'crypto';
-import { sendVerificationEmail, sendPasswordResetEmail } from '@/lib/email';
+import { sendVerificationEmail, sendCustomerPasswordResetEmail } from '@/lib/email';
 import bcrypt from 'bcryptjs';
 import { fetchPlatformSettings } from './settings-actions';
 
@@ -397,7 +397,7 @@ export async function requestCustomerPasswordReset(email: string): Promise<{ suc
     );
     
     // Send the actual password reset email
-    await sendPasswordResetEmail(customer.email, resetToken);
+    await sendCustomerPasswordResetEmail(customer.email, resetToken);
     
     logAuditEvent('Customer requested password reset', { type: 'customer', id: customer.id }, { email: customer.email });
 
