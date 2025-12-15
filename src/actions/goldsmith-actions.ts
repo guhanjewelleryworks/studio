@@ -1,3 +1,4 @@
+
 // src/actions/goldsmith-actions.ts
 'use server';
 
@@ -112,7 +113,9 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       );
 
       // Send verification email
-      await sendVerificationEmail(newGoldsmith.email, newGoldsmith.verificationToken, 'goldsmith');
+      if (newGoldsmith.verificationToken) {
+        await sendVerificationEmail(newGoldsmith.email, newGoldsmith.verificationToken, 'goldsmith');
+      }
       
       const insertedDoc = await collection.findOne({ _id: result.insertedId });
       if (insertedDoc) {
