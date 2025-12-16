@@ -64,11 +64,12 @@ export default function CustomerDashboardPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user?.id) {
-      const loadStats = async () => {
+    const loadStats = async () => {
+      // Check for authenticated status and session user ID before proceeding
+      if (status === 'authenticated' && session?.user?.id) {
         setIsLoadingStats(true);
         try {
-          const orders = await fetchCustomerOrders(session.user.id as string);
+          const orders = await fetchCustomerOrders(session.user.id);
           const notificationCount = orders.filter(
             o => o.status === 'customer_review_requested' || o.status === 'shipped'
           ).length;
@@ -82,9 +83,17 @@ export default function CustomerDashboardPage() {
         } finally {
           setIsLoadingStats(false);
         }
-      };
+      }
+    };
+    
+    // Only call loadStats if the user is authenticated
+    if (status === 'authenticated') {
       loadStats();
+    } else if (status === 'unauthenticated') {
+      // If unauthenticated, there's nothing to load, so stop the loading indicator
+      setIsLoadingStats(false);
     }
+
   }, [status, session, toast]);
   
   const handleLogout = () => {
