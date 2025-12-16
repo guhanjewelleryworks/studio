@@ -1,4 +1,3 @@
-
 // src/actions/goldsmith-actions.ts
 'use server';
 
@@ -75,6 +74,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
     const newGoldsmith: Goldsmith = {
+      id: uuidv4(),
       name: data.name.trim(),
       contactPerson: data.contactPerson?.trim() || '',
       email: normalizedEmail,
@@ -83,7 +83,6 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       district: data.district,
       specialty: Array.isArray(data.specialty) ? data.specialty.map(s => s.trim()).filter(s => s) : (data.specialty?.toString().trim() || ''),
       password: hashedPassword, 
-      id: uuidv4(),
       rating: 0,
       imageUrl: `https://picsum.photos/seed/${safeNameSeed}/400/300`,
       profileImageUrl: `https://picsum.photos/seed/${safeNameSeed}-profile/120/120`,
@@ -95,6 +94,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       responseTime: data.responseTime || "Varies",
       ordersCompleted: 0,
       profileViews: 0,
+      portfolioImages: [],
       status: 'pending_email_verification',
       registeredAt: new Date(),
       emailVerified: null,
