@@ -40,7 +40,7 @@ export default function CustomerOrderDetailPage({ params: paramsPromise }: { par
       router.push(`/login?redirect=/customer/orders/${orderId}`);
     }
 
-    if (status === 'authenticated' && session.user.id && orderId) {
+    if (status === 'authenticated' && session?.user?.id && orderId) {
       const loadOrderDetails = async () => {
         setIsLoading(true);
         setError(null);
