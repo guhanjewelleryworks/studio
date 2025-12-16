@@ -36,11 +36,11 @@ const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id
     rating: profile.rating || 0,
     imageUrl: profile.imageUrl || `https://placehold.co/400x300.png`,
     profileImageUrl: profile.profileImageUrl || `https://placehold.co/120x120.png`,
-    location: profile.location || { lat: 34.0522, lng: -118.2437 }, 
+    location: profile.location || { lat: 34.0522, lng: -118.2437 },
     shortBio: profile.shortBio || `Specializing in ${Array.isArray(profile.specialty) ? profile.specialty.join(', ') : profile.specialty || 'fine jewelry'}.`,
     tagline: profile.tagline || "Bespoke Creations",
     bio: profile.bio || "Talented artisan ready to create your unique piece.",
-    portfolioImages: profile.portfolioImages || Array.from({ length: 4 }, (_, i) => `https://placehold.co/600x450.png`),
+    portfolioImages: profile.portfolioImages || [],
     yearsExperience: profile.yearsExperience || 0,
     certifications: profile.certifications || [],
     responseTime: profile.responseTime || "Within 2 business days",
@@ -52,6 +52,7 @@ const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id
     phone: profile.phone || 'N/A',
     emailVerified: profile.emailVerified || null,
     verificationToken: profile.verificationToken || null,
+    registeredAt: profile.registeredAt || new Date(),
     // Ensure password is not part of the returned object
   };
 };
