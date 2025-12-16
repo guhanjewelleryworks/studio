@@ -60,8 +60,8 @@ export async function updatePlatformSettings(data: Partial<Omit<PlatformSettings
       cookies().set('maintenance_mode', 'true', { path: '/', httpOnly: true, maxAge: 60 * 60 * 24 * 7 }); // Set for 1 week
       console.log('[Action: updatePlatformSettings] Maintenance mode enabled, setting cookie.');
     } else if (data.isMaintenanceModeEnabled === false) {
-      // To delete a cookie, we set its maxAge to 0 or a past date.
-      cookies().set('maintenance_mode', 'true', { path: '/', httpOnly: true, maxAge: 0 });
+      // To delete a cookie, we can use .delete() or set maxAge to 0. .delete() is cleaner.
+      cookies().delete('maintenance_mode');
       console.log('[Action: updatePlatformSettings] Maintenance mode disabled, deleting cookie.');
     }
     
