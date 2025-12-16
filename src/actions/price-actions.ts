@@ -43,7 +43,7 @@ export async function fetchAndStoreLiveMetalPrices() {
                 })
                 .then(data => {
                     // CORRECTED: Handle cases where API returns 200 OK but with an error in the body
-                    if (data.error) {
+                    if (data && data.error) {
                         console.error(`[PriceAction V6.0] GoldAPI body error for ${metal.symbol}:`, data.error);
                         return Promise.reject({ metal: metal.symbol, status: 200, body: data.error });
                     }
@@ -59,7 +59,7 @@ export async function fetchAndStoreLiveMetalPrices() {
         const now = new Date();
 
         results.forEach(result => {
-            if (result.status === 'fulfilled') {
+            if (result.status === 'fulfilled' && result.value) {
                 const data = result.value;
                 const metalConfig = data.metalConfig;
                 console.log(`[PriceAction V6.0] Successful response for ${metalConfig.symbol}:`, JSON.stringify(data));
