@@ -1,4 +1,3 @@
-
 'use server';
 
 import { getSettingsCollection } from '@/lib/mongodb';
