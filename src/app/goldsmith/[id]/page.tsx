@@ -47,6 +47,12 @@ const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id
     ordersCompleted: profile.ordersCompleted || 0,
     profileViews: profile.profileViews || 0,
     status: profile.status || 'pending_verification',
+    contactPerson: profile.contactPerson || 'N/A',
+    email: profile.email || 'not-available@goldsmithconnect.com',
+    phone: profile.phone || 'N/A',
+    emailVerified: profile.emailVerified || null,
+    verificationToken: profile.verificationToken || null,
+    registeredAt: profile.registeredAt || new Date(),
     ...profile,
   };
 };
