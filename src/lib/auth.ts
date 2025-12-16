@@ -106,9 +106,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (message.user.email) {
         try {
           const customers = await getCustomersCollection();
+          // FIX: Correctly narrow the provider type before updating the database.
+          const provider = message.account?.provider;
+          const safeProvider: 'credentials' | 'google' = provider === 'google' ? 'google' : 'credentials';
+          
           await customers.updateOne(
             { email: message.user.email },
-            { $set: { lastLoginAt: new Date(), authProvider: message.account?.provider ?? 'credentials' } }
+            { $set: { lastLoginAt: new Date(), authProvider: safeProvider } }
           );
           console.log(`[Auth Event: signIn] Updated lastLoginAt for ${message.user.email}`);
         } catch (error) {
