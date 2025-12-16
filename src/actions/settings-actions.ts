@@ -1,3 +1,4 @@
+// src/actions/settings-actions.ts
 'use server';
 
 import { getSettingsCollection } from '@/lib/mongodb';
@@ -54,13 +55,14 @@ export async function updatePlatformSettings(data: Partial<Omit<PlatformSettings
       { upsert: true, returnDocument: 'after', projection: { _id: 0 } }
     );
     
-    // --- THIS IS THE CORRECT PLACE TO HANDLE THE COOKIE ---
-    // If maintenance mode was part of the update, set/delete the cookie.
+    // --- THIS IS THE CORRECTED COOKIE HANDLING LOGIC ---
     if (data.isMaintenanceModeEnabled === true) {
       cookies().set('maintenance_mode', 'true', { path: '/', httpOnly: true });
       console.log('[Action: updatePlatformSettings] Maintenance mode enabled, setting cookie.');
     } else if (data.isMaintenanceModeEnabled === false) {
-      cookies().delete('maintenance_mode');
+      // To delete a cookie, we set it with an expiry date in the past.
+      // The .delete() method is not available on the server-side cookies() store in this context.
+      cookies().set('maintenance_mode', '', { path: '/', expires: new Date(0) });
       console.log('[Action: updatePlatformSettings] Maintenance mode disabled, deleting cookie.');
     }
     
