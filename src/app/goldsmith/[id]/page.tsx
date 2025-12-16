@@ -52,8 +52,7 @@ const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id
     phone: profile.phone || 'N/A',
     emailVerified: profile.emailVerified || null,
     verificationToken: profile.verificationToken || null,
-    registeredAt: profile.registeredAt || new Date(),
-    ...profile,
+    // Ensure password is not part of the returned object
   };
 };
 

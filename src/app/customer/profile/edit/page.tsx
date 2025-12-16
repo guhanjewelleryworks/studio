@@ -54,7 +54,6 @@ export default function EditCustomerProfilePage() {
       const fetchCustomerData = async (id: string) => {
         setIsLoadingData(true);
         try {
-          // This call fetches the full customer object, including the password field existence
           const data = await fetchCustomerById(id);
           if (data) {
             setCustomerData(data);
@@ -168,9 +167,8 @@ export default function EditCustomerProfilePage() {
     );
   }
 
-  // Determine if the user signed up with an OAuth provider
   // password is intentionally omitted from returned customerData
-  const isOAuthUser = !customerData.authProvider || customerData.authProvider !== 'credentials';
+  const isOAuthUser = customerData.authProvider !== "credentials";
 
 
   return (
@@ -217,7 +215,7 @@ export default function EditCustomerProfilePage() {
                   type="email"
                   readOnly
                   className="text-base text-muted-foreground bg-muted/50 py-2"
-                  value={customerData.email}
+                  value={customerData.email ?? "Email not available"}
                   disabled
                 />
               </div>

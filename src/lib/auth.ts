@@ -7,6 +7,8 @@ import clientPromise, { getCustomersCollection } from '@/lib/mongodb';
 import type { Customer } from '@/types/goldsmith';
 import bcrypt from 'bcryptjs';
 import type { Account, User } from 'next-auth';
+import { ObjectId } from 'mongodb';
+
 
 async function getAccount(providerAccountId: string, provider: string) {
     const db = (await clientPromise).db(process.env.DB_NAME || 'goldsmithconnect');
@@ -81,7 +83,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             
             // Return the user object expected by next-auth
             return {
-                id: user.id,
+                id: user._id.toString(), // CRITICAL: Convert ObjectId to string for next-auth
                 name: user.name,
                 email: user.email,
                 image: user.image,
@@ -101,15 +103,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   events: {
     async signIn(message) {
-      // This event fires on a successful sign-in with ANY provider.
-      // This is the correct place for side-effects like updating login times.
-      if (message.user.email) {
+      if (message.user.email && message.account) {
         try {
           const customers = await getCustomersCollection();
-          // FIX: Correctly narrow the provider type before updating the database.
-          const provider = message.account?.provider;
+          const provider = message.account.provider;
+          // Ensure the provider value is one of the allowed literal types.
           const safeProvider: 'credentials' | 'google' = provider === 'google' ? 'google' : 'credentials';
-          
+
           await customers.updateOne(
             { email: message.user.email },
             { $set: { lastLoginAt: new Date(), authProvider: safeProvider } }
@@ -121,12 +121,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     },
     async linkAccount({ user, account }) {
-        if (user.id && account) {
+        if (user.id && ObjectId.isValid(user.id) && account) {
             const db = (await clientPromise).db(process.env.DB_NAME || 'goldsmithconnect');
-            await db.collection('customers').updateOne(
-                { _id: user.id },
-                { $set: { authProvider: account.provider } }
-            );
+            const userId = new ObjectId(user.id);
+            // Ensure the provider value is correctly typed before updating.
+            const provider = account.provider;
+            const allowedProviders = ['credentials', 'google'] as const;
+            const safeProvider: 'credentials' | 'google' | undefined = allowedProviders.includes(provider as any) ? provider as typeof allowedProviders[number] : undefined;
+
+            if (safeProvider) {
+                await db.collection('customers').updateOne(
+                    { _id: userId },
+                    { $set: { authProvider: safeProvider } }
+                );
+            }
         }
     },
   },

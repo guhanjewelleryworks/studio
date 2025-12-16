@@ -6,25 +6,25 @@ export interface Goldsmith {
   _id?: ObjectId | string; // MongoDB ID
   id: string; // Your application-specific ID
   name: string;
-  state: string; // Replaced address with state
-  district: string; // Replaced address with district
+  state: string; 
+  district: string; 
   specialty: string | string[];
   rating: number;
-  imageUrl?: string;
-  profileImageUrl?: string;
+  imageUrl: string;
+  profileImageUrl: string;
   location: Location;
-  shortBio?: string;
-  tagline?: string;
-  bio?: string;
-  portfolioImages?: string[];
-  yearsExperience?: number;
+  shortBio: string;
+  tagline: string;
+  bio: string;
+  portfolioImages: string[];
+  yearsExperience: number;
   certifications?: string[];
-  responseTime?: string;
-  ordersCompleted?: number;
-  profileViews?: number;
-  contactPerson?: string;
+  responseTime: string;
+  ordersCompleted: number;
+  profileViews: number;
+  contactPerson: string;
   email: string;
-  phone?: string;
+  phone: string;
   password?: string; 
   status: 'pending_email_verification' | 'pending_verification' | 'verified' | 'rejected';
   registeredAt: Date; // Added for tracking registration time

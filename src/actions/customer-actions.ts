@@ -239,12 +239,12 @@ export async function fetchCustomerById(id: string): Promise<Omit<Customer, 'pas
     
     // This query now handles both custom UUIDs (from credential signup) 
     // and MongoDB ObjectIDs (from OAuth providers like Google).
-    const query = {
+    const query: Filter<Customer> = {
       $and: [
         {
           $or: [
             { id: id },
-            ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: 'invalid-object-id' }
+            ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { _id: 'invalid-object-id' }
           ]
         },
         { isDeleted: { $ne: true } } // Ensure user is not deleted
@@ -273,10 +273,10 @@ export async function updateCustomerProfile(id: string, data: { name?: string })
     }
     const collection = await getCustomersCollection();
     
-    const filter = {
+    const filter: Filter<Customer> = {
       $or: [
         { id: id },
-        ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id: 'invalid-object-id' }
+        ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { _id: 'invalid-object-id' }
       ]
     };
 
@@ -309,10 +309,10 @@ export async function changeCustomerPassword(customerId: string, currentPassword
 
     const collection = await getCustomersCollection();
     
-    const filter = {
+    const filter: Filter<Customer> = {
       $or: [
         { id: customerId },
-        ObjectId.isValid(customerId) ? { _id: new ObjectId(customerId) } : { id: 'invalid-object-id' }
+        ObjectId.isValid(customerId) ? { _id: new ObjectId(customerId) } : { _id: 'invalid-object-id' }
       ]
     };
     
@@ -480,10 +480,10 @@ export async function deleteCustomer(customerId: string): Promise<{ success: boo
     
     const collection = await getCustomersCollection();
     
-    const filter = {
+    const filter: Filter<Customer> = {
       $or: [
         { id: customerId },
-        ObjectId.isValid(customerId) ? { _id: new ObjectId(customerId) } : { id: 'invalid-object-id' }
+        ObjectId.isValid(customerId) ? { _id: new ObjectId(customerId) } : { _id: 'invalid-object-id' }
       ]
     };
     
@@ -492,7 +492,7 @@ export async function deleteCustomer(customerId: string): Promise<{ success: boo
       return { success: false, error: 'Customer not found.' };
     }
     
-    const originalEmail = customer.email;
+    const originalEmail = customer.email ?? `unknown-email-${customer._id}`;
     const emailHash = createEmailHash(originalEmail);
 
     // Anonymize personal data and mark as deleted
@@ -524,7 +524,7 @@ export async function deleteCustomer(customerId: string): Promise<{ success: boo
     }
   } catch (error) {
     console.error(`[Action: deleteCustomer] Error deleting customer ${customerId}:`, error);
-    return { success: false, error: 'An unexpected server error occurred during profile deletion.' };
+    return { success: false, error: 'An unexpected error occurred during profile deletion.' };
   }
 }
 
