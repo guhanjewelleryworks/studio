@@ -396,7 +396,7 @@ export default function DiscoverPage() {
                         <CardTitle className="font-heading text-lg text-accent group-hover:text-primary transition-colors flex items-center gap-1.5">
                           <span className="truncate">{goldsmith.name}</span>
                           {goldsmith.status === 'verified' && (
-                            <ShieldCheck className="h-4 w-4 text-green-500 shrink-0" title="Verified Goldsmith" />
+                            <ShieldCheck className="h-4 w-4 text-green-500 shrink-0" />
                           )}
                         </CardTitle>
                         <CardDescription className="text-xs text-muted-foreground flex items-center">
