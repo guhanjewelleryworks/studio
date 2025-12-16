@@ -136,7 +136,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
   const handleContactFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
      e.preventDefault();
 
-     if (sessionStatus !== 'authenticated' || !session || !session.user) {
+     if (sessionStatus !== 'authenticated' || !session?.user?.id) {
         toast({ title: "Not Logged In", description: "You must be logged in to place an order.", variant: "destructive" });
         return;
     }
