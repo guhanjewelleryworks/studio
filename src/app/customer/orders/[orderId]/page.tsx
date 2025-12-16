@@ -1,3 +1,4 @@
+
 // src/app/customer/orders/[orderId]/page.tsx
 'use client';
 
@@ -48,7 +49,7 @@ export default function CustomerOrderDetailPage({ params: paramsPromise }: { par
           const fetchedOrder = await fetchOrderRequestById(orderId);
           if (fetchedOrder) {
             // Ensure the order belongs to the current customer
-            if (fetchedOrder.customerId && fetchedOrder.customerId !== session.user.id) {
+            if (fetchedOrder.customerId && fetchedOrder.customerId !== session?.user?.id) {
                setError("You are not authorized to view this order.");
                setOrder(null);
                setGoldsmith(null);

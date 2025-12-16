@@ -1,3 +1,4 @@
+
 // src/app/customer/dashboard/page.tsx
 'use client';
 
@@ -83,6 +84,10 @@ export default function CustomerDashboardPage() {
         } finally {
           setIsLoadingStats(false);
         }
+      } else if (status === 'authenticated' && !session?.user?.id) {
+        // Handle case where session exists but user.id is missing
+        setIsLoadingStats(false);
+        toast({ title: "Session Error", description: "Could not retrieve user details from session.", variant: "destructive" });
       }
     };
     

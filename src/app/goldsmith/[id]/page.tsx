@@ -1,3 +1,4 @@
+
 // src/app/goldsmith/[id]/page.tsx
 'use client';
 
@@ -237,7 +238,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
       );
     }
 
-    if (sessionStatus === 'authenticated' && session.user) {
+    if (sessionStatus === 'authenticated' && session?.user) {
       return (
         <Card id="contact-form-section" className="shadow-xl border-primary/10 rounded-xl bg-card">
           <CardHeader className="p-5">
