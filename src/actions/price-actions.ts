@@ -59,7 +59,7 @@ export async function fetchAndStoreLiveMetalPrices() {
         const now = new Date();
 
         results.forEach(result => {
-            if (result.status === 'fulfilled' && result.value) {
+            if (result.status === 'fulfilled') {
                 const data = result.value;
                 const metalConfig = data.metalConfig;
                 console.log(`[PriceAction V6.0] Successful response for ${metalConfig.symbol}:`, JSON.stringify(data));
@@ -89,7 +89,7 @@ export async function fetchAndStoreLiveMetalPrices() {
                     console.warn(`[PriceAction V6.0] ${errorMsg} Response keys:`, Object.keys(data));
                     errors.push(errorMsg);
                 }
-            } else {
+            } else { // status is 'rejected'
                 const errorMsg = `Failed to fetch data for metal. Reason: ${JSON.stringify(result.reason)}`;
                 console.error(`[PriceAction V6.0] ${errorMsg}`);
                 errors.push(errorMsg);
