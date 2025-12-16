@@ -9,14 +9,14 @@ import { UserPlus, Loader2, MailCheck, UserX } from 'lucide-react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
-import { useState, type FormEvent, useEffect } from 'react';
+import { useState, type FormEvent, useEffect, Suspense } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { saveCustomer } from '@/actions/customer-actions';
 import type { NewCustomerInput, PlatformSettings } from '@/types/goldsmith';
 import { fetchPlatformSettings } from '@/actions/settings-actions';
 import { usePathname } from 'next/navigation';
 
-export default function SignUpPage() {
+function SignUpPageContent() {
   const { toast } = useToast();
   const pathname = usePathname();
   const [name, setName] = useState('');
@@ -197,4 +197,16 @@ export default function SignUpPage() {
       </Card>
     </div>
   )
+}
+
+export default function SignUpPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-center items-center min-h-[calc(100vh-10rem)]">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+        }>
+            <SignUpPageContent />
+        </Suspense>
+    );
 }

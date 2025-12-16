@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import {
@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Loader2 } from 'lucide-react';
 
 const navLinkClasses =
   'relative text-sm font-medium text-foreground/80 transition-colors hover:text-primary after:absolute after:bottom-[-5px] after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full';
@@ -47,7 +48,7 @@ interface GoldsmithUser {
   email: string;
 }
 
-export function Header() {
+function HeaderContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -376,4 +377,12 @@ export function Header() {
       </div>
     </header>
   );
+}
+
+export function Header() {
+  return (
+    <Suspense fallback={<header className="w-full h-16 bg-background/90 backdrop-blur-md shadow-sm" />}>
+      <HeaderContent />
+    </Suspense>
+  )
 }

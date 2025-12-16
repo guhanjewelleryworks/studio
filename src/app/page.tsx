@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { Goldsmith } from '@/types/goldsmith';
@@ -14,7 +13,6 @@ import { fetchAllGoldsmiths } from '@/actions/goldsmith-actions';
 import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { differenceInDays } from 'date-fns';
-import { usePathname } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // --- Icons for the hero stats section ---
@@ -38,7 +36,6 @@ export default function Home() {
   const [featuredGoldsmiths, setFeaturedGoldsmiths] = useState<Goldsmith[]>([]);
   const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
   const [errorFeatured, setErrorFeatured] = useState<string | null>(null);
-  const pathname = usePathname();
 
   useEffect(() => {
     const loadFeaturedGoldsmiths = async () => {

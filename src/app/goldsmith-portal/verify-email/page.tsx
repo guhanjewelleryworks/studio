@@ -1,4 +1,3 @@
-
 // src/app/goldsmith-portal/verify-email/page.tsx
 'use client';
 

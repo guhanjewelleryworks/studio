@@ -28,7 +28,7 @@ import {
 import { requestCustomerPasswordReset } from '@/actions/customer-actions';
 
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
@@ -265,4 +265,17 @@ export default function LoginPage() {
       </Card>
     </div>
   );
+}
+
+
+export default function LoginPage() {
+  return (
+    <React.Suspense fallback={
+        <div className="flex justify-center items-center min-h-[calc(100vh-10rem)] py-10 bg-gradient-to-br from-secondary/30 to-background">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+    }>
+      <LoginPageContent />
+    </React.Suspense>
+  )
 }
