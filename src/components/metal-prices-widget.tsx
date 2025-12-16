@@ -48,11 +48,21 @@ export const MetalPricesWidget: React.FC = () => {
       if (storedPrices && storedPrices.length > 0) {
           const formatted = storedPrices.map(p => {
             const changeValue = p.changePercent;
+            // Explicitly define the type here to satisfy TypeScript
+            let type: 'up' | 'down' | 'neutral';
+            if (changeValue > 0.05) {
+                type = 'up';
+            } else if (changeValue < -0.05) {
+                type = 'down';
+            } else {
+                type = 'neutral';
+            }
+            
             return {
               name: p.name.replace('24K', '22K'),
               price: `₹${p.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/10g`,
               change: `${changeValue >= 0 ? '+' : ''}${changeValue.toFixed(2)}%`,
-              changeType: changeValue > 0.05 ? 'up' : changeValue < -0.05 ? 'down' : 'neutral',
+              changeType: type, // Use the strictly typed variable
               icon: Gem,
             };
           });
