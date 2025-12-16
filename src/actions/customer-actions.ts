@@ -1,4 +1,3 @@
-
 // src/actions/customer-actions.ts
 'use server';
 
@@ -82,6 +81,7 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
       name: data.name.trim(),
       email: normalizedEmail,
       password: hashedPassword,
+      authProvider: 'credentials',
       registeredAt: new Date(),
       lastLoginAt: undefined, 
       emailVerified: null,

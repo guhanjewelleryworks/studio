@@ -101,6 +101,7 @@ export interface Customer {
   email: string;
   image?: string; // Added for next-auth compatibility
   password?: string; // For app-specific auth, hashed in DB
+  authProvider?: 'credentials' | 'google'; // To track how user was created
   registeredAt: Date;
   lastLoginAt?: Date;
   emailVerified: Date | null;
@@ -112,7 +113,7 @@ export interface Customer {
   emailHash?: string; // For preventing re-registration of deleted emails
 }
 
-export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken' | 'passwordResetToken' | 'passwordResetTokenExpires' | 'isDeleted' | 'deletedAt' | 'emailHash'>;
+export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken' | 'passwordResetToken' | 'passwordResetTokenExpires' | 'isDeleted' | 'deletedAt' | 'emailHash' | 'authProvider'>;
 
 
 // --- Admin Type ---

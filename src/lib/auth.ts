@@ -6,6 +6,19 @@ import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import clientPromise, { getCustomersCollection } from '@/lib/mongodb';
 import type { Customer } from '@/types/goldsmith';
 import bcrypt from 'bcryptjs';
+import type { Account, User } from 'next-auth';
+
+async function getAccount(providerAccountId: string, provider: string) {
+    const db = (await clientPromise).db(process.env.DB_NAME || 'goldsmithconnect');
+    const account = await db.collection('accounts').findOne({ providerAccountId, provider });
+    return account;
+}
+
+async function linkAccountWithUser(userId: string, account: Omit<Account, 'userId'>) {
+    const db = (await clientPromise).db(process.env.DB_NAME || 'goldsmithconnect');
+    await db.collection('accounts').insertOne({ ...account, userId });
+}
+
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true, // Recommended for environments like Firebase Studio
@@ -95,20 +108,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const customers = await getCustomersCollection();
           await customers.updateOne(
             { email: message.user.email },
-            { $set: { lastLoginAt: new Date() } }
+            { $set: { lastLoginAt: new Date(), authProvider: message.account?.provider ?? 'credentials' } }
           );
           console.log(`[Auth Event: signIn] Updated lastLoginAt for ${message.user.email}`);
         } catch (error) {
           console.error("[Auth Event: signIn] Failed to update lastLoginAt:", error);
         }
       }
-    }
+    },
+    async linkAccount({ user, account }) {
+        if (user.id && account) {
+            const db = (await clientPromise).db(process.env.DB_NAME || 'goldsmithconnect');
+            await db.collection('customers').updateOne(
+                { _id: user.id },
+                { $set: { authProvider: account.provider } }
+            );
+        }
+    },
   },
   callbacks: {
     // The problematic signIn callback has been removed to allow default error handling.
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
         if (user) {
             token.id = user.id;
+        }
+        if (account) {
+            token.provider = account.provider;
         }
         return token;
     },

@@ -1,4 +1,3 @@
-
 // src/app/customer/profile/edit/page.tsx
 'use client';
 
@@ -170,7 +169,9 @@ export default function EditCustomerProfilePage() {
   }
 
   // Determine if the user signed up with an OAuth provider
-  const isOAuthUser = !customerData.password;
+  // password is intentionally omitted from returned customerData
+  const isOAuthUser = !customerData.authProvider || customerData.authProvider !== 'credentials';
+
 
   return (
     <div className="container mx-auto max-w-2xl py-8 px-4 md:px-6 min-h-[calc(100vh-8rem)] bg-gradient-to-br from-background via-secondary/10 to-background">
