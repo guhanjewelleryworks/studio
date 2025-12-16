@@ -57,11 +57,13 @@ export async function updatePlatformSettings(data: Partial<Omit<PlatformSettings
     
     // --- THIS IS THE CORRECTED COOKIE HANDLING LOGIC ---
     if (data.isMaintenanceModeEnabled === true) {
-      cookies().set('maintenance_mode', 'true', { path: '/', httpOnly: true, maxAge: 60 * 60 * 24 * 7 }); // Set for 1 week
+      const cookieStore = await cookies();
+      cookieStore.set('maintenance_mode', 'true', { path: '/', httpOnly: true, maxAge: 60 * 60 * 24 * 7 }); // Set for 1 week
       console.log('[Action: updatePlatformSettings] Maintenance mode enabled, setting cookie.');
     } else if (data.isMaintenanceModeEnabled === false) {
       // To delete a cookie, we can use .delete() or set maxAge to 0. .delete() is cleaner.
-      cookies().delete('maintenance_mode');
+      const cookieStore = await cookies();
+      cookieStore.delete('maintenance_mode');
       console.log('[Action: updatePlatformSettings] Maintenance mode disabled, deleting cookie.');
     }
     
