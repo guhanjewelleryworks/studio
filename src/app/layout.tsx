@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   title: 'Goldsmiths Connect',
   description: 'Find local artisans and craft your dream jewelry.',
   icons: {
-    icon: '/favicon.png',
+    icon: 'favicon.png',
   },
 };
 
