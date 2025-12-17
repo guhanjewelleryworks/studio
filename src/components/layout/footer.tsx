@@ -24,7 +24,7 @@ export function Footer() {
                 className="h-7 w-7 text-primary"
               />
               <div className="flex flex-col">
-                <span className="font-semibold text-lg text-accent">Goldsmith Connect</span>
+                <span className="font-semibold text-lg text-accent">Goldsmith Connect™</span>
                 <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
               </div>
             </Link>
@@ -32,7 +32,7 @@ export function Footer() {
               Connecting you with local artisans to craft your dream jewelry through a secure, mediated process.
             </p>
             <p className="text-[0.7rem] text-muted-foreground/80 pt-1.5">
-              © {currentYear} Goldsmith Connect. All rights reserved.
+              © {currentYear} Goldsmith Connect™. All rights reserved.
             </p>
           </div>
 
