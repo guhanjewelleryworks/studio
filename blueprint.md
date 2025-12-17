@@ -1,4 +1,4 @@
-# **App Name**: Goldsmith Connect
+# **App Name**: Goldsmiths Connect
 
 ## Core Features:
 

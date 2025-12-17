@@ -1,3 +1,4 @@
+
 // src/app/admin/settings/page.tsx
 'use client';
 
@@ -121,7 +122,7 @@ export default function AdminSettingsPage() {
         <CardHeader>
           <CardTitle className="text-xl text-accent font-heading">System Configuration</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Manage global settings for the Goldsmith Connect platform.
+            Manage global settings for the Goldsmiths Connect platform.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

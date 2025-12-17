@@ -1,3 +1,4 @@
+
 // src/app/pricing/page.tsx
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -69,7 +70,7 @@ export default async function PricingPage() {
            <Sparkles className="h-9 w-9 mx-auto text-primary mb-2" />
           <h2 className="text-base font-semibold leading-7 text-primary uppercase tracking-wider font-poppins">Pricing Plans</h2>
           <p className="font-heading mt-1 text-4xl tracking-tight text-foreground sm:text-5xl"> 
-            Connect & Create with Goldsmith Connect
+            Connect & Create with Goldsmiths Connect
           </p>
         </div>
         <p className="mx-auto mt-3 max-w-2xl text-center text-lg leading-8 text-muted-foreground mb-10">

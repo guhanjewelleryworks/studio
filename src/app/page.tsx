@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Goldsmith } from '@/types/goldsmith';
@@ -260,7 +261,7 @@ export default function Home() {
                   Ready to Create or Connect?
                 </h2>
                 <p className="mx-auto max-w-[600px] text-foreground/85 md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed font-poppins">
-                  Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmith Connect is your platform.
+                  Whether you're looking for a custom piece or you're a goldsmith ready to showcase your craft, Goldsmiths Connect is your platform.
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center pt-1">

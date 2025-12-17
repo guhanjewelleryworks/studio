@@ -1,3 +1,4 @@
+
 // src/components/email/PasswordResetEmail.tsx
 import * as React from 'react';
 
@@ -9,7 +10,7 @@ export const PasswordResetEmail: React.FC<Readonly<PasswordResetEmailProps>> = (
   resetLink,
 }) => (
   <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: '1.6', color: '#333' }}>
-    <h1 style={{ color: '#8B4513' }}>Goldsmith Connect Password Reset</h1>
+    <h1 style={{ color: '#8B4513' }}>Goldsmiths Connect Password Reset</h1>
     <p>We received a request to reset the password for your account. You can reset your password by clicking the link below:</p>
     <a 
       href={resetLink} 

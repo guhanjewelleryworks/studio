@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -18,13 +19,13 @@ export function Footer() {
             <Link href="/" className="flex items-center space-x-2 mb-1.5">
               <Image
                 src="/new_logo.png"
-                alt="Goldsmith Connect Logo"
+                alt="Goldsmiths Connect Logo"
                 width={28}
                 height={28}
                 className="h-7 w-7 text-primary"
               />
               <div className="flex flex-col">
-                <span className="font-semibold text-lg text-accent">Goldsmith Connect™</span>
+                <span className="font-semibold text-lg text-accent">Goldsmiths Connect™</span>
                 <span className="text-xs text-muted-foreground -mt-1">Finely Handcrafted</span>
               </div>
             </Link>
@@ -32,7 +33,7 @@ export function Footer() {
               Connecting you with local artisans to craft your dream jewelry through a secure, mediated process.
             </p>
             <p className="text-[0.7rem] text-muted-foreground/80 pt-1.5">
-              © {currentYear} Goldsmith Connect™. All rights reserved.
+              © {currentYear} Goldsmiths Connect™. All rights reserved.
             </p>
           </div>
 

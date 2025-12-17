@@ -1,7 +1,7 @@
 
-# Goldsmith Connect.
+# Goldsmiths Connect.
 
-This is a Next.js application built with Firebase Studio for Goldsmith Connect.
+This is a Next.js application built with Firebase Studio for Goldsmiths Connect.
 
 ## Project Setup
 

@@ -1,3 +1,4 @@
+
 // src/app/signup/page.tsx
 'use client';
 
@@ -153,7 +154,7 @@ function SignUpPageContent() {
         <CardHeader className="text-center pt-6 pb-3">
            <UserPlus className="h-10 w-10 mx-auto text-primary mb-2.5" />
           <CardTitle className="text-3xl text-accent">Create Your Account</CardTitle>
-          <CardDescription className="text-muted-foreground mt-1">Join Goldsmith Connect to discover artisans and craft your story.</CardDescription>
+          <CardDescription className="text-muted-foreground mt-1">Join Goldsmiths Connect to discover artisans and craft your story.</CardDescription>
         </CardHeader>
         <CardContent className="px-6 pb-6 pt-3">
           <form className="space-y-4" onSubmit={handleSubmit}>

@@ -1,3 +1,4 @@
+
 // src/lib/email.ts
 import { Resend } from 'resend';
 import { VerificationEmail } from '@/components/email/VerificationEmail';
@@ -16,9 +17,9 @@ export async function sendVerificationEmail(email: string, token: string, userTy
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Goldsmith Connect <onboarding@resend.dev>', // Must be a verified domain on Resend
+      from: 'Goldsmiths Connect <onboarding@resend.dev>', // Must be a verified domain on Resend
       to: [email],
-      subject: 'Verify Your Email Address for Goldsmith Connect',
+      subject: 'Verify Your Email Address for Goldsmiths Connect',
       react: VerificationEmail({ verificationLink }),
     });
 
@@ -42,9 +43,9 @@ export async function sendCustomerPasswordResetEmail(email: string, token: strin
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Goldsmith Connect <onboarding@resend.dev>',
+      from: 'Goldsmiths Connect <onboarding@resend.dev>',
       to: [email],
-      subject: 'Reset Your Goldsmith Connect Password',
+      subject: 'Reset Your Goldsmiths Connect Password',
       react: PasswordResetEmail({ resetLink }),
     });
 
@@ -67,7 +68,7 @@ export async function sendGoldsmithPasswordResetEmail(email: string, token: stri
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Goldsmith Connect <onboarding@resend.dev>',
+      from: 'Goldsmiths Connect <onboarding@resend.dev>',
       to: [email],
       subject: 'Reset Your Goldsmith Portal Password',
       react: PasswordResetEmail({ resetLink }),

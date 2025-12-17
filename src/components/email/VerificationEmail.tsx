@@ -1,3 +1,4 @@
+
 // src/components/email/VerificationEmail.tsx
 import * as React from 'react';
 
@@ -9,7 +10,7 @@ export const VerificationEmail: React.FC<Readonly<VerificationEmailProps>> = ({
   verificationLink,
 }) => (
   <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: '1.6', color: '#333' }}>
-    <h1 style={{ color: '#8B4513' }}>Welcome to Goldsmith Connect!</h1>
+    <h1 style={{ color: '#8B4513' }}>Welcome to Goldsmiths Connect!</h1>
     <p>We're excited to have you on board. Please verify your email address to complete your registration and start exploring.</p>
     <a 
       href={verificationLink} 

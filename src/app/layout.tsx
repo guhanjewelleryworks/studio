@@ -26,10 +26,10 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Goldsmith Connect',
+  title: 'Goldsmiths Connect',
   description: 'Find local artisans and craft your dream jewelry.',
   icons: {
-    icon: 'new_favicon.png',
+    icon: '/new_favicon.png',
   },
 };
 

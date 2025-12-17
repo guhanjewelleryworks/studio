@@ -33,26 +33,26 @@ const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id
     state: profile.state || "State Not Available",
     district: profile.district || "District Not Available",
     specialty: profile.specialty || ["Fine Jewelry"],
-    rating: profile.rating || 0,
+    rating: profile.rating ?? 0,
     imageUrl: profile.imageUrl || `https://placehold.co/400x300.png`,
     profileImageUrl: profile.profileImageUrl || `https://placehold.co/120x120.png`,
     location: profile.location || { lat: 34.0522, lng: -118.2437 },
     shortBio: profile.shortBio || `Specializing in ${Array.isArray(profile.specialty) ? profile.specialty.join(', ') : profile.specialty || 'fine jewelry'}.`,
     tagline: profile.tagline || "Bespoke Creations",
     bio: profile.bio || "Talented artisan ready to create your unique piece.",
-    portfolioImages: profile.portfolioImages || [],
-    yearsExperience: profile.yearsExperience || 0,
-    certifications: profile.certifications || [],
+    portfolioImages: profile.portfolioImages ?? [],
+    yearsExperience: profile.yearsExperience ?? 0,
+    certifications: profile.certifications ?? [],
     responseTime: profile.responseTime || "Within 2 business days",
-    ordersCompleted: profile.ordersCompleted || 0,
-    profileViews: profile.profileViews || 0,
+    ordersCompleted: profile.ordersCompleted ?? 0,
+    profileViews: profile.profileViews ?? 0,
     status: profile.status || 'pending_verification',
     contactPerson: profile.contactPerson || 'N/A',
     email: profile.email || 'not-available@goldsmithconnect.com',
     phone: profile.phone || 'N/A',
-    emailVerified: profile.emailVerified || null,
+    emailVerified: profile.emailVerified ?? null,
     verificationToken: profile.verificationToken || null,
-    registeredAt: profile.registeredAt || new Date(),
+    registeredAt: profile.registeredAt ?? new Date(),
     // Ensure password is not part of the returned object
   };
 };
@@ -325,7 +325,7 @@ export default function GoldsmithProfilePage({ params: paramsPromise }: { params
           <ShieldCheck className="h-4 w-4 !text-accent mr-1.5" />
           <AlertTitle className="font-poppins font-semibold text-sm text-foreground">Secure & Mediated Connection</AlertTitle>
           <AlertDescription className="text-xs mt-0.5 text-muted-foreground">
-            All initial communications and custom order requests are facilitated through Goldsmith Connect administrators.
+            All initial communications and custom order requests are facilitated through Goldsmiths Connect administrators.
           </AlertDescription>
         </Alert>
       <div className="grid md:grid-cols-3 gap-6 lg:gap-8">

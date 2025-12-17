@@ -1,3 +1,4 @@
+
 // src/app/login/page.tsx
 'use client';
 
@@ -157,7 +158,7 @@ function LoginPageContent() {
         <CardHeader className="text-center pt-6 pb-3">
           <LogIn className="h-10 w-10 mx-auto text-primary mb-2.5" />
           <CardTitle className="text-3xl text-accent">Welcome Back!</CardTitle>
-          <CardDescription className="text-muted-foreground mt-1">Log in to continue your Goldsmith Connect journey.</CardDescription>
+          <CardDescription className="text-muted-foreground mt-1">Log in to continue your Goldsmiths Connect journey.</CardDescription>
         </CardHeader>
         <CardContent className="px-6 pb-6 pt-3">
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -253,11 +254,15 @@ function LoginPageContent() {
             <div className="text-center text-sm text-muted-foreground pt-3.5 space-y-2">
               <p>
                 Don't have an account?{' '}
-                <Link href={`/signup?redirect=${pathname}`} className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">Sign up here</Link>
+                <Link href={`/signup?redirect=${pathname}`} className="font-semibold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
+                  Sign up here
+                </Link>
               </p>
               <p>
                 Are you a Goldsmith?{' '}
-                <Link href="/goldsmith-portal/login" className="font-semibold text-accent hover:text-accent/80 underline underline-offset-2 transition-colors">Login to Goldsmith Portal</Link>
+                <Link href="/goldsmith-portal/login" className="font-semibold text-accent hover:text-accent/80 underline underline-offset-2 transition-colors">
+                  Login to Goldsmith Portal
+                </Link>
               </p>
             </div>
           </form>

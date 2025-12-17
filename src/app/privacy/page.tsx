@@ -1,3 +1,4 @@
+
 // src/app/privacy/page.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from 'next/link';
@@ -12,7 +13,7 @@ export default function PrivacyPage() {
          </CardHeader>
         <CardContent className="prose prose-stone dark:prose-invert max-w-none text-foreground/85 space-y-3 px-6 pb-6 pt-0">
 
-            <p>Welcome to Goldsmith Connect. Your privacy is one of our top priorities. This Privacy Policy explains what information we collect, how we use it, and the choices you have.</p>
+            <p>Welcome to Goldsmiths Connect. Your privacy is one of our top priorities. This Privacy Policy explains what information we collect, how we use it, and the choices you have.</p>
             <p>By using our platform, you consent to the practices described in this Privacy Policy.</p>
 
             <h2 className="font-heading text-xl text-accent mt-4 mb-1.5">1. Information We Collect</h2>
@@ -99,7 +100,7 @@ export default function PrivacyPage() {
             <p>For concerns or complaints, contact:</p>
             <p>
                 Grievance Officer<br />
-                Email: support@goldsmithconnect.com
+                Email: support@goldsmithsconnect.com
             </p>
             <p>We aim to respond within 15 business days.</p>
             

@@ -14,7 +14,7 @@ export default function AdminPortalPage() {
           Admin Dashboard
         </h1>
         <p className="max-w-[700px] mx-auto text-muted-foreground md:text-lg mb-5 leading-relaxed">
-          Oversee and manage all aspects of the Goldsmith Connect platform. This central hub provides tools for user data management, goldsmith partnerships, order facilitation, and system settings.
+          Oversee and manage all aspects of the Goldsmiths Connect platform. This central hub provides tools for user data management, goldsmith partnerships, order facilitation, and system settings.
         </p>
 
         <Card className="max-w-lg mx-auto shadow-xl bg-card border-primary/20 rounded-xl">

@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -292,7 +293,7 @@ function HeaderContent() {
           <Link href="/" className="mr-8 flex items-center">
             <Image
               src="/logo_wordmark.png"
-              alt="Goldsmith Connect Logo"
+              alt="Goldsmiths Connect Logo"
               width={160}
               height={40}
               className="h-auto"
@@ -336,7 +337,7 @@ function HeaderContent() {
                       onClick={() => setIsSheetOpen(false)}
                       className="flex items-center space-x-2.5 px-6 py-5 border-b border-border/20"
                     >
-                      <Image src="/logo_wordmark.png" alt="Goldsmith Connect Logo" width={160} height={40} className="h-auto" />
+                      <Image src="/logo_wordmark.png" alt="Goldsmiths Connect Logo" width={160} height={40} className="h-auto" />
                     </Link>
                   </SheetTitle>
                 </SheetHeader>
@@ -365,7 +366,7 @@ function HeaderContent() {
           </Sheet>
 
           <Link href="/" className="flex items-center">
-            <Image src="/logo_wordmark.png" alt="Goldsmith Connect Logo" width={150} height={38} className="h-auto md:hidden" />
+            <Image src="/logo_wordmark.png" alt="Goldsmiths Connect Logo" width={150} height={38} className="h-auto md:hidden" />
           </Link>
           <div className="w-10 h-10 md:hidden" /> {/* Spacer for mobile */}
         </div>
