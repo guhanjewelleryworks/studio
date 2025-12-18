@@ -9,6 +9,12 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Use the public URL from env vars, falling back to the standard dev port 9002
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
 
+const isProd = process.env.NODE_ENV === "production";
+const fromEmail = isProd 
+  ? "Goldsmiths Connect <no-reply@goldsmithsconnect.com>" 
+  : "Goldsmiths Connect <onboarding@resend.dev>";
+
+
 export async function sendVerificationEmail(email: string, token: string, userType: 'customer' | 'goldsmith') {
   // Construct the correct link based on user type
   const verificationLink = userType === 'goldsmith'
@@ -17,7 +23,7 @@ export async function sendVerificationEmail(email: string, token: string, userTy
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Goldsmiths Connect <onboarding@resend.dev>', // Must be a verified domain on Resend
+      from: fromEmail, // Use environment-aware sender
       to: [email],
       subject: 'Verify Your Email Address for Goldsmiths Connect',
       react: VerificationEmail({ verificationLink }),
@@ -43,7 +49,7 @@ export async function sendCustomerPasswordResetEmail(email: string, token: strin
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Goldsmiths Connect <onboarding@resend.dev>',
+      from: fromEmail, // Use environment-aware sender
       to: [email],
       subject: 'Reset Your Goldsmiths Connect Password',
       react: PasswordResetEmail({ resetLink }),
@@ -68,7 +74,7 @@ export async function sendGoldsmithPasswordResetEmail(email: string, token: stri
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Goldsmiths Connect <onboarding@resend.dev>',
+      from: fromEmail, // Use environment-aware sender
       to: [email],
       subject: 'Reset Your Goldsmith Portal Password',
       react: PasswordResetEmail({ resetLink }),
