@@ -1,40 +1,26 @@
-
 // src/lib/mongodb.ts
 import type { Collection, Db } from 'mongodb';
 import { MongoClient } from 'mongodb';
 import type { Goldsmith, OrderRequest, Customer, StoredMetalPrice, PlatformSettings, AuditLog, AdminNotification, ContactSubmission, Admin } from '@/types/goldsmith'; // Ensure Goldsmith type is correctly imported
 
 const MONGODB_URI = process.env.MONGODB_URI;
+const DB_NAME = process.env.DB_NAME;
 
 if (!MONGODB_URI) {
   console.error("CRITICAL: MONGODB_URI environment variable is not defined.");
-} else {
-  console.log("MONGODB_URI found in environment. Attempting to connect...");
-  const maskedUri = MONGODB_URI.replace(/:([^:@]*)(?=@)/, ':********');
-  console.log("Full MONGODB_URI being used (password masked):", maskedUri);
+  throw new Error("MONGODB_URI environment variable must be defined.");
 }
 
-let DB_NAME: string;
-if (MONGODB_URI) {
-  try {
-      const url = new URL(MONGODB_URI);
-      const pathnameParts = url.pathname.split('/');
-      if (pathnameParts.length > 1 && pathnameParts[1]) {
-          DB_NAME = pathnameParts[1];
-          console.log(`Database name parsed from MONGODB_URI: ${DB_NAME}`);
-      } else {
-          DB_NAME = process.env.DB_NAME || 'goldsmithconnect';
-          console.warn(`Database name not found in MONGODB_URI path, using default or DB_NAME env var: ${DB_NAME}`);
-      }
-  } catch (error) {
-      console.warn("Could not parse MONGODB_URI to extract database name. Using default or DB_NAME env var.", error);
-      DB_NAME = process.env.DB_NAME || 'goldsmithconnect';
-      console.log(`Using database name: ${DB_NAME}`);
-  }
-} else {
-  DB_NAME = process.env.DB_NAME || 'goldsmithconnect';
-  console.warn(`MONGODB_URI is not defined. Using default database name: ${DB_NAME}`);
+if (!DB_NAME) {
+    console.error("CRITICAL: DB_NAME environment variable is not defined.");
+    throw new Error("DB_NAME environment variable must be defined.");
 }
+
+console.log("MONGODB_URI found. Attempting to connect...");
+const maskedUri = MONGODB_URI.replace(/:([^:@]*)(?=@)/, ':********');
+console.log("Full MONGODB_URI being used (password masked):", maskedUri);
+console.log(`Using database name from DB_NAME env var: ${DB_NAME}`);
+
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
@@ -68,48 +54,34 @@ async function createIndexes(db: Db) {
 if (process.env.NODE_ENV === 'development') {
   if (!global._mongoClientPromise) {
     console.log("Development: Creating new MongoDB client connection.");
-    if (!MONGODB_URI) {
-      console.error("Development: MONGODB_URI is missing, cannot create client promise.");
-      clientPromise = Promise.reject(new Error("MONGODB_URI is not defined in development."));
-    } else {
-      client = new MongoClient(MONGODB_URI);
-      global._mongoClientPromise = client.connect();
-      clientPromise = global._mongoClientPromise;
-    }
+    client = new MongoClient(MONGODB_URI);
+    global._mongoClientPromise = client.connect();
+    clientPromise = global._mongoClientPromise;
   } else {
     console.log("Development: Reusing existing MongoDB client promise.");
     clientPromise = global._mongoClientPromise;
   }
 } else {
   console.log("Production: Creating new MongoDB client connection.");
-   if (!MONGODB_URI) {
-      console.error("Production: MONGODB_URI is missing, cannot create client promise.");
-      clientPromise = Promise.reject(new Error("MONGODB_URI is not defined in production."));
-    } else {
-      client = new MongoClient(MONGODB_URI);
-      clientPromise = client.connect();
-    }
+  client = new MongoClient(MONGODB_URI);
+  clientPromise = client.connect();
 }
 
 export async function getDb(): Promise<Db> {
-  if (!MONGODB_URI) {
-    console.error("getDb called but MONGODB_URI is not defined. Database operations will fail.");
-    throw new Error("MONGODB_URI is not configured, cannot get database instance.");
+  // Re-check for production safety, although the initial check should have thrown.
+  if (!DB_NAME) {
+      console.error("getDb called but DB_NAME is not defined. Database operations will fail.");
+      throw new Error("DB_NAME environment variable is not configured.");
   }
+  
   try {
     const mongoClient = await clientPromise;
-    console.log(`Successfully connected to MongoDB. Accessing database: ${DB_NAME}`);
     const db = mongoClient.db(DB_NAME);
-    // Ensure indexes are created after connecting.
-    await createIndexes(db);
+    await createIndexes(db); // Fire-and-forget index creation
     return db;
   } catch (error) {
     console.error("Error getting database instance from clientPromise:", error);
-    if (MONGODB_URI) {
-      const maskedUri = MONGODB_URI.replace(/:([^:@]*)(?=@)/, ':********');
-      console.error("Failed to connect with MONGODB_URI (password masked):", maskedUri);
-    }
-    throw error;
+    throw error; // Re-throw to fail fast if connection fails
   }
 }
 

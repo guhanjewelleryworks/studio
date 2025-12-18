@@ -3,7 +3,7 @@ import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 import Credentials from 'next-auth/providers/credentials';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
-import clientPromise, { getCustomersCollection } from '@/lib/mongodb';
+import clientPromise, { getCustomersCollection, getDb } from '@/lib/mongodb';
 import type { Customer } from '@/types/goldsmith';
 import bcrypt from 'bcryptjs';
 import type { Account, User } from 'next-auth';
@@ -11,13 +11,13 @@ import { ObjectId } from 'mongodb';
 
 
 async function getAccount(providerAccountId: string, provider: string) {
-    const db = (await clientPromise).db(process.env.DB_NAME || 'goldsmithconnect');
+    const db = await getDb();
     const account = await db.collection('accounts').findOne({ providerAccountId, provider });
     return account;
 }
 
 async function linkAccountWithUser(userId: string, account: Omit<Account, 'userId'>) {
-    const db = (await clientPromise).db(process.env.DB_NAME || 'goldsmithconnect');
+    const db = await getDb();
     await db.collection('accounts').insertOne({ ...account, userId });
 }
 
@@ -25,7 +25,7 @@ async function linkAccountWithUser(userId: string, account: Omit<Account, 'userI
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true, // Recommended for environments like Firebase Studio
   adapter: MongoDBAdapter(clientPromise, {
-    databaseName: process.env.DB_NAME || 'goldsmithconnect',
+    databaseName: process.env.DB_NAME, // Use the DB_NAME from environment variables
     collections: {
       Users: 'customers', // Use our existing 'customers' collection
     },
@@ -122,7 +122,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async linkAccount({ user, account }) {
         if (user.id && ObjectId.isValid(user.id) && account) {
-            const db = (await clientPromise).db(process.env.DB_NAME || 'goldsmithconnect');
+            const db = await getDb();
             const userId = new ObjectId(user.id);
             // Ensure the provider value is correctly typed before updating.
             const provider = account.provider;
