@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/toaster";
 import AuthProvider from '@/components/auth/AuthProvider';
 import { fetchPlatformSettings } from '@/actions/settings-actions';
 import { AnnouncementBanner } from '@/components/layout/AnnouncementBanner';
+import { Snowfall } from '@/components/effects/Snowfall';
 
 const geistSans = GeistSans;
 
@@ -39,10 +40,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const settings = await fetchPlatformSettings();
+  const showSnowfall = process.env.NEXT_PUBLIC_ENABLE_SNOWFALL === 'true';
 
   return (
     <html lang="en" className={cn("h-full antialiased", poppins.variable, playfairDisplay.variable, geistSans.variable)} suppressHydrationWarning={true}>
       <body className={cn('min-h-full font-body flex flex-col text-foreground')}>
+        {showSnowfall && <Snowfall />}
         <AuthProvider>
           <div className="relative flex min-h-dvh flex-col bg-transparent z-0">
             {/* header + optional announcement — header is full-bleed but inner content constrained */}

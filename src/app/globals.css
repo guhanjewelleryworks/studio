@@ -189,3 +189,98 @@ html, body, #__next {
 
 /* Debug helper (optional)
 .debug-outline * { outline: 1px solid rgba(255,0,0,0.1); } */
+
+
+/* Snowfall Effect Styles */
+@keyframes snowfall-fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+  }
+  100% {
+    transform: translateY(105vh) rotate(360deg);
+  }
+}
+
+@keyframes snowfall-sway {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(40px);
+  }
+}
+
+.snowfall-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 20; /* Below UI elements like modals (z-50) but above content */
+}
+
+.snowflake {
+  position: absolute;
+  top: -5vh; /* Start off-screen */
+  color: white;
+  opacity: 0.7;
+  font-family: sans-serif; /* A font that supports the snowflake character */
+  will-change: transform;
+  
+  /* Add content directly via CSS */
+  &::after {
+    content: '❄'; 
+  }
+  
+  animation-name: snowfall-fall, snowfall-sway;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+}
+
+/* Unique animations for each snowflake */
+/* This part can be generated or manually created. For this fix, we'll create a few variations. */
+.snowflake:nth-child(5n) {
+  animation-duration: 12s, 4s;
+  animation-delay: -2s, -1s;
+  font-size: 1.5rem;
+  left: 10%;
+}
+
+.snowflake:nth-child(5n + 1) {
+  animation-duration: 15s, 5s;
+  animation-delay: -5s, -2.5s;
+  font-size: 1rem;
+  left: 30%;
+}
+
+.snowflake:nth-child(5n + 2) {
+  animation-duration: 10s, 3s;
+  animation-delay: 0s, 0s;
+  font-size: 1.75rem;
+  left: 50%;
+}
+
+.snowflake:nth-child(5n + 3) {
+  animation-duration: 18s, 6s;
+  animation-delay: -1s, -3s;
+  font-size: 1.25rem;
+  left: 70%;
+}
+
+.snowflake:nth-child(5n + 4) {
+  animation-duration: 9s, 3.5s;
+  animation-delay: -3s, -1.5s;
+  font-size: 0.8rem;
+  left: 90%;
+}
+
+/* Add more variations for randomness */
+.snowflake:nth-child(3n) {
+  left: calc(100vw * var(--random-left, 0.5)); /* Use CSS var for dynamic horizontal position */
+}
+.snowflake:nth-child(7n) {
+  animation-duration: 13s, 4.5s;
+  animation-delay: -4s, -2s;
+}
