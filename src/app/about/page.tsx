@@ -8,8 +8,8 @@ import Image from 'next/image';
 
 export default function AboutPage() {
   return (
-    <div className="bg-gradient-to-br from-background via-secondary/5 to-background py-10 sm:py-14">
-      <div className="container mx-auto max-w-5xl px-4 md:px-6">
+    <div className="bg-gradient-to-br from-background via-secondary/5 to-background py-10 sm:py-14 px-4 md:px-6">
+      <div className="container mx-auto max-w-5xl">
         {/* Header Section */}
         <div className="text-center mb-10 md:mb-12">
           <Handshake className="h-12 w-12 mx-auto text-primary mb-3" />
