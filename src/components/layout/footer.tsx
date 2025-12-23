@@ -41,8 +41,8 @@ export function Footer() {
           <div className="md:col-span-2">
             <h3 className="font-semibold text-foreground mb-2.5 text-sm">Company</h3>
             <nav className="flex flex-col gap-1.5">
-              <Link href="/#how-it-works" className={footerLinkClasses}>
-                How It Works
+              <Link href="/about" className={footerLinkClasses}>
+                About Us
               </Link>
               <Link href="/pricing" className={footerLinkClasses}>
                 Pricing

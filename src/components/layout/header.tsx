@@ -22,6 +22,7 @@ import {
   Briefcase,
   Shield,
   Contact,
+  Info, // Added Info icon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -304,8 +305,8 @@ function HeaderContent() {
             <Link href="/discover" className={cn(navLinkClasses)}>
               Discover
             </Link>
-            <Link href="/#how-it-works" className={cn(navLinkClasses)}>
-              How It Works
+            <Link href="/about" className={cn(navLinkClasses)}>
+              About Us
             </Link>
             <Link href="/pricing" className={cn(navLinkClasses)}>
               Pricing
@@ -345,8 +346,8 @@ function HeaderContent() {
                   <Link href="/discover" onClick={() => setIsSheetOpen(false)} className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">
                     Discover
                   </Link>
-                  <Link href="/#how-it-works" onClick={() => setIsSheetOpen(false)} className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">
-                    How It Works
+                  <Link href="/about" onClick={() => setIsSheetOpen(false)} className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">
+                    About Us
                   </Link>
                   <Link href="/pricing" onClick={() => setIsSheetOpen(false)} className="text-base font-medium text-foreground/90 hover:text-primary transition-colors py-2.5 px-2 rounded-md hover:bg-secondary">
                     Pricing
