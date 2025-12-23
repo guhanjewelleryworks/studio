@@ -21,10 +21,10 @@ export default function AboutPage() {
 
         {/* Core Mission Section */}
         <div className="grid md:grid-cols-2 gap-8 items-center mb-12">
-           <div className="relative aspect-square w-full max-w-md mx-auto overflow-hidden rounded-xl shadow-2xl group border-2 border-primary/20">
+           <div className="relative aspect-[4/3] w-full h-full max-w-md mx-auto overflow-hidden rounded-xl shadow-2xl group border-2 border-primary/20">
               <Image
                 src="/goldsmith-and-customer.png" 
-                alt="A goldsmith discussing a design with a customer"
+                alt="A a goldsmith discussing a design with a customer"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, 500px"
