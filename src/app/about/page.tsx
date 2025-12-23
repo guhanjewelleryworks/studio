@@ -15,7 +15,7 @@ export default function AboutPage() {
           <Handshake className="h-12 w-12 mx-auto text-primary mb-3" />
           <h1 className="font-heading text-4xl sm:text-5xl text-accent leading-tight">About Goldsmiths Connect</h1>
           <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
-            Forging connections between discerning clients and master artisans to create timeless, personal jewelry.
+            Connecting you with skilled local goldsmiths to create your perfect piece of jewelry.
           </p>
         </div>
 
