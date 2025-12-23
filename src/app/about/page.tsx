@@ -1,4 +1,3 @@
-
 // src/app/about/page.tsx
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,7 +22,7 @@ export default function AboutPage() {
         <div className="grid md:grid-cols-2 gap-8 items-center mb-12">
            <div className="relative aspect-square w-full max-w-md mx-auto overflow-hidden rounded-xl shadow-2xl group border-2 border-primary/20">
               <Image
-                src="/images/goldsmith_and_customer.png" 
+                src="/goldsmith-and-customer.png" 
                 alt="A goldsmith discussing a design with a customer"
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
