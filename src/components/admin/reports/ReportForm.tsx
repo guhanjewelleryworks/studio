@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -19,6 +20,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { addDays, format } from 'date-fns';
 import type { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
+import { safeFormatDate } from '@/lib/date';
 
 
 const reportTypes = [
@@ -53,7 +55,6 @@ export function ReportForm() {
 
   const isReportDateSensitive = reportTypes.find(r => r.value === selectedReport)?.dateSensitive ?? false;
 
-  // FIX: Define dateRange in the component scope
   const dateRange: ReportDateRange | undefined = isReportDateSensitive && date?.from && date?.to
       ? { from: date.from, to: date.to }
       : undefined;
@@ -67,7 +68,6 @@ export function ReportForm() {
     setError(null);
     setReportData(null);
     
-    // The dateRange variable is now available from the component's scope.
     const result = await generateReport(selectedReport, dateRange);
 
     if (result.success && result.data) {
@@ -243,7 +243,7 @@ export function ReportForm() {
                     <CardTitle className="text-accent">{reportData.title}</CardTitle>
                     {dateRange && isReportDateSensitive && (
                         <CardDescription>
-                            For period: {format(dateRange.from, "PPP")} to {format(dateRange.to, "PPP")}
+                            For period: {safeFormatDate(dateRange.from, 'PPP')} to {safeFormatDate(dateRange.to, 'PPP')}
                         </CardDescription>
                     )}
                   </CardHeader>
@@ -289,3 +289,5 @@ export function ReportForm() {
     </div>
   );
 }
+
+    

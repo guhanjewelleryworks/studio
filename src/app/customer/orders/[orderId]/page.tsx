@@ -15,7 +15,7 @@ import type { OrderRequest, Goldsmith } from '@/types/goldsmith';
 import { Loader2, ArrowLeft, Mail, Phone, ShoppingBag, User, CalendarDays, Edit3, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 import { Separator } from '@/components/ui/separator';
 import NextImage from 'next/image';
 
@@ -130,7 +130,7 @@ export default function CustomerOrderDetailPage({ params: paramsPromise }: { par
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl text-accent font-heading">{order.itemDescription}</CardTitle>
                 <CardDescription className="text-xs text-muted-foreground">
-                  Order ID: {order.id} | Placed on: {format(new Date(order.requestedAt), 'PPp')}
+                  Order ID: {order.id} | Placed on: {safeFormatDate(order.requestedAt)}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -160,7 +160,7 @@ export default function CustomerOrderDetailPage({ params: paramsPromise }: { par
                 )}
               </CardContent>
               <CardFooter className="pt-4">
-                 <p className="text-xs text-muted-foreground">Last Updated: {format(new Date(order.updatedAt), 'PPp')}</p>
+                 <p className="text-xs text-muted-foreground">Last Updated: {safeFormatDate(order.updatedAt)}</p>
               </CardFooter>
             </Card>
           </div>
@@ -209,3 +209,5 @@ export default function CustomerOrderDetailPage({ params: paramsPromise }: { par
     </div>
   );
 }
+
+    

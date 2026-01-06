@@ -1,3 +1,4 @@
+
 // src/app/customer/orders/page.tsx
 'use client';
 
@@ -12,7 +13,7 @@ import Link from 'next/link';
 import { fetchCustomerOrders } from '@/actions/customer-actions';
 import type { OrderRequest, OrderRequestStatus } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { OrderStatusProgress } from '@/components/orders/OrderStatusProgress'; 
 import { Separator } from '@/components/ui/separator';
@@ -128,7 +129,7 @@ export default function CustomerOrdersPage() {
                     </Badge>
                   </div>
                   <CardDescription className="text-xs text-muted-foreground mt-1">
-                    Order ID: {order.id.substring(0,18)}... | Requested: {format(new Date(order.requestedAt), 'PPp')}
+                    Order ID: {order.id.substring(0,18)}... | Requested: {safeFormatDate(order.requestedAt)}
                   </CardDescription>
                 </CardHeader>
                 
@@ -162,3 +163,5 @@ export default function CustomerOrdersPage() {
     </div>
   );
 }
+
+    

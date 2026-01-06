@@ -1,3 +1,4 @@
+
 // src/app/admin/database/page.tsx
 'use client';
 
@@ -13,7 +14,7 @@ import { fetchAdminGoldsmiths, fetchAllPlatformOrderRequests } from '@/actions/g
 import { getLatestStoredPrices } from '@/actions/price-actions';
 import type { Customer, Goldsmith, OrderRequest, StoredMetalPrice } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { useAdminAccess } from '@/hooks/useAdminAccess';
@@ -132,8 +133,8 @@ export default function AdminDatabasePage() {
   };
   
   const renderCellContent = (content: any): React.ReactNode => {
-    if (content instanceof Date) {
-        return format(content, 'PPpp');
+    if (content instanceof Date || (typeof content === 'string' && !isNaN(Date.parse(content)))) {
+        return safeFormatDate(content);
     }
     if (typeof content === 'object' && content !== null) {
         return JSON.stringify(content, null, 2);
@@ -244,3 +245,5 @@ export default function AdminDatabasePage() {
     </div>
   );
 }
+
+    

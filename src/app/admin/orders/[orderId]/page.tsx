@@ -1,3 +1,4 @@
+
 // src/app/admin/orders/[orderId]/page.tsx
 'use client';
 
@@ -283,3 +284,5 @@ export default function AdminOrderDetailPage({ params: paramsPromise }: { params
     </div>
   );
 }
+
+    

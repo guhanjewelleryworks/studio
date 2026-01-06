@@ -1,3 +1,4 @@
+
 // src/app/admin/orders/AdminOrdersClient.tsx
 'use client';
 
@@ -11,7 +12,7 @@ import Link from 'next/link';
 import { fetchAllPlatformOrderRequests, updateOrderStatus, fetchAdminGoldsmiths } from '@/actions/goldsmith-actions';
 import type { OrderRequest, OrderRequestStatus, Goldsmith } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { useAdminAccess } from '@/hooks/useAdminAccess';
@@ -236,7 +237,7 @@ export default function AdminOrdersClient({ initialOrders = [], initialGoldsmith
                       <TableCell className="text-foreground text-xs">{getGoldsmithName(order.goldsmithId)}</TableCell>
                       <TableCell className="text-foreground text-xs max-w-[200px] truncate" title={order.itemDescription}>{order.itemDescription}</TableCell>
                       <TableCell className="text-muted-foreground text-xs">
-                        {order.requestedAt ? format(new Date(order.requestedAt), 'PPpp') : 'N/A'}
+                        {safeFormatDate(order.requestedAt)}
                       </TableCell>
                       <TableCell>
                         <Badge variant={getStatusBadgeVariant(order.status)} className="capitalize text-xs">
@@ -280,3 +281,5 @@ export default function AdminOrdersClient({ initialOrders = [], initialGoldsmith
     </div>
   );
 }
+
+    

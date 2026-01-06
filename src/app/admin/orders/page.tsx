@@ -1,3 +1,4 @@
+
 // src/app/admin/orders/page.tsx
 // Server wrapper: force dynamic and fetch fresh orders/goldsmiths on every request
 export const dynamic = 'force-dynamic';
@@ -27,8 +28,8 @@ export default async function AdminOrdersServerWrapper() {
     // pass the initial data into the client component as props
     return (
       <AdminOrdersClient
-        initialOrders={normalizedOrders}
-        initialGoldsmiths={goldsmithData || []}
+        initialOrders={JSON.parse(JSON.stringify(normalizedOrders))}
+        initialGoldsmiths={JSON.parse(JSON.stringify(goldsmithData || []))}
       />
     );
   } catch (err) {
@@ -37,3 +38,5 @@ export default async function AdminOrdersServerWrapper() {
     return <AdminOrdersClient initialOrders={[]} initialGoldsmiths={[]} />;
   }
 }
+
+    

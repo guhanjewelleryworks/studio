@@ -1,3 +1,4 @@
+
 // src/app/goldsmith-portal/orders/page.tsx
 'use client';
 
@@ -12,7 +13,7 @@ import Link from 'next/link';
 import { fetchOrdersForGoldsmith, updateOrderStatus } from '@/actions/goldsmith-actions';
 import type { OrderRequest, OrderRequestStatus } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -153,7 +154,7 @@ function GoldsmithOrdersContent() {
                         <div>
                             <CardTitle className="text-lg text-accent font-heading">{order.itemDescription}</CardTitle>
                             <CardDescription className="text-xs text-muted-foreground pt-0.5">
-                                For: {order.customerName} | Requested: {format(new Date(order.requestedAt), 'PPp')}
+                                For: {order.customerName} | Requested: {safeFormatDate(order.requestedAt)}
                             </CardDescription>
                         </div>
                         <Badge variant={getStatusBadgeVariant(order.status)} className="capitalize text-xs">
@@ -229,3 +230,5 @@ function LoadingSkeleton() {
     </div>
   );
 }
+
+    
