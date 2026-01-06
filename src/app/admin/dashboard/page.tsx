@@ -361,7 +361,11 @@ export default function AdminDashboardPage() {
                               {activity.type === 'goldsmith' && `New goldsmith '${activity.data.name}' registered. Status: ${activity.data.status}.`}
                               {activity.type === 'order' && `New order from '${activity.data.customerName}' for '${activity.data.itemDescription.substring(0, 25)}...'.`}
                             </p>
-                            <p className="text-muted-foreground/70 text-[0.65rem] mt-0.5">{formatDistanceToNow(activity.timestamp, { addSuffix: true })}</p>
+                            <p className="text-muted-foreground/70 text-[0.65rem] mt-0.5">
+                              {activity.timestamp && !isNaN(new Date(activity.timestamp).getTime())
+                                ? formatDistanceToNow(activity.timestamp, { addSuffix: true })
+                                : '—'}
+                            </p>
                         </div>
                       </li>
                     ))}
