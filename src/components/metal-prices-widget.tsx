@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Gem, TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
 import type { StoredMetalPrice } from '@/types/goldsmith';
 import { formatDistanceToNow } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 
 interface FormattedMetalPrice {
   name: string;
@@ -35,7 +36,11 @@ export const MetalPricesWidget: React.FC = () => {
   
   const calculateRelativeTime = (date: Date | null) => {
     if (!date) return 'loading...';
-    return formatDistanceToNow(date, { addSuffix: true });
+    try {
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch (e) {
+      return 'just now'; // Fallback for invalid date during formatting
+    }
   };
 
   const loadAndFormatPrices = async () => {
@@ -67,7 +72,7 @@ export const MetalPricesWidget: React.FC = () => {
             };
           });
           setMetalPrices(formatted);
-          const updateDate = new Date(storedPrices[0].updatedAt);
+          const updateDate = storedPrices[0]?.updatedAt ? new Date(storedPrices[0].updatedAt) : null;
           setLastUpdated(updateDate);
           setRelativeTime(calculateRelativeTime(updateDate));
       } else {

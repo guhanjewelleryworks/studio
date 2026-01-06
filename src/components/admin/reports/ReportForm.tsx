@@ -105,7 +105,7 @@ export function ReportForm() {
 
     // Create a dynamic, safe filename
     const safeTitle = title.toLowerCase().replace(/[^a-z0-9_]+/g, '_');
-    const fileName = `${safeTitle}_${new Date().toISOString().split('T')[0]}.csv`;
+    const fileName = `${safeTitle}_${safeFormatDate(new Date(), 'yyyy-MM-dd')}.csv`;
     link.setAttribute("download", fileName);
     
     link.style.visibility = 'hidden';
