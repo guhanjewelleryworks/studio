@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { fetchAdminCustomers } from '@/actions/customer-actions';
 import type { Customer } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { useAdminAccess } from '@/hooks/useAdminAccess';
@@ -159,10 +159,10 @@ export default function AdminCustomersPage() {
                       <TableCell className="font-medium text-foreground">{customer.name}</TableCell>
                       <TableCell className="text-muted-foreground">{customer.email}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        {customer.registeredAt ? format(new Date(customer.registeredAt), 'PPpp') : 'N/A'}
+                        {safeFormatDate(customer.registeredAt)}
                       </TableCell>
                        <TableCell className="text-muted-foreground">
-                        {customer.lastLoginAt ? format(new Date(customer.lastLoginAt), 'PPpp') : 'N/A'}
+                        {safeFormatDate(customer.lastLoginAt)}
                       </TableCell>
                     </TableRow>
                   ))}

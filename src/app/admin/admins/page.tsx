@@ -11,7 +11,7 @@ import { fetchAllAdmins, createAdmin, deleteAdmin, updateAdmin } from '@/actions
 import type { Admin, NewAdminInput, Permission, UpdateAdminInput } from '@/types/goldsmith';
 import { validPermissions } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

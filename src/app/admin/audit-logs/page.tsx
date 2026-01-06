@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { fetchAuditLogs } from '@/actions/audit-log-actions';
 import type { AuditLog } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { useAdminAccess } from '@/hooks/useAdminAccess';
@@ -204,7 +204,7 @@ export default function AdminAuditLogsPage() {
                   <TableBody>
                     {filteredLogs.map((log) => (
                       <TableRow key={log.id}>
-                        <TableCell className="whitespace-nowrap text-xs text-muted-foreground">{format(new Date(log.timestamp), 'PPpp')}</TableCell>
+                        <TableCell className="whitespace-nowrap text-xs text-muted-foreground">{safeFormatDate(log.timestamp)}</TableCell>
                         <TableCell className="whitespace-nowrap text-xs text-foreground font-mono">{log.actor.type}:{log.actor.id}</TableCell>
                         <TableCell className="text-xs text-foreground">{log.action}</TableCell>
                         <TableCell className="whitespace-pre-wrap text-xs text-muted-foreground font-mono max-w-xs break-words">

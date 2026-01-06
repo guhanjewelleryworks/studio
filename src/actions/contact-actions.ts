@@ -21,7 +21,7 @@ export async function saveContactSubmission(data: NewContactSubmission): Promise
     }
 
     const collection = await getContactSubmissionsCollection();
-    const newSubmission: ContactSubmission = {
+    const newSubmission: Omit<ContactSubmission, '_id'> = {
       id: uuidv4(),
       ...data,
       phone: data.phone.trim(),

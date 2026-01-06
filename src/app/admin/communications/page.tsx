@@ -14,7 +14,7 @@ import {
 } from '@/actions/contact-actions';
 import type { ContactSubmission } from '@/types/goldsmith';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,7 +31,7 @@ const SubmissionCard = ({ submission, onArchive, onUnarchive, isArchiving, isUna
         <CardHeader className="pb-2 pt-4 px-4">
             <div className="flex justify-between items-start">
                 <CardTitle className="text-lg text-accent">{submission.subject}</CardTitle>
-                <Badge variant="secondary" className="text-xs">{format(new Date(submission.submittedAt), 'PPpp')}</Badge>
+                <Badge variant="secondary" className="text-xs">{safeFormatDate(submission.submittedAt)}</Badge>
             </div>
             <CardDescription className="text-xs text-muted-foreground pt-1">
                 From: {submission.name} ({submission.email})

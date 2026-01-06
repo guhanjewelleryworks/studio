@@ -49,9 +49,13 @@ export async function updatePlatformSettings(data: Partial<Omit<PlatformSettings
   console.log('[Action: updatePlatformSettings] Updating settings with data:', data);
   try {
     const collection = await getSettingsCollection();
+    
+    // Add updatedAt to the data being set
+    const updateData = { ...data, updatedAt: new Date() };
+
     const result = await collection.findOneAndUpdate(
       { key: 'platform_main' },
-      { $set: data },
+      { $set: updateData },
       { upsert: true, returnDocument: 'after', projection: { _id: 0 } }
     );
     

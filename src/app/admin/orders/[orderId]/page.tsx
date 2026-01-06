@@ -13,7 +13,7 @@ import type { OrderRequest, Goldsmith, OrderRequestStatus } from '@/types/goldsm
 import { Loader2, ArrowLeft, Mail, Phone, ShoppingBag, User, CalendarDays, Edit3, Image as ImageIcon, ShieldCheck, Send, PackageCheck, Truck, CheckCircle, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
+import { safeFormatDate } from '@/lib/date';
 import { Separator } from '@/components/ui/separator';
 import NextImage from 'next/image';
 import { Label } from '@/components/ui/label'; 
@@ -176,7 +176,7 @@ export default function AdminOrderDetailPage({ params: paramsPromise }: { params
             <CardHeader className="pb-4">
               <CardTitle className="text-xl text-accent font-heading">{order.itemDescription}</CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                Order ID: {order.id} | Placed on: {format(new Date(order.requestedAt), 'PPp')}
+                Order ID: {order.id} | Placed on: {safeFormatDate(order.requestedAt)}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -212,7 +212,7 @@ export default function AdminOrderDetailPage({ params: paramsPromise }: { params
               )}
             </CardContent>
              <CardFooter className="pt-4 flex-col items-start gap-3">
-               <p className="text-xs text-muted-foreground">Last Updated: {format(new Date(order.updatedAt), 'PPp')}</p>
+               <p className="text-xs text-muted-foreground">Last Updated: {safeFormatDate(order.updatedAt)}</p>
                 <div>
                     <Label htmlFor="order-status" className="text-sm font-semibold text-foreground mb-1.5 block">Update Order Status:</Label>
                     <div className="flex items-center gap-2">

@@ -48,6 +48,7 @@ async function seedDefaultAdmin(credentials: Pick<NewAdminInput, 'email' | 'pass
         role: 'superadmin',
         permissions: [...validPermissions], // Superadmin gets all permissions
         createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       const result = await collection.insertOne(newAdmin);
@@ -121,6 +122,7 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
         role: adminUser.role,
         permissions: finalPermissions, // Use the corrected permissions
         createdAt: adminUser.createdAt instanceof Date ? adminUser.createdAt.toISOString() : adminUser.createdAt,
+        updatedAt: adminUser.updatedAt instanceof Date ? adminUser.updatedAt.toISOString() : adminUser.updatedAt,
       };
 
       return { success: true, message: 'Login successful!', admin: adminDataToReturn as any };
@@ -166,6 +168,7 @@ export async function createAdmin(data: NewAdminInput): Promise<{ success: boole
             role: role,
             permissions: finalPermissions,
             createdAt: new Date(),
+            updatedAt: new Date(),
         };
 
         await collection.insertOne(newAdmin);
@@ -206,7 +209,7 @@ export async function updateAdmin(data: UpdateAdminInput): Promise<{ success: bo
         
         const result = await collection.updateOne(
             { id: data.id },
-            { $set: { name: data.name, permissions: data.permissions, role: newRole } }
+            { $set: { name: data.name, permissions: data.permissions, role: newRole, updatedAt: new Date() } }
         );
 
         if (result.modifiedCount > 0) {

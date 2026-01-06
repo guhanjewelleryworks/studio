@@ -73,7 +73,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
     const hashedPassword = await bcrypt.hash(data.password.trim(), SALT_ROUNDS);
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
-    const newGoldsmith: Goldsmith = {
+    const newGoldsmith: Omit<Goldsmith, '_id'> = {
       id: uuidv4(),
       name: data.name.trim(),
       contactPerson: data.contactPerson?.trim() || '',
@@ -97,6 +97,7 @@ export async function saveGoldsmith(data: NewGoldsmithInput): Promise<{ success:
       portfolioImages: [],
       status: 'pending_email_verification',
       registeredAt: new Date(),
+      updatedAt: new Date(),
       emailVerified: null,
       verificationToken,
     };
@@ -162,7 +163,7 @@ export async function verifyGoldsmithEmail(token: string): Promise<{ success: bo
 
     const result = await collection.updateOne(
       { _id: goldsmith._id },
-      { $set: { emailVerified: new Date(), status: 'pending_verification' }, $unset: { verificationToken: "" } }
+      { $set: { emailVerified: new Date(), status: 'pending_verification', updatedAt: new Date() }, $unset: { verificationToken: "" } }
     );
 
     if (result.modifiedCount > 0) {
@@ -255,7 +256,7 @@ export async function updateGoldsmithStatus(id: string, newStatus: Goldsmith['st
     const collection = await getGoldsmithsCollection();
     const result = await collection.updateOne(
       { id: id },
-      { $set: { status: newStatus } }
+      { $set: { status: newStatus, updatedAt: new Date() } }
     );
 
     if (result.modifiedCount === 1) {
@@ -353,7 +354,7 @@ export async function loginGoldsmith(credentials: Pick<NewGoldsmithInput, 'email
 
     const collection = await getGoldsmithsCollection();
     const newLastLoginAt = new Date();
-    await collection.updateOne({ id: goldsmith.id }, { $set: { lastLoginAt: newLastLoginAt } });
+    await collection.updateOne({ id: goldsmith.id }, { $set: { lastLoginAt: newLastLoginAt, updatedAt: newLastLoginAt } });
     
     logAuditEvent(
       'Goldsmith successful login',
@@ -602,6 +603,7 @@ export async function updateGoldsmithProfile(
         return { success: false, error: "No valid data provided to update." };
     }
 
+    updateData.updatedAt = new Date(); // Always update the timestamp
 
     const result = await collection.findOneAndUpdate(
       { id: id },
@@ -650,7 +652,10 @@ export async function addGoldsmithPortfolioImage(
 
     const result = await collection.findOneAndUpdate(
       { id: goldsmithId },
-      { $push: { portfolioImages: imageDataUri } },
+      { 
+        $push: { portfolioImages: imageDataUri },
+        $set: { updatedAt: new Date() }
+      },
       { returnDocument: 'after', projection: { password: 0 } } // Exclude password from result
     );
 
@@ -680,7 +685,10 @@ export async function deleteGoldsmithPortfolioImage(
     const collection = await getGoldsmithsCollection();
     const result = await collection.findOneAndUpdate(
       { id: goldsmithId },
-      { $pull: { portfolioImages: imageUrlToDelete } },
+      { 
+        $pull: { portfolioImages: imageUrlToDelete },
+        $set: { updatedAt: new Date() }
+      },
       { returnDocument: 'after', projection: { password: 0 } } // Exclude password from result
     );
 
@@ -747,7 +755,7 @@ export async function updateGoldsmithProfileImage(
     const collection = await getGoldsmithsCollection();
     const result = await collection.findOneAndUpdate(
       { id: goldsmithId },
-      { $set: { profileImageUrl: profileImageDataUri } },
+      { $set: { profileImageUrl: profileImageDataUri, updatedAt: new Date() } },
       { returnDocument: 'after', projection: { password: 0 } }
     );
 
@@ -804,7 +812,7 @@ export async function changeGoldsmithPassword(goldsmithId: string, currentPasswo
     const newHashedPassword = await bcrypt.hash(newPasswordInput.trim(), SALT_ROUNDS);
     const result = await collection.updateOne(
       { id: goldsmithId },
-      { $set: { password: newHashedPassword } }
+      { $set: { password: newHashedPassword, updatedAt: new Date() } }
     );
 
     if (result.modifiedCount === 1) {
@@ -839,7 +847,7 @@ export async function requestGoldsmithPasswordReset(email: string): Promise<{ su
 
     await collection.updateOne(
       { _id: goldsmith._id },
-      { $set: { passwordResetToken: resetToken, passwordResetTokenExpires } }
+      { $set: { passwordResetToken: resetToken, passwordResetTokenExpires, updatedAt: new Date() } }
     );
     
     await sendGoldsmithPasswordResetEmail(goldsmith.email, resetToken);
@@ -884,7 +892,7 @@ export async function resetGoldsmithPasswordWithToken(token: string, newPassword
     const result = await collection.updateOne(
       { _id: goldsmith._id },
       {
-        $set: { password: newHashedPassword },
+        $set: { password: newHashedPassword, updatedAt: new Date() },
         $unset: { passwordResetToken: "", passwordResetTokenExpires: "" }
       }
     );

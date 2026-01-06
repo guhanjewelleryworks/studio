@@ -14,7 +14,7 @@ import { revalidatePath } from 'next/cache';
 export async function createAdminNotification(data: Omit<AdminNotification, 'id' | 'isRead' | 'createdAt' | '_id'>) {
     try {
         const collection = await getNotificationsCollection();
-        const newNotification: AdminNotification = {
+        const newNotification: Omit<AdminNotification, '_id'> = {
             ...data,
             id: uuidv4(),
             isRead: false,

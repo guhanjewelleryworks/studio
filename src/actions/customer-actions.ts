@@ -83,6 +83,7 @@ export async function saveCustomer(data: NewCustomerInput): Promise<{ success: b
       password: hashedPassword,
       authProvider: 'credentials',
       registeredAt: new Date(),
+      updatedAt: new Date(),
       lastLoginAt: undefined, 
       emailVerified: null,
       verificationToken: verificationToken,
@@ -139,7 +140,7 @@ export async function verifyEmail(token: string): Promise<{ success: boolean; me
 
     const result = await collection.updateOne(
       { _id: customer._id },
-      { $set: { emailVerified: new Date() }, $unset: { verificationToken: "" } }
+      { $set: { emailVerified: new Date(), updatedAt: new Date() }, $unset: { verificationToken: "" } }
     );
 
     if (result.modifiedCount > 0) {
@@ -282,7 +283,7 @@ export async function updateCustomerProfile(id: string, data: { name?: string })
 
     const result = await collection.findOneAndUpdate(
       filter,
-      { $set: { name: data.name.trim() } },
+      { $set: { name: data.name.trim(), updatedAt: new Date() } },
       { returnDocument: 'after', projection: { password: 0, _id: 0 } }
     );
 
@@ -335,7 +336,7 @@ export async function changeCustomerPassword(customerId: string, currentPassword
     const newHashedPassword = await bcrypt.hash(newPasswordInput.trim(), SALT_ROUNDS);
     const result = await collection.updateOne(
       { _id: customer._id }, // Always update using the unique _id
-      { $set: { password: newHashedPassword } }
+      { $set: { password: newHashedPassword, updatedAt: new Date() } }
     );
 
     if (result.modifiedCount === 1) {
@@ -404,7 +405,7 @@ export async function requestCustomerPasswordReset(email: string): Promise<{ suc
 
     await collection.updateOne(
       { _id: customer._id },
-      { $set: { passwordResetToken: resetToken, passwordResetTokenExpires } }
+      { $set: { passwordResetToken: resetToken, passwordResetTokenExpires, updatedAt: new Date() } }
     );
     
     // Send the actual password reset email
@@ -450,7 +451,7 @@ export async function resetCustomerPasswordWithToken(token: string, newPassword:
     const result = await collection.updateOne(
       { _id: customer._id },
       {
-        $set: { password: newHashedPassword },
+        $set: { password: newHashedPassword, updatedAt: new Date() },
         $unset: { passwordResetToken: "", passwordResetTokenExpires: "" }
       }
     );
@@ -505,6 +506,7 @@ export async function deleteCustomer(customerId: string): Promise<{ success: boo
           emailHash: emailHash, // Add the hash of the original email
           isDeleted: true,
           deletedAt: new Date(),
+          updatedAt: new Date(),
         },
         $unset: {
           password: "",
