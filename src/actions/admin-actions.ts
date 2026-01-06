@@ -115,14 +115,14 @@ export async function loginAdmin(credentials: Pick<NewAdminInput, 'email' | 'pas
       }
 
       // Manually create a plain object to avoid serialization errors
-      const adminDataToReturn = {
+      const adminDataToReturn: Omit<Admin, 'password' | '_id'> = {
         id: adminUser.id,
         name: adminUser.name,
         email: adminUser.email,
         role: adminUser.role,
         permissions: finalPermissions, // Use the corrected permissions
-        createdAt: adminUser.createdAt instanceof Date ? adminUser.createdAt.toISOString() : adminUser.createdAt,
-        updatedAt: adminUser.updatedAt instanceof Date ? adminUser.updatedAt.toISOString() : adminUser.updatedAt,
+        createdAt: adminUser.createdAt,
+        updatedAt: adminUser.updatedAt,
       };
 
       return { success: true, message: 'Login successful!', admin: adminDataToReturn as any };

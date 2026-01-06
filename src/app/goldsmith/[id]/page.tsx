@@ -27,6 +27,7 @@ interface PageParams {
 
 const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id: string): GoldsmithProfileType | null => {
   if (!profile) return null;
+  const registeredAt = profile.registeredAt ?? new Date();
   return {
     id: profile.id || id,
     name: profile.name || "Goldsmith Name Not Available",
@@ -52,7 +53,8 @@ const ensureCompleteProfile = (profile: Partial<GoldsmithProfileType> | null, id
     phone: profile.phone || 'N/A',
     emailVerified: profile.emailVerified ?? null,
     verificationToken: profile.verificationToken || null,
-    registeredAt: profile.registeredAt ?? new Date(),
+    registeredAt: registeredAt,
+    updatedAt: profile.updatedAt ?? registeredAt,
     // Ensure password is not part of the returned object
   };
 };
