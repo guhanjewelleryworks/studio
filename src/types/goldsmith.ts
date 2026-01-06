@@ -1,3 +1,4 @@
+
 // src/types/goldsmith.ts
 import type { Location } from '@/services/geolocation';
 import type { ObjectId } from 'mongodb';
@@ -28,6 +29,7 @@ export interface Goldsmith {
   password?: string; 
   status: 'pending_email_verification' | 'pending_verification' | 'verified' | 'rejected';
   registeredAt: Date; // Added for tracking registration time
+  updatedAt: Date; // Added for consistency
   lastLoginAt?: Date; // Added for tracking login time
   emailVerified: Date | null;
   verificationToken: string | null;
@@ -53,6 +55,7 @@ export type NewGoldsmithInput = Omit<
   | 'profileViews'
   | 'status'
   | 'registeredAt' // Exclude from input, will be set by server
+  | 'updatedAt'
   | 'lastLoginAt'
   | 'emailVerified'
   | 'verificationToken'
@@ -103,6 +106,7 @@ export interface Customer {
   password?: string; // For app-specific auth, hashed in DB
   authProvider?: 'credentials' | 'google'; // To track how user was created
   registeredAt: Date;
+  updatedAt: Date;
   lastLoginAt?: Date;
   emailVerified: Date | null;
   verificationToken: string | null;
@@ -113,7 +117,7 @@ export interface Customer {
   emailHash?: string; // For preventing re-registration of deleted emails
 }
 
-export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken' | 'passwordResetToken' | 'passwordResetTokenExpires' | 'isDeleted' | 'deletedAt' | 'emailHash' | 'authProvider'>;
+export type NewCustomerInput = Omit<Customer, '_id' | 'id' | 'image' | 'registeredAt' | 'updatedAt' | 'lastLoginAt' | 'emailVerified' | 'verificationToken' | 'passwordResetToken' | 'passwordResetTokenExpires' | 'isDeleted' | 'deletedAt' | 'emailHash' | 'authProvider'>;
 
 
 // --- Admin Type ---
@@ -140,9 +144,10 @@ export interface Admin {
   role: 'superadmin' | 'admin';
   permissions: Permission[];
   createdAt: Date;
+  updatedAt: Date;
 }
 
-export type NewAdminInput = Omit<Admin, '_id' | 'id' | 'createdAt' | 'role'>;
+export type NewAdminInput = Omit<Admin, '_id' | 'id' | 'createdAt' | 'updatedAt' | 'role'>;
 
 export type UpdateAdminInput = {
     id: string;
